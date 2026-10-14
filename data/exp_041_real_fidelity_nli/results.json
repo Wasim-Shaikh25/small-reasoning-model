@@ -1,0 +1,32 @@
+{
+  "id": "EXP-041",
+  "title": "Fidelity bidirectional-NLI rerun with the real DeBERTa-v3 MNLI checkpoint",
+  "status": "closed",
+  "goal": "Re-measure EXP-017's bidirectional-NLI fidelity check with MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli in place of the lexical judge.",
+  "method": "The same claims and paragraphs EXP-017 used, run once each through the identity-copy renderer (whitespace normalization only, no paraphrase -- the renderer does not generate text). lab.common.real_encoders.real_bidirectional_nli replaces lab.common.verify.bidirectional_nli: same forward/backward entailment-threshold structure, scored by the real MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli checkpoint instead of the lexical judge.",
+  "metrics": {
+    "model": "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli",
+    "renders": 13,
+    "bidirectional_nli_pass_rate": 1.0,
+    "generator_used": false,
+    "vs_exp_017_lexical_judge": {
+      "exp_017_bidirectional_nli_pass_rate": 1.0,
+      "exp_041_bidirectional_nli_pass_rate": 1.0
+    }
+  },
+  "results_prose": "On the same 13 claim and paragraph renders EXP-017 used (restricted to the 'memo' style's identity copy, since the renderer does not paraphrase), MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli scores bidirectional entailment pass rate 1.0. EXP-017's lexical judge scored 1.0 on a larger, 5-style sweep over the same source text.",
+  "conclusion": "The real MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli checkpoint is loaded and measured for this fidelity check, not assumed. The renderer itself is still deterministic copy, not a generative rewriter -- this rerun only changes which model verifies that the copy preserved meaning, not what produced the copy.",
+  "scale_down": "13 renders (8 claims, 5 paragraphs), one style each, versus EXP-017's 5-style x 13-item sweep.",
+  "referenced_files": [
+    "lab/exp_041_real_fidelity_nli/run.py",
+    "lab/common/real_encoders.py",
+    "lab/common/harness.py",
+    "lab/common/verify.py",
+    "data/exp_017_fidelity/results.json",
+    "data/exp_041_real_fidelity_nli/results.json"
+  ],
+  "follow_ups": [],
+  "elapsed_sec": 1187.3176,
+  "peak_rss_mb": 642.13,
+  "models_used": "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli, a local checkpoint loaded with transformers (not an API call). Rewriter role is out of scope for this rerun; the renderer stays the unchanged deterministic copy."
+}

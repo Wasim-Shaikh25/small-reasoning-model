@@ -1,0 +1,117 @@
+{
+  "id": "EXP-040",
+  "title": "Paged retrieval needle recall with the real bge-small-en-v1.5 embedder",
+  "status": "closed",
+  "goal": "Re-measure EXP-015's needle-recall-at-5 with bge-small-en-v1.5 as the dense leg of the hybrid retriever, in place of TF-IDF, on the identical haystacks.",
+  "method": "Identical to EXP-015's needle_recall: a distinctive sentence (a 5-digit quorum code) is planted at the midpoint of an otherwise uniform haystack of 10, 100, and 1000 short pages. lab.common.real_bge_index.RealBgeIndex replaces lab.common.index.Index: same BM25 sparse leg and 0.5/0.5 blend, but the dense leg embeds every page and the query with the real bge-small-en-v1.5 checkpoint (sentence-transformers, loaded locally, not an API call) instead of TfidfVectorizer cosine.",
+  "metrics": {
+    "model": "BAAI/bge-small-en-v1.5",
+    "needle_recall": [
+      {
+        "pages": 10,
+        "recall_at_5": 1.0,
+        "top": [
+          "PG0005",
+          "PG0000",
+          "PG0001"
+        ]
+      },
+      {
+        "pages": 100,
+        "recall_at_5": 1.0,
+        "top": [
+          "PG0050",
+          "PG0078",
+          "PG0023"
+        ]
+      },
+      {
+        "pages": 1000,
+        "recall_at_5": 1.0,
+        "top": [
+          "PG0500",
+          "PG0219",
+          "PG0406"
+        ]
+      }
+    ],
+    "vs_exp_015_tfidf": {
+      "exp_015_needle_recall": [
+        {
+          "pages": 10,
+          "recall_at_5": 1.0,
+          "top": [
+            "PG0005",
+            "PG0000",
+            "PG0001"
+          ]
+        },
+        {
+          "pages": 100,
+          "recall_at_5": 1.0,
+          "top": [
+            "PG0050",
+            "PG0000",
+            "PG0001"
+          ]
+        },
+        {
+          "pages": 1000,
+          "recall_at_5": 1.0,
+          "top": [
+            "PG0500",
+            "PG0000",
+            "PG0001"
+          ]
+        }
+      ],
+      "exp_040_needle_recall": [
+        {
+          "pages": 10,
+          "recall_at_5": 1.0,
+          "top": [
+            "PG0005",
+            "PG0000",
+            "PG0001"
+          ]
+        },
+        {
+          "pages": 100,
+          "recall_at_5": 1.0,
+          "top": [
+            "PG0050",
+            "PG0078",
+            "PG0023"
+          ]
+        },
+        {
+          "pages": 1000,
+          "recall_at_5": 1.0,
+          "top": [
+            "PG0500",
+            "PG0219",
+            "PG0406"
+          ]
+        }
+      ]
+    }
+  },
+  "results_prose": "Needle Recall@5 at 10, 100, and 1000 pages with BAAI/bge-small-en-v1.5 as the dense leg: [{'pages': 10, 'recall_at_5': 1.0, 'top': ['PG0005', 'PG0000', 'PG0001']}, {'pages': 100, 'recall_at_5': 1.0, 'top': ['PG0050', 'PG0078', 'PG0023']}, {'pages': 1000, 'recall_at_5': 1.0, 'top': ['PG0500', 'PG0219', 'PG0406']}]. EXP-015's TF-IDF dense leg scored: [{'pages': 10, 'recall_at_5': 1.0, 'top': ['PG0005', 'PG0000', 'PG0001']}, {'pages': 100, 'recall_at_5': 1.0, 'top': ['PG0050', 'PG0000', 'PG0001']}, {'pages': 1000, 'recall_at_5': 1.0, 'top': ['PG0500', 'PG0000', 'PG0001']}].",
+  "conclusion": "The real BAAI/bge-small-en-v1.5 checkpoint is loaded and measured, not assumed. Recall matches EXP-015's TF-IDF dense leg at every size tested here -- a single distinctive numeric needle sentence is easy for both a lexical and a dense retriever to find in this synthetic haystack, so this fixture does not yet distinguish them. A harder retrieval probe (paraphrased needle, no shared surface tokens with the query) would be needed to see where a real dense embedder pulls ahead of TF-IDF, the way EXP-029's harder headline-retrieval test did for spaCy vectors.",
+  "scale_down": "Pages are short synthetic paragraphs, not scanned document pages, same as EXP-015. 1,000 pages were run, not a multi-million-token archive.",
+  "referenced_files": [
+    "lab/exp_040_real_paged_retrieval/run.py",
+    "lab/common/real_bge_index.py",
+    "lab/common/real_encoders.py",
+    "lab/common/index.py",
+    "lab/common/harness.py",
+    "data/exp_015_paged_memory/results.json",
+    "data/exp_040_real_paged_retrieval/results.json"
+  ],
+  "follow_ups": [
+    "A harder retrieval probe where the needle doesn't share surface tokens with the query would better separate bge from TF-IDF than this fixture does."
+  ],
+  "elapsed_sec": 18.3648,
+  "peak_rss_mb": 545.38,
+  "models_used": "BAAI/bge-small-en-v1.5, a local checkpoint loaded with sentence-transformers (not an API call). This is the real blueprint embedder (ARCHITECTURE.md section 8), not a substitute and not the spaCy static vectors EXP-029/032 used while huggingface.co was blocked."
+}

@@ -1,0 +1,55 @@
+{
+  "id": "EXP-031",
+  "title": "NLI judge rerun with the real DeBERTa-v3 MNLI checkpoint",
+  "status": "closed",
+  "goal": "Re-measure EXP-006 with MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli in place of the lexical judge, on the identical items, so the two are directly comparable.",
+  "method": "Identical to EXP-006: 30 premise/span pairs, each turned into a hypothesis by 3 templates, scored for entail/neutral/contradict. The only change is the scoring function: lab.common.nli.judge (lexical coverage, number mismatch, polarity) is replaced by lab.common.real_encoders.real_nli, which runs the premise and hypothesis through the real MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli checkpoint (loaded locally with transformers, not an API call) and sums its entailment/neutral/contradiction probabilities under the checkpoint's own label names.",
+  "metrics": {
+    "model": "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli",
+    "n_base_items": 30,
+    "template_accuracy": {
+      "T1": 0.7333,
+      "T2": 0.7667,
+      "T3": 0.7333
+    },
+    "best_template": "T2",
+    "accuracy_by_category_best_template": {
+      "exception": 0.0,
+      "negation": 1.0,
+      "neutral": 1.0,
+      "number": 1.0,
+      "supported": 0.875
+    },
+    "negation_accuracy": 1.0,
+    "exception_accuracy": 0.0,
+    "number_conflict_accuracy": 1.0,
+    "vs_exp_006_lexical_judge": {
+      "exp_006_best_template_accuracy": 0.7667,
+      "exp_031_best_template_accuracy": 0.7667,
+      "exp_006_negation_accuracy": 1.0,
+      "exp_031_negation_accuracy": 1.0,
+      "exp_006_exception_accuracy": 0.0,
+      "exp_031_exception_accuracy": 0.0,
+      "exp_006_number_conflict_accuracy": 1.0,
+      "exp_031_number_conflict_accuracy": 1.0
+    }
+  },
+  "results_prose": "On the same 30 premise/span pairs and 3 templates EXP-006 used, MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli scores {'T1': 0.7333, 'T2': 0.7667, 'T3': 0.7333} by template (best: T2). On that template: number conflicts 1.0, negation 1.0, exception/qualification probes 0.0. EXP-006's lexical judge scored exception accuracy 0.0 and negation 1.0 on the identical items.",
+  "conclusion": "The real MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli checkpoint is loaded and measured on EXP-006's own items, not assumed from its training data description. It does not close the exception/qualification gap EXP-006 flagged: accuracy on that category is 0.0 here versus 0.0 for the lexical judge, so EXP-026's code-rule todo for except/unless/provided-that remains relevant even with a real NLI encoder.",
+  "scale_down": "Same 30 hand-written pairs EXP-006 used, not the full MNLI/ANLI/ContractNLI dev sets.",
+  "referenced_files": [
+    "lab/exp_031_real_nli_judge/run.py",
+    "lab/common/real_encoders.py",
+    "lab/common/nli.py",
+    "lab/common/harness.py",
+    "data/exp_006_nli_judge/results.json",
+    "data/exp_031_real_nli_judge/items.json",
+    "data/exp_031_real_nli_judge/results.json"
+  ],
+  "follow_ups": [
+    "Rerun EXP-012's support re-check and EXP-017's bidirectional-NLI fidelity gate with this same real_nli function (EXP-037, EXP-041) now that it is proven to load and score correctly."
+  ],
+  "elapsed_sec": 1083.884,
+  "peak_rss_mb": 641.46,
+  "models_used": "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli, a local checkpoint loaded with transformers (not an API call). This is the real blueprint NLI judge (ARCHITECTURE.md section 8), not a substitute. It is never used to write answer text, only to score entail/neutral/contradict for a premise/hypothesis pair."
+}

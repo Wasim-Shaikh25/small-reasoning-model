@@ -1,0 +1,223 @@
+[
+  {
+    "source": "The notice period is 30 days.",
+    "output": "The notice period is 30 days.",
+    "nli": {
+      "forward": {
+        "entail": 0.9962,
+        "neutral": 0.0031,
+        "contradict": 0.0007
+      },
+      "backward": {
+        "entail": 0.9962,
+        "neutral": 0.0031,
+        "contradict": 0.0007
+      },
+      "ok": true
+    }
+  },
+  {
+    "source": "The security deposit is INR 50000.",
+    "output": "The security deposit is INR 50000.",
+    "nli": {
+      "forward": {
+        "entail": 0.996,
+        "neutral": 0.0033,
+        "contradict": 0.0007
+      },
+      "backward": {
+        "entail": 0.996,
+        "neutral": 0.0033,
+        "contradict": 0.0007
+      },
+      "ok": true
+    }
+  },
+  {
+    "source": "Ravi Sharma is the Lessee.",
+    "output": "Ravi Sharma is the Lessee.",
+    "nli": {
+      "forward": {
+        "entail": 0.9962,
+        "neutral": 0.0031,
+        "contradict": 0.0006
+      },
+      "backward": {
+        "entail": 0.9962,
+        "neutral": 0.0031,
+        "contradict": 0.0006
+      },
+      "ok": true
+    }
+  },
+  {
+    "source": "The lease was signed on 5 January 2024.",
+    "output": "The lease was signed on 5 January 2024.",
+    "nli": {
+      "forward": {
+        "entail": 0.9976,
+        "neutral": 0.002,
+        "contradict": 0.0004
+      },
+      "backward": {
+        "entail": 0.9976,
+        "neutral": 0.002,
+        "contradict": 0.0004
+      },
+      "ok": true
+    }
+  },
+  {
+    "source": "The tenant shall not sublet unless the Lessor consents.",
+    "output": "The tenant shall not sublet unless the Lessor consents.",
+    "nli": {
+      "forward": {
+        "entail": 0.9969,
+        "neutral": 0.0024,
+        "contradict": 0.0006
+      },
+      "backward": {
+        "entail": 0.9969,
+        "neutral": 0.0024,
+        "contradict": 0.0006
+      },
+      "ok": true
+    }
+  },
+  {
+    "source": "The rent is INR 25000.",
+    "output": "The rent is INR 25000.",
+    "nli": {
+      "forward": {
+        "entail": 0.9965,
+        "neutral": 0.0029,
+        "contradict": 0.0006
+      },
+      "backward": {
+        "entail": 0.9965,
+        "neutral": 0.0029,
+        "contradict": 0.0006
+      },
+      "ok": true
+    }
+  },
+  {
+    "source": "The cure period is 10 days.",
+    "output": "The cure period is 10 days.",
+    "nli": {
+      "forward": {
+        "entail": 0.9957,
+        "neutral": 0.0036,
+        "contradict": 0.0007
+      },
+      "backward": {
+        "entail": 0.9957,
+        "neutral": 0.0036,
+        "contradict": 0.0007
+      },
+      "ok": true
+    }
+  },
+  {
+    "source": "ABC Pvt Ltd is the Lessor.",
+    "output": "ABC Pvt Ltd is the Lessor.",
+    "nli": {
+      "forward": {
+        "entail": 0.9976,
+        "neutral": 0.0019,
+        "contradict": 0.0005
+      },
+      "backward": {
+        "entail": 0.9976,
+        "neutral": 0.0019,
+        "contradict": 0.0005
+      },
+      "ok": true
+    }
+  },
+  {
+    "source": "The tenant shall pay INR 25000 on the 1st of each month and shall not withhold rent.",
+    "output": "The tenant shall pay INR 25000 on the 1st of each month and shall not withhold rent.",
+    "nli": {
+      "forward": {
+        "entail": 0.9962,
+        "neutral": 0.0032,
+        "contradict": 0.0007
+      },
+      "backward": {
+        "entail": 0.9962,
+        "neutral": 0.0032,
+        "contradict": 0.0007
+      },
+      "ok": true
+    }
+  },
+  {
+    "source": "Notice of 30 days must be given except where the premises are destroyed.",
+    "output": "Notice of 30 days must be given except where the premises are destroyed.",
+    "nli": {
+      "forward": {
+        "entail": 0.9908,
+        "neutral": 0.0072,
+        "contradict": 0.0021
+      },
+      "backward": {
+        "entail": 0.9908,
+        "neutral": 0.0072,
+        "contradict": 0.0021
+      },
+      "ok": true
+    }
+  },
+  {
+    "source": "Meera Iyer signed on 5 January 2024 in the presence of the witness.",
+    "output": "Meera Iyer signed on 5 January 2024 in the presence of the witness.",
+    "nli": {
+      "forward": {
+        "entail": 0.9943,
+        "neutral": 0.0048,
+        "contradict": 0.0009
+      },
+      "backward": {
+        "entail": 0.9943,
+        "neutral": 0.0048,
+        "contradict": 0.0009
+      },
+      "ok": true
+    }
+  },
+  {
+    "source": "The deposit of INR 50000 is held until 14 days after the handover.",
+    "output": "The deposit of INR 50000 is held until 14 days after the handover.",
+    "nli": {
+      "forward": {
+        "entail": 0.9942,
+        "neutral": 0.0048,
+        "contradict": 0.001
+      },
+      "backward": {
+        "entail": 0.9942,
+        "neutral": 0.0048,
+        "contradict": 0.001
+      },
+      "ok": true
+    }
+  },
+  {
+    "source": "Entry is permitted only between 09:00 and 18:00.",
+    "output": "Entry is permitted only between 09:00 and 18:00.",
+    "nli": {
+      "forward": {
+        "entail": 0.9943,
+        "neutral": 0.0046,
+        "contradict": 0.0011
+      },
+      "backward": {
+        "entail": 0.9943,
+        "neutral": 0.0046,
+        "contradict": 0.0011
+      },
+      "ok": true
+    }
+  }
+]

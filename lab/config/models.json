@@ -29,10 +29,20 @@
     "required_guardrail": "every rewrite must pass the fidelity check (numbers/dates/names preserved, modals unchanged, bidirectional entailment, citations preserved) or fall back to the unchanged lab/common/assemble.py output"
   },
   "real_model_reruns": {
-    "note": "EXP-025, EXP-029, EXP-032, and EXP-033 only. Every other exploration above still ran the classical substitutes in 'substitutes'.",
-    "huggingface_co_blocked": "This sandbox's egress policy denies huggingface.co (403 CONNECT, policy denial), so bge-small-en-v1.5, DeBERTa-v3, and GLiNER cannot be downloaded here. See lab/common/real_models.py.",
-    "embeddings": "spaCy en_core_web_md static word vectors (GloVe-style, real pretrained, not downloaded from huggingface.co) in place of TF-IDF, for EXP-029 and EXP-032's dense retrieval leg",
-    "entity_tagging": "spaCy en_core_web_sm NER (CNN tagger trained on OntoNotes 5, real pretrained) in place of the rule tagger, for EXP-032 and EXP-033",
-    "not_the_blueprint_checkpoint": "spaCy's pipelines are real, reachable, non-generative pretrained models, but they are not bge-small-en-v1.5, deepset/deberta-v3-base-squad2, or GLiNER. Do not cite EXP-029/032/033 numbers as bge, DeBERTa, or GLiNER results."
+    "note": "EXP-025, EXP-029, EXP-032, EXP-033: spaCy real-pretrained substitutes, from when huggingface.co was blocked (see spaCy sub-block below). EXP-030, EXP-031, EXP-038, EXP-039, EXP-040, EXP-042: the actual blueprint checkpoints, loaded directly, now that huggingface.co is reachable from this machine. Every other exploration still runs the classical substitutes in 'substitutes'.",
+    "huggingface_co_reachable_here": "On this machine huggingface.co is reachable (unlike the earlier cloud sandbox this project started in), so bge-small-en-v1.5, deepset/deberta-v3-base-squad2, and MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli are loaded directly. See lab/common/real_encoders.py.",
+    "real_blueprint_checkpoints_loaded": {
+      "bge-small-en-v1.5": "dense retrieval leg, in place of TF-IDF cosine (EXP-040 paged retrieval, EXP-042 repetition detection); sentence-transformers, local, not an API call",
+      "deepset/deberta-v3-base-squad2": "extractive QA, in place of the lexical extractors (EXP-030, EXP-038, EXP-039); transformers, local, not an API call",
+      "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli": "NLI judge, in place of the lexical judge (EXP-031, EXP-041); transformers, local, not an API call",
+      "dslim/bert-base-NER": "named-entity tagging, in place of the rule tagger; loaded in lab/common/real_encoders.py but not yet wired into a closed exploration (EXP-034 needs more than a model swap, see below)",
+      "gliner": "named by the blueprint for NER alongside dslim/bert-base-NER; the `gliner` package is not installed in this environment, so GLiNER itself is not loaded -- dslim/bert-base-NER is the real checkpoint measured instead"
+    },
+    "entity_resolution_not_yet_rerun": "EXP-034 (entity resolution with real NER + bge) is still todo: lab/common/entities.py's resolution loop is built around rule-tagger-specific labels (defined term, address, amount) that dslim/bert-base-NER's PER/ORG/LOC/MISC don't map onto directly, so this is a real integration task, not a drop-in swap.",
+    "spacy_substitutes_still_in_use": {
+      "embeddings": "spaCy en_core_web_md static word vectors (GloVe-style, real pretrained) in place of TF-IDF, for EXP-029 and EXP-032's dense retrieval leg -- not re-run with bge, since EXP-040/042 already measure bge directly on different fixtures",
+      "entity_tagging": "spaCy en_core_web_sm NER (CNN tagger trained on OntoNotes 5, real pretrained) in place of the rule tagger, for EXP-032 and EXP-033"
+    },
+    "not_the_blueprint_checkpoint": "spaCy's pipelines are real, reachable, non-generative pretrained models, but they are not bge-small-en-v1.5, deepset/deberta-v3-base-squad2, or GLiNER. Do not cite EXP-029/032/033 numbers as bge, DeBERTa, or GLiNER results -- EXP-030/031/038/039/040/042 are the actual blueprint-checkpoint numbers."
   }
 }

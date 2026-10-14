@@ -440,6 +440,144 @@ TODOS = [
         "conclusion": "Todo. This stays a deterministic checker.",
         "scale_down": "",
     },
+    {
+        "id": "EXP-049",
+        "title": "Per-word relevance and grammaticality scoring for the ask pipeline",
+        "status": "todo",
+        "goal": (
+            "Score each content word in a candidate sentence for (a) relevance to the ask -- token/lemma "
+            "overlap and salience against the ask's content terms -- and (b) local grammatical well-"
+            "formedness -- subject/verb/object intact, not a sentence fragment -- before a sentence is "
+            "allowed into the shortlist that feeds extraction. This is the first stage of the word-by-word "
+            "relevance cascade: chunk the prompt, then check every nearby word's relevance and grammar "
+            "before deciding how to use the sentence."
+        ),
+        "method": "Not run.",
+        "models_used": (
+            "spaCy's dependency parser (already a dependency via lab/common/real_models.py, non-generative) "
+            "for the grammaticality signal; lab/common/textutil's content_tokens/coverage for the ask-"
+            "relevance signal. No generative model, no new checkpoint."
+        ),
+        "referenced_files": [
+            "lab/common/textutil.py",
+            "lab/common/real_models.py",
+            "lab/common/ask.py",
+            "lab/common/qa.py",
+            "ARCHITECTURE.md",
+            "AGENT.md",
+        ],
+        "results_prose": "Not run.",
+        "conclusion": "Todo. Feeds the shortlisting step EXP-051 marks with a role, once this scoring exists.",
+        "scale_down": "",
+    },
+    {
+        "id": "EXP-050",
+        "title": "Neighbor-sentence coherence check for page-wise assembly",
+        "status": "todo",
+        "goal": (
+            "Before a sentence is placed into an outline leaf (lab/common/assemble.build_outline), measure "
+            "whether it reads coherently next to its immediate neighbors -- consecutive-sentence similarity "
+            "plus a discourse-connective rule check (however, therefore, in addition, and similar) -- so a "
+            "leaf whose findings don't flow as a sequence can be flagged or reordered before it is written."
+        ),
+        "method": "Not run.",
+        "models_used": (
+            "bge-small-en-v1.5 (lab/common/real_encoders.py, already loaded for EXP-040/042) for consecutive-"
+            "sentence similarity, with spaCy static vectors as a fallback; a small rule table for discourse "
+            "connectives. No generative model."
+        ),
+        "referenced_files": [
+            "lab/common/real_encoders.py",
+            "lab/common/assemble.py",
+            "lab/common/textutil.py",
+        ],
+        "results_prose": "Not run.",
+        "conclusion": "Todo.",
+        "scale_down": "",
+    },
+    {
+        "id": "EXP-051",
+        "title": "Sentence role-tagging classifier (direct answer / supporting evidence / background / contradiction)",
+        "status": "todo",
+        "goal": (
+            "Replace the current binary found/missing/conflicted status (lab/common/verify.coverage_check) "
+            "with a 4-way role label per shortlisted sentence -- direct_answer, supporting_evidence, "
+            "background, contradiction -- so the page-wise writer knows how to use each sentence, not just "
+            "whether it passed verification. This is the 'mark how to use them' step of the relevance "
+            "cascade."
+        ),
+        "method": "Not run.",
+        "models_used": (
+            "Multinomial logistic regression (sklearn), the same head shape as EXP-011's next_action_head, "
+            "trained only on labels stored in this repository. Features: NLI probabilities (lexical judge, "
+            "or the real DeBERTa-v3 MNLI checkpoint once EXP-031 closes), ask-relevance score, and sentence "
+            "position. No generative model."
+        ),
+        "referenced_files": [
+            "lab/exp_011_decision_heads/run.py",
+            "lab/common/verify.py",
+            "lab/common/nli.py",
+            "lab/common/real_encoders.py",
+        ],
+        "results_prose": "Not run.",
+        "conclusion": "Todo. Depends on EXP-049's relevance score as one input feature.",
+        "scale_down": "",
+    },
+    {
+        "id": "EXP-052",
+        "title": "Ask-driven table of contents before page-wise assembly",
+        "status": "todo",
+        "goal": (
+            "Build a deterministic outline directly from the ask -- what sections or sub-answers does this "
+            "question imply -- before lab/common/assemble.build_outline buckets findings into 4-per-leaf "
+            "groups, so long-form output has a stable skeleton instead of an arbitrary grouping. This is the "
+            "missing wiring between the ask analyzer and the page-wise assembler that EXP-018 already proved "
+            "scales (5,000 findings to 42,506 words without holding the whole document in memory)."
+        ),
+        "method": "Not run.",
+        "models_used": (
+            "Deterministic code only: the existing ask analyzer's sub-ask decomposition plus a section-count/"
+            "ordering rule. No new model, generative or otherwise -- this is wiring between two already-"
+            "built modules."
+        ),
+        "referenced_files": [
+            "lab/common/ask.py",
+            "lab/common/assemble.py",
+            "lab/exp_002_ask_analyzer/run.py",
+            "lab/exp_018_longform/run.py",
+        ],
+        "results_prose": "Not run.",
+        "conclusion": "Todo.",
+        "scale_down": "",
+    },
+    {
+        "id": "EXP-053",
+        "title": "Cross-page consistency check for book-length assembly",
+        "status": "todo",
+        "goal": (
+            "When assembling many pages, check that a fact asserted on a late page doesn't contradict one "
+            "asserted on an early page, using lab/common/graph.py's entity graph and lab/common/memory.py's "
+            "verified-note recall as the index a human would flip back to, instead of re-reading the whole "
+            "document. Nothing today checks page 40 against page 4; this is the missing piece for genuinely "
+            "unlimited-length output."
+        ),
+        "method": "Not run.",
+        "models_used": (
+            "Deterministic code (graph adjacency, stored verified notes) plus the existing NLI judge (lexical, "
+            "or the real DeBERTa-v3 MNLI checkpoint once EXP-031 closes) to flag a cross-page contradiction. "
+            "No generative model."
+        ),
+        "referenced_files": [
+            "lab/common/graph.py",
+            "lab/common/memory.py",
+            "lab/common/assemble.py",
+            "lab/common/verify.py",
+            "lab/exp_015_paged_memory/run.py",
+        ],
+        "results_prose": "Not run.",
+        "conclusion": "Todo. Depends on EXP-052's outline existing first, so there are multiple pages worth checking against each other.",
+        "scale_down": "",
+    },
 ]
 
 RERUN_TODOS = [
@@ -460,24 +598,6 @@ RERUN_TODOS = [
         "Not run. Proposed: DeBERTa-v3 NLI, bge-small-en-v1.5, GLiNER. Not generative. Do not call a hosted generative API. Do not use these models to write answer text. FLAN-T5 is not the ask classifier and conflicts with FORBIDDEN.md.",
         _prior("exp_002_ask_analyzer"),
         "Todo. The closed EXP-002 scores are rule scores.",
-    ),
-    _todo(
-        "EXP-030",
-        "Rerun extractive QA with DeBERTa and RoBERTa SQuAD2",
-        "Re-measure EXP-005 with deepset/deberta-v3-base-squad2 and roberta-base-squad2 as the agreement model.",
-        ENCODER_METHOD,
-        "Not run. Proposed: deepset/deberta-v3-base-squad2 and roberta-base-squad2. Not generative. Do not use either model to write answer text; they extract spans.",
-        _prior("exp_005_extractive_qa"),
-        "Todo. The closed EXP-005 scores are lexical-extractor scores.",
-    ),
-    _todo(
-        "EXP-031",
-        "Rerun the NLI judge with DeBERTa-v3 MNLI",
-        "Re-measure EXP-006 with MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli.",
-        ENCODER_METHOD + " A larger DeBERTa-v3 NLI is an alternative. ContractNLI waits on a legal collection and is not this rerun.",
-        "Not run. Proposed: MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli. Not generative.",
-        _prior("exp_006_nli_judge"),
-        "Todo. The closed EXP-006 scores, including exception accuracy 0, are lexical-judge scores.",
     ),
     _todo(
         "EXP-034",
@@ -505,60 +625,6 @@ RERUN_TODOS = [
         "Not run. Proposed feature source: DeBERTa QA and DeBERTa NLI. The head used here was already logistic regression, which the blueprint allows. Not generative.",
         _prior("exp_011_decision_heads"),
         "Todo. The closed test accuracy is on templated lexical features, not on MNLI or SQuAD features.",
-    ),
-    _todo(
-        "EXP-037",
-        "Rerun the support check with DeBERTa NLI",
-        "Re-measure the EXP-012 support re-check with MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli. Keep dateparser for the calculation check.",
-        ENCODER_METHOD + " Do not replace dateparser.",
-        "Not run. Proposed: MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli. dateparser stays. Not generative.",
-        _prior("exp_012_verification"),
-        "Todo. Quote and coverage checks stay code.",
-    ),
-    _todo(
-        "EXP-038",
-        "Rerun provenance QA with DeBERTa SQuAD2",
-        "Re-measure EXP-013 answer spans with deepset/deberta-v3-base-squad2. Provenance tags stay code.",
-        ENCODER_METHOD,
-        "Not run. Proposed: deepset/deberta-v3-base-squad2. Not generative. FLAN-T5 must not write the answer.",
-        _prior("exp_013_provenance"),
-        "Todo. The closed faithfulness score is a lexical-QA score.",
-    ),
-    _todo(
-        "EXP-039",
-        "Rerun cross-domain QA with DeBERTa SQuAD2",
-        "Re-measure EXP-014 with deepset/deberta-v3-base-squad2. Keep dateparser for ordering.",
-        ENCODER_METHOD + " Do not replace dateparser. Do not relabel the recipe items to hide a miss.",
-        "Not run. Proposed: deepset/deberta-v3-base-squad2. dateparser stays. Not generative.",
-        _prior("exp_014_reasoning"),
-        "Todo. The closed domain scores are lexical-QA scores.",
-    ),
-    _todo(
-        "EXP-040",
-        "Rerun paged retrieval with bge embeddings",
-        "Re-measure EXP-015 needle recall and the page index with bge-small-en-v1.5.",
-        ENCODER_METHOD,
-        "Not run. Proposed: bge-small-en-v1.5. Not generative.",
-        _prior("exp_015_paged_memory"),
-        "Todo. The closed needle scores are TF-IDF scores.",
-    ),
-    _todo(
-        "EXP-041",
-        "Rerun fidelity NLI with DeBERTa; do not load FLAN-T5",
-        "Re-measure the EXP-017 bidirectional NLI check with MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli. The rewriter stays the deterministic copy.",
-        ENCODER_METHOD + " BLOCKED for the rewriter: do not download or run FLAN-T5, FLAN-T5-large, LaMini-Flan-T5, or CTranslate2 generation. CONFLICTS WITH FORBIDDEN.md.",
-        "DeBERTa NLI is an encoder and may be measured later. FLAN-T5, FLAN-T5-large, LaMini-Flan-T5, and CTranslate2 CONFLICT WITH FORBIDDEN.md and must not be run. The deterministic copy stays.",
-        _prior("exp_017_fidelity"),
-        "Todo for the DeBERTa check only. The FLAN-T5 rewriter rerun is blocked. See EXP-046.",
-    ),
-    _todo(
-        "EXP-042",
-        "Rerun repetition similarity with bge; do not load FLAN-T5",
-        "Re-measure EXP-018 repetition with bge-small-en-v1.5. Unit text stays copied from verified findings.",
-        ENCODER_METHOD + " BLOCKED for the unit writer: do not download or run FLAN-T5, FLAN-T5-large, LaMini-Flan-T5, or CTranslate2 generation. CONFLICTS WITH FORBIDDEN.md.",
-        "bge-small-en-v1.5 is an encoder and may be measured later. FLAN-T5 as the unit writer CONFLICTS WITH FORBIDDEN.md and must not be run.",
-        _prior("exp_018_longform"),
-        "Todo for the bge similarity check only. The FLAN-T5 writer is blocked. See EXP-046.",
     ),
     _todo(
         "EXP-043",

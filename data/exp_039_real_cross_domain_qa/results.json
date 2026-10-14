@@ -1,0 +1,55 @@
+{
+  "id": "EXP-039",
+  "title": "Cross-domain QA rerun with the real DeBERTa-v3 SQuAD2 checkpoint",
+  "status": "closed",
+  "goal": "Re-measure EXP-014's per-domain extractive accuracy with deepset/deberta-v3-base-squad2 in place of the lexical extractor, on the identical 24 items across 6 domains.",
+  "method": "Identical domains, questions, and passages as EXP-014. lab.common.real_encoders.real_qa replaces lab.common.qa.answer_question for the 24 single-passage items. The reasoning-skills probes (comparison, counting, ordering, sum, conditional) are deterministic code, unaffected by the QA model, and are not rerun here -- EXP-014's own numbers for those stand.",
+  "metrics": {
+    "model": "deepset/deberta-v3-base-squad2",
+    "per_domain_accuracy": {
+      "software": 0.5,
+      "recipes": 1.0,
+      "sports": 1.0,
+      "finance": 1.0,
+      "medical": 1.0,
+      "legal": 1.0
+    },
+    "domain_gap": 0.5,
+    "items_per_domain": 4,
+    "vs_exp_014_lexical_qa": {
+      "exp_014_per_domain_accuracy": {
+        "software": 0.75,
+        "recipes": 0.25,
+        "sports": 0.75,
+        "finance": 0.75,
+        "medical": 0.75,
+        "legal": 1.0
+      },
+      "exp_039_per_domain_accuracy": {
+        "software": 0.5,
+        "recipes": 1.0,
+        "sports": 1.0,
+        "finance": 1.0,
+        "medical": 1.0,
+        "legal": 1.0
+      },
+      "exp_014_domain_gap": 0.75,
+      "exp_039_domain_gap": 0.5
+    }
+  },
+  "results_prose": "With deepset/deberta-v3-base-squad2, per-domain accuracy on 4 items each: {'software': 0.5, 'recipes': 1.0, 'sports': 1.0, 'finance': 1.0, 'medical': 1.0, 'legal': 1.0}. The gap between the highest and lowest domain is 0.5. EXP-014's lexical extractor scored: {'software': 0.75, 'recipes': 0.25, 'sports': 0.75, 'finance': 0.75, 'medical': 0.75, 'legal': 1.0} (gap 0.75).",
+  "conclusion": "The real deepset/deberta-v3-base-squad2 checkpoint is loaded and measured on EXP-014's own items, not assumed. If the domain gap shrinks relative to EXP-014's lexical-extractor gap, that is evidence the real checkpoint's accuracy is less sensitive to a domain's wording than the hand-written lexical rules were; if it does not shrink, the remaining gap is a property of the questions themselves, not the extractor.",
+  "scale_down": "Same 4 items in each of 6 domains EXP-014 used.",
+  "referenced_files": [
+    "lab/exp_039_real_cross_domain_qa/run.py",
+    "lab/common/real_encoders.py",
+    "lab/common/harness.py",
+    "data/exp_014_reasoning/results.json",
+    "data/exp_039_real_cross_domain_qa/items.json",
+    "data/exp_039_real_cross_domain_qa/results.json"
+  ],
+  "follow_ups": [],
+  "elapsed_sec": 32.0166,
+  "peak_rss_mb": 818.23,
+  "models_used": "deepset/deberta-v3-base-squad2, a local checkpoint loaded with transformers (not an API call)."
+}

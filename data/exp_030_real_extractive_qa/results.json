@@ -1,0 +1,47 @@
+{
+  "id": "EXP-030",
+  "title": "Extractive QA rerun with the real DeBERTa-v3 SQuAD2 checkpoint",
+  "status": "closed",
+  "goal": "Re-measure EXP-005 with deepset/deberta-v3-base-squad2 in place of the lexical extractors, on the identical 40 items, so the two are directly comparable.",
+  "method": "Identical 40 items as EXP-005 (20 answerable, 20 unanswerable, each with passage A and a distractor B). For each item, lab.common.real_encoders.real_qa (deepset/deberta-v3-base-squad2, loaded locally with transformers, handle_impossible_answer=True) runs independently on A and B; the item is answered with whichever passage the checkpoint itself judges answerable, at the higher confidence score, and marked unanswerable only if the checkpoint found no answer in either passage. This differs from EXP-005's design in one respect: EXP-005 used two different lexical extractors as a self-consistency check (second_extractor_agreement); with one real checkpoint loaded there is no second independent extractor to agree or disagree, so that metric is dropped here rather than faked.",
+  "metrics": {
+    "model": "deepset/deberta-v3-base-squad2",
+    "n": 40,
+    "exact_match_on_answerable": 0.1786,
+    "contained_match_on_answerable": 0.9286,
+    "unanswerable_recall": 0.9167,
+    "false_answer_rate_on_unanswerable": 0.0833,
+    "missed_answer_rate": 0.0,
+    "span_valid_rate_when_answered": 1.0,
+    "answered": 29,
+    "abstained": 11,
+    "abstention_source": "the checkpoint's own handle_impossible_answer decision, not a tuned threshold",
+    "vs_exp_005_lexical_extractor": {
+      "exp_005_exact_match_on_answerable": 0.5357,
+      "exp_030_exact_match_on_answerable": 0.1786,
+      "exp_005_unanswerable_recall": 1.0,
+      "exp_030_unanswerable_recall": 0.9167,
+      "exp_005_span_valid_rate_when_answered": 1.0,
+      "exp_030_span_valid_rate_when_answered": 1.0
+    },
+    "exact_match_misses_that_are_trailing_punctuation_only": 20
+  },
+  "results_prose": "On EXP-005's identical 40 items, deepset/deberta-v3-base-squad2 scores exact match 0.1786 (contained-span match 0.9286) on answerable items, unanswerable recall 0.9167 (false-answer rate 0.0833), span validity when answered 1.0. EXP-005's lexical extractor scored exact match 0.5357 and unanswerable recall 1.0 on the identical items.",
+  "conclusion": "The real deepset/deberta-v3-base-squad2 checkpoint is loaded and measured on EXP-005's own items, not assumed from a benchmark leaderboard number. The headline exact-match number (0.1786, versus EXP-005's 0.5357) looks like a sharp regression but is mostly a tokenization artifact, not a wrong-span problem: 20 of the 23 exact-match misses on answerable items are spans that match the gold answer exactly once a trailing period is stripped (for example predicting '30 days.' for a gold of '30 days') -- this checkpoint's span boundary includes the sentence's closing punctuation where the hand-written lexical extractor's rules strip it. The contained-span match (0.9286) already absorbs this and is the more honest comparison point than raw exact match here. The real difference worth keeping is unanswerable recall, down from 1.0 to 0.9167: the checkpoint's own handle_impossible_answer decision, not a tuned coverage threshold, is a qualitative difference from the lexical extractor.",
+  "scale_down": "Same 40 hand-written items EXP-005 used, not the full SQuAD2 dev set (that is EXP-047, which already reran the lexical extractor on 300 real SQuAD2 questions).",
+  "referenced_files": [
+    "lab/exp_030_real_extractive_qa/run.py",
+    "lab/common/real_encoders.py",
+    "lab/common/harness.py",
+    "lab/common/textutil.py",
+    "data/exp_005_extractive_qa/results.json",
+    "data/exp_030_real_extractive_qa/items.json",
+    "data/exp_030_real_extractive_qa/results.json"
+  ],
+  "follow_ups": [
+    "Rerun EXP-047's 300 real SQuAD2 dev questions with this same real_qa function for a true model-vs-model comparison on identical real data, as EXP-047 itself flagged."
+  ],
+  "elapsed_sec": 50.1092,
+  "peak_rss_mb": 821.79,
+  "models_used": "deepset/deberta-v3-base-squad2, a local checkpoint loaded with transformers (not an API call). This is the real blueprint extractive QA checkpoint (ARCHITECTURE.md section 8), not a substitute."
+}
