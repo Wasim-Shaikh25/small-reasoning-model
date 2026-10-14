@@ -4,11 +4,104 @@ An exploration is one research step. Status is `todo`, `open`, or `closed`.
 Closed results below were written by `lab/exp_*/run.py` into `data/exp_*/results.json` and copied here by `lab/render_explorations.py`.
 Do not edit the numbers by hand. Re-run the exploration and render again.
 
-Generative language models were not used in any exploration.
+Generative language models were not used in any exploration. The blueprint encoder checkpoints were not loaded either. Read **Blueprint models were not used** before treating any score as a DeBERTa, GLiNER, bge, or FLAN-T5 result.
+
+## Blueprint models were not used
+
+Read this before any score below. The closed numbers were not changed by this note.
+
+ARCHITECTURE.md section 8 names the PoC models. Section 3.2.1 names FLAN-T5 as the untrusted proposer. Section 3.7 names FLAN-T5 as the rewriter. The runtime lines under section 8 name ONNX Runtime for encoders and CTranslate2 for FLAN-T5. Section 3.3 names SQLite for recall memory. Section 9 names Platt scaling and isotonic regression for calibration.
+
+**Those proposed models were not used**, except the rows whose Used cell is Yes: logistic regression, dateparser, SQLite, and Platt scaling. Every other closed score was measured with the substitute in the last column. Do not cite these scores as DeBERTa, GLiNER, bge, KeyBERT, libpostal, or FLAN-T5 results.
+
+The same substitute list is stored in `lab/config/models.json`.
+
+| Proposed model | Component | Used in this POC? | Substitute actually used | Reason |
+|---|---|---|---|---|
+| bge-small-en-v1.5 | Embeddings (section 8) | No | sklearn TfidfVectorizer cosine | Not downloaded or loaded. Retrieval ran with a classical substitute. |
+| bge-m3 | Embeddings alternative | No | sklearn TfidfVectorizer cosine | Not downloaded or loaded. |
+| e5-small | Embeddings alternative | No | sklearn TfidfVectorizer cosine | Not downloaded or loaded. |
+| all-MiniLM-L6-v2 | Embeddings alternative | No | sklearn TfidfVectorizer cosine | Not downloaded or loaded. |
+| Qdrant sparse vectors (BM25/SPLADE) | Sparse retrieval (section 8) | No | in-process Okapi BM25 (k1=1.5, b=0.75) | Qdrant was not installed and SPLADE was not loaded. The BM25 algorithm ran in-process. |
+| fastembed sparse models | Sparse retrieval alternative | No | in-process Okapi BM25 | Not downloaded or loaded. |
+| bge-reranker-v2-m3 | Reranker (section 8) | No | lexical score: 0.6 coverage + 0.25 Jaccard + 0.15 phrase | Not downloaded or loaded. |
+| MiniLM cross-encoder | Reranker alternative | No | lexical coverage reranker | Not downloaded or loaded. |
+| DeBERTa-v3 NLI (zero-shot) | Ask classifier (sections 3.2 and 8) | No | feature rules on the ask text | Not downloaded or loaded. |
+| Fine-tuned DeBERTa-v3-small | Ask classifier alternative | No | feature rules on the ask text | Not trained and not downloaded. |
+| KeyBERT-style with bge-small | Keyphrases (sections 3.2 and 8) | No | content-term salience | Not downloaded or loaded. bge-small was not loaded, so this embedding keyphrase method did not run. |
+| YAKE | Keyphrase alternative | No | content-term salience | Not used. |
+| GLiNER (medium or multi) | Entity tagging (sections 3.4 and 8) | No | two rule taggers | Not downloaded or loaded. |
+| spaCy NER | Entity tagging alternative | No | two rule taggers | Not installed. |
+| dslim/bert-base-NER | Second NER (section 8) | No | stricter second rule tagger | Not downloaded or loaded. |
+| RoBERTa NER | Second NER alternative | No | stricter second rule tagger | Not downloaded or loaded. |
+| libpostal (pypostal) | Address parsing (section 8) | No | regex field parser | Not installed. The regex parser is the whole address parser. The blueprint allows regex only as a PIN-code feature beside libpostal. |
+| deepset/deberta-v3-base-squad2 | Extractive QA (sections 3.5 and 8) | No | unigram lexical span extractor | Not downloaded or loaded. |
+| roberta-base-squad2 | Second QA model for agreement | No | bigram lexical span extractor | Not downloaded or loaded. |
+| MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli | NLI (sections 3.5 and 8) | No | polarity, number-mismatch, and token-coverage judge | Not downloaded or loaded. |
+| Larger DeBERTa-v3 NLI | NLI alternative | No | lexical NLI judge | Not downloaded or loaded. |
+| ContractNLI-tuned verifier | NLI alternative, Phase 3 | No | lexical NLI judge | Not downloaded or loaded. No legal corpus is attached. |
+| Logistic regression | Pair matcher; decision and next-action heads (section 8) | Yes | sklearn LogisticRegression; decision head uses CalibratedClassifierCV method=sigmoid (Platt) | The blueprint lists logistic regression for these roles. LightGBM, the other listed option, was not used. |
+| LightGBM | Pair matcher and heads alternative | No | sklearn LogisticRegression | Not installed. Logistic regression, which the blueprint lists for the same roles, was used. |
+| Small cross-encoder | Pair matcher alternative | No | logistic regression over rapidfuzz ratio, Jaccard, surname, address, and role | Not trained and not downloaded. |
+| Small MLP | Decision and next-action heads alternative | No | logistic regression with Platt scaling | Not used. Logistic regression was used. |
+| FLAN-T5 checkpoint | Rewriter (section 3.7, Experiment A) | No. Conflicts with FORBIDDEN.md | deterministic assembly of verified findings | Generative language model. Prohibited at any size, including a local checkpoint. |
+| FLAN-T5 checkpoint | Proposer (section 3.2.1, Experiment P) | No. Conflicts with FORBIDDEN.md | template analyzer plus grounding filter | Generative language model. The proposer was not called. |
+| FLAN-T5-large | Rewriter alternative | No. Conflicts with FORBIDDEN.md | deterministic assembly of verified findings | Generative language model. Prohibited. |
+| LaMini-Flan-T5 | Rewriter alternative | No. Conflicts with FORBIDDEN.md | deterministic assembly of verified findings | Generative language model. Prohibited. The blueprint also flags its card as non-commercial. |
+| Qdrant (server or local mode) | Vector database (section 8) | No | in-memory BM25 + TF-IDF index | Not installed. |
+| Qdrant Edge | Vector database alternative | No | in-memory index | Not installed. |
+| NetworkX | Graph (section 8) | No | in-memory adjacency list (lab/common/graph.py) | Not installed. |
+| Kuzu | Graph alternative | No | in-memory adjacency list | Not installed. |
+| Neo4j | Graph alternative | No | in-memory adjacency list | Not installed. |
+| dateparser and a small calculator | Dates and amounts (section 8) | Yes | dateparser plus timedelta, plus code that compares and sums amounts | This matches the blueprint's primary date tool. |
+| Duckling | Date alternative | No | dateparser plus timedelta | The primary date tool was used, so Duckling was not loaded. |
+| ONNX Runtime int8 | Encoder runtime (section 8) | No | CPython running the classical substitutes | No encoder checkpoint was loaded, so nothing was exported to ONNX. |
+| CTranslate2 int8 | FLAN-T5 runtime (section 8) | No. Conflicts with FORBIDDEN.md | no generative runtime | CTranslate2 generation is prohibited. |
+| SQLite | Recall memory (section 3.3; Qdrant is the alternative) | Yes | SQLite via lab/common/memory.py | This matches the blueprint's primary recall store. |
+| Isotonic regression | Calibration alternative (section 9) | No | Platt scaling (sigmoid) | Platt scaling is the other method the blueprint names, and it was used. |
+
+### Conflicts with FORBIDDEN.md
+
+These proposed models are generative language models. FORBIDDEN.md forbids them at any size, including a local checkpoint and including CTranslate2 generation. They were not used. The rerun entries that name them are blocked. A blocked entry is not permission to run the model.
+
+- FLAN-T5 as the rewriter (section 3.7, Experiment A). See EXP-046.
+- FLAN-T5 as the proposer (section 3.2.1, Experiment P). See EXP-043 and EXP-046.
+- FLAN-T5-large. See EXP-046.
+- LaMini-Flan-T5. See EXP-046.
+- CTranslate2 int8 generation. See EXP-046.
+
+DeBERTa, GLiNER, BERT-NER, RoBERTa, bge, MiniLM, e5, spaCy, libpostal, Qdrant, SPLADE, fastembed, NetworkX, Kuzu, Neo4j, and LightGBM are not generative decoders. Their rerun entries are unrun measurement work. A future run still must not call a hosted generative API and must not use the checkpoint to write answer text.
+
+### Which closed exploration to rerun
+
+| Closed exploration | Proposed piece that was skipped | Rerun todo |
+|---|---|---|
+| EXP-001 | DeBERTa QA, DeBERTa NLI, and bge retrieval inside the controller | EXP-027 |
+| EXP-002 | DeBERTa-v3 NLI, KeyBERT with bge-small, GLiNER | EXP-028 |
+| EXP-003 | No neural model is assigned to chunking | none |
+| EXP-004 | bge-small-en-v1.5, Qdrant BM25/SPLADE, bge-reranker-v2-m3, NetworkX | EXP-029 |
+| EXP-005 | deepset/deberta-v3-base-squad2 and roberta-base-squad2 | EXP-030 |
+| EXP-006 | MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli | EXP-031 |
+| EXP-007 | DeBERTa SQuAD2 for the hops. dateparser stays | EXP-032 |
+| EXP-008 | GLiNER, dslim/bert-base-NER, libpostal | EXP-033 |
+| EXP-009 | GLiNER, BERT-NER, and bge similarity. Logistic regression stays | EXP-034 |
+| EXP-010 | DeBERTa QA and DeBERTa NLI | EXP-035 |
+| EXP-011 | Encoder features into the existing logistic-regression heads | EXP-036 |
+| EXP-012 | DeBERTa NLI for the support check. dateparser stays | EXP-037 |
+| EXP-013 | DeBERTa SQuAD2 | EXP-038 |
+| EXP-014 | DeBERTa SQuAD2. dateparser stays | EXP-039 |
+| EXP-015 | bge-small-en-v1.5 embeddings | EXP-040 |
+| EXP-016 | SQLite was the proposed recall store | none |
+| EXP-017 | DeBERTa NLI for fidelity. FLAN-T5 rewriter is blocked | EXP-041 and EXP-046 |
+| EXP-018 | bge for repetition. FLAN-T5 unit writer is blocked | EXP-042 and EXP-046 |
+| EXP-019 | FLAN-T5 proposer is blocked | EXP-043 and EXP-046 |
+| EXP-020 | Encoder stack. FLAN-T5 stays out | EXP-044 |
+| EXP-021 | Encoder latency. CTranslate2 stays out | EXP-045 |
 
 ## EXP-001 Task controller, schemas, and budgets
 
 - Status: `closed`
+- Models used: No blueprint checkpoint. The controller ran lexical QA, lexical NLI, TF-IDF, in-process BM25, and logistic-regression heads. DeBERTa, GLiNER, bge, and FLAN-T5 were not loaded. FLAN-T5 conflicts with FORBIDDEN.md. Rerun: EXP-027.
 - Goal: Show that budgets, schema checks, and the fail-safe abstain path are plain code, and that instructions inside a passage are not executed.
 - Method: Validate three judgment payloads (valid, repairable, irreparable), cap a deep depth proposal at medium, and run the controller on a deposit question plus a passage that contains an exec instruction.
 - Referenced files:
@@ -55,6 +148,7 @@ Elapsed seconds: 0.0142. Peak RSS MB: 113.0.
 ## EXP-002 Ask analyzer templates
 
 - Status: `closed`
+- Models used: Proposed for this component: zero-shot DeBERTa-v3 NLI, fine-tuned DeBERTa-v3-small, KeyBERT with bge-small, YAKE, and GLiNER. None of those were loaded. The run used feature rules and content-term salience. Rerun: EXP-028.
 - Goal: Measure task-type accuracy, depth accuracy, and template decomposition on 60 asks without a generative proposer.
 - Method: Rule cues classify task type and depth. Sub-questions come from conjunction splits and per-type templates. A fact counts as covered when half of its content tokens appear in a sub-question. The raw ask is always retained as a query.
 - Referenced files:
@@ -93,6 +187,7 @@ Elapsed seconds: 0.0021. Peak RSS MB: 12.39.
 ## EXP-003 Structure-aware chunking
 
 - Status: `closed`
+- Models used: The blueprint assigns no neural model to structure-aware chunking. This run used code (heading rules and extractive summaries). FLAN-T5 was not used to write summaries and conflicts with FORBIDDEN.md. There is no model rerun for this entry.
 - Goal: Chunk a small contract-shaped document by headings, pages, and block type, and keep summaries extractive.
 - Method: Headings and page markers split the document. Each chunk stores doc id, version hash, page, section path, offsets, and chunk type. Summaries are the highest-salience sentences already in the chunk.
 - Referenced files:
@@ -153,6 +248,7 @@ Elapsed seconds: 0.0012. Peak RSS MB: 15.97.
 ## EXP-004 Hybrid retrieval and rerank
 
 - Status: `closed`
+- Models used: Proposed: bge-small-en-v1.5 (alternatives bge-m3, e5-small, all-MiniLM-L6-v2), Qdrant BM25/SPLADE (alternative fastembed), bge-reranker-v2-m3 (alternative MiniLM cross-encoder), and NetworkX (alternatives Kuzu, Neo4j). None of those were loaded. The run used TF-IDF cosine, in-process Okapi BM25, a lexical reranker, and an adjacency list. Rerun: EXP-029.
 - Goal: Measure dense-plus-sparse retrieval, reranker lift, and whether one entity link recovers a cross-passage address.
 - Method: Okapi BM25 and TF-IDF cosine are min-max normalized and averaged. A lexical coverage score reranks the top 30. The graph links Lessee to Ravi Sharma and then to the residence passage, which does not contain the word Lessee.
 - Referenced files:
@@ -202,6 +298,7 @@ Elapsed seconds: 0.0219. Peak RSS MB: 113.04.
 ## EXP-005 Extractive QA and answerability
 
 - Status: `closed`
+- Models used: Proposed: deepset/deberta-v3-base-squad2 and roberta-base-squad2. Neither was loaded. The run used a unigram lexical span extractor and a bigram lexical span extractor. Rerun: EXP-030.
 - Goal: Measure span exactness, unanswerable abstention, distractor robustness, and quote validity for lexical extractive QA.
 - Method: Two sentence scorers (unigram coverage and bigram overlap) pick a passage. The span is a date, person, amount, or the complement of 'is/means' copied from that sentence. Abstain when the best score is below 0.34. Scoring uses the architecture's score_qa helper.
 - Referenced files:
@@ -235,6 +332,7 @@ Elapsed seconds: 0.0029. Peak RSS MB: 12.39.
 ## EXP-006 NLI judge and claim templates
 
 - Status: `closed`
+- Models used: Proposed: MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli, with a larger DeBERTa-v3 NLI and ContractNLI as alternatives. None were loaded. The run used a polarity, number-mismatch, and token-coverage judge. Rerun: EXP-031.
 - Goal: Compare claim templates and measure support, contradiction, negation, and exception behavior of the lexical judge.
 - Method: Each gold relation is turned into a hypothesis by three templates. The judge uses token coverage, number mismatch, and polarity. Exception words are not given a special parser, so that weakness can show up in the score.
 - Referenced files:
@@ -275,6 +373,7 @@ Elapsed seconds: 0.0022. Peak RSS MB: 12.32.
 ## EXP-007 Multi-hop chaining
 
 - Status: `closed`
+- Models used: dateparser was used, which is the blueprint's date tool. Duckling was not used. Hop spans came from the lexical QA extractor. deepset/deberta-v3-base-squad2 and roberta-base-squad2 were not loaded. Rerun the QA hops as EXP-032 and keep dateparser.
 - Goal: Measure 2-hop and 3-hop extractive chaining, including date arithmetic done in code.
 - Method: Each hop inserts the previous span into the next question and runs extractive QA. Date endings call add_period on the extracted start and length. A chain is correct only if every hop matches.
 - Referenced files:
@@ -308,6 +407,7 @@ Elapsed seconds: 0.0353. Peak RSS MB: 28.7.
 ## EXP-008 Entity detection and roles
 
 - Status: `closed`
+- Models used: Proposed: GLiNER, spaCy, dslim/bert-base-NER, RoBERTa NER, and libpostal. None were loaded. The run used two rule taggers, a regex address parser, and lexical QA for roles. Rerun: EXP-033.
 - Goal: Score rule taggers per label, flag ambiguous place names, parse an address, and answer role questions from the passage.
 - Method: A primary rule tagger marks person, organization, address, defined term, date, and amount. A stricter second tagger covers titled people and suffixed organizations. Exact character offsets are compared with gold. Role questions use extractive QA.
 - Referenced files:
@@ -389,6 +489,7 @@ Elapsed seconds: 0.0024. Peak RSS MB: 119.18.
 ## EXP-009 Entity resolution and example store
 
 - Status: `closed`
+- Models used: Logistic regression and rapidfuzz string features were used. The blueprint allows logistic regression for the pair matcher. LightGBM and a small cross-encoder were not used. GLiNER, BERT-NER, and bge similarity were not loaded, so these features are not encoder features. Rerun: EXP-034. Keep logistic regression and rapidfuzz.
 - Goal: Measure wrong resolutions, ambiguous flags, a pair matcher, and whether verified examples are stored without errors.
 - Method: Documents are chunked and passed through the resolution loop. Shared surnames and two addresses force an ambiguous status. The pair matcher is logistic regression on string and context features. The example store accepts only resolved mentions that match the gold name.
 - Referenced files:
@@ -465,6 +566,7 @@ Elapsed seconds: 0.0095. Peak RSS MB: 121.75.
 ## EXP-010 Gap resolution loop
 
 - Status: `closed`
+- Models used: DeBERTa SQuAD2, MoritzLaurer DeBERTa-v3 MNLI, and bge-reranker-v2-m3 were not loaded. The loop used lexical QA, lexical NLI, and lexical retrieval. Rerun: EXP-035.
 - Goal: Run the budgeted gap loop on unknown terms, ambiguous references, missing premises, conflicting values, and vague criteria.
 - Method: Each round searches the supplied passages, reranks, and re-reads with extractive QA. Disagreeing spans stay open. After at most 3 rounds the gap is resolved, ambiguous, or unresolved. No weights change.
 - Referenced files:
@@ -637,6 +739,7 @@ Elapsed seconds: 0.0261. Peak RSS MB: 113.07.
 ## EXP-011 Decision and next-action heads
 
 - Status: `closed`
+- Models used: Logistic regression with Platt scaling (CalibratedClassifierCV, method=sigmoid) was used for the decision head, and multinomial logistic regression for the next-action head. The blueprint allows logistic regression here. LightGBM and a small MLP were not used. Features came from the lexical QA/NLI pipeline, not from DeBERTa. Rerun: EXP-036.
 - Goal: Train the small decision head and next-action head on pipeline features and measure abstention, calibration, and unsupported claims.
 - Method: Scenarios with known labels are featurized by the real lexical QA and NLI judges. Logistic regression is trained offline. A validation sweep picks the highest-coverage threshold whose unsupported-claim rate is at most 5 percent. The next-action head is a second logistic regression. Rendering for the chain check is deterministic.
 - Referenced files:
@@ -721,6 +824,7 @@ Elapsed seconds: 0.0411. Peak RSS MB: 119.63.
 ## EXP-012 Verification engine
 
 - Status: `closed`
+- Models used: Quote, coverage, citation, and qualifier checks are code. dateparser was used for the calculation check. The support check used lexical NLI. MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli was not loaded. Rerun: EXP-037.
 - Goal: Exercise quote, support, agreement, conflict, calculation, coverage, contradiction queries, and the output validator.
 - Method: Each check is run on a fixed passage and a planted failure. The calculator recomputes the date from the same spans. Qualifiers that were not in the source fail validation.
 - Referenced files:
@@ -772,6 +876,7 @@ Elapsed seconds: 0.0323. Peak RSS MB: 28.48.
 ## EXP-013 Provenance and context faithfulness
 
 - Status: `closed`
+- Models used: Provenance tags are code. Answer spans came from lexical QA. deepset/deberta-v3-base-squad2 was not loaded. FLAN-T5 was not used. Rerun: EXP-038.
 - Goal: Check that answers follow supplied context, that undefined invented terms stay unresolved, and that provenance tags separate evidence, inference, and background.
 - Method: A fixed background table holds ordinary facts such as Paris and a 14-day sprint. Extractive QA reads only the passage. If the span is not in the passage, the answer is dropped even when the background table has a value.
 - Referenced files:
@@ -806,6 +911,7 @@ Elapsed seconds: 0.0008. Peak RSS MB: 12.12.
 ## EXP-014 Cross-domain lookup and reasoning skills
 
 - Status: `closed`
+- Models used: Cross-domain spans came from lexical QA. dateparser was used for ordering. DeBERTa SQuAD2 was not loaded. Rerun: EXP-039 and keep dateparser.
 - Goal: Compare extractive accuracy across unrelated domains and record which reasoning skills the non-generative engine actually performs.
 - Method: Six domains have four original passages each. Comparison, counting, ordering, and sums run in code on extracted values. The conditional probe is a single if/unless sentence.
 - Referenced files:
@@ -857,6 +963,7 @@ Elapsed seconds: 0.0355. Peak RSS MB: 28.55.
 ## EXP-015 Paged memory and needle recall
 
 - Status: `closed`
+- Models used: The page index used TF-IDF. bge-small-en-v1.5 and Qdrant were not loaded. Rerun: EXP-040.
 - Goal: Measure needle recall as the haystack grows, page-fault restoration after eviction, and the effect of the working-set budget.
 - Method: Synthetic pages are indexed with the hybrid retriever. The working set pins the ask, evicts the lowest-relevance unpinned page, and counts a page fault when a missing passage is admitted again. A notebook stores one row per sub-question.
 - Referenced files:
@@ -966,6 +1073,7 @@ Elapsed seconds: 0.0357. Peak RSS MB: 116.49.
 ## EXP-016 Recall memory and revalidation
 
 - Status: `closed`
+- Models used: SQLite was used, which is the blueprint's recall store. A Qdrant collection was the named alternative and was not used. No encoder checkpoint applies to this entry.
 - Goal: Show that only verified notes are stored, that a changed source invalidates them, and that a conflict flips the note.
 - Method: SQLite stores the note schema from the architecture: statement, source pointer, version hash, and exact text. Recall reopens the archive and checks the hash and the exact text before the note can be used.
 - Referenced files:
@@ -1007,6 +1115,7 @@ Elapsed seconds: 0.0058. Peak RSS MB: 13.49.
 ## EXP-017 Rewrite fidelity without a generator
 
 - Status: `closed`
+- Models used: The proposed rewriter is FLAN-T5, with FLAN-T5-large and LaMini-Flan-T5 as alternatives and CTranslate2 as the runtime. CONFLICTS WITH FORBIDDEN.md. Those models were not used and must not be run. The run copied verified findings and checked them with lexical bidirectional NLI. A DeBERTa NLI rerun of the fidelity check is EXP-041. The FLAN-T5 rerun is EXP-046 and is blocked.
 - Goal: Measure fact, number, and modality preservation for a deterministic renderer, and show that the fidelity checks catch planted edits.
 - Method: The renderer joins already verified sentences and normalizes whitespace. It does not paraphrase. Fidelity uses the architecture's number and modal comparison. Planted edits drop a number, add a number, or flip shall/not. Bidirectional NLI is the lexical judge.
 - Referenced files:
@@ -1084,6 +1193,7 @@ Elapsed seconds: 0.0029. Peak RSS MB: 12.12.
 ## EXP-018 Long-form assembly
 
 - Status: `closed`
+- Models used: Unit text was copied from verified findings. FLAN-T5, FLAN-T5-large, LaMini-Flan-T5, and CTranslate2 were not used. CONFLICTS WITH FORBIDDEN.md. Repetition used TF-IDF, not bge. Rerun similarity with bge as EXP-042. The FLAN-T5 writer stays blocked (EXP-046).
 - Goal: Assemble documents from verified findings at 200, 1,000, and 5,000 claims and check coverage, citations, repetition, glossary flags, throughput, and resume.
 - Method: An outline groups findings into units of four. Each unit is rendered by code with its citation marker. TF-IDF cosine flags near-duplicate units. A checkpoint stores finished units so a truncated job can resume. No sentence is generated.
 - Referenced files:
@@ -1175,6 +1285,7 @@ Elapsed seconds: 0.3986. Peak RSS MB: 131.35.
 ## EXP-019 Proposal grounding filter
 
 - Status: `closed`
+- Models used: The proposer is FLAN-T5 in section 3.2.1. CONFLICTS WITH FORBIDDEN.md. It was not called. The run used template queries plus the grounding filter. The measured field proposer_model_called is false. The rerun is EXP-043 and is blocked.
 - Goal: Measure the grounding filter and the retrieval lift of template queries over the raw ask, without calling a generative proposer.
 - Method: Candidate strings are kept only when they are well formed and their names, numbers, dates, and content terms already occur in the ask or the pasted context. Template queries come from the ask analyzer. Recall of the gold lease passage is compared with the raw ask.
 - Referenced files:
@@ -1211,6 +1322,7 @@ Elapsed seconds: 0.0068. Peak RSS MB: 112.79.
 ## EXP-020 Red team and end-to-end loop
 
 - Status: `closed`
+- Models used: The end-to-end loop used the same lexical stack as EXP-001: lexical QA, lexical NLI, TF-IDF, and in-process BM25. DeBERTa, GLiNER, bge, and FLAN-T5 were not loaded. FLAN-T5 conflicts with FORBIDDEN.md. Rerun: EXP-044.
 - Goal: Run supported, unanswerable, contradictory, negated, injected, and near-duplicate asks through the controller.
 - Method: The controller analyzes the ask, retrieves with the hybrid index, judges with extractive QA and the lexical NLI check, runs a contradiction pass before a supported answer, and abstains when the schema or the evidence fails. Passage text is never executed.
 - Referenced files:
@@ -1306,6 +1418,7 @@ Elapsed seconds: 0.0304. Peak RSS MB: 113.01.
 ## EXP-021 Stage latency and memory
 
 - Status: `closed`
+- Models used: Stage timings are for the lexical stack. The measured models_loaded list is empty. ONNX Runtime was not used because no encoder was loaded. CTranslate2 conflicts with FORBIDDEN.md and was not used. Rerun: EXP-045.
 - Goal: Record latency and peak RAM for ask analysis, chunking, retrieval, QA, NLI, and the controller on this machine.
 - Method: Each stage is warmed up once and then timed over repeated calls. Peak RSS is the process high-water mark from getrusage.
 - Referenced files:
@@ -1348,6 +1461,7 @@ Elapsed seconds: 0.0592. Peak RSS MB: 113.2.
 ## EXP-022 On-disk hybrid index
 
 - Status: `todo`
+- Models used: bge, SPLADE, fastembed, and Qdrant are still not loaded. This todo is an on-disk index for the classical hybrid scorer. Do not add a generative retriever.
 - Goal: Repeat the hybrid retrieval measurement with an on-disk index once the corpus no longer fits the process index.
 - Method: Not run.
 - Referenced files:
@@ -1361,6 +1475,7 @@ Elapsed seconds: 0.0592. Peak RSS MB: 113.2.
 ## EXP-023 Human fluency rating
 
 - Status: `todo`
+- Models used: No model. A person rates fluency. Filling the score with FLAN-T5 or any other generative model conflicts with FORBIDDEN.md.
 - Goal: Collect a human 1-to-5 fluency rating for deterministic assemblies. Do not impute the score.
 - Method: Not run.
 - Referenced files:
@@ -1374,6 +1489,7 @@ Elapsed seconds: 0.0592. Peak RSS MB: 113.2.
 ## EXP-024 Local span tagger
 
 - Status: `todo`
+- Models used: This todo trains a span tagger on labels stored in the repository. It is separate from the GLiNER and dslim/bert-base-NER rerun (EXP-033). Do not download a generative model.
 - Goal: If rule-tagger hard-slice F1 is too low, train a span tagger only on locally labeled spans.
 - Method: Not run.
 - Referenced files:
@@ -1387,6 +1503,7 @@ Elapsed seconds: 0.0592. Peak RSS MB: 113.2.
 ## EXP-025 Attach a document collection
 
 - Status: `todo`
+- Models used: No checkpoint is loaded by this todo. The blueprint archive store is Qdrant, which this POC did not use. Do not add FLAN-T5 when a collection is attached. FLAN-T5 conflicts with FORBIDDEN.md.
 - Goal: Ingest a public, non-confidential document set with the same chunker and index. Keep the engine domain-agnostic.
 - Method: Not run.
 - Referenced files:
@@ -1400,6 +1517,7 @@ Elapsed seconds: 0.0592. Peak RSS MB: 113.2.
 ## EXP-026 Qualification rules
 
 - Status: `todo`
+- Models used: Code rules only. ContractNLI is a Phase 3 NLI alternative and is not this todo. The checker stays deterministic.
 - Goal: Add code rules for except, unless, and provided that if the lexical judge keeps missing them.
 - Method: Not run.
 - Referenced files:
@@ -1409,4 +1527,370 @@ Elapsed seconds: 0.0592. Peak RSS MB: 113.2.
 
 - Scale-down: 
 - Conclusion: Todo. This stays a deterministic checker.
+
+## Proposed-model reruns
+
+These entries are `todo`. None of them has been run. A blocked entry must stay blocked.
+
+## EXP-027 Rerun the controller with the proposed encoders
+
+- Status: `todo`
+- Models used: Not run. Proposed: deepset/deberta-v3-base-squad2, MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli, bge-small-en-v1.5. These are encoders. FLAN-T5 conflicts with FORBIDDEN.md and must not be added.
+- Goal: Re-measure EXP-001 once DeBERTa extractive QA, DeBERTa NLI, and bge retrieval are actually loaded. Keep FLAN-T5 out of the controller.
+- Method: Not run. When this is picked up, load the named checkpoint locally and measure again. Not a generative model. Do not call a hosted generative API. Do not use the checkpoint to write answer text. Write a new results.json only after the checkpoint actually runs. Do not copy the closed lexical scores forward.
+- Referenced files:
+- `lab/exp_001_controller/run.py`
+- `data/exp_001_controller/results.json`
+- `lab/config/models.json`
+- `FORBIDDEN.md`
+- `ARCHITECTURE.md`
+- Results: Not run.
+
+
+- Scale-down: 
+- Conclusion: Todo. Replace the EXP-001 numbers only after a real encoder run.
+
+## EXP-028 Rerun the ask analyzer with DeBERTa, KeyBERT, and GLiNER
+
+- Status: `todo`
+- Models used: Not run. Proposed: DeBERTa-v3 NLI, bge-small-en-v1.5, GLiNER. Not generative. Do not call a hosted generative API. Do not use these models to write answer text. FLAN-T5 is not the ask classifier and conflicts with FORBIDDEN.md.
+- Goal: Re-measure EXP-002 with a zero-shot DeBERTa-v3 NLI ask classifier, KeyBERT using bge-small-en-v1.5, and GLiNER on the ask.
+- Method: Not run. When this is picked up, load the named checkpoint locally and measure again. Not a generative model. Do not call a hosted generative API. Do not use the checkpoint to write answer text. Write a new results.json only after the checkpoint actually runs. Do not copy the closed lexical scores forward.
+- Referenced files:
+- `lab/exp_002_ask_analyzer/run.py`
+- `data/exp_002_ask_analyzer/results.json`
+- `lab/config/models.json`
+- `FORBIDDEN.md`
+- `ARCHITECTURE.md`
+- Results: Not run.
+
+
+- Scale-down: 
+- Conclusion: Todo. The closed EXP-002 scores are rule scores.
+
+## EXP-029 Rerun hybrid retrieval with bge, Qdrant, and the bge reranker
+
+- Status: `todo`
+- Models used: Not run. Proposed: bge-small-en-v1.5, Qdrant BM25/SPLADE, bge-reranker-v2-m3. Not generative.
+- Goal: Re-measure EXP-004 with bge-small-en-v1.5, Qdrant sparse BM25/SPLADE, and bge-reranker-v2-m3. NetworkX may replace the adjacency list.
+- Method: Not run. When this is picked up, load the named checkpoint locally and measure again. Not a generative model. Do not call a hosted generative API. Do not use the checkpoint to write answer text. Write a new results.json only after the checkpoint actually runs. Do not copy the closed lexical scores forward. fastembed, MiniLM, bge-m3, e5-small, and all-MiniLM-L6-v2 are alternatives, not a requirement to run every one of them in the same pass.
+- Referenced files:
+- `lab/exp_004_hybrid_retrieval/run.py`
+- `data/exp_004_hybrid_retrieval/results.json`
+- `lab/config/models.json`
+- `FORBIDDEN.md`
+- `ARCHITECTURE.md`
+- Results: Not run.
+
+
+- Scale-down: 
+- Conclusion: Todo. The closed EXP-004 scores are TF-IDF, in-process BM25, and lexical rerank scores.
+
+## EXP-030 Rerun extractive QA with DeBERTa and RoBERTa SQuAD2
+
+- Status: `todo`
+- Models used: Not run. Proposed: deepset/deberta-v3-base-squad2 and roberta-base-squad2. Not generative. Do not use either model to write answer text; they extract spans.
+- Goal: Re-measure EXP-005 with deepset/deberta-v3-base-squad2 and roberta-base-squad2 as the agreement model.
+- Method: Not run. When this is picked up, load the named checkpoint locally and measure again. Not a generative model. Do not call a hosted generative API. Do not use the checkpoint to write answer text. Write a new results.json only after the checkpoint actually runs. Do not copy the closed lexical scores forward.
+- Referenced files:
+- `lab/exp_005_extractive_qa/run.py`
+- `data/exp_005_extractive_qa/results.json`
+- `lab/config/models.json`
+- `FORBIDDEN.md`
+- `ARCHITECTURE.md`
+- Results: Not run.
+
+
+- Scale-down: 
+- Conclusion: Todo. The closed EXP-005 scores are lexical-extractor scores.
+
+## EXP-031 Rerun the NLI judge with DeBERTa-v3 MNLI
+
+- Status: `todo`
+- Models used: Not run. Proposed: MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli. Not generative.
+- Goal: Re-measure EXP-006 with MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli.
+- Method: Not run. When this is picked up, load the named checkpoint locally and measure again. Not a generative model. Do not call a hosted generative API. Do not use the checkpoint to write answer text. Write a new results.json only after the checkpoint actually runs. Do not copy the closed lexical scores forward. A larger DeBERTa-v3 NLI is an alternative. ContractNLI waits on a legal collection and is not this rerun.
+- Referenced files:
+- `lab/exp_006_nli_judge/run.py`
+- `data/exp_006_nli_judge/results.json`
+- `lab/config/models.json`
+- `FORBIDDEN.md`
+- `ARCHITECTURE.md`
+- Results: Not run.
+
+
+- Scale-down: 
+- Conclusion: Todo. The closed EXP-006 scores, including exception accuracy 0, are lexical-judge scores.
+
+## EXP-032 Rerun multi-hop QA with DeBERTa SQuAD2
+
+- Status: `todo`
+- Models used: Not run. Proposed QA model: deepset/deberta-v3-base-squad2. dateparser was already used and stays. Not generative.
+- Goal: Re-measure EXP-007 hop spans with deepset/deberta-v3-base-squad2. Keep dateparser for the date arithmetic.
+- Method: Not run. When this is picked up, load the named checkpoint locally and measure again. Not a generative model. Do not call a hosted generative API. Do not use the checkpoint to write answer text. Write a new results.json only after the checkpoint actually runs. Do not copy the closed lexical scores forward. Do not replace dateparser.
+- Referenced files:
+- `lab/exp_007_hop_chain/run.py`
+- `data/exp_007_hop_chain/results.json`
+- `lab/config/models.json`
+- `FORBIDDEN.md`
+- `ARCHITECTURE.md`
+- Results: Not run.
+
+
+- Scale-down: 
+- Conclusion: Todo. Keep the dateparser path. Replace only the span extractor after a real run.
+
+## EXP-033 Rerun entity detection with GLiNER, BERT-NER, and libpostal
+
+- Status: `todo`
+- Models used: Not run. Proposed: GLiNER, dslim/bert-base-NER, libpostal. Not generative. This is separate from EXP-024, which trains on repository labels only.
+- Goal: Re-measure EXP-008 with GLiNER, dslim/bert-base-NER, and libpostal.
+- Method: Not run. When this is picked up, load the named checkpoint locally and measure again. Not a generative model. Do not call a hosted generative API. Do not use the checkpoint to write answer text. Write a new results.json only after the checkpoint actually runs. Do not copy the closed lexical scores forward. spaCy and RoBERTa NER are alternatives.
+- Referenced files:
+- `lab/exp_008_entity_detect/run.py`
+- `data/exp_008_entity_detect/results.json`
+- `lab/config/models.json`
+- `FORBIDDEN.md`
+- `ARCHITECTURE.md`
+- Results: Not run.
+
+
+- Scale-down: 
+- Conclusion: Todo. The closed EXP-008 scores are rule-tagger scores.
+
+## EXP-034 Rerun entity resolution on encoder mentions and bge similarity
+
+- Status: `todo`
+- Models used: Not run. Proposed taggers and embedder: GLiNER, dslim/bert-base-NER, bge-small-en-v1.5. Logistic regression stays. Not generative.
+- Goal: Re-measure EXP-009 after GLiNER and BERT-NER supply the mentions and bge-small-en-v1.5 supplies a similarity feature. Keep logistic regression and rapidfuzz.
+- Method: Not run. When this is picked up, load the named checkpoint locally and measure again. Not a generative model. Do not call a hosted generative API. Do not use the checkpoint to write answer text. Write a new results.json only after the checkpoint actually runs. Do not copy the closed lexical scores forward. Do not swap the head to a generative model. LightGBM remains optional.
+- Referenced files:
+- `lab/exp_009_entity_resolve/run.py`
+- `data/exp_009_entity_resolve/results.json`
+- `lab/config/models.json`
+- `FORBIDDEN.md`
+- `ARCHITECTURE.md`
+- Results: Not run.
+
+
+- Scale-down: 
+- Conclusion: Todo. The closed pair-matcher accuracy is a logistic-regression score on rule features.
+
+## EXP-035 Rerun gap resolution with DeBERTa QA and NLI
+
+- Status: `todo`
+- Models used: Not run. Proposed: deepset/deberta-v3-base-squad2 and MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli. Not generative.
+- Goal: Re-measure EXP-010 with DeBERTa SQuAD2 spans and DeBERTa NLI support checks.
+- Method: Not run. When this is picked up, load the named checkpoint locally and measure again. Not a generative model. Do not call a hosted generative API. Do not use the checkpoint to write answer text. Write a new results.json only after the checkpoint actually runs. Do not copy the closed lexical scores forward.
+- Referenced files:
+- `lab/exp_010_gap_resolution/run.py`
+- `data/exp_010_gap_resolution/results.json`
+- `lab/config/models.json`
+- `FORBIDDEN.md`
+- `ARCHITECTURE.md`
+- Results: Not run.
+
+
+- Scale-down: 
+- Conclusion: Todo. The closed EXP-010 accuracy is a lexical-loop score.
+
+## EXP-036 Rerun the decision heads on encoder features
+
+- Status: `todo`
+- Models used: Not run. Proposed feature source: DeBERTa QA and DeBERTa NLI. The head used here was already logistic regression, which the blueprint allows. Not generative.
+- Goal: Re-measure EXP-011 with features taken from the real DeBERTa QA and NLI pipeline. The head may stay logistic regression.
+- Method: Not run. When this is picked up, load the named checkpoint locally and measure again. Not a generative model. Do not call a hosted generative API. Do not use the checkpoint to write answer text. Write a new results.json only after the checkpoint actually runs. Do not copy the closed lexical scores forward. Do not add a generative model. LightGBM and a small MLP are optional alternatives to logistic regression, not a reason to drop the measured head before a new run.
+- Referenced files:
+- `lab/exp_011_decision_heads/run.py`
+- `data/exp_011_decision_heads/results.json`
+- `lab/config/models.json`
+- `FORBIDDEN.md`
+- `ARCHITECTURE.md`
+- Results: Not run.
+
+
+- Scale-down: 
+- Conclusion: Todo. The closed test accuracy is on templated lexical features, not on MNLI or SQuAD features.
+
+## EXP-037 Rerun the support check with DeBERTa NLI
+
+- Status: `todo`
+- Models used: Not run. Proposed: MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli. dateparser stays. Not generative.
+- Goal: Re-measure the EXP-012 support re-check with MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli. Keep dateparser for the calculation check.
+- Method: Not run. When this is picked up, load the named checkpoint locally and measure again. Not a generative model. Do not call a hosted generative API. Do not use the checkpoint to write answer text. Write a new results.json only after the checkpoint actually runs. Do not copy the closed lexical scores forward. Do not replace dateparser.
+- Referenced files:
+- `lab/exp_012_verification/run.py`
+- `data/exp_012_verification/results.json`
+- `lab/config/models.json`
+- `FORBIDDEN.md`
+- `ARCHITECTURE.md`
+- Results: Not run.
+
+
+- Scale-down: 
+- Conclusion: Todo. Quote and coverage checks stay code.
+
+## EXP-038 Rerun provenance QA with DeBERTa SQuAD2
+
+- Status: `todo`
+- Models used: Not run. Proposed: deepset/deberta-v3-base-squad2. Not generative. FLAN-T5 must not write the answer.
+- Goal: Re-measure EXP-013 answer spans with deepset/deberta-v3-base-squad2. Provenance tags stay code.
+- Method: Not run. When this is picked up, load the named checkpoint locally and measure again. Not a generative model. Do not call a hosted generative API. Do not use the checkpoint to write answer text. Write a new results.json only after the checkpoint actually runs. Do not copy the closed lexical scores forward.
+- Referenced files:
+- `lab/exp_013_provenance/run.py`
+- `data/exp_013_provenance/results.json`
+- `lab/config/models.json`
+- `FORBIDDEN.md`
+- `ARCHITECTURE.md`
+- Results: Not run.
+
+
+- Scale-down: 
+- Conclusion: Todo. The closed faithfulness score is a lexical-QA score.
+
+## EXP-039 Rerun cross-domain QA with DeBERTa SQuAD2
+
+- Status: `todo`
+- Models used: Not run. Proposed: deepset/deberta-v3-base-squad2. dateparser stays. Not generative.
+- Goal: Re-measure EXP-014 with deepset/deberta-v3-base-squad2. Keep dateparser for ordering.
+- Method: Not run. When this is picked up, load the named checkpoint locally and measure again. Not a generative model. Do not call a hosted generative API. Do not use the checkpoint to write answer text. Write a new results.json only after the checkpoint actually runs. Do not copy the closed lexical scores forward. Do not replace dateparser. Do not relabel the recipe items to hide a miss.
+- Referenced files:
+- `lab/exp_014_reasoning/run.py`
+- `data/exp_014_reasoning/results.json`
+- `lab/config/models.json`
+- `FORBIDDEN.md`
+- `ARCHITECTURE.md`
+- Results: Not run.
+
+
+- Scale-down: 
+- Conclusion: Todo. The closed domain scores are lexical-QA scores.
+
+## EXP-040 Rerun paged retrieval with bge embeddings
+
+- Status: `todo`
+- Models used: Not run. Proposed: bge-small-en-v1.5. Not generative.
+- Goal: Re-measure EXP-015 needle recall and the page index with bge-small-en-v1.5.
+- Method: Not run. When this is picked up, load the named checkpoint locally and measure again. Not a generative model. Do not call a hosted generative API. Do not use the checkpoint to write answer text. Write a new results.json only after the checkpoint actually runs. Do not copy the closed lexical scores forward.
+- Referenced files:
+- `lab/exp_015_paged_memory/run.py`
+- `data/exp_015_paged_memory/results.json`
+- `lab/config/models.json`
+- `FORBIDDEN.md`
+- `ARCHITECTURE.md`
+- Results: Not run.
+
+
+- Scale-down: 
+- Conclusion: Todo. The closed needle scores are TF-IDF scores.
+
+## EXP-041 Rerun fidelity NLI with DeBERTa; do not load FLAN-T5
+
+- Status: `todo`
+- Models used: DeBERTa NLI is an encoder and may be measured later. FLAN-T5, FLAN-T5-large, LaMini-Flan-T5, and CTranslate2 CONFLICT WITH FORBIDDEN.md and must not be run. The deterministic copy stays.
+- Goal: Re-measure the EXP-017 bidirectional NLI check with MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli. The rewriter stays the deterministic copy.
+- Method: Not run. When this is picked up, load the named checkpoint locally and measure again. Not a generative model. Do not call a hosted generative API. Do not use the checkpoint to write answer text. Write a new results.json only after the checkpoint actually runs. Do not copy the closed lexical scores forward. BLOCKED for the rewriter: do not download or run FLAN-T5, FLAN-T5-large, LaMini-Flan-T5, or CTranslate2 generation. CONFLICTS WITH FORBIDDEN.md.
+- Referenced files:
+- `lab/exp_017_fidelity/run.py`
+- `data/exp_017_fidelity/results.json`
+- `lab/config/models.json`
+- `FORBIDDEN.md`
+- `ARCHITECTURE.md`
+- Results: Not run.
+
+
+- Scale-down: 
+- Conclusion: Todo for the DeBERTa check only. The FLAN-T5 rewriter rerun is blocked. See EXP-046.
+
+## EXP-042 Rerun repetition similarity with bge; do not load FLAN-T5
+
+- Status: `todo`
+- Models used: bge-small-en-v1.5 is an encoder and may be measured later. FLAN-T5 as the unit writer CONFLICTS WITH FORBIDDEN.md and must not be run.
+- Goal: Re-measure EXP-018 repetition with bge-small-en-v1.5. Unit text stays copied from verified findings.
+- Method: Not run. When this is picked up, load the named checkpoint locally and measure again. Not a generative model. Do not call a hosted generative API. Do not use the checkpoint to write answer text. Write a new results.json only after the checkpoint actually runs. Do not copy the closed lexical scores forward. BLOCKED for the unit writer: do not download or run FLAN-T5, FLAN-T5-large, LaMini-Flan-T5, or CTranslate2 generation. CONFLICTS WITH FORBIDDEN.md.
+- Referenced files:
+- `lab/exp_018_longform/run.py`
+- `data/exp_018_longform/results.json`
+- `lab/config/models.json`
+- `FORBIDDEN.md`
+- `ARCHITECTURE.md`
+- Results: Not run.
+
+
+- Scale-down: 
+- Conclusion: Todo for the bge similarity check only. The FLAN-T5 writer is blocked. See EXP-046.
+
+## EXP-043 Blocked: do not rerun the proposer with FLAN-T5
+
+- Status: `todo`
+- Models used: CONFLICTS WITH FORBIDDEN.md. FLAN-T5 is a generative language model. This entry records the gap. It is not permission to run the model. The template analyzer and grounding filter stay.
+- Goal: The blueprint assigns FLAN-T5 to the proposer (section 3.2.1, Experiment P). That rerun is not allowed. The grounding filter from EXP-019 stays.
+- Method: BLOCKED. Do not download or run FLAN-T5. Do not call a hosted generative API. Do not ask another model to write proposals.
+- Referenced files:
+- `lab/exp_019_proposal_filter/run.py`
+- `data/exp_019_proposal_filter/results.json`
+- `lab/config/models.json`
+- `FORBIDDEN.md`
+- `ARCHITECTURE.md`
+- Results: Not run.
+
+
+- Scale-down: 
+- Conclusion: Blocked by FORBIDDEN.md. Leave EXP-019 on the deterministic path.
+
+## EXP-044 Rerun the red-team loop with the encoder stack
+
+- Status: `todo`
+- Models used: Not run. Proposed stack: DeBERTa QA, DeBERTa NLI, bge retrieval. FLAN-T5 conflicts with FORBIDDEN.md and must stay out.
+- Goal: Re-measure EXP-020 after the encoder reruns above are real. The loop still abstains when support fails.
+- Method: Not run. When this is picked up, load the named checkpoint locally and measure again. Not a generative model. Do not call a hosted generative API. Do not use the checkpoint to write answer text. Write a new results.json only after the checkpoint actually runs. Do not copy the closed lexical scores forward. BLOCKED: do not add FLAN-T5 to the rewrite case or any other case. CONFLICTS WITH FORBIDDEN.md.
+- Referenced files:
+- `lab/exp_020_redteam_e2e/run.py`
+- `data/exp_020_redteam_e2e/results.json`
+- `lab/config/models.json`
+- `FORBIDDEN.md`
+- `ARCHITECTURE.md`
+- Results: Not run.
+
+
+- Scale-down: 
+- Conclusion: Todo. Run this only after the encoder checkpoints have actually been measured. Do not reuse the lexical red-team scores as encoder scores.
+
+## EXP-045 Rerun latency after the encoders are loaded
+
+- Status: `todo`
+- Models used: Not run. ONNX Runtime int8 is an encoder runtime and is allowed once an encoder exists. CTranslate2 generation CONFLICTS WITH FORBIDDEN.md and must not be run.
+- Goal: Re-measure EXP-021 stage latency and memory with the encoder checkpoints resident. ONNX Runtime int8 is an allowed encoder runtime for that later measurement.
+- Method: Not run. When this is picked up, load the named checkpoint locally and measure again. Not a generative model. Do not call a hosted generative API. Do not use the checkpoint to write answer text. Write a new results.json only after the checkpoint actually runs. Do not copy the closed lexical scores forward. BLOCKED: do not time CTranslate2 generation and do not load FLAN-T5. CONFLICTS WITH FORBIDDEN.md.
+- Referenced files:
+- `lab/exp_021_latency/run.py`
+- `data/exp_021_latency/results.json`
+- `lab/config/models.json`
+- `FORBIDDEN.md`
+- `ARCHITECTURE.md`
+- Results: Not run.
+
+
+- Scale-down: 
+- Conclusion: Todo. The closed timings describe the lexical stack, whose models_loaded list is empty.
+
+## EXP-046 Blocked: FLAN-T5 rewriter, proposer, and CTranslate2
+
+- Status: `todo`
+- Models used: CONFLICTS WITH FORBIDDEN.md. These are generative language models. The deterministic copy, assembly, and grounding filter stay. This entry exists so the gap is visible. It is not permission to run the models.
+- Goal: Record that the blueprint's generative pieces were not used and must not be run: FLAN-T5 as rewriter (section 3.7, Experiment A), FLAN-T5 as proposer (section 3.2.1, Experiment P), FLAN-T5-large, LaMini-Flan-T5, and CTranslate2 int8 generation.
+- Method: BLOCKED. Do not download or run FLAN-T5, FLAN-T5-large, LaMini-Flan-T5, or CTranslate2 generation. Do not call a hosted generative API.
+- Referenced files:
+- `FORBIDDEN.md`
+- `ARCHITECTURE.md`
+- `lab/common/assemble.py`
+- `lab/common/proposals.py`
+- `lab/exp_017_fidelity/run.py`
+- `lab/exp_018_longform/run.py`
+- `lab/exp_019_proposal_filter/run.py`
+- Results: Not run. Must not be run.
+
+
+- Scale-down: 
+- Conclusion: Blocked by FORBIDDEN.md. EXP-017, EXP-018, and EXP-019 stay on the deterministic path.
 
