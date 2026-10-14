@@ -2060,9 +2060,9 @@ These entries are `todo`. None of them has been run. A blocked entry must stay b
 ## EXP-043 Blocked: do not rerun the proposer with FLAN-T5
 
 - Status: `todo`
-- Models used: CONFLICTS WITH FORBIDDEN.md. FLAN-T5 is a generative language model. This entry records the gap. It is not permission to run the model. The template analyzer and grounding filter stay.
+- Models used: Still CONFLICTS WITH FORBIDDEN.md even after the 2026-10-14 bounded-rewriter exception (see EXP-048): that exception covers the rewriter role only, never the proposer. This entry records the gap. It is not permission to run the model. The template analyzer and grounding filter stay.
 - Goal: The blueprint assigns FLAN-T5 to the proposer (section 3.2.1, Experiment P). That rerun is not allowed. The grounding filter from EXP-019 stays.
-- Method: BLOCKED. Do not download or run FLAN-T5. Do not call a hosted generative API. Do not ask another model to write proposals.
+- Method: BLOCKED. Do not download or run FLAN-T5 as a proposer. Do not call a hosted generative API. Do not ask another model to write proposals.
 - Referenced files:
 - `lab/exp_019_proposal_filter/run.py`
 - `data/exp_019_proposal_filter/results.json`
@@ -2111,23 +2111,41 @@ These entries are `todo`. None of them has been run. A blocked entry must stay b
 - Scale-down: 
 - Conclusion: Todo. The closed timings describe the lexical stack, whose models_loaded list is empty.
 
-## EXP-046 Blocked: FLAN-T5 rewriter, proposer, and CTranslate2
+## EXP-046 Still blocked: FLAN-T5 proposer, larger FLAN-T5 variants, and CTranslate2 generation
 
 - Status: `todo`
-- Models used: CONFLICTS WITH FORBIDDEN.md. These are generative language models. The deterministic copy, assembly, and grounding filter stay. This entry exists so the gap is visible. It is not permission to run the models.
-- Goal: Record that the blueprint's generative pieces were not used and must not be run: FLAN-T5 as rewriter (section 3.7, Experiment A), FLAN-T5 as proposer (section 3.2.1, Experiment P), FLAN-T5-large, LaMini-Flan-T5, and CTranslate2 int8 generation.
-- Method: BLOCKED. Do not download or run FLAN-T5, FLAN-T5-large, LaMini-Flan-T5, or CTranslate2 generation. Do not call a hosted generative API.
+- Models used: CONFLICTS WITH FORBIDDEN.md. These are generative language models or roles the bounded exception does not cover. The deterministic proposer path (template analyzer plus grounding filter) stays. This entry exists so the remaining gap is visible. It is not permission to run these models or roles.
+- Goal: Record that the blueprint's remaining generative pieces were not used and must not be run: FLAN-T5 as proposer (section 3.2.1, Experiment P), FLAN-T5-large, LaMini-Flan-T5, and CTranslate2 int8 generation. The rewriter role is no longer blanket-blocked -- see EXP-048 for the narrow, bounded exception recorded in FORBIDDEN.md on 2026-10-14.
+- Method: BLOCKED. Do not download or run FLAN-T5 as a proposer, FLAN-T5-large, LaMini-Flan-T5, or CTranslate2 generation. Do not call a hosted generative API. A small FLAN-T5/T5 checkpoint in the rewriter role only is EXP-048, not this entry.
 - Referenced files:
 - `FORBIDDEN.md`
 - `ARCHITECTURE.md`
-- `lab/common/assemble.py`
 - `lab/common/proposals.py`
-- `lab/exp_017_fidelity/run.py`
-- `lab/exp_018_longform/run.py`
 - `lab/exp_019_proposal_filter/run.py`
 - Results: Not run. Must not be run.
 
 
 - Scale-down: 
-- Conclusion: Blocked by FORBIDDEN.md. EXP-017, EXP-018, and EXP-019 stay on the deterministic path.
+- Conclusion: Blocked by FORBIDDEN.md. EXP-019 stays on the deterministic path. EXP-017 and EXP-018's fidelity/repetition checks are unaffected by this entry; a bounded-rewriter rerun of those two, once EXP-048 exists, would be a separate future todo.
+
+## EXP-048 Bounded FLAN-T5 rewriter (small checkpoint, fidelity-gated)
+
+- Status: `todo`
+- Models used: Not run. Proposed: a small local flan-t5-small checkpoint (or comparably small T5 model, under ~300M params), loaded with transformers (or converted to CTranslate2 int8, as ARCHITECTURE.md section 8 recommends, once the plain-transformers path is measured). Rewriter role only -- never extraction, answering, or support/contradiction judging. Not an API call; a local checkpoint only.
+- Goal: Implement and measure the narrow rewriter exception recorded in FORBIDDEN.md on 2026-10-14 (project owner's explicit decision): load flan-t5-small, feed it only already-verified (statement, citation) findings plus a style instruction, run the section 3.7 fidelity validator on its output, and fall back to the unchanged lab/common/assemble.py text on any failure. Measure fidelity pass rate, fallback rate, and a human or proxy fluency rating, the same way EXP-017 and EXP-023 (still todo) would.
+- Method: Not run. Blocked: huggingface.co is denied by this sandbox's egress policy, so flan-t5-small cannot be downloaded here (same block that limits EXP-029/032/033/040/etc. to spaCy real-model substitutes; see lab/common/real_models.py). This todo is expected to be picked up on a machine or environment where huggingface.co is reachable -- for example, a laptop, rather than this sandbox.
+- Referenced files:
+- `FORBIDDEN.md`
+- `OBJECTIVE.md`
+- `lab/config/models.json`
+- `ARCHITECTURE.md`
+- `lab/common/assemble.py`
+- `lab/common/harness.py`
+- `lab/exp_017_fidelity/run.py`
+- `lab/exp_018_longform/run.py`
+- Results: Not run.
+
+
+- Scale-down: 
+- Conclusion: Todo, blocked on network access to huggingface.co from wherever this is run next. Once unblocked: add lab/common/real_rewriter.py (model load, a render_unit_generative(leaf, glossary) counterpart to assemble.render_unit, and the fidelity gate reusing harness.fidelity()), wire it into assemble.assemble() behind a flag so the deterministic path remains the default and the fallback, and write lab/exp_048_bounded_rewriter/run.py following the existing exploration pattern (Run, write_json, finish, models_used). Do not let this checkpoint touch extraction or verification; those stay on the existing lexical/real-NER/real-embedding substitutes.
 
