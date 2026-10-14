@@ -1,0 +1,249 @@
+[
+  {
+    "doc_id": "training-10014",
+    "gold": [
+      "Gerald Clancy",
+      "Howard Katz",
+      "CSCE"
+    ],
+    "rule_tagger_pred": [
+      "cocoa exchange",
+      "gerald clancy",
+      "howard katz",
+      "the new",
+      "york coffee"
+    ],
+    "real_ner_pred": [
+      "cocoa exchange",
+      "gerald clancy",
+      "howard katz",
+      "the new york coffee,"
+    ],
+    "rule_tagger_hits": [
+      "Gerald Clancy",
+      "Howard Katz"
+    ],
+    "real_ner_hits": [
+      "Gerald Clancy",
+      "Howard Katz"
+    ]
+  },
+  {
+    "doc_id": "training-10014",
+    "gold": [
+      "Clancy"
+    ],
+    "rule_tagger_pred": [],
+    "real_ner_pred": [
+      "exchange"
+    ],
+    "rule_tagger_hits": [],
+    "real_ner_hits": []
+  },
+  {
+    "doc_id": "training-10100",
+    "gold": [
+      "Jorge Cardenas",
+      "International Coffee Organization"
+    ],
+    "rule_tagger_pred": [
+      "international coffee",
+      "jorge cardenas"
+    ],
+    "real_ner_pred": [
+      "jorge cardenas",
+      "the international coffee organization (ico"
+    ],
+    "rule_tagger_hits": [
+      "Jorge Cardenas",
+      "International Coffee Organization"
+    ],
+    "real_ner_hits": [
+      "Jorge Cardenas",
+      "International Coffee Organization"
+    ]
+  },
+  {
+    "doc_id": "training-1026",
+    "gold": [
+      "Daniel Arap Moi"
+    ],
+    "rule_tagger_pred": [
+      "arap moi",
+      "president daniel"
+    ],
+    "real_ner_pred": [
+      "daniel arap moi"
+    ],
+    "rule_tagger_hits": [
+      "Daniel Arap Moi"
+    ],
+    "real_ner_hits": [
+      "Daniel Arap Moi"
+    ]
+  },
+  {
+    "doc_id": "training-1030",
+    "gold": [
+      "Robin Taylor",
+      "ZIANA"
+    ],
+    "rule_tagger_pred": [
+      "administrative executive",
+      "robin taylor"
+    ],
+    "real_ner_pred": [
+      "robin taylor"
+    ],
+    "rule_tagger_hits": [
+      "Robin Taylor"
+    ],
+    "real_ner_hits": [
+      "Robin Taylor"
+    ]
+  },
+  {
+    "doc_id": "training-10640",
+    "gold": [
+      "Alejandro Martinez Cuenca",
+      "International Coffee Organisation"
+    ],
+    "rule_tagger_pred": [
+      "alejandro martinez",
+      "international coffee",
+      "latin american",
+      "nicaraguan foreign",
+      "trade minister"
+    ],
+    "real_ner_pred": [
+      "cuenca",
+      "international coffee organisation",
+      "nicaraguan foreign"
+    ],
+    "rule_tagger_hits": [
+      "Alejandro Martinez Cuenca",
+      "International Coffee Organisation"
+    ],
+    "real_ner_hits": [
+      "Alejandro Martinez Cuenca",
+      "International Coffee Organisation"
+    ]
+  },
+  {
+    "doc_id": "training-10682",
+    "gold": [
+      "George Gordon Paton and Co Inc"
+    ],
+    "rule_tagger_pred": [
+      "co inc",
+      "george gordon"
+    ],
+    "real_ner_pred": [
+      "co inc",
+      "george gordon paton"
+    ],
+    "rule_tagger_hits": [
+      "George Gordon Paton and Co Inc"
+    ],
+    "real_ner_hits": [
+      "George Gordon Paton and Co Inc"
+    ]
+  },
+  {
+    "doc_id": "training-10902",
+    "gold": [
+      "International Coffee Organization"
+    ],
+    "rule_tagger_pred": [
+      "international coffee"
+    ],
+    "real_ner_pred": [
+      "ico",
+      "the international coffee organization"
+    ],
+    "rule_tagger_hits": [
+      "International Coffee Organization"
+    ],
+    "real_ner_hits": [
+      "International Coffee Organization"
+    ]
+  },
+  {
+    "doc_id": "training-10959",
+    "gold": [
+      "Jorio Dauster",
+      "IBC"
+    ],
+    "rule_tagger_pred": [
+      "president jorio"
+    ],
+    "real_ner_pred": [
+      "ibc",
+      "jorio dauster"
+    ],
+    "rule_tagger_hits": [],
+    "real_ner_hits": [
+      "Jorio Dauster",
+      "IBC"
+    ]
+  },
+  {
+    "doc_id": "training-11372",
+    "gold": [
+      "Rene Montes"
+    ],
+    "rule_tagger_pred": [
+      "ambassador rene"
+    ],
+    "real_ner_pred": [
+      "ico",
+      "rene montes"
+    ],
+    "rule_tagger_hits": [],
+    "real_ner_hits": [
+      "Rene Montes"
+    ]
+  },
+  {
+    "doc_id": "training-11816",
+    "gold": [
+      "United Industrial Corp Ltd",
+      "Teck Hock and Co"
+    ],
+    "rule_tagger_pred": [
+      "teck hock",
+      "united industrial",
+      "united industrial corp ltd"
+    ],
+    "real_ner_pred": [
+      "teck hock and co (pte) ltd",
+      "united industrial corp ltd"
+    ],
+    "rule_tagger_hits": [
+      "United Industrial Corp Ltd",
+      "Teck Hock and Co"
+    ],
+    "real_ner_hits": [
+      "United Industrial Corp Ltd",
+      "Teck Hock and Co"
+    ]
+  },
+  {
+    "doc_id": "training-11183",
+    "gold": [
+      "Coffee Board"
+    ],
+    "rule_tagger_pred": [
+      "coffee board"
+    ],
+    "real_ner_pred": [
+      "coffee board"
+    ],
+    "rule_tagger_hits": [
+      "Coffee Board"
+    ],
+    "real_ner_hits": [
+      "Coffee Board"
+    ]
+  }
+]

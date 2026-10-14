@@ -1,0 +1,1674 @@
+[
+  {
+    "chunk_id": "training-10014-p1-c1",
+    "doc_id": "training-10014",
+    "version_hash": "sha256:5c6850ba59f38bf0c7c5987d5a02ff8c72f019dd69f14ff7042bf7da87ccc637",
+    "page": 1,
+    "section_path": [
+      "Document"
+    ],
+    "char_offsets": [
+      0,
+      718
+    ],
+    "chunk_type": "clause",
+    "text": "COFFEE, SUGAR AND COCOA EXCHANGE NAMES CHAIRMAN The New York Coffee, Sugar and Cocoa Exchange (CSCE) elected former first vice chairman Gerald Clancy to a two-year term as chairman of the board of managers, replacing previous chairman Howard Katz. Katz, chairman since 1985, will remain a board member. Clancy currently serves on the Exchange board of managers as chairman of its appeals, executive, pension and political action committees. The CSCE also elected Charles Nastro, executive vice president of Shearson Lehman Bros, as first vice chairman. Anthony Maccia, vice president of Woodhouse, Drake and Carey, was named second vice chairman, and Clifford Evans, president of Demico Futures, was elected treasurer.",
+    "word_count": 109,
+    "summary": "COFFEE, SUGAR AND COCOA EXCHANGE NAMES CHAIRMAN The New York Coffee, Sugar and Cocoa Exchange (CSCE) elected former first vice chairman Gerald Clancy to a two-year term as chairman of the board of managers, replacing previous chairman Howard Katz. Anthony Maccia, vice president of Woodhouse, Drake and Carey, was named second vice chairman, and Clifford Evans, president of Demico Futures, was elected treasurer.",
+    "summary_is_evidence": false,
+    "summary_sentences_are_substrings": true,
+    "below_min_words": false,
+    "source_category": "coffee",
+    "source_title": "COFFEE, SUGAR AND COCOA EXCHANGE NAMES CHAIRMAN The New York Coffee, Sugar and Cocoa Exchange (CSCE) elected former firs"
+  },
+  {
+    "chunk_id": "training-10100-p1-c1",
+    "doc_id": "training-10100",
+    "version_hash": "sha256:b2e3c2684d053f1340c73299170b4eb19435e9a95b49b071581b9c9ad8337cee",
+    "page": 1,
+    "section_path": [
+      "Document"
+    ],
+    "char_offsets": [
+      0,
+      744
+    ],
+    "chunk_type": "clause",
+    "text": "CARDENAS SEES NO MAJOR DECISIONS AT ICO MEETING Jorge Cardenas, manager of Colombia's coffee growers' federation, said he did not believe any important decisions would emerge from an upcoming meeting of the International Coffee Organization (ICO). The ICO executive board is set to meet in London from March 31 and could decide to call a special council session by the end of April to discuss export quotas. \"It's going to be a routine meeting, an update of what has been happening in the market, but it's unlikely any major decisions are taken,\" Cardenas told journalists. Earlier this month, talks in London to re-introduce export quotas, suspended in February 1986, ended in failure. Colombian finance minister Cesar Gaviria, also talking to",
+    "word_count": 120,
+    "summary": "CARDENAS SEES NO MAJOR DECISIONS AT ICO MEETING Jorge Cardenas, manager of Colombia's coffee growers' federation, said he did not believe any important decisions would emerge from an upcoming meeting of the International Coffee Organization (ICO). The ICO executive board is set to meet in London from March 31 and could decide to call a special council session by the end of April to discuss export quotas.",
+    "summary_is_evidence": false,
+    "summary_sentences_are_substrings": true,
+    "below_min_words": false,
+    "source_category": "coffee",
+    "source_title": "CARDENAS SEES NO MAJOR DECISIONS AT ICO MEETING Jorge Cardenas, manager of Colombia's coffee growers' federation, said h"
+  },
+  {
+    "chunk_id": "training-10100-p1-c2",
+    "doc_id": "training-10100",
+    "version_hash": "sha256:b2e3c2684d053f1340c73299170b4eb19435e9a95b49b071581b9c9ad8337cee",
+    "page": 1,
+    "section_path": [
+      "Document"
+    ],
+    "char_offsets": [
+      651,
+      1320
+    ],
+    "chunk_type": "clause",
+    "text": "in February 1986, ended in failure. Colombian finance minister Cesar Gaviria, also talking to reporters at the end of the weekly National Coffee Committee meeting, said the positions of Brazil and of the United States were too far apart to allow a prompt agreement on quotas. Brazil's coffee chief Jorio Dauster said yesterday Brazil would not change its coffee policies. Cardenas said the market situation was getting clearer because the trade knew the projected output and stockpile levels of producers. He said according to ICO statistics there was a shortfall of nine mln (60-kg) bags on the world market between October, the start of the coffee year, and February.",
+    "word_count": 109,
+    "summary": "Colombian finance minister Cesar Gaviria, also talking to reporters at the end of the weekly National Coffee Committee meeting, said the positions of Brazil and of the United States were too far apart to allow a prompt agreement on quotas. He said according to ICO statistics there was a shortfall of nine mln (60-kg) bags on the world market between October, the start of the coffee year, and February.",
+    "summary_is_evidence": false,
+    "summary_sentences_are_substrings": true,
+    "below_min_words": false,
+    "source_category": "coffee",
+    "source_title": "CARDENAS SEES NO MAJOR DECISIONS AT ICO MEETING Jorge Cardenas, manager of Colombia's coffee growers' federation, said h"
+  },
+  {
+    "chunk_id": "training-1026-p1-c1",
+    "doc_id": "training-1026",
+    "version_hash": "sha256:ab775a4e495fca603f94e27a06ab5a4c3c48dd2136adee1d3179b7ecffd16399",
+    "page": 1,
+    "section_path": [
+      "Document"
+    ],
+    "char_offsets": [
+      0,
+      669
+    ],
+    "chunk_type": "clause",
+    "text": "KENYAN ECONOMY FACES PROBLEMS, PRESIDENT SAYS The Kenyan economy is heading for difficult times after a boom last year, and the country must tighten its belt to prevent the balance of payments swinging too far into deficit, President Daniel Arap Moi said. In a speech at the state opening of parliament, Moi said high coffee prices and cheap oil in 1986 led to economic growth of five pct, compared with 4.1 pct in 1985. The same factors produced a two billion shilling balance of payments surplus and inflation fell to 5.6 pct from 10.7 pct in 1985, he added. \"But both these factors are no longer in our favour ... As a result, we cannot expect an increase in foreign",
+    "word_count": 120,
+    "summary": "KENYAN ECONOMY FACES PROBLEMS, PRESIDENT SAYS The Kenyan economy is heading for difficult times after a boom last year, and the country must tighten its belt to prevent the balance of payments swinging too far into deficit, President Daniel Arap Moi said. In a speech at the state opening of parliament, Moi said high coffee prices and cheap oil in 1986 led to economic growth of five pct, compared with 4.1 pct in 1985.",
+    "summary_is_evidence": false,
+    "summary_sentences_are_substrings": true,
+    "below_min_words": false,
+    "source_category": "coffee",
+    "source_title": "KENYAN ECONOMY FACES PROBLEMS, PRESIDENT SAYS The Kenyan economy is heading for difficult times after a boom last year, "
+  },
+  {
+    "chunk_id": "training-1026-p1-c2",
+    "doc_id": "training-1026",
+    "version_hash": "sha256:ab775a4e495fca603f94e27a06ab5a4c3c48dd2136adee1d3179b7ecffd16399",
+    "page": 1,
+    "section_path": [
+      "Document"
+    ],
+    "char_offsets": [
+      599,
+      1242
+    ],
+    "chunk_type": "clause",
+    "text": "in our favour ... As a result, we cannot expect an increase in foreign exchange reserves during the year,\" he said. The price of coffee, Kenya's main source of foreign exchange, fell in London today to about 94 cents a pound from a peak of 2.14 dlrs in January 1986. Crude oil, which early last year slipped below 10 dlrs a barrel, has since crept back to over 18 dlrs. Moi said the price changes, coupled with a general decline in the flow of capital from the rest of the world, made it more difficult to finance the government's budget deficit. Kenya was already spending over 27 pct of its budget on servicing its debts and last year it was",
+    "word_count": 120,
+    "summary": "The price of coffee, Kenya's main source of foreign exchange, fell in London today to about 94 cents a pound from a peak of 2.14 dlrs in January 1986. Moi said the price changes, coupled with a general decline in the flow of capital from the rest of the world, made it more difficult to finance the government's budget deficit.",
+    "summary_is_evidence": false,
+    "summary_sentences_are_substrings": true,
+    "below_min_words": false,
+    "source_category": "coffee",
+    "source_title": "KENYAN ECONOMY FACES PROBLEMS, PRESIDENT SAYS The Kenyan economy is heading for difficult times after a boom last year, "
+  },
+  {
+    "chunk_id": "training-1026-p1-c3",
+    "doc_id": "training-1026",
+    "version_hash": "sha256:ab775a4e495fca603f94e27a06ab5a4c3c48dd2136adee1d3179b7ecffd16399",
+    "page": 1,
+    "section_path": [
+      "Document"
+    ],
+    "char_offsets": [
+      1178,
+      1783
+    ],
+    "chunk_type": "clause",
+    "text": "27 pct of its budget on servicing its debts and last year it was a net exporter of capital for the first time in its history, he added. \"This is a clear indication that we are entering a difficult phase as regards our external debts, and it is imperative that we raise the rate of domestic savings and rely less on foreign sources to finance our development,\" he said. \"It will be necessary to maintain strict discipline on expenditure ... And members of this house will have to take the lead in encouraging wananchi (ordinary people) to be more frugal in satisfying immediate needs,\" the president added.",
+    "word_count": 107,
+    "summary": "\"This is a clear indication that we are entering a difficult phase as regards our external debts, and it is imperative that we raise the rate of domestic savings and rely less on foreign sources to finance our development,\" he said. And members of this house will have to take the lead in encouraging wananchi (ordinary people) to be more frugal in satisfying immediate needs,\" the president added.",
+    "summary_is_evidence": false,
+    "summary_sentences_are_substrings": true,
+    "below_min_words": false,
+    "source_category": "coffee",
+    "source_title": "KENYAN ECONOMY FACES PROBLEMS, PRESIDENT SAYS The Kenyan economy is heading for difficult times after a boom last year, "
+  },
+  {
+    "chunk_id": "training-10268-p1-c1",
+    "doc_id": "training-10268",
+    "version_hash": "sha256:8329eef4a93ece32f48934e1bc551572f74fe859db41d3c4d7c6b6a3cbf0e782",
+    "page": 1,
+    "section_path": [
+      "Document"
+    ],
+    "char_offsets": [
+      0,
+      762
+    ],
+    "chunk_type": "clause",
+    "text": "INDIA STEPS UP COUNTERTRADE DEALS TO CUT TRADE GAP India is searching for non-communist countertrade partners to help it cut its trade deficit and conserve foreign exchange. Wheat, tobacco, tea, coffee, jute, engineering and electronic goods, as well as minerals including iron ore, are all on offer in return for crude oil, petroleum products, chemicals, steel and machinery, trade sources told Reuters. Most of the impetus behind countertrade, which began in 1984, comes from two state trading firms -- the State Trading Corp (STC) and the Minerals and Metals Trading Corp (MMTC). \"The two state trading corporations are free to use their buying power in respect to bulk commodities to promote Indian exports,\" a commerce ministry spokeswoman said, adding that",
+    "word_count": 120,
+    "summary": "INDIA STEPS UP COUNTERTRADE DEALS TO CUT TRADE GAP India is searching for non-communist countertrade partners to help it cut its trade deficit and conserve foreign exchange. Wheat, tobacco, tea, coffee, jute, engineering and electronic goods, as well as minerals including iron ore, are all on offer in return for crude oil, petroleum products, chemicals, steel and machinery, trade sources told Reuters.",
+    "summary_is_evidence": false,
+    "summary_sentences_are_substrings": true,
+    "below_min_words": false,
+    "source_category": "coffee",
+    "source_title": "INDIA STEPS UP COUNTERTRADE DEALS TO CUT TRADE GAP India is searching for non-communist countertrade partners to help it"
+  },
+  {
+    "chunk_id": "training-10268-p1-c2",
+    "doc_id": "training-10268",
+    "version_hash": "sha256:8329eef4a93ece32f48934e1bc551572f74fe859db41d3c4d7c6b6a3cbf0e782",
+    "page": 1,
+    "section_path": [
+      "Document"
+    ],
+    "char_offsets": [
+      665,
+      1441
+    ],
+    "chunk_type": "clause",
+    "text": "to bulk commodities to promote Indian exports,\" a commerce ministry spokeswoman said, adding that private firms are excluded from countertrading. One trade source said India has targetted countries that depend on an Indian domestic market recently opened to foreign imports. However, countertrade deals still make up only a small part of India's total trading and are likely to account for less than eight pct of the estimated 18.53 billion dlrs in trade during the nine months ended December, the sources said. Countertrade accounted for just five pct of India's 25.65 billion dlrs in trade during fiscal 1985/86 ended March, against almost nothing in 1984/85, official figures show. However, the figures exclude exchanges with the Eastern Bloc paid in non-convertible Indian",
+    "word_count": 120,
+    "summary": "However, countertrade deals still make up only a small part of India's total trading and are likely to account for less than eight pct of the estimated 18.53 billion dlrs in trade during the nine months ended December, the sources said. Countertrade accounted for just five pct of India's 25.65 billion dlrs in trade during fiscal 1985/86 ended March, against almost nothing in 1984/85, official figures show.",
+    "summary_is_evidence": false,
+    "summary_sentences_are_substrings": true,
+    "below_min_words": false,
+    "source_category": "coffee",
+    "source_title": "INDIA STEPS UP COUNTERTRADE DEALS TO CUT TRADE GAP India is searching for non-communist countertrade partners to help it"
+  },
+  {
+    "chunk_id": "training-10268-p1-c3",
+    "doc_id": "training-10268",
+    "version_hash": "sha256:8329eef4a93ece32f48934e1bc551572f74fe859db41d3c4d7c6b6a3cbf0e782",
+    "page": 1,
+    "section_path": [
+      "Document"
+    ],
+    "char_offsets": [
+      1344,
+      2115
+    ],
+    "chunk_type": "clause",
+    "text": "show. However, the figures exclude exchanges with the Eastern Bloc paid in non-convertible Indian rupees, the sources said. Total trade with the Soviet Union, involving swaps of agricultural produce and textiles for Soviet arms and crude oil, is estimated at 3.04 billion dlrs in fiscal 1986/87, against three billion in 1985/86. Indian countertrade, which is being promoted mainly to help narrow the country's large trade deficit, is still insignificant compared with agreements reached by Indonesia, Venezuela and Brazil, the trade sources said. The trade deficit, which hit an estimated record 6.96 billion dlrs in 1985/86, is expected to decline to 5.6 billion in the current fiscal year. But the push to include non-communist countries in countertrade is also due to",
+    "word_count": 120,
+    "summary": "Total trade with the Soviet Union, involving swaps of agricultural produce and textiles for Soviet arms and crude oil, is estimated at 3.04 billion dlrs in fiscal 1986/87, against three billion in 1985/86. Indian countertrade, which is being promoted mainly to help narrow the country's large trade deficit, is still insignificant compared with agreements reached by Indonesia, Venezuela and Brazil, the trade sources said.",
+    "summary_is_evidence": false,
+    "summary_sentences_are_substrings": true,
+    "below_min_words": false,
+    "source_category": "coffee",
+    "source_title": "INDIA STEPS UP COUNTERTRADE DEALS TO CUT TRADE GAP India is searching for non-communist countertrade partners to help it"
+  },
+  {
+    "chunk_id": "training-10268-p1-c4",
+    "doc_id": "training-10268",
+    "version_hash": "sha256:8329eef4a93ece32f48934e1bc551572f74fe859db41d3c4d7c6b6a3cbf0e782",
+    "page": 1,
+    "section_path": [
+      "Document"
+    ],
+    "char_offsets": [
+      2031,
+      2795
+    ],
+    "chunk_type": "clause",
+    "text": "year. But the push to include non-communist countries in countertrade is also due to other factors, including the slow growth of foreign reserves, a tight debt repayment schedule, shrinking aid and trade protectionism, businessmen said. One source said India is showing more dynamism in promoting countertrade deals than in the past, when the deals were made discreetly because they break GATT rules. As a member of the General Agreement on Tariffs and Trade (GATT), India cannot officially support bartering. The MMTC's recent countertrade deals include iron ore exports to Yugoslavia for steel structures and rails. \"MMTC's recent global tenders now include a clause that preference will be given to parties who accept payment in kind for goods and services sold",
+    "word_count": 120,
+    "summary": "But the push to include non-communist countries in countertrade is also due to other factors, including the slow growth of foreign reserves, a tight debt repayment schedule, shrinking aid and trade protectionism, businessmen said. One source said India is showing more dynamism in promoting countertrade deals than in the past, when the deals were made discreetly because they break GATT rules.",
+    "summary_is_evidence": false,
+    "summary_sentences_are_substrings": true,
+    "below_min_words": false,
+    "source_category": "coffee",
+    "source_title": "INDIA STEPS UP COUNTERTRADE DEALS TO CUT TRADE GAP India is searching for non-communist countertrade partners to help it"
+  },
+  {
+    "chunk_id": "training-10268-p1-c5",
+    "doc_id": "training-10268",
+    "version_hash": "sha256:8329eef4a93ece32f48934e1bc551572f74fe859db41d3c4d7c6b6a3cbf0e782",
+    "page": 1,
+    "section_path": [
+      "Document"
+    ],
+    "char_offsets": [
+      2721,
+      3439
+    ],
+    "chunk_type": "clause",
+    "text": "be given to parties who accept payment in kind for goods and services sold to India,\" a trade official said, adding that the policy remains flexible. \"We also take into account other factors such as prices at which the goods and services are offered to India,\" the trade official said. Early this year the commerce ministry quietly told foreign companies interested in selling aircraft, ships, drilling rigs and railway equipment to India that they stood a better chance if they bought Indian goods or services in return, the trade sources said. Illustrating the point, the official said a South Korean firm recently agreed to sell a drilling platform worth 40 mln dlrs to the state-run Oil and Natural Gas Commission.",
+    "word_count": 120,
+    "summary": "Early this year the commerce ministry quietly told foreign companies interested in selling aircraft, ships, drilling rigs and railway equipment to India that they stood a better chance if they bought Indian goods or services in return, the trade sources said. Illustrating the point, the official said a South Korean firm recently agreed to sell a drilling platform worth 40 mln dlrs to the state-run Oil and Natural Gas Commission.",
+    "summary_is_evidence": false,
+    "summary_sentences_are_substrings": true,
+    "below_min_words": false,
+    "source_category": "coffee",
+    "source_title": "INDIA STEPS UP COUNTERTRADE DEALS TO CUT TRADE GAP India is searching for non-communist countertrade partners to help it"
+  },
+  {
+    "chunk_id": "training-10268-p1-c6",
+    "doc_id": "training-10268",
+    "version_hash": "sha256:8329eef4a93ece32f48934e1bc551572f74fe859db41d3c4d7c6b6a3cbf0e782",
+    "page": 1,
+    "section_path": [
+      "Document"
+    ],
+    "char_offsets": [
+      3355,
+      4059
+    ],
+    "chunk_type": "clause",
+    "text": "drilling platform worth 40 mln dlrs to the state-run Oil and Natural Gas Commission. In return, the South Koreans gave a verbal assurance to buy Indian goods worth 10 pct of the contract, against the 25 pct sought by New Delhi, the trade official said. \"We selected the Korean firm because its bid was the lowest,\" he added. Countertrade is helping African countries short of foreign currency to import goods. India has signed a trade protocol to buy up to 15,000 tonnes of asbestos fibre from Zimbabwe in exchange for Indian goods, including jute bags and cars. But despite India's new drive, countertrade has some inherent problems, they added. \"It is not always easy to meet the basic requirement that",
+    "word_count": 120,
+    "summary": "In return, the South Koreans gave a verbal assurance to buy Indian goods worth 10 pct of the contract, against the 25 pct sought by New Delhi, the trade official said. India has signed a trade protocol to buy up to 15,000 tonnes of asbestos fibre from Zimbabwe in exchange for Indian goods, including jute bags and cars.",
+    "summary_is_evidence": false,
+    "summary_sentences_are_substrings": true,
+    "below_min_words": false,
+    "source_category": "coffee",
+    "source_title": "INDIA STEPS UP COUNTERTRADE DEALS TO CUT TRADE GAP India is searching for non-communist countertrade partners to help it"
+  },
+  {
+    "chunk_id": "training-10268-p1-c7",
+    "doc_id": "training-10268",
+    "version_hash": "sha256:8329eef4a93ece32f48934e1bc551572f74fe859db41d3c4d7c6b6a3cbf0e782",
+    "page": 1,
+    "section_path": [
+      "Document"
+    ],
+    "char_offsets": [
+      3980,
+      4486
+    ],
+    "chunk_type": "clause",
+    "text": "problems, they added. \"It is not always easy to meet the basic requirement that the trade should always be balanced,\" one trade source said. \"The other problem is it is often difficult to supply or buy commodities which the other party wants.\" Another added, \"Barter is also restrictive. We look upon it as a temporary measure to get over the current balance of payments difficulty. \"This is why countertrade has not been made a law in India. It does not even figure in the country's foreign trade policy.\"",
+    "word_count": 88,
+    "summary": "\"It is not always easy to meet the basic requirement that the trade should always be balanced,\" one trade source said. \"The other problem is it is often difficult to supply or buy commodities which the other party wants.\" Another added, \"Barter is also restrictive.",
+    "summary_is_evidence": false,
+    "summary_sentences_are_substrings": true,
+    "below_min_words": false,
+    "source_category": "coffee",
+    "source_title": "INDIA STEPS UP COUNTERTRADE DEALS TO CUT TRADE GAP India is searching for non-communist countertrade partners to help it"
+  },
+  {
+    "chunk_id": "training-1030-p1-c1",
+    "doc_id": "training-1030",
+    "version_hash": "sha256:83ce7566dfb64965954cd96b371dca455bc27e9a98d3f2888a7d83f4caa700f6",
+    "page": 1,
+    "section_path": [
+      "Document"
+    ],
+    "char_offsets": [
+      0,
+      565
+    ],
+    "chunk_type": "clause",
+    "text": "ZIMBABWE COFFEE OUTPUT SET TO RISE Zimbabwean coffee output will reach 13,000 tonnes this year, up on just over 11,000 tonnes produced in 1986, the Commercial Coffee Growers Association said. Administrative Executive Robin Taylor told the domestic news agency ZIANA that Zimbabwe earned the equivalent of 33 mln U.S. Dlrs from coffee exports last year. He would not say how much the country would earn in 1987. Taylor said the 173 commercial coffee growers under his association had increased production from 5,632 tonnes in 1980 to more than 11,000 tonnes in l986.",
+    "word_count": 92,
+    "summary": "ZIMBABWE COFFEE OUTPUT SET TO RISE Zimbabwean coffee output will reach 13,000 tonnes this year, up on just over 11,000 tonnes produced in 1986, the Commercial Coffee Growers Association said. Taylor said the 173 commercial coffee growers under his association had increased production from 5,632 tonnes in 1980 to more than 11,000 tonnes in l986.",
+    "summary_is_evidence": false,
+    "summary_sentences_are_substrings": true,
+    "below_min_words": false,
+    "source_category": "coffee",
+    "source_title": "ZIMBABWE COFFEE OUTPUT SET TO RISE Zimbabwean coffee output will reach 13,000 tonnes this year, up on just over 11,000 t"
+  },
+  {
+    "chunk_id": "training-10406-p1-c1",
+    "doc_id": "training-10406",
+    "version_hash": "sha256:e06802c7cd78bf22a3ad1f855fe751c7001dc31c659bfb46f6ab204f8d960f22",
+    "page": 1,
+    "section_path": [
+      "Document"
+    ],
+    "char_offsets": [
+      0,
+      772
+    ],
+    "chunk_type": "clause",
+    "text": "INDIA STEPS UP COUNTERTRADE DEALS India is searching for non-communist countertrade partners to help it cut its trade deficit and conserve foreign exchange. Wheat, tobacco, tea, coffee, jute, engineering and electronic goods, as well as minerals including iron ore, are all on offer in return for crude oil, petroleum products, chemicals, steel and machinery, trade sources told Reuters. Most of the impetus behind countertrade, which began in 1984, comes from two state trading firms -- the State Trading Corp (STC) and the Minerals and Metals Trading Corp (MMTC). \"The two state trading corporations are free to use their buying power in respect to bulk commodities to promote Indian exports,\" a commerce ministry spokeswoman said, adding that private firms are excluded",
+    "word_count": 120,
+    "summary": "Wheat, tobacco, tea, coffee, jute, engineering and electronic goods, as well as minerals including iron ore, are all on offer in return for crude oil, petroleum products, chemicals, steel and machinery, trade sources told Reuters. \"The two state trading corporations are free to use their buying power in respect to bulk commodities to promote Indian exports,\" a commerce ministry spokeswoman said, adding that private firms are excluded",
+    "summary_is_evidence": false,
+    "summary_sentences_are_substrings": true,
+    "below_min_words": false,
+    "source_category": "coffee",
+    "source_title": "INDIA STEPS UP COUNTERTRADE DEALS India is searching for non-communist countertrade partners to help it cut its trade de"
+  },
+  {
+    "chunk_id": "training-10406-p1-c2",
+    "doc_id": "training-10406",
+    "version_hash": "sha256:e06802c7cd78bf22a3ad1f855fe751c7001dc31c659bfb46f6ab204f8d960f22",
+    "page": 1,
+    "section_path": [
+      "Document"
+    ],
+    "char_offsets": [
+      671,
+      1445
+    ],
+    "chunk_type": "clause",
+    "text": "promote Indian exports,\" a commerce ministry spokeswoman said, adding that private firms are excluded from countertrading. One trade source said India has targetted countries that depend on an Indian domestic market recently opened to foreign imports. But countertrade deals still make up only a small part of India's total trading and are likely to account for less than eight pct of the estimated 18.53 billion dlrs in trade during the nine months ended December, the sources said. Countertrade accounted for just five pct of India's 25.65 billion dlrs in trade during fiscal 1985/86 ended March, against almost nothing in 1984/85, official figures show. However, the figures exclude exchanges with the Eastern Bloc paid in non-convertible Indian rupees, the sources said.",
+    "word_count": 120,
+    "summary": "But countertrade deals still make up only a small part of India's total trading and are likely to account for less than eight pct of the estimated 18.53 billion dlrs in trade during the nine months ended December, the sources said. Countertrade accounted for just five pct of India's 25.65 billion dlrs in trade during fiscal 1985/86 ended March, against almost nothing in 1984/85, official figures show.",
+    "summary_is_evidence": false,
+    "summary_sentences_are_substrings": true,
+    "below_min_words": false,
+    "source_category": "coffee",
+    "source_title": "INDIA STEPS UP COUNTERTRADE DEALS India is searching for non-communist countertrade partners to help it cut its trade de"
+  },
+  {
+    "chunk_id": "training-10406-p1-c3",
+    "doc_id": "training-10406",
+    "version_hash": "sha256:e06802c7cd78bf22a3ad1f855fe751c7001dc31c659bfb46f6ab204f8d960f22",
+    "page": 1,
+    "section_path": [
+      "Document"
+    ],
+    "char_offsets": [
+      1349,
+      1617
+    ],
+    "chunk_type": "clause",
+    "text": "exclude exchanges with the Eastern Bloc paid in non-convertible Indian rupees, the sources said. Total trade with the Soviet Union, involving swaps of agricultural produce and textiles for Soviet arms and crude oil, is estimated at 3.04 billion dlrs in fiscal 1986/87.",
+    "word_count": 42,
+    "summary": "exclude exchanges with the Eastern Bloc paid in non-convertible Indian rupees, the sources said. Total trade with the Soviet Union, involving swaps of agricultural produce and textiles for Soviet arms and crude oil, is estimated at 3.04 billion dlrs in fiscal 1986/87.",
+    "summary_is_evidence": false,
+    "summary_sentences_are_substrings": true,
+    "below_min_words": false,
+    "source_category": "coffee",
+    "source_title": "INDIA STEPS UP COUNTERTRADE DEALS India is searching for non-communist countertrade partners to help it cut its trade de"
+  },
+  {
+    "chunk_id": "training-10640-p1-c1",
+    "doc_id": "training-10640",
+    "version_hash": "sha256:83dc6403e34d0fb5757bd30eea5293654faf43fcd8269cde3304ef6d13b7ed65",
+    "page": 1,
+    "section_path": [
+      "Document"
+    ],
+    "char_offsets": [
+      0,
+      797
+    ],
+    "chunk_type": "clause",
+    "text": "COFFEE PRICES BAD NEWS FOR LATIN AMERICA -MINISTER A senior Nicaraguan official said a recent plunge in coffee prices was economically and politically disastrous for Latin American coffee-producing countries. Nicaraguan Foreign Trade Minister Alejandro Martinez Cuenca was in London to brief International Coffee Organisation (ICO) executive board producer members after a meeting last weekend in Managua attended by eight Latin American coffee producers to discuss the fall in coffee prices. London coffee prices slid 300 stg per tonne in March, to 1,279 stg from 1,580 stg at end-February. Martinez told reporters the price fall since the ICO failed to agree export quotas on March 1 has had disastrous results on Latin America, both economically and politically. He urged continued negotiations",
+    "word_count": 120,
+    "summary": "COFFEE PRICES BAD NEWS FOR LATIN AMERICA -MINISTER A senior Nicaraguan official said a recent plunge in coffee prices was economically and politically disastrous for Latin American coffee-producing countries. Nicaraguan Foreign Trade Minister Alejandro Martinez Cuenca was in London to brief International Coffee Organisation (ICO) executive board producer members after a meeting last weekend in Managua attended by eight Latin American coffee producers to discuss the fall in coffee prices.",
+    "summary_is_evidence": false,
+    "summary_sentences_are_substrings": true,
+    "below_min_words": false,
+    "source_category": "coffee",
+    "source_title": "COFFEE PRICES BAD NEWS FOR LATIN AMERICA -MINISTER A senior Nicaraguan official said a recent plunge in coffee prices wa"
+  },
+  {
+    "chunk_id": "training-10640-p1-c2",
+    "doc_id": "training-10640",
+    "version_hash": "sha256:83dc6403e34d0fb5757bd30eea5293654faf43fcd8269cde3304ef6d13b7ed65",
+    "page": 1,
+    "section_path": [
+      "Document"
+    ],
+    "char_offsets": [
+      690,
+      1442
+    ],
+    "chunk_type": "clause",
+    "text": "had disastrous results on Latin America, both economically and politically. He urged continued negotiations among coffee producers to pave the way for a coffee export quota agreement by September. Coffee export quotas, used to regulate coffee prices under an International Coffee Agreement, were suspended a year ago when prices soared in response to a drought in Brazil. Central American economic ministers have estimated the region will lose 720 mln dlrs in foreign exchange earnings in 1987 if coffee prices are not rescued by a quota arrangement, Martinez said. He said ICO quota talks broke down last month because consumer members lack the political will to fully support commodity agreements, and because consumers tried to dictate to producers.",
+    "word_count": 117,
+    "summary": "Central American economic ministers have estimated the region will lose 720 mln dlrs in foreign exchange earnings in 1987 if coffee prices are not rescued by a quota arrangement, Martinez said. He said ICO quota talks broke down last month because consumer members lack the political will to fully support commodity agreements, and because consumers tried to dictate to producers.",
+    "summary_is_evidence": false,
+    "summary_sentences_are_substrings": true,
+    "below_min_words": false,
+    "source_category": "coffee",
+    "source_title": "COFFEE PRICES BAD NEWS FOR LATIN AMERICA -MINISTER A senior Nicaraguan official said a recent plunge in coffee prices wa"
+  },
+  {
+    "chunk_id": "training-10682-p1-c1",
+    "doc_id": "training-10682",
+    "version_hash": "sha256:2603d24b2d820f8d6854bc668455f0c0071c94f2e810f71e73ae8e6171afa56f",
+    "page": 1,
+    "section_path": [
+      "Document"
+    ],
+    "char_offsets": [
+      0,
+      469
+    ],
+    "chunk_type": "clause",
+    "text": "PATON REPORTS U.S. GREEN COFFEE ROASTINGS HIGHER U.S. roastings of green coffee in the week ended March 21 were about 250,000 (60-kilo) bags, including that used for soluble production, compared with 195,000 bags in the corresponding week of last year and about 300,000 bags in the week ended March 14, George Gordon Paton and Co Inc reported. It said cumulative roastings for calendar 1987 now total 3,845,000 bags, compared with 4,070,000 bags by this time last year.",
+    "word_count": 77,
+    "summary": "roastings of green coffee in the week ended March 21 were about 250,000 (60-kilo) bags, including that used for soluble production, compared with 195,000 bags in the corresponding week of last year and about 300,000 bags in the week ended March 14, George Gordon Paton and Co Inc reported. It said cumulative roastings for calendar 1987 now total 3,845,000 bags, compared with 4,070,000 bags by this time last year.",
+    "summary_is_evidence": false,
+    "summary_sentences_are_substrings": true,
+    "below_min_words": false,
+    "source_category": "coffee",
+    "source_title": "PATON REPORTS U.S. GREEN COFFEE ROASTINGS HIGHER U.S. roastings of green coffee in the week ended March 21 were about 25"
+  },
+  {
+    "chunk_id": "training-10752-p1-c1",
+    "doc_id": "training-10752",
+    "version_hash": "sha256:11dc6c499c71afbc876c412f063ba86b41e79b94deaa136b61442f771e8fcef9",
+    "page": 1,
+    "section_path": [
+      "Document"
+    ],
+    "char_offsets": [
+      0,
+      595
+    ],
+    "chunk_type": "clause",
+    "text": "TOP QUALITIES SOUGHT ON HAMBURG COFFEE MARKET The green coffee market saw some demand for high quality coffees in the past week, but business was described as generally unsatisfactory, trade sources said. Especially sought were spot East African and Ethiopian and some Brazils, they said, adding that some high grade robustas also met some demand. Sporadic business was noted in the second hand which offered Kenya coffee for May/June shipment up to 25 dlrs below origin levels. Roasters are said to be well covered and are not expected to enter the market for larger purchases in the near term.",
+    "word_count": 99,
+    "summary": "TOP QUALITIES SOUGHT ON HAMBURG COFFEE MARKET The green coffee market saw some demand for high quality coffees in the past week, but business was described as generally unsatisfactory, trade sources said. Especially sought were spot East African and Ethiopian and some Brazils, they said, adding that some high grade robustas also met some demand.",
+    "summary_is_evidence": false,
+    "summary_sentences_are_substrings": true,
+    "below_min_words": false,
+    "source_category": "coffee",
+    "source_title": "TOP QUALITIES SOUGHT ON HAMBURG COFFEE MARKET The green coffee market saw some demand for high quality coffees in the pa"
+  },
+  {
+    "chunk_id": "training-1085-p1-c1",
+    "doc_id": "training-1085",
+    "version_hash": "sha256:cc56b827bde2b754c81b1bf4ac943794dde3cb4dde232f63b9849846a3da7518",
+    "page": 1,
+    "section_path": [
+      "Document"
+    ],
+    "char_offsets": [
+      0,
+      774
+    ],
+    "chunk_type": "definition",
+    "text": "COFFEE TALKS COLLAPSE EASES NEED FOR U.S. BILL The collapse of International Coffee Organization, ICO, talks on export quotas yesterday removes the immediate need to reinstate U.S. legislation allowing the customs service to monitor coffee imports, analysts here said. The Reagan administration proposed in trade legislation offered Congress last month that authority to monitor coffee imports be resumed. That authority lapsed in September 1986. A bill also was introduced by Rep. Frank Guarini (D-N.J.). However, the failure of the ICO talks in London to reach agreement on export quotas means the U.S. legislation is not immediately needed, one analyst said. Earlier supporters of the coffee bill hoped it could be passed by Congress quickly. \"You're going to have a hard",
+    "word_count": 120,
+    "summary": "BILL The collapse of International Coffee Organization, ICO, talks on export quotas yesterday removes the immediate need to reinstate U.S. The Reagan administration proposed in trade legislation offered Congress last month that authority to monitor coffee imports be resumed.",
+    "summary_is_evidence": false,
+    "summary_sentences_are_substrings": true,
+    "below_min_words": false,
+    "source_category": "coffee",
+    "source_title": "COFFEE TALKS COLLAPSE EASES NEED FOR U.S. BILL The collapse of International Coffee Organization, ICO, talks on export q"
+  },
+  {
+    "chunk_id": "training-1085-p1-c2",
+    "doc_id": "training-1085",
+    "version_hash": "sha256:cc56b827bde2b754c81b1bf4ac943794dde3cb4dde232f63b9849846a3da7518",
+    "page": 1,
+    "section_path": [
+      "Document"
+    ],
+    "char_offsets": [
+      700,
+      856
+    ],
+    "chunk_type": "clause",
+    "text": "hoped it could be passed by Congress quickly. \"You're going to have a hard time convincing Congress (now) this is an urgent issue,\" the coffee analyst said.",
+    "word_count": 27,
+    "summary": "hoped it could be passed by Congress quickly. \"You're going to have a hard time convincing Congress (now) this is an urgent issue,\" the coffee analyst said.",
+    "summary_is_evidence": false,
+    "summary_sentences_are_substrings": true,
+    "below_min_words": true,
+    "source_category": "coffee",
+    "source_title": "COFFEE TALKS COLLAPSE EASES NEED FOR U.S. BILL The collapse of International Coffee Organization, ICO, talks on export q"
+  },
+  {
+    "chunk_id": "training-10876-p1-c1",
+    "doc_id": "training-10876",
+    "version_hash": "sha256:5abc4bb08a053b1a31bbbcb2e1a35f63db4b8eba9ed21b072594e77d1fee9cd7",
+    "page": 1,
+    "section_path": [
+      "Document"
+    ],
+    "char_offsets": [
+      0,
+      751
+    ],
+    "chunk_type": "clause",
+    "text": "U.S. SEES NO NEW COFFEE AGREEMENT TALKS SOON The United States does not expect the executive board meeting of the International Coffee Organization, ICO, to call for a new round of negotiations on reinstating coffee quotas, a U.S. government official said. The official, a member of the U.S. delegation to ICO talks earlier this year, said no new coffee agreement talks are expected because there is no indication the negotiating positions of major producers and consumers have changed. The U.S. still demands, as a condition of reimposition of coffee quotas, that \"objective criteria\" be set for establishing quotas, said the U.S. official, who asked not to be identified. Brazil, the major producer, insists on quotas based on a traditional formula.",
+    "word_count": 120,
+    "summary": "SEES NO NEW COFFEE AGREEMENT TALKS SOON The United States does not expect the executive board meeting of the International Coffee Organization, ICO, to call for a new round of negotiations on reinstating coffee quotas, a U.S. delegation to ICO talks earlier this year, said no new coffee agreement talks are expected because there is no indication the negotiating positions of major producers and consumers have changed.",
+    "summary_is_evidence": false,
+    "summary_sentences_are_substrings": true,
+    "below_min_words": false,
+    "source_category": "coffee",
+    "source_title": "U.S. SEES NO NEW COFFEE AGREEMENT TALKS SOON The United States does not expect the executive board meeting of the Intern"
+  },
+  {
+    "chunk_id": "training-10876-p1-c2",
+    "doc_id": "training-10876",
+    "version_hash": "sha256:5abc4bb08a053b1a31bbbcb2e1a35f63db4b8eba9ed21b072594e77d1fee9cd7",
+    "page": 1,
+    "section_path": [
+      "Document"
+    ],
+    "char_offsets": [
+      659,
+      934
+    ],
+    "chunk_type": "clause",
+    "text": "be identified. Brazil, the major producer, insists on quotas based on a traditional formula. The U.S. remains open to a negotiating meeting but only if some new flexibility is apparent from major countries, the official said. The ICO executive board meets tomorrow in London.",
+    "word_count": 44,
+    "summary": "Brazil, the major producer, insists on quotas based on a traditional formula. remains open to a negotiating meeting but only if some new flexibility is apparent from major countries, the official said.",
+    "summary_is_evidence": false,
+    "summary_sentences_are_substrings": true,
+    "below_min_words": false,
+    "source_category": "coffee",
+    "source_title": "U.S. SEES NO NEW COFFEE AGREEMENT TALKS SOON The United States does not expect the executive board meeting of the Intern"
+  },
+  {
+    "chunk_id": "training-10902-p1-c1",
+    "doc_id": "training-10902",
+    "version_hash": "sha256:7e2da132556bc3a062b6161c346f30f52cfa014351cce7d1aea49c13fa73e2d2",
+    "page": 1,
+    "section_path": [
+      "Document"
+    ],
+    "char_offsets": [
+      0,
+      757
+    ],
+    "chunk_type": "clause",
+    "text": "ICO BOARD SEEN UNLIKELY TO SET NEW COFFEE TALKS Chances that the International Coffee Organization, ICO, executive board meeting this week will agree to resume negotiations on export quotas soon look remote, ICO delegates and trade sources said. ICO observers doubted Brazil or key consuming countries are ready to give sufficient ground to convince the other side that reopening negotiations again would be worthwhile, they said. ICO talks on quotas last month broke down after eight days when producers and consumers failed to reach agreement. \"Since we have not seen signs of change in other positions, it's difficult to see a positive outcome at this stage,\" Brazilian delegate Lindenberg Sette said. But quotas must be negotiated sometime, he said. The",
+    "word_count": 120,
+    "summary": "ICO BOARD SEEN UNLIKELY TO SET NEW COFFEE TALKS Chances that the International Coffee Organization, ICO, executive board meeting this week will agree to resume negotiations on export quotas soon look remote, ICO delegates and trade sources said. ICO observers doubted Brazil or key consuming countries are ready to give sufficient ground to convince the other side that reopening negotiations again would be worthwhile, they said.",
+    "summary_is_evidence": false,
+    "summary_sentences_are_substrings": true,
+    "below_min_words": false,
+    "source_category": "coffee",
+    "source_title": "ICO BOARD SEEN UNLIKELY TO SET NEW COFFEE TALKS Chances that the International Coffee Organization, ICO, executive board"
+  },
+  {
+    "chunk_id": "training-10902-p1-c2",
+    "doc_id": "training-10902",
+    "version_hash": "sha256:7e2da132556bc3a062b6161c346f30f52cfa014351cce7d1aea49c13fa73e2d2",
+    "page": 1,
+    "section_path": [
+      "Document"
+    ],
+    "char_offsets": [
+      663,
+      1430
+    ],
+    "chunk_type": "clause",
+    "text": "Brazilian delegate Lindenberg Sette said. But quotas must be negotiated sometime, he said. The U.S. has indicated it is open to dialogue on quotas but that Brazil must be flexible, rather than refuse to lower its export share as it did in the last negotiations, delegates said. At this week's March 31-April 2 meeting, the 16-member ICO board is scheduled to discuss the current market situation, the reintroduction of quotas, verification of stocks and some administrative matters, according to a draft agenda. The fact that Brazilian Coffee Institute president Jorio Dauster, Assistant U.S. Trade Representative Jon Rosenbaum and chief Colombian delegate Jorge Cardenas are not attending the meeting has signalled to most market watchers that it will be a non-event",
+    "word_count": 120,
+    "summary": "At this week's March 31-April 2 meeting, the 16-member ICO board is scheduled to discuss the current market situation, the reintroduction of quotas, verification of stocks and some administrative matters, according to a draft agenda. Trade Representative Jon Rosenbaum and chief Colombian delegate Jorge Cardenas are not attending the meeting has signalled to most market watchers that it will be a non-event",
+    "summary_is_evidence": false,
+    "summary_sentences_are_substrings": true,
+    "below_min_words": false,
+    "source_category": "coffee",
+    "source_title": "ICO BOARD SEEN UNLIKELY TO SET NEW COFFEE TALKS Chances that the International Coffee Organization, ICO, executive board"
+  },
+  {
+    "chunk_id": "training-10902-p1-c3",
+    "doc_id": "training-10902",
+    "version_hash": "sha256:7e2da132556bc3a062b6161c346f30f52cfa014351cce7d1aea49c13fa73e2d2",
+    "page": 1,
+    "section_path": [
+      "Document"
+    ],
+    "char_offsets": [
+      1353,
+      2077
+    ],
+    "chunk_type": "clause",
+    "text": "the meeting has signalled to most market watchers that it will be a non-event as far as negotiating quotas is concerned. \"I would imagine there will be a lot of politicking among producers behind closed doors to work up some kind of proposal by September (the next scheduled council meeting),\" Bronwyn Curtis of Landell Mills Commodities Studies said. Traders and delegates said they have seen no sign that a date will be set for an earlier council meeting. If the stalemate continues much longer, analysts expect the coffee agreement will end up operating without quotas for the remainder of its life, to September 30, 1989. When talks broke down, the U.S. and Brazil, the largest coffee consumer and producer respectively,",
+    "word_count": 120,
+    "summary": "\"I would imagine there will be a lot of politicking among producers behind closed doors to work up some kind of proposal by September (the next scheduled council meeting),\" Bronwyn Curtis of Landell Mills Commodities Studies said. If the stalemate continues much longer, analysts expect the coffee agreement will end up operating without quotas for the remainder of its life, to September 30, 1989.",
+    "summary_is_evidence": false,
+    "summary_sentences_are_substrings": true,
+    "below_min_words": false,
+    "source_category": "coffee",
+    "source_title": "ICO BOARD SEEN UNLIKELY TO SET NEW COFFEE TALKS Chances that the International Coffee Organization, ICO, executive board"
+  },
+  {
+    "chunk_id": "training-10902-p1-c4",
+    "doc_id": "training-10902",
+    "version_hash": "sha256:7e2da132556bc3a062b6161c346f30f52cfa014351cce7d1aea49c13fa73e2d2",
+    "page": 1,
+    "section_path": [
+      "Document"
+    ],
+    "char_offsets": [
+      1984,
+      2763
+    ],
+    "chunk_type": "clause",
+    "text": "talks broke down, the U.S. and Brazil, the largest coffee consumer and producer respectively, blamed one another for sabotaging negotiations by refusing to compromise. Brazil wanted to maintain the previous export quota shares, under which it was allocated 30 pct of world coffee exports, but consumers and a small group of producers pressed for shares to be redistributed using \"objective criteria,\" which would have threatened Brazil's share. At a recent meeting in Managua of Latin American producers, Costa Rica and Honduras said they were willing to put their objections as members of the group of eight ICO \"dissident\" producers aside, in order to stem the damaging decline in prices, Nicaraguan External Trade Minister Alejandro Martinez Cuenca told reporters Saturday. He",
+    "word_count": 120,
+    "summary": "Brazil wanted to maintain the previous export quota shares, under which it was allocated 30 pct of world coffee exports, but consumers and a small group of producers pressed for shares to be redistributed using \"objective criteria,\" which would have threatened Brazil's share. At a recent meeting in Managua of Latin American producers, Costa Rica and Honduras said they were willing to put their objections as members of the group of eight ICO \"dissident\" producers aside, in order to stem the damaging decline in prices, Nicaraguan External Trade Minister Alejandro Martinez Cuenca told reporters Saturday.",
+    "summary_is_evidence": false,
+    "summary_sentences_are_substrings": true,
+    "below_min_words": false,
+    "source_category": "coffee",
+    "source_title": "ICO BOARD SEEN UNLIKELY TO SET NEW COFFEE TALKS Chances that the International Coffee Organization, ICO, executive board"
+  },
+  {
+    "chunk_id": "training-10902-p1-c5",
+    "doc_id": "training-10902",
+    "version_hash": "sha256:7e2da132556bc3a062b6161c346f30f52cfa014351cce7d1aea49c13fa73e2d2",
+    "page": 1,
+    "section_path": [
+      "Document"
+    ],
+    "char_offsets": [
+      2656,
+      3017
+    ],
+    "chunk_type": "clause",
+    "text": "decline in prices, Nicaraguan External Trade Minister Alejandro Martinez Cuenca told reporters Saturday. He was in London to brief producers on the Managua meeting. However, other producers said they were not aware of this move toward producer solidarity. London coffee prices closed at 1,276 stg a tonne today, down from around 1,550 at the beginning of March.",
+    "word_count": 57,
+    "summary": "decline in prices, Nicaraguan External Trade Minister Alejandro Martinez Cuenca told reporters Saturday. London coffee prices closed at 1,276 stg a tonne today, down from around 1,550 at the beginning of March.",
+    "summary_is_evidence": false,
+    "summary_sentences_are_substrings": true,
+    "below_min_words": false,
+    "source_category": "coffee",
+    "source_title": "ICO BOARD SEEN UNLIKELY TO SET NEW COFFEE TALKS Chances that the International Coffee Organization, ICO, executive board"
+  },
+  {
+    "chunk_id": "training-10959-p1-c1",
+    "doc_id": "training-10959",
+    "version_hash": "sha256:8ded077fb95c8880217ffd846eb0a8b8b92264808a837b6c098453675d2531c7",
+    "page": 1,
+    "section_path": [
+      "Document"
+    ],
+    "char_offsets": [
+      0,
+      763
+    ],
+    "chunk_type": "clause",
+    "text": "IBC EXPECTED TO MAINTAIN COFFEE EXPORT FORMULA The Brazilian Coffee Institute, IBC, is expected to maintain its previous pricing system when it reopens export registrations, probably later this week, exporters said. They said IBC President Jorio Dauster is likely to leave the basic formula for the minimum registration price unchanged but raise the contribution quota to partially offset the effects of cruzado devaluation since April registrations were closed in mid-February. To fully compensate for devaluation the quota would have to be around 28 dlrs per bag against 7.0 when registrations closed. However, even a 21 dlr per bag rise in the contribution quota would make Brazil coffees uncompetitive on world markets, and an increase to around 15 dlrs a bag",
+    "word_count": 120,
+    "summary": "IBC EXPECTED TO MAINTAIN COFFEE EXPORT FORMULA The Brazilian Coffee Institute, IBC, is expected to maintain its previous pricing system when it reopens export registrations, probably later this week, exporters said. They said IBC President Jorio Dauster is likely to leave the basic formula for the minimum registration price unchanged but raise the contribution quota to partially offset the effects of cruzado devaluation since April registrations were closed in mid-February.",
+    "summary_is_evidence": false,
+    "summary_sentences_are_substrings": true,
+    "below_min_words": false,
+    "source_category": "coffee",
+    "source_title": "IBC EXPECTED TO MAINTAIN COFFEE EXPORT FORMULA The Brazilian Coffee Institute, IBC, is expected to maintain its previous"
+  },
+  {
+    "chunk_id": "training-10959-p1-c2",
+    "doc_id": "training-10959",
+    "version_hash": "sha256:8ded077fb95c8880217ffd846eb0a8b8b92264808a837b6c098453675d2531c7",
+    "page": 1,
+    "section_path": [
+      "Document"
+    ],
+    "char_offsets": [
+      684,
+      1396
+    ],
+    "chunk_type": "clause",
+    "text": "coffees uncompetitive on world markets, and an increase to around 15 dlrs a bag is more likely, the exporters said. They added that Dauster is keen to raise the contribution quota as the Institute needs money to repay Central Governmnet funds released to finance IBC purchases at the guaranteed producer price. Although a vote in the Monetary Council to provide more funds for such purchases was deferred on technical grounds last week, funds are still being released for subsequent approval. The sources said it is still unclear when registrations will be reopened, although most expect it to be by the end of this week. \"Brazil owes it to its customers to make its intentions know. A country like Brazil cannot",
+    "word_count": 120,
+    "summary": "They added that Dauster is keen to raise the contribution quota as the Institute needs money to repay Central Governmnet funds released to finance IBC purchases at the guaranteed producer price. Although a vote in the Monetary Council to provide more funds for such purchases was deferred on technical grounds last week, funds are still being released for subsequent approval.",
+    "summary_is_evidence": false,
+    "summary_sentences_are_substrings": true,
+    "below_min_words": false,
+    "source_category": "coffee",
+    "source_title": "IBC EXPECTED TO MAINTAIN COFFEE EXPORT FORMULA The Brazilian Coffee Institute, IBC, is expected to maintain its previous"
+  },
+  {
+    "chunk_id": "training-10959-p1-c3",
+    "doc_id": "training-10959",
+    "version_hash": "sha256:8ded077fb95c8880217ffd846eb0a8b8b92264808a837b6c098453675d2531c7",
+    "page": 1,
+    "section_path": [
+      "Document"
+    ],
+    "char_offsets": [
+      1319,
+      2068
+    ],
+    "chunk_type": "clause",
+    "text": "it to its customers to make its intentions know. A country like Brazil cannot afford to be permanently closed down,\" one exporter said. However, before announcing its export policy the IBC is likely to wait to see if tomorrow's meeting of the International Coffee Organisation, ICO, executive board in London decides to call a full council meeting to discuss reintroduction of export quotas, sources said. There is also talk of the announcement this week of new measures to adjust the Brazilian economy, and the IBC could be awaiting clarification before making any move, the exporters said. Another factor which could be delaying the opening of registrations is the current strike by bank workers which, while not affecting current shipments, could",
+    "word_count": 120,
+    "summary": "However, before announcing its export policy the IBC is likely to wait to see if tomorrow's meeting of the International Coffee Organisation, ICO, executive board in London decides to call a full council meeting to discuss reintroduction of export quotas, sources said. There is also talk of the announcement this week of new measures to adjust the Brazilian economy, and the IBC could be awaiting clarification before making any move, the exporters said.",
+    "summary_is_evidence": false,
+    "summary_sentences_are_substrings": true,
+    "below_min_words": false,
+    "source_category": "coffee",
+    "source_title": "IBC EXPECTED TO MAINTAIN COFFEE EXPORT FORMULA The Brazilian Coffee Institute, IBC, is expected to maintain its previous"
+  },
+  {
+    "chunk_id": "training-10959-p1-c4",
+    "doc_id": "training-10959",
+    "version_hash": "sha256:8ded077fb95c8880217ffd846eb0a8b8b92264808a837b6c098453675d2531c7",
+    "page": 1,
+    "section_path": [
+      "Document"
+    ],
+    "char_offsets": [
+      1979,
+      2285
+    ],
+    "chunk_type": "clause",
+    "text": "is the current strike by bank workers which, while not affecting current shipments, could affect documentation and currency operations for new sales. This would certainly be the case if the IBC was considering obliging exporters to pay the contribution quota within two or three days of registering a sale.",
+    "word_count": 49,
+    "summary": "is the current strike by bank workers which, while not affecting current shipments, could affect documentation and currency operations for new sales. This would certainly be the case if the IBC was considering obliging exporters to pay the contribution quota within two or three days of registering a sale.",
+    "summary_is_evidence": false,
+    "summary_sentences_are_substrings": true,
+    "below_min_words": false,
+    "source_category": "coffee",
+    "source_title": "IBC EXPECTED TO MAINTAIN COFFEE EXPORT FORMULA The Brazilian Coffee Institute, IBC, is expected to maintain its previous"
+  },
+  {
+    "chunk_id": "training-11183-p1-c1",
+    "doc_id": "training-11183",
+    "version_hash": "sha256:ad37c4dbad7270e5802ed1904ce385e532aba1eba7d07bb3d0ff387838f24018",
+    "page": 1,
+    "section_path": [
+      "Document"
+    ],
+    "char_offsets": [
+      0,
+      723
+    ],
+    "chunk_type": "clause",
+    "text": "INDIA REDUCES EXPORT DUTY ON COFFEE India cut the export duty on coffee to 330 rupees per 100 kg from 600 rupees, effective March 23, a Coffee Board official said. The reduction should help India reach its coffee export target of 90,000 tonnes in fiscal 1987/88 ending March 31, against provisionally estimated exports of 75,000 tonnes in 1986/87 and an actual 99,254 tonnes in 1985/86, he said. India is likely to press for international export quotas at a meeting of coffee producers in London this week because of depressed prices, he added. The International Coffee Organisation, which represents both consumers and producers, has so far failed to reach agreement on quotas. India feels it will be useful to have quotas",
+    "word_count": 120,
+    "summary": "INDIA REDUCES EXPORT DUTY ON COFFEE India cut the export duty on coffee to 330 rupees per 100 kg from 600 rupees, effective March 23, a Coffee Board official said. The reduction should help India reach its coffee export target of 90,000 tonnes in fiscal 1987/88 ending March 31, against provisionally estimated exports of 75,000 tonnes in 1986/87 and an actual 99,254 tonnes in 1985/86, he said.",
+    "summary_is_evidence": false,
+    "summary_sentences_are_substrings": true,
+    "below_min_words": false,
+    "source_category": "coffee",
+    "source_title": "INDIA REDUCES EXPORT DUTY ON COFFEE India cut the export duty on coffee to 330 rupees per 100 kg from 600 rupees, effect"
+  },
+  {
+    "chunk_id": "training-11183-p1-c2",
+    "doc_id": "training-11183",
+    "version_hash": "sha256:ad37c4dbad7270e5802ed1904ce385e532aba1eba7d07bb3d0ff387838f24018",
+    "page": 1,
+    "section_path": [
+      "Document"
+    ],
+    "char_offsets": [
+      649,
+      923
+    ],
+    "chunk_type": "clause",
+    "text": "to reach agreement on quotas. India feels it will be useful to have quotas now because the slide in prices is unlikely to be halted immediately, he said. Export quotas were suspended in February 1986 when market prices surged after a drought devastated Brazil's coffee crop.",
+    "word_count": 46,
+    "summary": "India feels it will be useful to have quotas now because the slide in prices is unlikely to be halted immediately, he said. Export quotas were suspended in February 1986 when market prices surged after a drought devastated Brazil's coffee crop.",
+    "summary_is_evidence": false,
+    "summary_sentences_are_substrings": true,
+    "below_min_words": false,
+    "source_category": "coffee",
+    "source_title": "INDIA REDUCES EXPORT DUTY ON COFFEE India cut the export duty on coffee to 330 rupees per 100 kg from 600 rupees, effect"
+  },
+  {
+    "chunk_id": "training-11224-p1-c1",
+    "doc_id": "training-11224",
+    "version_hash": "sha256:30d5ef09c1235d0519ec40845239d2900d52381a2bcd43fb66e0d7a6b7751293",
+    "page": 1,
+    "section_path": [
+      "Document"
+    ],
+    "char_offsets": [
+      0,
+      802
+    ],
+    "chunk_type": "clause",
+    "text": "COMMODITY PACTS MORE ORIENTED TOWARDS MARKET Consuming countries, chastened by the collapse of International Tin Council (ITC) price support operations in 1985, are insisting more than ever before that commodity pacts reflect the reality of the markets they are serving, a Reuter survey showed. They want price ranges to be more responsive to market trends - to avoid overstimulating output and straining the accords' support operations - and intervention rules that avoid the risk of exports by non-members undermining the pacts. Consumers and producers, mindful of ITC buffer stock losses, have also sought strict conditions for buffer operations. Importers and some key exporting countries have shunned a generalised approach to commodity price stabilisation and prefer to assess each commodity case",
+    "word_count": 120,
+    "summary": "COMMODITY PACTS MORE ORIENTED TOWARDS MARKET Consuming countries, chastened by the collapse of International Tin Council (ITC) price support operations in 1985, are insisting more than ever before that commodity pacts reflect the reality of the markets they are serving, a Reuter survey showed. They want price ranges to be more responsive to market trends - to avoid overstimulating output and straining the accords' support operations - and intervention rules that avoid the risk of exports by non-members undermining the pacts.",
+    "summary_is_evidence": false,
+    "summary_sentences_are_substrings": true,
+    "below_min_words": false,
+    "source_category": "coffee",
+    "source_title": "COMMODITY PACTS MORE ORIENTED TOWARDS MARKET Consuming countries, chastened by the collapse of International Tin Council"
+  },
+  {
+    "chunk_id": "training-11224-p1-c2",
+    "doc_id": "training-11224",
+    "version_hash": "sha256:30d5ef09c1235d0519ec40845239d2900d52381a2bcd43fb66e0d7a6b7751293",
+    "page": 1,
+    "section_path": [
+      "Document"
+    ],
+    "char_offsets": [
+      706,
+      1503
+    ],
+    "chunk_type": "clause",
+    "text": "a generalised approach to commodity price stabilisation and prefer to assess each commodity case by case, the survey showed. The International Cocoa Organization (ICCO) last week set precise limits on what the Buffer Stock Manager (BSM) could do under the new agreement. It imposed daily and weekly purchase limits, prohibited the BSM from operating on futures markets and stipulated, after consumer insistence, that up to 15 pct of total buffer stock purchases could be of non-member cocoa. This will help prevent lower quality cocoa from Malaysia, the world's fourth largest producer, undermining the market. The cocoa pact establishes precise differentials the Buffer Stock Manager must use when purchasing varying grades. A new International Natural Rubber Agreement (INRA) was adopted earlier",
+    "word_count": 120,
+    "summary": "The International Cocoa Organization (ICCO) last week set precise limits on what the Buffer Stock Manager (BSM) could do under the new agreement. It imposed daily and weekly purchase limits, prohibited the BSM from operating on futures markets and stipulated, after consumer insistence, that up to 15 pct of total buffer stock purchases could be of non-member cocoa.",
+    "summary_is_evidence": false,
+    "summary_sentences_are_substrings": true,
+    "below_min_words": false,
+    "source_category": "coffee",
+    "source_title": "COMMODITY PACTS MORE ORIENTED TOWARDS MARKET Consuming countries, chastened by the collapse of International Tin Council"
+  },
+  {
+    "chunk_id": "training-11224-p1-c3",
+    "doc_id": "training-11224",
+    "version_hash": "sha256:30d5ef09c1235d0519ec40845239d2900d52381a2bcd43fb66e0d7a6b7751293",
+    "page": 1,
+    "section_path": [
+      "Document"
+    ],
+    "char_offsets": [
+      1400,
+      2246
+    ],
+    "chunk_type": "clause",
+    "text": "when purchasing varying grades. A new International Natural Rubber Agreement (INRA) was adopted earlier this month in Geneva. Importing and exporting countries agreed several changes to make the reference price more responsive to market trends and they eliminated provisions under which the buffer stock could borrow from banks to finance operations. Direct cash contributions from members will fund buffer stock purchases. Bank financing was a particular feature of the failed ITC buffer stock which suffered losses running into hundreds of millions of sterling. Legal wrangles continue. Recent International Coffee Organization (ICO) negotiations in London exemplified the degree to which consumers insist that agreements reflect market reality, commodity analysts said. Consumers and a small group of producers argued that \"objective criteria\"",
+    "word_count": 120,
+    "summary": "Importing and exporting countries agreed several changes to make the reference price more responsive to market trends and they eliminated provisions under which the buffer stock could borrow from banks to finance operations. Recent International Coffee Organization (ICO) negotiations in London exemplified the degree to which consumers insist that agreements reflect market reality, commodity analysts said.",
+    "summary_is_evidence": false,
+    "summary_sentences_are_substrings": true,
+    "below_min_words": false,
+    "source_category": "coffee",
+    "source_title": "COMMODITY PACTS MORE ORIENTED TOWARDS MARKET Consuming countries, chastened by the collapse of International Tin Council"
+  },
+  {
+    "chunk_id": "training-11224-p1-c4",
+    "doc_id": "training-11224",
+    "version_hash": "sha256:30d5ef09c1235d0519ec40845239d2900d52381a2bcd43fb66e0d7a6b7751293",
+    "page": 1,
+    "section_path": [
+      "Document"
+    ],
+    "char_offsets": [
+      2148,
+      2923
+    ],
+    "chunk_type": "clause",
+    "text": "commodity analysts said. Consumers and a small group of producers argued that \"objective criteria\" should be used to define export quota shares, which would have meant a reduction in the share of Brazil, the world's leading producer. Brazil wanted to maintain its previous quota share of 30 pct. The talks broke down and, although an ICO executive board meeting starts in London today, delegates and trade sources see chances of any near term negotiations on export quota distribution as remote. International agreements exist for sugar and wheat. These do not have any economic clauses but provide a forum for discussions on possible future economic agreements, collect statistics and draw up market analyses. Analysts said differences between sugar exporting countries have",
+    "word_count": 120,
+    "summary": "Consumers and a small group of producers argued that \"objective criteria\" should be used to define export quota shares, which would have meant a reduction in the share of Brazil, the world's leading producer. The talks broke down and, although an ICO executive board meeting starts in London today, delegates and trade sources see chances of any near term negotiations on export quota distribution as remote.",
+    "summary_is_evidence": false,
+    "summary_sentences_are_substrings": true,
+    "below_min_words": false,
+    "source_category": "coffee",
+    "source_title": "COMMODITY PACTS MORE ORIENTED TOWARDS MARKET Consuming countries, chastened by the collapse of International Tin Council"
+  },
+  {
+    "chunk_id": "training-11224-p1-c5",
+    "doc_id": "training-11224",
+    "version_hash": "sha256:30d5ef09c1235d0519ec40845239d2900d52381a2bcd43fb66e0d7a6b7751293",
+    "page": 1,
+    "section_path": [
+      "Document"
+    ],
+    "char_offsets": [
+      2819,
+      3584
+    ],
+    "chunk_type": "clause",
+    "text": "statistics and draw up market analyses. Analysts said differences between sugar exporting countries have held up any progress towards an accord with economic teeth, while sheer competition between major exporters amid a world grain glut militate against any pact with economic provisions for wheat. An alternative focus for commodity discussions are international study groups, made up of governments with advice from industry, such as those for lead and zinc and rubber. The U.N. Common fund for commodities, with a planned directly contributed capital of 470 mln dlrs, has failed to become operational because neither the U.S. Nor the Soviet Union has ratified it. U.S. Officials in Washington said the U.S. Doubts the fund would be able to fulfil its objectives,",
+    "word_count": 120,
+    "summary": "Analysts said differences between sugar exporting countries have held up any progress towards an accord with economic teeth, while sheer competition between major exporters amid a world grain glut militate against any pact with economic provisions for wheat. Common fund for commodities, with a planned directly contributed capital of 470 mln dlrs, has failed to become operational because neither the U.S.",
+    "summary_is_evidence": false,
+    "summary_sentences_are_substrings": true,
+    "below_min_words": false,
+    "source_category": "coffee",
+    "source_title": "COMMODITY PACTS MORE ORIENTED TOWARDS MARKET Consuming countries, chastened by the collapse of International Tin Council"
+  },
+  {
+    "chunk_id": "training-11224-p1-c6",
+    "doc_id": "training-11224",
+    "version_hash": "sha256:30d5ef09c1235d0519ec40845239d2900d52381a2bcd43fb66e0d7a6b7751293",
+    "page": 1,
+    "section_path": [
+      "Document"
+    ],
+    "char_offsets": [
+      3504,
+      4272
+    ],
+    "chunk_type": "clause",
+    "text": "Washington said the U.S. Doubts the fund would be able to fulfil its objectives, citing the lack of widespread support. U.S. Officials in Washington and Malaysian officials in Kuala Lumpur expressed a policy of looking at each commodity pact case by case. U.S. Officials said it has been willing to study individual cases for economically sound, market-oriented commodity accords balancing producer and consumer interests. \"We see little to be gained by attempting to increase the price of a commodity whose long-term trend is downward,\" official Administration policy states. The U.S. Currently belongs to only two international commodity agreements that have economic clauses - the International Coffee Agreement (ICA) and INRA - but it is also a member of the sugar",
+    "word_count": 120,
+    "summary": "Officials said it has been willing to study individual cases for economically sound, market-oriented commodity accords balancing producer and consumer interests. Currently belongs to only two international commodity agreements that have economic clauses - the International Coffee Agreement (ICA) and INRA - but it is also a member of the sugar",
+    "summary_is_evidence": false,
+    "summary_sentences_are_substrings": true,
+    "below_min_words": false,
+    "source_category": "coffee",
+    "source_title": "COMMODITY PACTS MORE ORIENTED TOWARDS MARKET Consuming countries, chastened by the collapse of International Tin Council"
+  },
+  {
+    "chunk_id": "training-11224-p1-c7",
+    "doc_id": "training-11224",
+    "version_hash": "sha256:30d5ef09c1235d0519ec40845239d2900d52381a2bcd43fb66e0d7a6b7751293",
+    "page": 1,
+    "section_path": [
+      "Document"
+    ],
+    "char_offsets": [
+      4209,
+      4944
+    ],
+    "chunk_type": "clause",
+    "text": "Agreement (ICA) and INRA - but it is also a member of the sugar and wheat pacts. The U.S. Did not join the International Cocoa Agreement because it considered its proposed price ranges unrealistic and not designed to protect the interests of consuming countries, the State Department said. U.S. Officials singled out the INRA as the one commodity agreement that seems to be working. U.S. Negotiators were successful in getting other members of the pact to agree that the price review and adjustment mechanism of the rubber agreement would accurately reflect market trends and also to continue the accord as a market oriented agreement, U.S. Officials said. Canadian officials in Ottawa also said they have consistently tried to look at",
+    "word_count": 120,
+    "summary": "Did not join the International Cocoa Agreement because it considered its proposed price ranges unrealistic and not designed to protect the interests of consuming countries, the State Department said. Negotiators were successful in getting other members of the pact to agree that the price review and adjustment mechanism of the rubber agreement would accurately reflect market trends and also to continue the accord as a market oriented agreement, U.S.",
+    "summary_is_evidence": false,
+    "summary_sentences_are_substrings": true,
+    "below_min_words": false,
+    "source_category": "coffee",
+    "source_title": "COMMODITY PACTS MORE ORIENTED TOWARDS MARKET Consuming countries, chastened by the collapse of International Tin Council"
+  },
+  {
+    "chunk_id": "training-11224-p1-c8",
+    "doc_id": "training-11224",
+    "version_hash": "sha256:30d5ef09c1235d0519ec40845239d2900d52381a2bcd43fb66e0d7a6b7751293",
+    "page": 1,
+    "section_path": [
+      "Document"
+    ],
+    "char_offsets": [
+      4860,
+      5573
+    ],
+    "chunk_type": "clause",
+    "text": "said. Canadian officials in Ottawa also said they have consistently tried to look at membership of commodity pacts on the merits of each case. Malaysian Primary Industries Minister Lim Keng Yaik told Reuters in Kuala Lumpur his country, the world's top producer of rubber, tin and palm oil, decides its participation in international commodity pacts case by case. Malaysia is a member of the Association of Tin Producing Countries (ATPC) which produce 65 pct of world tin. The ATPC launched a plan to limit member tin exports to 96,000 tonnes for a year from March to cut the tin surplus to 50,000 from 70,000. Economist in the West German Ministry of Agriculture and delegate to cocoa, wheat and sugar agreements",
+    "word_count": 120,
+    "summary": "Malaysian Primary Industries Minister Lim Keng Yaik told Reuters in Kuala Lumpur his country, the world's top producer of rubber, tin and palm oil, decides its participation in international commodity pacts case by case. The ATPC launched a plan to limit member tin exports to 96,000 tonnes for a year from March to cut the tin surplus to 50,000 from 70,000.",
+    "summary_is_evidence": false,
+    "summary_sentences_are_substrings": true,
+    "below_min_words": false,
+    "source_category": "coffee",
+    "source_title": "COMMODITY PACTS MORE ORIENTED TOWARDS MARKET Consuming countries, chastened by the collapse of International Tin Council"
+  },
+  {
+    "chunk_id": "training-11224-p1-c9",
+    "doc_id": "training-11224",
+    "version_hash": "sha256:30d5ef09c1235d0519ec40845239d2900d52381a2bcd43fb66e0d7a6b7751293",
+    "page": 1,
+    "section_path": [
+      "Document"
+    ],
+    "char_offsets": [
+      5484,
+      6264
+    ],
+    "chunk_type": "clause",
+    "text": "the West German Ministry of Agriculture and delegate to cocoa, wheat and sugar agreements Peter Baron told Reuters in London, \"Agreements with economic clauses to stabilise prices could function if fixed price ranges were close to market reality, if there was full participation by producers and consumers, and if participants were prepared to take their obligations in the framework of the agreement seriously.\" But Baron added, \"No real sanctions are available for a country that doesn't stick to its obligations...The German approach is sceptical. We don't think agreements are the best instrument to help developing countries. They were never meant to be a vehicle for the transfer of resources and that is how developing countries often interpret them.\" Traditionally Britain",
+    "word_count": 120,
+    "summary": "the West German Ministry of Agriculture and delegate to cocoa, wheat and sugar agreements Peter Baron told Reuters in London, \"Agreements with economic clauses to stabilise prices could function if fixed price ranges were close to market reality, if there was full participation by producers and consumers, and if participants were prepared to take their obligations in the framework of the agreement seriously.\" But Baron added, \"No real sanctions are available for a country that doesn't stick to its obligations...The German approach is sceptical. They were never meant to be a vehicle for the transfer of resources and that is how developing countries often interpret them.\" Traditionally Britain",
+    "summary_is_evidence": false,
+    "summary_sentences_are_substrings": true,
+    "below_min_words": false,
+    "source_category": "coffee",
+    "source_title": "COMMODITY PACTS MORE ORIENTED TOWARDS MARKET Consuming countries, chastened by the collapse of International Tin Council"
+  },
+  {
+    "chunk_id": "training-11224-p1-c10",
+    "doc_id": "training-11224",
+    "version_hash": "sha256:30d5ef09c1235d0519ec40845239d2900d52381a2bcd43fb66e0d7a6b7751293",
+    "page": 1,
+    "section_path": [
+      "Document"
+    ],
+    "char_offsets": [
+      6161,
+      6934
+    ],
+    "chunk_type": "clause",
+    "text": "transfer of resources and that is how developing countries often interpret them.\" Traditionally Britain has always been supportive of commodity agreements, reflecting its strong links with Third World producing countries. But recently demands for more stringent and justifiable pacts with emphasis placed on the need for \"intellectual honesty\" and \"objective criteria\" have grown. British officials stress the need for commodity pacts to be a two way partnership in trade rather than a disguise for aid. It is now seen as essential that any pacts involving direct market participation through a buffer stock have a high degree of transparency and do not contain the risk of open-ended borrowing that occurred in the tin pact, they said. U.K. Delegates talk of stabilisation",
+    "word_count": 120,
+    "summary": "transfer of resources and that is how developing countries often interpret them.\" Traditionally Britain has always been supportive of commodity agreements, reflecting its strong links with Third World producing countries. It is now seen as essential that any pacts involving direct market participation through a buffer stock have a high degree of transparency and do not contain the risk of open-ended borrowing that occurred in the tin pact, they said.",
+    "summary_is_evidence": false,
+    "summary_sentences_are_substrings": true,
+    "below_min_words": false,
+    "source_category": "coffee",
+    "source_title": "COMMODITY PACTS MORE ORIENTED TOWARDS MARKET Consuming countries, chastened by the collapse of International Tin Council"
+  },
+  {
+    "chunk_id": "training-11224-p1-c11",
+    "doc_id": "training-11224",
+    "version_hash": "sha256:30d5ef09c1235d0519ec40845239d2900d52381a2bcd43fb66e0d7a6b7751293",
+    "page": 1,
+    "section_path": [
+      "Document"
+    ],
+    "char_offsets": [
+      6846,
+      7620
+    ],
+    "chunk_type": "clause",
+    "text": "borrowing that occurred in the tin pact, they said. U.K. Delegates talk of stabilisation and the need for prices to reflect changes in market structure and price trends rather than dictate what prices should be. A Foreign Ministry official in Tokyo said Japan urges price realism in commodity pacts, adding high prices inflate supply. A government spokesman in Paris said France is favourable to commodity pacts. France, a large consumer and producer of sugar, favours a sugar pact as long as it reflects the real market situation, particularly regarding stocks. Indonesia's Foreign Minister Mochtar Kusumaatmadja told Reuters in Jakarta: \"These agreements can work as long as the problems are cyclical..But it's another matter when there are structural problems..But we are",
+    "word_count": 120,
+    "summary": "A Foreign Ministry official in Tokyo said Japan urges price realism in commodity pacts, adding high prices inflate supply. Indonesia's Foreign Minister Mochtar Kusumaatmadja told Reuters in Jakarta: \"These agreements can work as long as the problems are cyclical..But it's another matter when there are structural problems..But we are",
+    "summary_is_evidence": false,
+    "summary_sentences_are_substrings": true,
+    "below_min_words": false,
+    "source_category": "coffee",
+    "source_title": "COMMODITY PACTS MORE ORIENTED TOWARDS MARKET Consuming countries, chastened by the collapse of International Tin Council"
+  },
+  {
+    "chunk_id": "training-11224-p1-c12",
+    "doc_id": "training-11224",
+    "version_hash": "sha256:30d5ef09c1235d0519ec40845239d2900d52381a2bcd43fb66e0d7a6b7751293",
+    "page": 1,
+    "section_path": [
+      "Document"
+    ],
+    "char_offsets": [
+      7523,
+      8269
+    ],
+    "chunk_type": "clause",
+    "text": "the problems are cyclical..But it's another matter when there are structural problems..But we are still committed to commodity agreements as an act of faith.\" Nicaraguan External Trade Minister Alejandro Martinez Cuenca said in London producers cannot afford not to give their backing to commodity agreements. \"The political will is not there on the part of some consumers to make agreements work,\" Martinez Cuenca said. The head of the economics department in the Brazilian Foreign Ministry, Sebastiao do Rego Barros, told Reuters an agreement can be successful if it keeps a link with market reality. If you have an agreement such as coffee with a system of quotas, with a link between prices practised inside the pact and actual market prices,",
+    "word_count": 120,
+    "summary": "the problems are cyclical..But it's another matter when there are structural problems..But we are still committed to commodity agreements as an act of faith.\" Nicaraguan External Trade Minister Alejandro Martinez Cuenca said in London producers cannot afford not to give their backing to commodity agreements. The head of the economics department in the Brazilian Foreign Ministry, Sebastiao do Rego Barros, told Reuters an agreement can be successful if it keeps a link with market reality.",
+    "summary_is_evidence": false,
+    "summary_sentences_are_substrings": true,
+    "below_min_words": false,
+    "source_category": "coffee",
+    "source_title": "COMMODITY PACTS MORE ORIENTED TOWARDS MARKET Consuming countries, chastened by the collapse of International Tin Council"
+  },
+  {
+    "chunk_id": "training-11224-p1-c13",
+    "doc_id": "training-11224",
+    "version_hash": "sha256:30d5ef09c1235d0519ec40845239d2900d52381a2bcd43fb66e0d7a6b7751293",
+    "page": 1,
+    "section_path": [
+      "Document"
+    ],
+    "char_offsets": [
+      8183,
+      8491
+    ],
+    "chunk_type": "clause",
+    "text": "quotas, with a link between prices practised inside the pact and actual market prices, it can work. UNCTAD spokesman Graham Shanley said consuming countries realise steady export earnings enhance developing countries' ability to service debt and mean greater demand for industrialised nations' capital goods.",
+    "word_count": 44,
+    "summary": "quotas, with a link between prices practised inside the pact and actual market prices, it can work. UNCTAD spokesman Graham Shanley said consuming countries realise steady export earnings enhance developing countries' ability to service debt and mean greater demand for industrialised nations' capital goods.",
+    "summary_is_evidence": false,
+    "summary_sentences_are_substrings": true,
+    "below_min_words": false,
+    "source_category": "coffee",
+    "source_title": "COMMODITY PACTS MORE ORIENTED TOWARDS MARKET Consuming countries, chastened by the collapse of International Tin Council"
+  },
+  {
+    "chunk_id": "training-11265-p1-c1",
+    "doc_id": "training-11265",
+    "version_hash": "sha256:1423cd7087357d5b0c81dd8290364ecfc54525882c9314d0a88b0801c9d6d9ce",
+    "page": 1,
+    "section_path": [
+      "Document"
+    ],
+    "char_offsets": [
+      0,
+      740
+    ],
+    "chunk_type": "clause",
+    "text": "ICO BOARD PASSES OVER COFFEE QUOTA ISSUE Executive board members of the International Coffee Organization, ICO, passed over the issue of export quota negotiations at its regular meeting here, delegates said. No move was made to reopen dialogue on export quotas and no further discussion on the issue is likely during the three-day talks, they said. Producer and consumer members of the ICO council failed to agree export quota shares in early March. Neither Brazil, the largest producer, nor the U.S., the largest consumer, are ready to be flexible, delegates said. \"The situation is unchanged,\" consumer spokesman Abraham Van Overbeeke told reporters. \"As long as Brazil sticks to its position there will not be quotas -- there is no point",
+    "word_count": 120,
+    "summary": "ICO BOARD PASSES OVER COFFEE QUOTA ISSUE Executive board members of the International Coffee Organization, ICO, passed over the issue of export quota negotiations at its regular meeting here, delegates said. No move was made to reopen dialogue on export quotas and no further discussion on the issue is likely during the three-day talks, they said.",
+    "summary_is_evidence": false,
+    "summary_sentences_are_substrings": true,
+    "below_min_words": false,
+    "source_category": "coffee",
+    "source_title": "ICO BOARD PASSES OVER COFFEE QUOTA ISSUE Executive board members of the International Coffee Organization, ICO, passed o"
+  },
+  {
+    "chunk_id": "training-11265-p1-c2",
+    "doc_id": "training-11265",
+    "version_hash": "sha256:1423cd7087357d5b0c81dd8290364ecfc54525882c9314d0a88b0801c9d6d9ce",
+    "page": 1,
+    "section_path": [
+      "Document"
+    ],
+    "char_offsets": [
+      672,
+      1391
+    ],
+    "chunk_type": "clause",
+    "text": "sticks to its position there will not be quotas -- there is no point in meeting.\" At the last council meeting, Brazil wanted to maintain its previous quota share of around 30 pct of the market. Consumers and a splinter group of eight producers favoured redistribution of export shares using \"objective criteria,\" which would likely have reduced Brazil's share. Brazilian delegate Lindenberg Sette said that, if quota negotiations were to resume, the 1.0 mln bag shortfall Brazil was willing to give up in early March if the producer proposal was accepted would no longer be on the table. \"As we said from the start...No agreement, no one million bags,\" he told Reuters. Shortfalls of 200,000 bags offered by OAMCAF, the",
+    "word_count": 120,
+    "summary": "sticks to its position there will not be quotas -- there is no point in meeting.\" At the last council meeting, Brazil wanted to maintain its previous quota share of around 30 pct of the market. Brazilian delegate Lindenberg Sette said that, if quota negotiations were to resume, the 1.0 mln bag shortfall Brazil was willing to give up in early March if the producer proposal was accepted would no longer be on the table.",
+    "summary_is_evidence": false,
+    "summary_sentences_are_substrings": true,
+    "below_min_words": false,
+    "source_category": "coffee",
+    "source_title": "ICO BOARD PASSES OVER COFFEE QUOTA ISSUE Executive board members of the International Coffee Organization, ICO, passed o"
+  },
+  {
+    "chunk_id": "training-11265-p1-c3",
+    "doc_id": "training-11265",
+    "version_hash": "sha256:1423cd7087357d5b0c81dd8290364ecfc54525882c9314d0a88b0801c9d6d9ce",
+    "page": 1,
+    "section_path": [
+      "Document"
+    ],
+    "char_offsets": [
+      1306,
+      2059
+    ],
+    "chunk_type": "clause",
+    "text": "one million bags,\" he told Reuters. Shortfalls of 200,000 bags offered by OAMCAF, the African and Malagasy Coffee Organization, and 20,000 bags offered by Angola, are also no longer valid, delegates said. The closest the board came to discussing quotas was a briefing by the Guatemalan ICO delegate Rene Montes on a recent Latin American producers meeting in Managua, delegates said. There, the producers expressed their political will to negotiate basic quotas, particularly in the face of the damaging drop in coffee prices after the council failed to agree quotas, Montes said. The ICO board also reviewed export statistics and stock verification. They expected talks on stock verification to take up the remainder of today's session, delegates said.",
+    "word_count": 118,
+    "summary": "Shortfalls of 200,000 bags offered by OAMCAF, the African and Malagasy Coffee Organization, and 20,000 bags offered by Angola, are also no longer valid, delegates said. There, the producers expressed their political will to negotiate basic quotas, particularly in the face of the damaging drop in coffee prices after the council failed to agree quotas, Montes said.",
+    "summary_is_evidence": false,
+    "summary_sentences_are_substrings": true,
+    "below_min_words": false,
+    "source_category": "coffee",
+    "source_title": "ICO BOARD PASSES OVER COFFEE QUOTA ISSUE Executive board members of the International Coffee Organization, ICO, passed o"
+  },
+  {
+    "chunk_id": "training-11341-p1-c1",
+    "doc_id": "training-11341",
+    "version_hash": "sha256:0c19fcc5833717216f82356be7e25155f641b024f51a0b2307752676b9136d91",
+    "page": 1,
+    "section_path": [
+      "Document"
+    ],
+    "char_offsets": [
+      0,
+      709
+    ],
+    "chunk_type": "clause",
+    "text": "CSCE RESTRUCTURES COFFEE FUTURES DAILY LIMITS The Coffee, Sugar and Cocoa Exchange has expanded the normal daily trading limit in Coffee \"C\" contracts to 6.0 cents a lb, from the previous 4.0 cents, effective today, the CSCE said. The new daily limits apply to all but the two nearby positions, currently May and July, which trade without limits. In addition, the 6.0 cent limit can be increased to 9.0 cents a lb if the first two limited months both make limit moves in the same direction for two consecutive sessions, according to the CSCE announcement. Before the rule change today, the CSCE required two days of limit moves in the first three restricted contracts before expanding the daily trading limit.",
+    "word_count": 120,
+    "summary": "CSCE RESTRUCTURES COFFEE FUTURES DAILY LIMITS The Coffee, Sugar and Cocoa Exchange has expanded the normal daily trading limit in Coffee \"C\" contracts to 6.0 cents a lb, from the previous 4.0 cents, effective today, the CSCE said. In addition, the 6.0 cent limit can be increased to 9.0 cents a lb if the first two limited months both make limit moves in the same direction for two consecutive sessions, according to the CSCE announcement.",
+    "summary_is_evidence": false,
+    "summary_sentences_are_substrings": true,
+    "below_min_words": false,
+    "source_category": "coffee",
+    "source_title": "CSCE RESTRUCTURES COFFEE FUTURES DAILY LIMITS The Coffee, Sugar and Cocoa Exchange has expanded the normal daily trading"
+  },
+  {
+    "chunk_id": "training-11341-p1-c2",
+    "doc_id": "training-11341",
+    "version_hash": "sha256:0c19fcc5833717216f82356be7e25155f641b024f51a0b2307752676b9136d91",
+    "page": 1,
+    "section_path": [
+      "Document"
+    ],
+    "char_offsets": [
+      616,
+      1083
+    ],
+    "chunk_type": "clause",
+    "text": "limit moves in the first three restricted contracts before expanding the daily trading limit. Under new guidelines, if the first two restricted deliveries move the 6.0 cent limit for two days the Exchange will expand the limit. The expanded 9.0 cent limit will remain in effect until the settling prices on both of the first two limited months has not moved by more than the normal 6.0 cent limit for other contracts in two successive trading sessions, the CSCE said.",
+    "word_count": 80,
+    "summary": "Under new guidelines, if the first two restricted deliveries move the 6.0 cent limit for two days the Exchange will expand the limit. The expanded 9.0 cent limit will remain in effect until the settling prices on both of the first two limited months has not moved by more than the normal 6.0 cent limit for other contracts in two successive trading sessions, the CSCE said.",
+    "summary_is_evidence": false,
+    "summary_sentences_are_substrings": true,
+    "below_min_words": false,
+    "source_category": "coffee",
+    "source_title": "CSCE RESTRUCTURES COFFEE FUTURES DAILY LIMITS The Coffee, Sugar and Cocoa Exchange has expanded the normal daily trading"
+  },
+  {
+    "chunk_id": "training-11372-p1-c1",
+    "doc_id": "training-11372",
+    "version_hash": "sha256:e1e8f898c914c12a3eba1ef2164ed78e6336c005449f92b400f2ac2842956fdb",
+    "page": 1,
+    "section_path": [
+      "Document"
+    ],
+    "char_offsets": [
+      0,
+      783
+    ],
+    "chunk_type": "clause",
+    "text": "GUATEMALA TO HOST OTHER MILDS COFFEE MEETING Guatemala will host a meeting of other milds coffee producers probably in May to discuss basic export quotas, the Guatemalan delegate to the International Coffee Organization, ICO, said. No firm date has been set for the talks, Ambassador Rene Montes told reporters at the ICO executive board meeting here. Producer countries Brazil, Colombia, and a member of OAMCAF, the African and Malagasy Coffee Organization, may also be invited for consultation, he said. ICO producers and consumers could not agree on how to calculate export quota shares at a recent council meeting here. Other milds coffee producers include Costa Rica, Dominican Republic, Ecuador, El Salvador, Guatemala, Honduras, India, Mexico, Nicaragua, Papua New Guinea, and",
+    "word_count": 120,
+    "summary": "GUATEMALA TO HOST OTHER MILDS COFFEE MEETING Guatemala will host a meeting of other milds coffee producers probably in May to discuss basic export quotas, the Guatemalan delegate to the International Coffee Organization, ICO, said. Other milds coffee producers include Costa Rica, Dominican Republic, Ecuador, El Salvador, Guatemala, Honduras, India, Mexico, Nicaragua, Papua New Guinea, and",
+    "summary_is_evidence": false,
+    "summary_sentences_are_substrings": true,
+    "below_min_words": false,
+    "source_category": "coffee",
+    "source_title": "GUATEMALA TO HOST OTHER MILDS COFFEE MEETING Guatemala will host a meeting of other milds coffee producers probably in M"
+  },
+  {
+    "chunk_id": "training-11372-p1-c2",
+    "doc_id": "training-11372",
+    "version_hash": "sha256:e1e8f898c914c12a3eba1ef2164ed78e6336c005449f92b400f2ac2842956fdb",
+    "page": 1,
+    "section_path": [
+      "Document"
+    ],
+    "char_offsets": [
+      673,
+      789
+    ],
+    "chunk_type": "clause",
+    "text": "Dominican Republic, Ecuador, El Salvador, Guatemala, Honduras, India, Mexico, Nicaragua, Papua New Guinea, and Peru.",
+    "word_count": 15,
+    "summary": "Dominican Republic, Ecuador, El Salvador, Guatemala, Honduras, India, Mexico, Nicaragua, Papua New Guinea, and Peru.",
+    "summary_is_evidence": false,
+    "summary_sentences_are_substrings": true,
+    "below_min_words": true,
+    "source_category": "coffee",
+    "source_title": "GUATEMALA TO HOST OTHER MILDS COFFEE MEETING Guatemala will host a meeting of other milds coffee producers probably in M"
+  },
+  {
+    "chunk_id": "training-11462-p1-c1",
+    "doc_id": "training-11462",
+    "version_hash": "sha256:fda32ba303ff3d2e1447e42c598935f40cd1de0fae3139b3b7215b6ad4c5a23e",
+    "page": 1,
+    "section_path": [
+      "Document"
+    ],
+    "char_offsets": [
+      0,
+      760
+    ],
+    "chunk_type": "clause",
+    "text": "CSCE ALTERS RULES ON TRADING LIMITS The Coffee, Sugar and Cocoa Exchange amended regulations governing expanded trading limits on coffee, cocoa and sugar contracts to provide uniformity. Effective today, the exchange will permit normal daily price limits in those commodities to expand whenever the first two limited contract months move the limit in the same direction for two consecutive sessions. The normal daily limits will be reinstated once the first two limited deliveries close by less than the normal limit for two successive trading days. Previously exchange rules required the first three limited months to move the limit in coffee and cocoa. It had required the first two limited sugar deliveries to make such moves for three consecutive sessions.",
+    "word_count": 119,
+    "summary": "CSCE ALTERS RULES ON TRADING LIMITS The Coffee, Sugar and Cocoa Exchange amended regulations governing expanded trading limits on coffee, cocoa and sugar contracts to provide uniformity. Effective today, the exchange will permit normal daily price limits in those commodities to expand whenever the first two limited contract months move the limit in the same direction for two consecutive sessions.",
+    "summary_is_evidence": false,
+    "summary_sentences_are_substrings": true,
+    "below_min_words": false,
+    "source_category": "coffee",
+    "source_title": "CSCE ALTERS RULES ON TRADING LIMITS The Coffee, Sugar and Cocoa Exchange amended regulations governing expanded trading "
+  },
+  {
+    "chunk_id": "training-11816-p1-c1",
+    "doc_id": "training-11816",
+    "version_hash": "sha256:889cf0e87e651afe6bba2dd7fb84e0da9358f0d1734322a4f920e7b5ba6c1a37",
+    "page": 1,
+    "section_path": [
+      "Document"
+    ],
+    "char_offsets": [
+      0,
+      697
+    ],
+    "chunk_type": "clause",
+    "text": "SINGAPORE'S UIC TO BUY INTO TECK HOCK COFFEE FIRM Singapore's United Industrial Corp Ltd (UIC) has agreed in principle to inject 16 mln dlrs in convertible loan stock into &lt;Teck Hock and Co (Pte) Ltd>, a creditor bank official said. UIC is likely to take a controlling stake in the troubled international coffee trading firm, but plans are not finalised and negotiations will continue for another two weeks, he said. Teck Hock's nine creditor banks have agreed to extend the company's loan repayment period for 10 years although a percentage of the new capital injection will be used to pay off part of the debt. Teck Hock owes more than 100 mln Singapore dlrs and since last December the banks",
+    "word_count": 120,
+    "summary": "SINGAPORE'S UIC TO BUY INTO TECK HOCK COFFEE FIRM Singapore's United Industrial Corp Ltd (UIC) has agreed in principle to inject 16 mln dlrs in convertible loan stock into &lt;Teck Hock and Co (Pte) Ltd>, a creditor bank official said. Teck Hock's nine creditor banks have agreed to extend the company's loan repayment period for 10 years although a percentage of the new capital injection will be used to pay off part of the debt.",
+    "summary_is_evidence": false,
+    "summary_sentences_are_substrings": true,
+    "below_min_words": false,
+    "source_category": "coffee",
+    "source_title": "SINGAPORE'S UIC TO BUY INTO TECK HOCK COFFEE FIRM Singapore's United Industrial Corp Ltd (UIC) has agreed in principle t"
+  },
+  {
+    "chunk_id": "training-11816-p1-c2",
+    "doc_id": "training-11816",
+    "version_hash": "sha256:889cf0e87e651afe6bba2dd7fb84e0da9358f0d1734322a4f920e7b5ba6c1a37",
+    "page": 1,
+    "section_path": [
+      "Document"
+    ],
+    "char_offsets": [
+      621,
+      1032
+    ],
+    "chunk_type": "clause",
+    "text": "Hock owes more than 100 mln Singapore dlrs and since last December the banks have been allowing the company to postpone loan repayments while they try to find an investor. The nine banks are Oversea-Chinese Banking Corp Ltd, United Overseas Bank Ltd, Banque Paribas, Bangkok Bank Ltd, Citibank N.A., Standard Chartered Bank Ltd, Algemene Bank Nederland NV, Banque Nationale de Paris and Chase Manhattan Bank NA.",
+    "word_count": 66,
+    "summary": "Hock owes more than 100 mln Singapore dlrs and since last December the banks have been allowing the company to postpone loan repayments while they try to find an investor. The nine banks are Oversea-Chinese Banking Corp Ltd, United Overseas Bank Ltd, Banque Paribas, Bangkok Bank Ltd, Citibank N.A., Standard Chartered Bank Ltd, Algemene Bank Nederland NV, Banque Nationale de Paris and Chase Manhattan Bank NA.",
+    "summary_is_evidence": false,
+    "summary_sentences_are_substrings": true,
+    "below_min_words": false,
+    "source_category": "coffee",
+    "source_title": "SINGAPORE'S UIC TO BUY INTO TECK HOCK COFFEE FIRM Singapore's United Industrial Corp Ltd (UIC) has agreed in principle t"
+  },
+  {
+    "chunk_id": "training-11866-p1-c1",
+    "doc_id": "training-11866",
+    "version_hash": "sha256:b5d06cadb07b2c176df2a0579357f1bd6bd8a7f3d096580ae0e16e1ee5591779",
+    "page": 1,
+    "section_path": [
+      "Document"
+    ],
+    "char_offsets": [
+      0,
+      791
+    ],
+    "chunk_type": "clause",
+    "text": "ICO COFFEE PRODUCERS TO DISCUSS MARKET SITUATION International Coffee Organization, ICO, producers will meet at 1500 GMT (0900 est) for a general discussion of the market situation, producer spokesman Lindenberg Sette said. The Brazilian delegate said several producers requested the meeting but Brazil was not among them. The ICO executive board's regular session this week has so far been confined to routine matters, with no attempt by producers or consumers to revive export quota negotiations, delegates said. Talks to restore quotas collapsed early last month when producers and consumers failed to resolve differences on how quotas should be allocated. Producer delegates said there was no sense of urgency among producers to reopen quota talks with consumers, with most countries now",
+    "word_count": 120,
+    "summary": "ICO COFFEE PRODUCERS TO DISCUSS MARKET SITUATION International Coffee Organization, ICO, producers will meet at 1500 GMT (0900 est) for a general discussion of the market situation, producer spokesman Lindenberg Sette said. The ICO executive board's regular session this week has so far been confined to routine matters, with no attempt by producers or consumers to revive export quota negotiations, delegates said.",
+    "summary_is_evidence": false,
+    "summary_sentences_are_substrings": true,
+    "below_min_words": false,
+    "source_category": "coffee",
+    "source_title": "ICO COFFEE PRODUCERS TO DISCUSS MARKET SITUATION International Coffee Organization, ICO, producers will meet at 1500 GMT"
+  },
+  {
+    "chunk_id": "training-11866-p1-c2",
+    "doc_id": "training-11866",
+    "version_hash": "sha256:b5d06cadb07b2c176df2a0579357f1bd6bd8a7f3d096580ae0e16e1ee5591779",
+    "page": 1,
+    "section_path": [
+      "Document"
+    ],
+    "char_offsets": [
+      703,
+      1419
+    ],
+    "chunk_type": "clause",
+    "text": "of urgency among producers to reopen quota talks with consumers, with most countries now prepared to wait for the ICO's annual September council session to restart negotiations. Members of the Inter-African Coffee Organization called for today's producer meeting to exchange views on the market situation, the producer delegates said. The lack of a new debate on export quotas here this week was cited as the reason for renewed weakness in coffee prices in London and New York futures, traders said. Near May in London hit a five-year low this morning at 1,220 stg, about 50 stg below last night's close, they said. The executive board session looks set to end today, following a final session at 1600 GMT (1000 est)",
+    "word_count": 120,
+    "summary": "of urgency among producers to reopen quota talks with consumers, with most countries now prepared to wait for the ICO's annual September council session to restart negotiations. The lack of a new debate on export quotas here this week was cited as the reason for renewed weakness in coffee prices in London and New York futures, traders said.",
+    "summary_is_evidence": false,
+    "summary_sentences_are_substrings": true,
+    "below_min_words": false,
+    "source_category": "coffee",
+    "source_title": "ICO COFFEE PRODUCERS TO DISCUSS MARKET SITUATION International Coffee Organization, ICO, producers will meet at 1500 GMT"
+  },
+  {
+    "chunk_id": "training-11866-p1-c3",
+    "doc_id": "training-11866",
+    "version_hash": "sha256:b5d06cadb07b2c176df2a0579357f1bd6bd8a7f3d096580ae0e16e1ee5591779",
+    "page": 1,
+    "section_path": [
+      "Document"
+    ],
+    "char_offsets": [
+      1347,
+      1536
+    ],
+    "chunk_type": "clause",
+    "text": "looks set to end today, following a final session at 1600 GMT (1000 est) when a consultancy report of the operation of the ICO will be presented to producers and consumers, delegates added.",
+    "word_count": 33,
+    "summary": "looks set to end today, following a final session at 1600 GMT (1000 est) when a consultancy report of the operation of the ICO will be presented to producers and consumers, delegates added.",
+    "summary_is_evidence": false,
+    "summary_sentences_are_substrings": true,
+    "below_min_words": true,
+    "source_category": "coffee",
+    "source_title": "ICO COFFEE PRODUCERS TO DISCUSS MARKET SITUATION International Coffee Organization, ICO, producers will meet at 1500 GMT"
+  },
+  {
+    "chunk_id": "training-11882-p1-c1",
+    "doc_id": "training-11882",
+    "version_hash": "sha256:598bf389bcf5c9de84d46ef04ed5c52a8cc22ddccc4e2b8b130fa20850b332db",
+    "page": 1,
+    "section_path": [
+      "Document"
+    ],
+    "char_offsets": [
+      0,
+      753
+    ],
+    "chunk_type": "clause",
+    "text": "KENYAN MINISTER FORECASTS ECONOMIC EXPANSION Kenya's economy will continue to expand this year and the government will do more to encourage investment by foreign firms and the local private sector, Planning Minister Robert Ouko said. He told a news conference that the government would soon create a special bureau to expedite processing of investment applications by local and foreign investors. Praising the role of multinational companies and local entrepreneurs in Kenya's economy, the minister promised to maintain a close working contact with the private sector. The economy grew by 5.3 pct last year, up from 4.1 pct in 1985, Ouko said. This was owing to high prices for the country's coffee exports, low oil prices, low inflation and rising real",
+    "word_count": 120,
+    "summary": "KENYAN MINISTER FORECASTS ECONOMIC EXPANSION Kenya's economy will continue to expand this year and the government will do more to encourage investment by foreign firms and the local private sector, Planning Minister Robert Ouko said. He told a news conference that the government would soon create a special bureau to expedite processing of investment applications by local and foreign investors.",
+    "summary_is_evidence": false,
+    "summary_sentences_are_substrings": true,
+    "below_min_words": false,
+    "source_category": "coffee",
+    "source_title": "KENYAN MINISTER FORECASTS ECONOMIC EXPANSION Kenya's economy will continue to expand this year and the government will d"
+  },
+  {
+    "chunk_id": "training-11882-p1-c2",
+    "doc_id": "training-11882",
+    "version_hash": "sha256:598bf389bcf5c9de84d46ef04ed5c52a8cc22ddccc4e2b8b130fa20850b332db",
+    "page": 1,
+    "section_path": [
+      "Document"
+    ],
+    "char_offsets": [
+      667,
+      1470
+    ],
+    "chunk_type": "clause",
+    "text": "prices for the country's coffee exports, low oil prices, low inflation and rising real incomes, he added. \"Despite rising petroleum prices and falling coffee prices, Kenya's economy is still expected to improve in 1987,\" the planning minister said. \"High aggregate demand arising from low inflation, trade liberalisation and disciplined financial management are expected to increase output in the manufacturing sector,\" he said. Agriculture would expand significantly if favourable weather continued and farmers responded to producer price rises announced in February, the minister added. Kenyan farmers are anxiously awaiting the arrival of the long rainy season, which is due to start about now. Ouko said the production of Kenya's main cash crops increased during the second half of last year. Coffee",
+    "word_count": 120,
+    "summary": "\"Despite rising petroleum prices and falling coffee prices, Kenya's economy is still expected to improve in 1987,\" the planning minister said. \"High aggregate demand arising from low inflation, trade liberalisation and disciplined financial management are expected to increase output in the manufacturing sector,\" he said.",
+    "summary_is_evidence": false,
+    "summary_sentences_are_substrings": true,
+    "below_min_words": false,
+    "source_category": "coffee",
+    "source_title": "KENYAN MINISTER FORECASTS ECONOMIC EXPANSION Kenya's economy will continue to expand this year and the government will d"
+  },
+  {
+    "chunk_id": "training-11882-p1-c3",
+    "doc_id": "training-11882",
+    "version_hash": "sha256:598bf389bcf5c9de84d46ef04ed5c52a8cc22ddccc4e2b8b130fa20850b332db",
+    "page": 1,
+    "section_path": [
+      "Document"
+    ],
+    "char_offsets": [
+      1390,
+      2080
+    ],
+    "chunk_type": "clause",
+    "text": "of Kenya's main cash crops increased during the second half of last year. Coffee deliveries to the state-run Coffee Board of Kenya rose 17 pct and tea deliveries rose four pct during the period, he said. Ouko paid tribute to the private sector for its contribution to the economy and promised to improve government cooperation with businessmen by maintaining regular contact with them. \"I wish to pay tribute to the private sector for its contribution to the economy in 1986 and challenge it to maintain the same spirit this year ... The manufacturing sector grew by an estimated 5.8 pct in 1986, in line with the same period the previous year,\" he said. Ouko said the \"one stop\" bureau was",
+    "word_count": 120,
+    "summary": "Coffee deliveries to the state-run Coffee Board of Kenya rose 17 pct and tea deliveries rose four pct during the period, he said. Ouko paid tribute to the private sector for its contribution to the economy and promised to improve government cooperation with businessmen by maintaining regular contact with them.",
+    "summary_is_evidence": false,
+    "summary_sentences_are_substrings": true,
+    "below_min_words": false,
+    "source_category": "coffee",
+    "source_title": "KENYAN MINISTER FORECASTS ECONOMIC EXPANSION Kenya's economy will continue to expand this year and the government will d"
+  },
+  {
+    "chunk_id": "training-11882-p1-c4",
+    "doc_id": "training-11882",
+    "version_hash": "sha256:598bf389bcf5c9de84d46ef04ed5c52a8cc22ddccc4e2b8b130fa20850b332db",
+    "page": 1,
+    "section_path": [
+      "Document"
+    ],
+    "char_offsets": [
+      2004,
+      2734
+    ],
+    "chunk_type": "clause",
+    "text": "same period the previous year,\" he said. Ouko said the \"one stop\" bureau was intended to stimulate investment and cut the time and bureacracy currently involved in processing applications. The planning minister presented a review of the Kenyan economy during the second half of 1986 which showed inflation falling to 4.3 pct from 10.2 a year earlier. This was owing to higher agricultural production and the Kenyan shilling's relative strength against other major currencies, the report said. The average exchange rate was 16.23 shillings per U.S. Dlr last year, a fall of only 1.2 pct from 16.432 in 1985. The half yearly report said exports increased about 30 pct in July-December 1986, while imports rose by only six pct during",
+    "word_count": 120,
+    "summary": "The planning minister presented a review of the Kenyan economy during the second half of 1986 which showed inflation falling to 4.3 pct from 10.2 a year earlier. The half yearly report said exports increased about 30 pct in July-December 1986, while imports rose by only six pct during",
+    "summary_is_evidence": false,
+    "summary_sentences_are_substrings": true,
+    "below_min_words": false,
+    "source_category": "coffee",
+    "source_title": "KENYAN MINISTER FORECASTS ECONOMIC EXPANSION Kenya's economy will continue to expand this year and the government will d"
+  },
+  {
+    "chunk_id": "training-11882-p1-c5",
+    "doc_id": "training-11882",
+    "version_hash": "sha256:598bf389bcf5c9de84d46ef04ed5c52a8cc22ddccc4e2b8b130fa20850b332db",
+    "page": 1,
+    "section_path": [
+      "Document"
+    ],
+    "char_offsets": [
+      2657,
+      2956
+    ],
+    "chunk_type": "clause",
+    "text": "about 30 pct in July-December 1986, while imports rose by only six pct during the period. This gave Kenya an overall balance of payments surplus of 780 mln Kenya shillings (48 mln dlrs) during the period, compared with a 1.4 billion shilling (87 mln dlr) deficit in the second half of 1985, it said.",
+    "word_count": 54,
+    "summary": "about 30 pct in July-December 1986, while imports rose by only six pct during the period. This gave Kenya an overall balance of payments surplus of 780 mln Kenya shillings (48 mln dlrs) during the period, compared with a 1.4 billion shilling (87 mln dlr) deficit in the second half of 1985, it said.",
+    "summary_is_evidence": false,
+    "summary_sentences_are_substrings": true,
+    "below_min_words": false,
+    "source_category": "coffee",
+    "source_title": "KENYAN MINISTER FORECASTS ECONOMIC EXPANSION Kenya's economy will continue to expand this year and the government will d"
+  },
+  {
+    "chunk_id": "training-11949-p1-c1",
+    "doc_id": "training-11949",
+    "version_hash": "sha256:01334aa1bb99ffda9cc25632e25285fd26af6a79d909f52bb7072552e9d2a2f9",
+    "page": 1,
+    "section_path": [
+      "Document"
+    ],
+    "char_offsets": [
+      0,
+      753
+    ],
+    "chunk_type": "clause",
+    "text": "KENYAN MINISTER FORECASTS ECONOMIC EXPANSION Kenya's economy will continue to expand this year and the government will do more to encourage investment by foreign firms and the local private sector, Planning Minister Robert Ouko said. He told a news conference that the government would soon create a special bureau to expedite processing of investment applications by local and foreign investors. Praising the role of multinational companies and local entrepreneurs in Kenya's economy, the minister promised to maintain a close working contact with the private sector. The economy grew by 5.3 pct last year, up from 4.1 pct in 1985, Ouko said. This was owing to high prices for the country's coffee exports, low oil prices, low inflation and rising real",
+    "word_count": 120,
+    "summary": "KENYAN MINISTER FORECASTS ECONOMIC EXPANSION Kenya's economy will continue to expand this year and the government will do more to encourage investment by foreign firms and the local private sector, Planning Minister Robert Ouko said. He told a news conference that the government would soon create a special bureau to expedite processing of investment applications by local and foreign investors.",
+    "summary_is_evidence": false,
+    "summary_sentences_are_substrings": true,
+    "below_min_words": false,
+    "source_category": "coffee",
+    "source_title": "KENYAN MINISTER FORECASTS ECONOMIC EXPANSION Kenya's economy will continue to expand this year and the government will d"
+  },
+  {
+    "chunk_id": "training-11949-p1-c2",
+    "doc_id": "training-11949",
+    "version_hash": "sha256:01334aa1bb99ffda9cc25632e25285fd26af6a79d909f52bb7072552e9d2a2f9",
+    "page": 1,
+    "section_path": [
+      "Document"
+    ],
+    "char_offsets": [
+      667,
+      1413
+    ],
+    "chunk_type": "clause",
+    "text": "prices for the country's coffee exports, low oil prices, low inflation and rising real incomes, he added. \"Despite rising petroleum prices and falling coffee prices, Kenya's economy is still expected to improve in 1987,\" the planning minister said. Agriculture would expand significantly if favourable weather continued and farmers responded to producer price rises announced in February, the minister added. Kenyan farmers are anxiously awaiting the arrival of the long rainy season, which is due to start about now. Ouko said the production of Kenya's main cash crops increased during the second half of last year. Coffee deliveries to the state-run Coffee Board of Kenya rose 17 pct and tea deliveries rose four pct during the period, he said.",
+    "word_count": 118,
+    "summary": "\"Despite rising petroleum prices and falling coffee prices, Kenya's economy is still expected to improve in 1987,\" the planning minister said. Coffee deliveries to the state-run Coffee Board of Kenya rose 17 pct and tea deliveries rose four pct during the period, he said.",
+    "summary_is_evidence": false,
+    "summary_sentences_are_substrings": true,
+    "below_min_words": false,
+    "source_category": "coffee",
+    "source_title": "KENYAN MINISTER FORECASTS ECONOMIC EXPANSION Kenya's economy will continue to expand this year and the government will d"
+  },
+  {
+    "chunk_id": "training-12008-p1-c1",
+    "doc_id": "training-12008",
+    "version_hash": "sha256:100ac468d69397866e695757d2f47786a8cbdd092597700c84a70c62148595e0",
+    "page": 1,
+    "section_path": [
+      "Document"
+    ],
+    "char_offsets": [
+      0,
+      182
+    ],
+    "chunk_type": "clause",
+    "text": "RESTORATION OF COFFEE EXPORT QUOTAS BEFORE OCTOBER SEEMS UNLIKELY - ICO PRODUCER DELEGATES\n\nRESTORATION OF COFFEE EXPORT QUOTAS BEFORE OCTOBER SEEMS UNLIKELY - ICO PRODUCER DELEGATES",
+    "word_count": 26,
+    "summary": "RESTORATION OF COFFEE EXPORT QUOTAS BEFORE OCTOBER SEEMS UNLIKELY - ICO PRODUCER DELEGATES RESTORATION OF COFFEE EXPORT QUOTAS BEFORE OCTOBER SEEMS UNLIKELY - ICO PRODUCER DELEGATES",
+    "summary_is_evidence": false,
+    "summary_sentences_are_substrings": false,
+    "below_min_words": true,
+    "source_category": "coffee",
+    "source_title": "RESTORATION OF COFFEE EXPORT QUOTAS BEFORE OCTOBER SEEMS UNLIKELY - ICO PRODUCER DELEGATES"
+  },
+  {
+    "chunk_id": "training-12011-p1-c1",
+    "doc_id": "training-12011",
+    "version_hash": "sha256:303cba4b82af47c34064182200739e9d0c2e18eeaf24f529c90b9bf55d2277ba",
+    "page": 1,
+    "section_path": [
+      "Document"
+    ],
+    "char_offsets": [
+      0,
+      779
+    ],
+    "chunk_type": "clause",
+    "text": "ICO QUOTAS BEFORE OCTOBER UNLIKELY - DELEGATES The restoration of coffee export quotas before the end of the current 1986/87 coffee year (Oct 1/Sept 30) now seems unlikely, given reluctance by International Coffee Organization, ICO, producers and consumers to resume negotiations on an interim quota accord, producer delegates told reporters. Consumers and most producers see no point in reopening the quota dialogue while Brazil's position remains unchanged, they said. Brazil's refusal to accept a reduction in its previous 30 pct share of the ICO's global export quota effectively torpedoed talks here last month aimed at restoring quotas before October, the delegates noted. Disappointment at the lack of progress on quotas forced coffee futures in London and New York to new",
+    "word_count": 120,
+    "summary": "ICO QUOTAS BEFORE OCTOBER UNLIKELY - DELEGATES The restoration of coffee export quotas before the end of the current 1986/87 coffee year (Oct 1/Sept 30) now seems unlikely, given reluctance by International Coffee Organization, ICO, producers and consumers to resume negotiations on an interim quota accord, producer delegates told reporters. Brazil's refusal to accept a reduction in its previous 30 pct share of the ICO's global export quota effectively torpedoed talks here last month aimed at restoring quotas before October, the delegates noted.",
+    "summary_is_evidence": false,
+    "summary_sentences_are_substrings": true,
+    "below_min_words": false,
+    "source_category": "coffee",
+    "source_title": "ICO QUOTAS BEFORE OCTOBER UNLIKELY - DELEGATES The restoration of coffee export quotas before the end of the current 198"
+  },
+  {
+    "chunk_id": "training-12011-p1-c2",
+    "doc_id": "training-12011",
+    "version_hash": "sha256:303cba4b82af47c34064182200739e9d0c2e18eeaf24f529c90b9bf55d2277ba",
+    "page": 1,
+    "section_path": [
+      "Document"
+    ],
+    "char_offsets": [
+      706,
+      1438
+    ],
+    "chunk_type": "clause",
+    "text": "of progress on quotas forced coffee futures in London and New York to new lows today, traders here said. Near May in New York fell below one dlr in early trading at around 99.10 cents per pound, traders said. Producer delegates said that while the possibility of reimposing quotas before October remained on the ICO agenda, in practice the idea had effectively been discarded. The ICO's executive board session here this week has so far barely touched on the quota debate, demonstrating general unwillingness to revive talks while chances of success are still remote, producer delegates said. Some producers are in no hurry to see quotas restored, despite the price collapse seen since the failure of last month's negotiations, they",
+    "word_count": 120,
+    "summary": "Near May in New York fell below one dlr in early trading at around 99.10 cents per pound, traders said. The ICO's executive board session here this week has so far barely touched on the quota debate, demonstrating general unwillingness to revive talks while chances of success are still remote, producer delegates said.",
+    "summary_is_evidence": false,
+    "summary_sentences_are_substrings": true,
+    "below_min_words": false,
+    "source_category": "coffee",
+    "source_title": "ICO QUOTAS BEFORE OCTOBER UNLIKELY - DELEGATES The restoration of coffee export quotas before the end of the current 198"
+  },
+  {
+    "chunk_id": "training-12011-p1-c3",
+    "doc_id": "training-12011",
+    "version_hash": "sha256:303cba4b82af47c34064182200739e9d0c2e18eeaf24f529c90b9bf55d2277ba",
+    "page": 1,
+    "section_path": [
+      "Document"
+    ],
+    "char_offsets": [
+      1344,
+      2128
+    ],
+    "chunk_type": "clause",
+    "text": "restored, despite the price collapse seen since the failure of last month's negotiations, they said. \"With Brazil's frost season approaching, who wants to negotiate quotas,\" one leading producer delegate said. Coffee prices normally rise during Brazil's frost season (mainly June-August) as dealers and roasters build up stocks as insurance against possible severe frost damage to Brazil's crop. Many producers are more interested in working towards reimposing quotas from October 1, based on a new system of quota allocations valid until the International Coffee Agreement expires in 1989, they said. Guatemala has already proposed the \"other oilds\" producer group should meet in the next two months to begin talks on how to allocate quota shares. Producers still seem divided on how",
+    "word_count": 120,
+    "summary": "Coffee prices normally rise during Brazil's frost season (mainly June-August) as dealers and roasters build up stocks as insurance against possible severe frost damage to Brazil's crop. Many producers are more interested in working towards reimposing quotas from October 1, based on a new system of quota allocations valid until the International Coffee Agreement expires in 1989, they said.",
+    "summary_is_evidence": false,
+    "summary_sentences_are_substrings": true,
+    "below_min_words": false,
+    "source_category": "coffee",
+    "source_title": "ICO QUOTAS BEFORE OCTOBER UNLIKELY - DELEGATES The restoration of coffee export quotas before the end of the current 198"
+  },
+  {
+    "chunk_id": "training-12011-p1-c4",
+    "doc_id": "training-12011",
+    "version_hash": "sha256:303cba4b82af47c34064182200739e9d0c2e18eeaf24f529c90b9bf55d2277ba",
+    "page": 1,
+    "section_path": [
+      "Document"
+    ],
+    "char_offsets": [
+      2048,
+      2839
+    ],
+    "chunk_type": "clause",
+    "text": "begin talks on how to allocate quota shares. Producers still seem divided on how to overhaul the quota distribution system, with some producer delegates reporting growing support for a radical reallocation, based on the principle of \"objective criteria\" favoured by consumers. At last month's council session a splinter group of small producers backed consumer demands for new quota shares based on exportable production and stocks, while Brazil, Colombia and the rest of the producers favoured leaving quota allocations unchanged, except for some temporary adjustments. A delegate from one of the eight said more producers now supported their cause. The delegate said unless major producers like Brazil showed readiness to negotiate new quota shares, prospects for a quota accord in October",
+    "word_count": 120,
+    "summary": "Producers still seem divided on how to overhaul the quota distribution system, with some producer delegates reporting growing support for a radical reallocation, based on the principle of \"objective criteria\" favoured by consumers. At last month's council session a splinter group of small producers backed consumer demands for new quota shares based on exportable production and stocks, while Brazil, Colombia and the rest of the producers favoured leaving quota allocations unchanged, except for some temporary adjustments.",
+    "summary_is_evidence": false,
+    "summary_sentences_are_substrings": true,
+    "below_min_words": false,
+    "source_category": "coffee",
+    "source_title": "ICO QUOTAS BEFORE OCTOBER UNLIKELY - DELEGATES The restoration of coffee export quotas before the end of the current 198"
+  },
+  {
+    "chunk_id": "training-12011-p1-c5",
+    "doc_id": "training-12011",
+    "version_hash": "sha256:303cba4b82af47c34064182200739e9d0c2e18eeaf24f529c90b9bf55d2277ba",
+    "page": 1,
+    "section_path": [
+      "Document"
+    ],
+    "char_offsets": [
+      2752,
+      3505
+    ],
+    "chunk_type": "clause",
+    "text": "showed readiness to negotiate new quota shares, prospects for a quota accord in October also looked bleak. The U.S. and most other consumers are still determined to make reimposition of quotas conditional on a redistribution of quota shares based on \"objective criteria.\" ICO observers remained sceptical that Brazil would be prepared to accept a quota reduction when the ICO council meets in September. Brazil has adopted a tough stance with banks on external debt negotiations and is likely to be just as tough on coffee, they said. They said Brazil's reluctance to open coffee export registrations might reflect fears this would provoke another price slide and force an emergency ICO council session, which would most likely end in failure. Producers",
+    "word_count": 120,
+    "summary": "and most other consumers are still determined to make reimposition of quotas conditional on a redistribution of quota shares based on \"objective criteria.\" ICO observers remained sceptical that Brazil would be prepared to accept a quota reduction when the ICO council meets in September. They said Brazil's reluctance to open coffee export registrations might reflect fears this would provoke another price slide and force an emergency ICO council session, which would most likely end in failure.",
+    "summary_is_evidence": false,
+    "summary_sentences_are_substrings": true,
+    "below_min_words": false,
+    "source_category": "coffee",
+    "source_title": "ICO QUOTAS BEFORE OCTOBER UNLIKELY - DELEGATES The restoration of coffee export quotas before the end of the current 198"
+  },
+  {
+    "chunk_id": "training-12011-p1-c6",
+    "doc_id": "training-12011",
+    "version_hash": "sha256:303cba4b82af47c34064182200739e9d0c2e18eeaf24f529c90b9bf55d2277ba",
+    "page": 1,
+    "section_path": [
+      "Document"
+    ],
+    "char_offsets": [
+      3416,
+      4000
+    ],
+    "chunk_type": "clause",
+    "text": "force an emergency ICO council session, which would most likely end in failure. Producers met this afternoon to review the market situation but had only a general discussion about how further negotiations should proceed, a producer delegate said. Producers plan to hold consultations on quotas, and then may set a date for a formal producer meeting, but plans are not fixed, he said. The ICO executive board reconvened at 1650 hours local time to hear a report from consultants on ICO operations. The board meeting looks set to end today, a day earlier than scheduled, delegates said.",
+    "word_count": 97,
+    "summary": "Producers met this afternoon to review the market situation but had only a general discussion about how further negotiations should proceed, a producer delegate said. Producers plan to hold consultations on quotas, and then may set a date for a formal producer meeting, but plans are not fixed, he said.",
+    "summary_is_evidence": false,
+    "summary_sentences_are_substrings": true,
+    "below_min_words": false,
+    "source_category": "coffee",
+    "source_title": "ICO QUOTAS BEFORE OCTOBER UNLIKELY - DELEGATES The restoration of coffee export quotas before the end of the current 198"
+  }
+]

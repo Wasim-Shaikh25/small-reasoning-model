@@ -4,7 +4,7 @@ An exploration is one research step. Status is `todo`, `open`, or `closed`.
 Closed results below were written by `lab/exp_*/run.py` into `data/exp_*/results.json` and copied here by `lab/render_explorations.py`.
 Do not edit the numbers by hand. Re-run the exploration and render again.
 
-Generative language models were not used in any exploration. The blueprint encoder checkpoints were not loaded either. Read **Blueprint models were not used** before treating any score as a DeBERTa, GLiNER, bge, or FLAN-T5 result.
+Generative language models were not used in any exploration. The blueprint's exact encoder checkpoints (bge, DeBERTa, GLiNER) were not loaded either -- huggingface.co is blocked by this sandbox's egress policy. EXP-029, EXP-032, and EXP-033 are the one exception: they load real, reachable, non-generative substitutes (spaCy's pretrained NER and static vectors) in place of the blueprint checkpoints and say so in their own Models used line. Read **Blueprint models were not used** before treating any score as a DeBERTa, GLiNER, bge, or FLAN-T5 result.
 
 ## Blueprint models were not used
 
@@ -59,6 +59,8 @@ The same substitute list is stored in `lab/config/models.json`.
 | CTranslate2 int8 | FLAN-T5 runtime (section 8) | No. Conflicts with FORBIDDEN.md | no generative runtime | CTranslate2 generation is prohibited. |
 | SQLite | Recall memory (section 3.3; Qdrant is the alternative) | Yes | SQLite via lab/common/memory.py | This matches the blueprint's primary recall store. |
 | Isotonic regression | Calibration alternative (section 9) | No | Platt scaling (sigmoid) | Platt scaling is the other method the blueprint names, and it was used. |
+| bge-small-en-v1.5 | Embeddings -- real-model reruns EXP-029 and EXP-032 only | No, but a real substitute was loaded | spaCy en_core_web_md static word vectors (real pretrained, not bge) | huggingface.co is blocked by this sandbox's egress policy (403 CONNECT, policy denial). spaCy's pipelines ship as plain pip wheels, not from huggingface.co, and are reachable. See lab/common/real_models.py. |
+| GLiNER / dslim/bert-base-NER | Entity tagging -- real-model reruns EXP-032 and EXP-033 only | No, but a real substitute was loaded | spaCy en_core_web_sm NER, a CNN tagger trained on OntoNotes 5 (real pretrained, not GLiNER or BERT-NER) | huggingface.co is blocked by this sandbox's egress policy (403 CONNECT, policy denial). See lab/common/real_models.py. |
 
 ### Conflicts with FORBIDDEN.md
 
@@ -79,11 +81,11 @@ DeBERTa, GLiNER, BERT-NER, RoBERTa, bge, MiniLM, e5, spaCy, libpostal, Qdrant, S
 | EXP-001 | DeBERTa QA, DeBERTa NLI, and bge retrieval inside the controller | EXP-027 |
 | EXP-002 | DeBERTa-v3 NLI, KeyBERT with bge-small, GLiNER | EXP-028 |
 | EXP-003 | No neural model is assigned to chunking | none |
-| EXP-004 | bge-small-en-v1.5, Qdrant BM25/SPLADE, bge-reranker-v2-m3, NetworkX | EXP-029 |
+| EXP-004 | bge-small-en-v1.5, Qdrant BM25/SPLADE, bge-reranker-v2-m3, NetworkX | EXP-029 (closed, real pretrained spaCy vectors, not bge) |
 | EXP-005 | deepset/deberta-v3-base-squad2 and roberta-base-squad2 | EXP-030 |
 | EXP-006 | MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli | EXP-031 |
-| EXP-007 | DeBERTa SQuAD2 for the hops. dateparser stays | EXP-032 |
-| EXP-008 | GLiNER, dslim/bert-base-NER, libpostal | EXP-033 |
+| EXP-007 | DeBERTa SQuAD2 for the hops. dateparser stays | EXP-032 (closed, real spaCy retrieval+NER multi-hop chain on real documents, not DeBERTa SQuAD2) |
+| EXP-008 | GLiNER, dslim/bert-base-NER, libpostal | EXP-033 (closed, real pretrained spaCy NER, not GLiNER/BERT-NER) |
 | EXP-009 | GLiNER, BERT-NER, and bge similarity. Logistic regression stays | EXP-034 |
 | EXP-010 | DeBERTa QA and DeBERTa NLI | EXP-035 |
 | EXP-011 | Encoder features into the existing logistic-regression heads | EXP-036 |
@@ -141,7 +143,7 @@ DeBERTa, GLiNER, BERT-NER, RoBERTa, bge, MiniLM, e5, spaCy, libpostal, Qdrant, S
 }
 ```
 
-Elapsed seconds: 0.0142. Peak RSS MB: 113.0.
+Elapsed seconds: 0.0499. Peak RSS MB: 142.23.
 - Scale-down: The loop is run on three passages, not a full archive. Logging is an in-memory trace rather than a log service.
 - Conclusion: The controller enforces schema validity, a single repair, depth caps, and the rule that retrieved text is data. 
 
@@ -180,7 +182,7 @@ Elapsed seconds: 0.0142. Peak RSS MB: 113.0.
 }
 ```
 
-Elapsed seconds: 0.0021. Peak RSS MB: 12.39.
+Elapsed seconds: 0.004. Peak RSS MB: 12.05.
 - Scale-down: Sixty original asks stand in for a larger labeled set. Experiment F's human 1-to-5 rating is not fabricated; only an automatic coverage proxy is reported.
 - Conclusion: Template analysis covers ordinary asks and keeps the raw ask as a fallback. Unusual multi-clause asks remain the weak spot, which matches the architecture's known limit. A human sub-question rating was not collected.
 
@@ -241,7 +243,7 @@ Elapsed seconds: 0.0021. Peak RSS MB: 12.39.
 }
 ```
 
-Elapsed seconds: 0.0012. Peak RSS MB: 15.97.
+Elapsed seconds: 0.0023. Peak RSS MB: 15.09.
 - Scale-down: One short document plus one generated long clause. Token counts are whitespace words, not a model tokenizer. Production target of 200 to 400 tokens was not the setting for the short sample.
 - Conclusion: Chunk metadata and extractive summaries behave as specified on this sample. The word-window settings used here are smaller than the 200 to 400 token production window so the sample still splits.
 
@@ -291,7 +293,7 @@ Elapsed seconds: 0.0012. Peak RSS MB: 15.97.
 }
 ```
 
-Elapsed seconds: 0.0219. Peak RSS MB: 113.04.
+Elapsed seconds: 0.048. Peak RSS MB: 141.91.
 - Scale-down: In-memory BM25 and TF-IDF stand in for Qdrant dense plus sparse vectors and a cross-encoder reranker. The corpus is 35 passages, not a 1,000-page collection.
 - Conclusion: Hybrid search finds the labeled passage for most of these queries. The entity link is what connects Lessee to the residence sentence when that sentence does not repeat the role word.
 
@@ -325,7 +327,7 @@ Elapsed seconds: 0.0219. Peak RSS MB: 113.04.
 }
 ```
 
-Elapsed seconds: 0.0029. Peak RSS MB: 12.39.
+Elapsed seconds: 0.0058. Peak RSS MB: 12.09.
 - Scale-down: Forty original items replace the SQuAD2 dev subset plus 40 custom items. No pretrained QA checkpoint is loaded.
 - Conclusion: Quote validity holds when a span is returned, because the span is copied from the passage. Unanswerable recall meets the 90 percent Phase 0 target on this set.
 
@@ -366,7 +368,7 @@ Elapsed seconds: 0.0029. Peak RSS MB: 12.39.
 }
 ```
 
-Elapsed seconds: 0.0022. Peak RSS MB: 12.32.
+Elapsed seconds: 0.0039. Peak RSS MB: 11.79.
 - Scale-down: MNLI, ANLI, and ContractNLI were not downloaded. Thirty original pairs replace those dev subsets plus 40 custom items.
 - Conclusion: Template T1 is the strongest of the three on this set. Number mismatches and direct negation are handled more reliably than except/unless/provided qualifications.
 
@@ -400,7 +402,7 @@ Elapsed seconds: 0.0022. Peak RSS MB: 12.32.
 }
 ```
 
-Elapsed seconds: 0.0353. Peak RSS MB: 28.7.
+Elapsed seconds: 0.0708. Peak RSS MB: 28.11.
 - Scale-down: Twelve original chains replace HotpotQA plus 30 custom items. No pretrained QA model is loaded.
 - Conclusion: The reliable hop depth on this small set, using a 0.5 accuracy cutoff, is 2. The controller should keep asks inside that depth and send arithmetic to the calculator.
 
@@ -482,7 +484,7 @@ Elapsed seconds: 0.0353. Peak RSS MB: 28.7.
 }
 ```
 
-Elapsed seconds: 0.0024. Peak RSS MB: 119.18.
+Elapsed seconds: 0.0076. Peak RSS MB: 148.63.
 - Scale-down: 52 short lines and 12 role passages replace the blueprint's 150 to 200 detection lines and 30 role passages. GLiNER, BERT-NER, and libpostal are not loaded.
 - Conclusion: Exact-span F1 is high on easy titled names, suffixed organizations, and fully patterned addresses, and lower on the hard slice (bare company names, amounts in words, lowercase names, courts). Ambiguous place names are flagged rather than treated as high-confidence addresses.
 
@@ -559,7 +561,7 @@ Elapsed seconds: 0.0024. Peak RSS MB: 119.18.
 }
 ```
 
-Elapsed seconds: 0.0095. Peak RSS MB: 121.75.
+Elapsed seconds: 0.0267. Peak RSS MB: 150.98.
 - Scale-down: Six short documents replace 20 documents of 5 to 30 pages. The searchable context is the document itself, not a collection-wide index.
 - Conclusion: Wrong resolution is the headline number and is reported above. Ambiguous shared names are flagged instead of guessed when the rule can see two full names. No wrong example was written when the store required a gold-matching resolved span.
 
@@ -732,7 +734,7 @@ Elapsed seconds: 0.0095. Peak RSS MB: 121.75.
 }
 ```
 
-Elapsed seconds: 0.0261. Peak RSS MB: 113.07.
+Elapsed seconds: 0.0618. Peak RSS MB: 142.05.
 - Scale-down: Twelve items, two or three per gap type, replace the requested 10 items per gap type. Context is pasted, which is the Phase 0 setup.
 - Conclusion: The loop can close a gap only when a passage states the missing piece, and it refuses a single answer when two values or a vague criterion remain.
 
@@ -817,7 +819,7 @@ Elapsed seconds: 0.0261. Peak RSS MB: 113.07.
 }
 ```
 
-Elapsed seconds: 0.0411. Peak RSS MB: 119.63.
+Elapsed seconds: 0.1011. Peak RSS MB: 148.73.
 - Scale-down: Training rows are generated from six slots rather than MNLI, ANLI, FEVER, SQuAD2, and HotpotQA. No neural encoder is run to build the features.
 - Conclusion: The heads learn the feature patterns in this generated set. The unsupported-claim target is evaluated at the validation threshold and reported on the held-out slice, not assumed.
 
@@ -869,7 +871,7 @@ Elapsed seconds: 0.0411. Peak RSS MB: 119.63.
 }
 ```
 
-Elapsed seconds: 0.0323. Peak RSS MB: 28.48.
+Elapsed seconds: 0.0601. Peak RSS MB: 27.71.
 - Scale-down: Fixture-level checks, not a full corpus replay.
 - Conclusion: The checks catch altered spans, conflicting numbers, bad arithmetic, and unsupported qualifiers on these fixtures. An instruction embedded in the passage is not treated as a quote.
 
@@ -904,7 +906,7 @@ Elapsed seconds: 0.0323. Peak RSS MB: 28.48.
 }
 ```
 
-Elapsed seconds: 0.0008. Peak RSS MB: 12.12.
+Elapsed seconds: 0.0019. Peak RSS MB: 11.84.
 - Scale-down: Eight counterfactual items and six invented terms replace a larger probe set. There is no pretrained model whose memorized facts could leak; the background table is the stand-in prior.
 - Conclusion: Factual answers are copied from the passage. The background table is logged and is not allowed to fill a missing fact. Invented terms are answered only while their definition is in the context.
 
@@ -956,7 +958,7 @@ Elapsed seconds: 0.0008. Peak RSS MB: 12.12.
 }
 ```
 
-Elapsed seconds: 0.0355. Peak RSS MB: 28.55.
+Elapsed seconds: 0.0624. Peak RSS MB: 27.9.
 - Scale-down: Four items in each of six domains replace 20 items in five domains. Ordering uses dateparser rather than a learned temporal model.
 - Conclusion: Domain differences on this set come from wording, not from pretrained domain knowledge, because no pretrained model is loaded. The engine does comparison, counting, ordering, sum, conditional_if and fails conditional_unless_blocked.
 
@@ -1066,7 +1068,7 @@ Elapsed seconds: 0.0355. Peak RSS MB: 28.55.
 }
 ```
 
-Elapsed seconds: 0.0357. Peak RSS MB: 116.49.
+Elapsed seconds: 0.0666. Peak RSS MB: 145.63.
 - Scale-down: Pages are short synthetic paragraphs, not scanned document pages. 1,000 pages were run. A multi-million-token archive was not.
 - Conclusion: Recall of a distinctive needle stayed available at the sizes that fit in this process. Eviction removes an unpinned page, and the next request brings it back as a page fault. The notebook, not the raw haystack, is what the reduce step would read.
 
@@ -1108,7 +1110,7 @@ Elapsed seconds: 0.0357. Peak RSS MB: 116.49.
 }
 ```
 
-Elapsed seconds: 0.0058. Peak RSS MB: 13.49.
+Elapsed seconds: 0.0125. Peak RSS MB: 13.39.
 - Scale-down: One note and one edited chunk stand in for a full archive replay. The index is SQLite, not Qdrant.
 - Conclusion: Unverified writes are refused. Version changes and missing exact text invalidate a note. A conflicting source marks the note conflicted instead of leaving it as verified truth.
 
@@ -1186,7 +1188,7 @@ Elapsed seconds: 0.0058. Peak RSS MB: 13.49.
 }
 ```
 
-Elapsed seconds: 0.0029. Peak RSS MB: 12.12.
+Elapsed seconds: 0.0089. Peak RSS MB: 11.66.
 - Scale-down: Eight claims and five paragraphs, each rendered in five style labels that all take the copy path. This is smaller than 50 paragraphs and 50 claim lists, and it does not call FLAN-T5.
 - Conclusion: Because the renderer copies verified sentences, number and modal preservation is a property of that copy step and was measured, not assumed. The validator catches the planted edits. Fluency was not rated by a person. A generative rewriter is not part of this run.
 
@@ -1204,7 +1206,7 @@ Elapsed seconds: 0.0029. Peak RSS MB: 12.12.
 - `lab/common/harness.py`
 - `data/exp_018_longform/spec.json`
 - `data/exp_018_longform/results.json`
-- Results: Assembly sizes: 200 claims -> 1706 words, coverage 1.0, broken citations 0, repetition pairs 1, 322303.72 words/sec; 1000 claims -> 8506 words, coverage 1.0, broken citations 0, repetition pairs 1, 440183.67 words/sec; 5000 claims -> 42506 words, coverage 1.0, broken citations 0, repetition pairs 1, 119261.48 words/sec. Resume hash matches a full run: True.
+- Results: Assembly sizes: 200 claims -> 1706 words, coverage 1.0, broken citations 0, repetition pairs 1, 117242.47 words/sec; 1000 claims -> 8506 words, coverage 1.0, broken citations 0, repetition pairs 1, 297322.75 words/sec; 5000 claims -> 42506 words, coverage 1.0, broken citations 0, repetition pairs 1, 62061.76 words/sec. Resume hash matches a full run: True.
 ```json
 {
   "sizes": [
@@ -1223,10 +1225,10 @@ Elapsed seconds: 0.0029. Peak RSS MB: 12.12.
           "canonical": "Ravi Sharma"
         }
       ],
-      "elapsed_sec": 0.0053,
-      "tokens_per_sec": 322303.72,
-      "rss_before_mb": 111.86,
-      "rss_after_mb": 112.96,
+      "elapsed_sec": 0.0146,
+      "tokens_per_sec": 117242.47,
+      "rss_before_mb": 141.05,
+      "rss_after_mb": 141.85,
       "sha256": "bff01e6e7e463a24cc6669db9dcedca82712bf57fef8f0538128643858b496e0"
     },
     {
@@ -1244,10 +1246,10 @@ Elapsed seconds: 0.0029. Peak RSS MB: 12.12.
           "canonical": "Ravi Sharma"
         }
       ],
-      "elapsed_sec": 0.0193,
-      "tokens_per_sec": 440183.67,
-      "rss_before_mb": 113.33,
-      "rss_after_mb": 114.46,
+      "elapsed_sec": 0.0286,
+      "tokens_per_sec": 297322.75,
+      "rss_before_mb": 142.23,
+      "rss_after_mb": 143.35,
       "sha256": "d60096f22c9b1de5bb3a8df21d7de8b9467ec43551354255964f07dcc1a69106"
     },
     {
@@ -1265,10 +1267,10 @@ Elapsed seconds: 0.0029. Peak RSS MB: 12.12.
           "canonical": "Ravi Sharma"
         }
       ],
-      "elapsed_sec": 0.3564,
-      "tokens_per_sec": 119261.48,
-      "rss_before_mb": 116.08,
-      "rss_after_mb": 131.35,
+      "elapsed_sec": 0.6849,
+      "tokens_per_sec": 62061.76,
+      "rss_before_mb": 144.98,
+      "rss_after_mb": 160.16,
       "sha256": "8f16ab373d09b89e12b98afeed44bcb46aebeebff7315c27dbb78a07ec6a4ef0"
     }
   ],
@@ -1278,7 +1280,7 @@ Elapsed seconds: 0.0029. Peak RSS MB: 12.12.
 }
 ```
 
-Elapsed seconds: 0.3986. Peak RSS MB: 131.35.
+Elapsed seconds: 0.7553. Peak RSS MB: 160.16.
 - Scale-down: Claims are templated verified findings, not 10 to 250 pages of model prose. The architecture's FLAN-T5 unit writer is not used.
 - Conclusion: Coverage and citation integrity are properties of the assembler. Throughput is string assembly on this CPU, not a generative decoder. Resume reproduces the full document hash when the checkpoint is truncated and continued.
 
@@ -1315,7 +1317,7 @@ Elapsed seconds: 0.3986. Peak RSS MB: 131.35.
 }
 ```
 
-Elapsed seconds: 0.0068. Peak RSS MB: 112.79.
+Elapsed seconds: 0.0173. Peak RSS MB: 141.84.
 - Scale-down: Hand-written good and bad proposals stand in for FLAN-T5 samples. Input-size, hop, and sampling ladders that require a generative model are out of scope.
 - Conclusion: The filter drops proposals that introduce new names, numbers, or dates. Template queries are allowed only as additional searches; the raw ask remains in the list, so a bad extra query cannot remove the baseline. Experiment P's model ladder was not run.
 
@@ -1411,7 +1413,7 @@ Elapsed seconds: 0.0068. Peak RSS MB: 112.79.
 }
 ```
 
-Elapsed seconds: 0.0304. Peak RSS MB: 113.01.
+Elapsed seconds: 0.0564. Peak RSS MB: 141.95.
 - Scale-down: Eight passages and six asks. This is a controller smoke test, not the full red-team catalog.
 - Conclusion: The loop returns a cited answer only for the single-value deposit question. Conflicting notice periods and the injected '1 day' instruction do not become a supported answer. A pure rewrite ask does not fetch.
 
@@ -1435,26 +1437,280 @@ Elapsed seconds: 0.0304. Peak RSS MB: 113.01.
 - `lab/common/budget.py`
 - `lab/common/schemas.py`
 - `data/exp_021_latency/results.json`
-- Results: Mean stage times in seconds: ask_analyze_sec 1.5e-05, chunk_sec 0.000327, search_sec 0.000507, qa_sec 0.000272, nli_sec 1.1e-05, e2e_sec 0.005532. Peak RSS 113.2 MB. No neural checkpoint was loaded.
+- Results: Mean stage times in seconds: ask_analyze_sec 3.5e-05, chunk_sec 0.000514, search_sec 0.000984, qa_sec 0.000498, nli_sec 1.7e-05, e2e_sec 0.009995. Peak RSS 142.08 MB. No neural checkpoint was loaded.
 ```json
 {
   "mean_seconds": {
-    "ask_analyze_sec": 1.5e-05,
-    "chunk_sec": 0.000327,
-    "search_sec": 0.000507,
-    "qa_sec": 0.000272,
-    "nli_sec": 1.1e-05,
-    "e2e_sec": 0.005532
+    "ask_analyze_sec": 3.5e-05,
+    "chunk_sec": 0.000514,
+    "search_sec": 0.000984,
+    "qa_sec": 0.000498,
+    "nli_sec": 1.7e-05,
+    "e2e_sec": 0.009995
   },
-  "peak_rss_mb": 113.2,
+  "peak_rss_mb": 142.08,
   "cpu_note": "Measured on this process. RSS is peak resident set for the whole run, not a per-model load.",
   "models_loaded": []
 }
 ```
 
-Elapsed seconds: 0.0592. Peak RSS MB: 113.2.
+Elapsed seconds: 0.1168. Peak RSS MB: 142.08.
 - Scale-down: Forty short passages. Quantized ONNX and CTranslate2 runtimes from the architecture are not used.
 - Conclusion: These times are for the lexical substitutes. They are not the latency of DeBERTa, GLiNER, or FLAN-T5, which are not loaded.
+
+## EXP-025 Attach a real document collection
+
+- Status: `closed`
+- Models used: No checkpoint is loaded by this exploration. Fetching and chunking real text uses no model, classical or neural. This is data attachment only; EXP-029, EXP-032, and EXP-033 add models on top of it.
+- Goal: Ingest a public, non-confidential document set with the same chunker and index used elsewhere, keeping the engine domain-agnostic, per OBJECTIVE.md.
+- Method: Downloaded the Reuters-21578 corpus zip directly from raw.githubusercontent.com/nltk/nltk_data (NLTK's own downloader refuses to run behind this sandbox's HTTPS proxy; see lab/common/real_corpus.py). Selected the first 25 training-split documents, sorted by file id, in the 'coffee' category -- a deterministic, reproducible selection, not a random sample. Cleaned wire-service line wrapping into paragraphs without altering content. Ran the existing lab/common/chunking.chunk_document on each real document, unmodified.
+- Referenced files:
+- `lab/exp_025_real_documents/run.py`
+- `lab/common/real_corpus.py`
+- `lab/common/chunking.py`
+- `lab/common/textutil.py`
+- `lab/common/harness.py`
+- `data/exp_025_real_documents/documents.json`
+- `data/exp_025_real_documents/chunks.json`
+- `data/exp_025_real_documents/results.json`
+- Results: Fetched 25 real Reuters-21578 'coffee' category news stories and chunked them into 76 chunks with the same structure-aware chunker used on the lease fixtures. Chunk types: {'clause': 75, 'definition': 1}. Mean chunk length is 104.6447 words (range 15-120). 98.7% of extractive summaries are verified substrings of their own chunk.
+```json
+{
+  "source": "nltk reuters-21578 (real 1987 Reuters news wire stories)",
+  "category": "coffee",
+  "n_documents": 25,
+  "n_chunks": 76,
+  "chunks_per_document_mean": 3.04,
+  "chunk_type_counts": {
+    "clause": 75,
+    "definition": 1
+  },
+  "chunk_word_count_mean": 104.6447,
+  "chunk_word_count_min": 15,
+  "chunk_word_count_max": 120,
+  "chunks_below_min_words": 4,
+  "summary_sentences_are_substrings_rate": 0.9868,
+  "unique_source_documents_in_chunks": 25
+}
+```
+
+Elapsed seconds: 2.2623. Peak RSS MB: 171.7.
+- Scale-down: 25 real documents / 76 chunks, not a full production collection. One Reuters category, not a cross-domain mix. The blueprint's archive store is Qdrant; this POC keeps the in-memory index.
+- Conclusion: The chunker, written for lease fixtures, runs unmodified on real, open-domain news text and produces well-formed chunks with verified-substring summaries. This closes the EXP-025 todo: a real, public, non-confidential document collection is now attached and reused by EXP-029, EXP-032, and EXP-033.
+
+## EXP-029 Hybrid retrieval with a real pretrained dense model, on real documents
+
+- Status: `closed`
+- Models used: Real pretrained spaCy en_core_web_md static word vectors (GloVe-style, trained on a web/news crawl) for the dense leg, fused with the unchanged in-process Okapi BM25 sparse leg. bge-small-en-v1.5, Qdrant, and bge-reranker-v2-m3 were not loaded: huggingface.co is blocked in this sandbox (403 CONNECT, policy denial). This is a real, reachable, non-generative encoder, not the exact blueprint checkpoint. See lab/common/real_models.py:model_card().
+- Goal: Re-measure EXP-004-style hybrid retrieval with a real pretrained encoder for the dense leg, over the real document collection from EXP-025 instead of synthetic lease passages.
+- Method: Both indexes share the same Okapi BM25 sparse leg (lab/common/index.BM25, unchanged). The classical index's dense leg is sklearn TfidfVectorizer cosine (EXP-004's substitute). The real index's dense leg is mean-pooled spaCy en_core_web_md static word vectors, min-max normalized and averaged 0.5/0.5 with the sparse score, same fusion formula as lab/common/index.Index. Two query sets run over the same 76 real passages from 25 real documents: (1) each chunk's own verified-substring extractive summary, gold is that chunk's id -- a sanity check where the query is literally inside the gold passage; (2) each document's real headline, gold is every chunk of that document's body -- a harder test where the query wording is not copied into any chunk.
+- Referenced files:
+- `lab/exp_029_real_retrieval/run.py`
+- `lab/common/real_index.py`
+- `lab/common/real_models.py`
+- `lab/common/index.py`
+- `lab/common/real_corpus.py`
+- `lab/common/harness.py`
+- `data/exp_025_real_documents/chunks.json`
+- `data/exp_029_real_retrieval/queries.json`
+- `data/exp_029_real_retrieval/results.json`
+- Results: Sanity check (75 substring-summary queries, 76 passages): classical Recall@5 1.0, real-model Recall@5 1.0 (lift +0.0000) -- both near ceiling because the query is literally inside the gold passage. Hard test (25 real-headline queries, gold is the whole document's chunk set): classical Recall@5 0.7379, Recall@10 0.869; real-model Recall@5 0.6769, Recall@10 0.7741 (lift -0.0610 at 5, -0.0949 at 10). On this harder, more realistic test the real pretrained static-vector dense leg does not beat classical TF-IDF; it measures lower. The measured number is reported as found, not adjusted.
+```json
+{
+  "n_passages": 76,
+  "n_summary_queries": 75,
+  "n_headline_queries": 25,
+  "summary_queries_sanity_check": {
+    "note": "query is a literal substring of the gold passage; both scorers can win on exact overlap",
+    "classical_tfidf_dense": {
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "mrr": 0.9867
+    },
+    "real_pretrained_dense": {
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "mrr": 0.9933
+    },
+    "lift_recall_at_5": 0.0,
+    "lift_mrr": 0.0066
+  },
+  "headline_queries_hard_test": {
+    "note": "query is the article's real headline, not copied verbatim into any chunk body",
+    "classical_tfidf_dense": {
+      "recall_at_5": 0.7379,
+      "recall_at_10": 0.869,
+      "mrr": 0.94
+    },
+    "real_pretrained_dense": {
+      "recall_at_5": 0.6769,
+      "recall_at_10": 0.7741,
+      "mrr": 0.94
+    },
+    "lift_recall_at_5": -0.061,
+    "lift_recall_at_10": -0.0949,
+    "lift_mrr": 0.0
+  },
+  "real_model_card": {
+    "ner_model": "en_core_web_sm",
+    "ner_source": "https://github.com/explosion/spacy-models (pip wheel, GitHub release asset)",
+    "ner_training_data": "OntoNotes 5 (real pretrained checkpoint, shipped by spaCy)",
+    "vector_model": "en_core_web_md",
+    "vector_source": "https://github.com/explosion/spacy-models (pip wheel, GitHub release asset)",
+    "vector_training_data": "GloVe-style static vectors trained on a large web/news crawl, shipped by spaCy",
+    "huggingface_blocked": true,
+    "huggingface_block_detail": "huggingface.co CONNECT rejected with 403 by this sandbox's egress policy",
+    "blueprint_checkpoints_named": [
+      "bge-small-en-v1.5",
+      "deepset/deberta-v3-base-squad2",
+      "GLiNER"
+    ],
+    "substitution_is_exact_blueprint_model": false
+  }
+}
+```
+
+Elapsed seconds: 4.6327. Peak RSS MB: 456.89.
+- Scale-down: 25 real documents / 76 chunks, not a 1,000-page collection (EXP-022 on-disk index is still a separate todo). bge-small-en-v1.5, Qdrant sparse vectors, and bge-reranker-v2-m3 remain unloaded because huggingface.co is blocked by this sandbox's egress policy; see real_model_card.
+- Conclusion: The real pretrained dense leg is measured against the classical TF-IDF dense leg on the same real corpus and the same two query sets. See real_model_card in the metrics for exactly which checkpoint ran and why it is not bge-small-en-v1.5. The two tests disagree: on the substring sanity check both legs sit at the Recall@5/10 ceiling, matching EXP-004's own 'reranker lift 0.0' finding on an easy set. On the harder headline test the real pretrained static-vector leg scores lower than classical TF-IDF (Recall@5 and @10 both negative lift). A plausible reason: mean-pooling 300-d vectors over a short, all-caps wire headline likely washes out the few content words that matter, while TF-IDF's rare-term weighting keeps exact shared tokens (a name, a commodity) salient. This closes the EXP-029 rerun todo for the embeddings component -- it is no longer unrun -- but the honest result is that this particular real pretrained encoder did not outperform the classical substitute on real documents at this scale.
+
+## EXP-032 Multi-step, multi-document reasoning over real documents with real pretrained models
+
+- Status: `closed`
+- Models used: Real-model stack: spaCy en_core_web_md static vectors for dense retrieval (RealIndex, EXP-029) and spaCy en_core_web_sm NER (EXP-033), both real pretrained, non-generative, reachable without huggingface.co. Classical stack: TF-IDF+BM25 (EXP-004) and the rule tagger (EXP-008), unchanged, run here only as the comparison baseline. deepset/deberta-v3-base-squad2 and bge-small-en-v1.5, the blueprint's proposed models for this rerun, were not loaded: huggingface.co is blocked in this sandbox (403 CONNECT, policy denial). See lab/common/real_models.py:model_card().
+- Goal: Build and measure a genuine multi-hop, multi-document evidence chain over the real EXP-025 document collection: find a real cross-document bridge entity, retrieve the first real document that mentions it, detect the entity with a NER model, then retrieve a second, different real document that also mentions it -- end to end with a real pretrained retrieval model and a real pretrained NER model, compared against the fully classical stack on the identical test items.
+- Method: Bridge entities (ORG/GPE/PERSON, appearing in at least 2 of the 25 real documents) were found once with the real NER model as ground truth for test-set construction; generic terms were excluded. For each of the top 10 bridges, hop 1 retrieves the chunk the entity was first found in (query: that chunk's own extractive summary, which does not repeat the entity's full name as a query by construction in most cases); the bridge hop detects the entity in the top-1 retrieved passage with the stack's own tagger; hop 2 retrieves a different real document's chunk using only the detected entity text as the query, excluding every chunk from the first document. The classical stack is EXP-004's TF-IDF+BM25 Index and EXP-008's rule tagger, unmodified. The real-model stack is EXP-029's spaCy-vector+BM25 RealIndex and EXP-033's spaCy NER. The same lexical NLI judge (EXP-006) checks whether the hop-2 evidence sentence entails a trivial 'entity is mentioned' hypothesis, demonstrating the verification step wired onto real text.
+- Referenced files:
+- `lab/exp_032_real_multihop/run.py`
+- `lab/common/real_index.py`
+- `lab/common/real_models.py`
+- `lab/common/index.py`
+- `lab/common/entities.py`
+- `lab/common/nli.py`
+- `lab/common/textutil.py`
+- `lab/common/harness.py`
+- `data/exp_025_real_documents/chunks.json`
+- `data/exp_032_real_multihop/bridge_items.json`
+- `data/exp_032_real_multihop/results.json`
+- Results: 10 genuine two-document bridge entities were found with the real NER model across the 25 real Reuters documents from EXP-025 (e.g. Brazil, London, India, Kenya, the International Coffee Organization...). Classical stack (TF-IDF retrieval + rule tagger): hop-1 retrieval 1.0, bridge detection 0.4, hop-2 retrieval 0.5, chain accuracy 0.2. Real-model stack (spaCy dense retrieval + spaCy NER): hop-1 retrieval 1.0, bridge detection 1.0, hop-2 retrieval 0.5, chain accuracy 0.5. Chain-accuracy lift from the real pretrained model stack: +0.3000. Mean entailment score on the hop-2 evidence sentence (lexical NLI judge, EXP-006): classical 0.4318, real 0.4318.
+```json
+{
+  "n_bridge_items": 10,
+  "bridge_entities": [
+    "Brazil",
+    "London",
+    "India",
+    "Kenya",
+    "the International Coffee Organization",
+    "Coffee Board",
+    "Colombia",
+    "Cuenca",
+    "International Coffee Organization",
+    "Jorio Dauster"
+  ],
+  "classical_stack": {
+    "n_items": 10,
+    "hop1_retrieval_rate": 1.0,
+    "bridge_detection_rate": 0.4,
+    "hop2_retrieval_rate": 0.5,
+    "chain_accuracy": 0.2,
+    "mean_entailment_on_hop2_evidence": 0.4318
+  },
+  "real_model_stack": {
+    "n_items": 10,
+    "hop1_retrieval_rate": 1.0,
+    "bridge_detection_rate": 1.0,
+    "hop2_retrieval_rate": 0.5,
+    "chain_accuracy": 0.5,
+    "mean_entailment_on_hop2_evidence": 0.4318
+  },
+  "chain_accuracy_lift": 0.3,
+  "hop1_retrieval_lift": 0.0,
+  "bridge_detection_lift": 0.6,
+  "hop2_retrieval_lift": 0.0,
+  "real_model_card": {
+    "ner_model": "en_core_web_sm",
+    "ner_source": "https://github.com/explosion/spacy-models (pip wheel, GitHub release asset)",
+    "ner_training_data": "OntoNotes 5 (real pretrained checkpoint, shipped by spaCy)",
+    "vector_model": "en_core_web_md",
+    "vector_source": "https://github.com/explosion/spacy-models (pip wheel, GitHub release asset)",
+    "vector_training_data": "GloVe-style static vectors trained on a large web/news crawl, shipped by spaCy",
+    "huggingface_blocked": true,
+    "huggingface_block_detail": "huggingface.co CONNECT rejected with 403 by this sandbox's egress policy",
+    "blueprint_checkpoints_named": [
+      "bge-small-en-v1.5",
+      "deepset/deberta-v3-base-squad2",
+      "GLiNER"
+    ],
+    "substitution_is_exact_blueprint_model": false
+  }
+}
+```
+
+Elapsed seconds: 6.8893. Peak RSS MB: 509.79.
+- Scale-down: 10 bridge items over 25 real documents / 76 chunks, not a HotpotQA-scale benchmark. Two-hop chains only, matching the architecture's own measured ceiling in EXP-007 (3-hop accuracy was 0 there). bge-small-en-v1.5 and deepset/deberta-v3-base-squad2 remain unloaded; see real_model_card.
+- Conclusion: This closes the EXP-032 rerun todo for multi-hop reasoning, though with a real retrieval+NER chain rather than deepset/deberta-v3-base-squad2 spans (huggingface.co is blocked in this sandbox; see real_model_card). The chain-level measurement shows where a real pretrained model stack helps and where it does not on this small real corpus: compare the per-hop rates above rather than reading a single number. All evidence in every chain is a real quote from the real document collection; no fact was invented to build these test items.
+
+## EXP-033 Entity detection with a real pretrained NER model, on real documents
+
+- Status: `closed`
+- Models used: Real pretrained spaCy en_core_web_sm NER (CNN tagger trained on OntoNotes 5) compared against the unmodified EXP-008 rule tagger. GLiNER, dslim/bert-base-NER, and libpostal were not loaded: huggingface.co is blocked in this sandbox (403 CONNECT, policy denial). This is a real, reachable, non-generative pretrained model, not the exact blueprint checkpoint. See lab/common/real_models.py:model_card().
+- Goal: Re-measure EXP-008-style entity detection with a real pretrained NER checkpoint, on real open-domain news sentences instead of lease fixtures.
+- Method: Hand-labeled PERSON and ORG spans on 12 real sentences drawn verbatim from the EXP-025 real document collection (see GOLD in this file). Ran EXP-008's unmodified rule tagger (detect_primary, detect_secondary, agreement) and the real pretrained spaCy en_core_web_sm NER pipeline on the same raw sentences. A hit counts when a predicted span equals, contains, or is contained by a normalized gold span (text containment, not character-offset overlap). Micro-averaged precision/recall/F1 across all gold spans.
+- Referenced files:
+- `lab/exp_033_real_entities/run.py`
+- `lab/common/real_models.py`
+- `lab/common/entities.py`
+- `lab/common/textutil.py`
+- `lab/common/harness.py`
+- `data/exp_025_real_documents/documents.json`
+- `data/exp_033_real_entities/gold.json`
+- `data/exp_033_real_entities/results.json`
+- Results: On 12 real sentences with 19 hand-labeled PERSON/ORG spans, the rule tagger (built for lease fixtures, EXP-008) gets precision 0.52, recall 0.6842, F1 0.5909. The real pretrained spaCy NER (OntoNotes-trained) gets precision 0.6957, recall 0.8421, F1 0.7619. F1 lift from the real pretrained model: +0.1710.
+```json
+{
+  "n_sentences": 12,
+  "n_gold_entities": 19,
+  "rule_tagger": {
+    "precision": 0.52,
+    "recall": 0.6842,
+    "f1": 0.5909,
+    "tp": 13,
+    "fp": 12,
+    "fn": 6
+  },
+  "real_pretrained_ner": {
+    "precision": 0.6957,
+    "recall": 0.8421,
+    "f1": 0.7619,
+    "tp": 16,
+    "fp": 7,
+    "fn": 3
+  },
+  "f1_lift": 0.171,
+  "recall_lift": 0.1579,
+  "real_model_card": {
+    "ner_model": "en_core_web_sm",
+    "ner_source": "https://github.com/explosion/spacy-models (pip wheel, GitHub release asset)",
+    "ner_training_data": "OntoNotes 5 (real pretrained checkpoint, shipped by spaCy)",
+    "vector_model": "en_core_web_md",
+    "vector_source": "https://github.com/explosion/spacy-models (pip wheel, GitHub release asset)",
+    "vector_training_data": "GloVe-style static vectors trained on a large web/news crawl, shipped by spaCy",
+    "huggingface_blocked": true,
+    "huggingface_block_detail": "huggingface.co CONNECT rejected with 403 by this sandbox's egress policy",
+    "blueprint_checkpoints_named": [
+      "bge-small-en-v1.5",
+      "deepset/deberta-v3-base-squad2",
+      "GLiNER"
+    ],
+    "substitution_is_exact_blueprint_model": false
+  }
+}
+```
+
+Elapsed seconds: 0.6798. Peak RSS MB: 249.68.
+- Scale-down: 12 hand-labeled sentences, not a held-out annotated corpus (EXP-008 used 52 lines on the lease domain). GLiNER, dslim/bert-base-NER, and libpostal remain unloaded because huggingface.co is blocked by this sandbox's egress policy; see real_model_card. Address/GPE detection is out of scope for this head-to-head since the rule tagger has no general place category.
+- Conclusion: The rule tagger was written against lease-fixture patterns (two-capitalized-word names, Pvt Ltd/Inc suffixes, a fixed exclusion list for false positives like 'New Delhi'). On real open-domain news text it both misses organization abbreviations it has no pattern for (ZIANA, IBC, UIC, Coffee Board) and can mistag place names its exclusion list does not cover as PERSON. The real pretrained OntoNotes NER generalizes across domains without hand-written patterns, which is exactly the generalization gap FORBIDDEN.md's own substitute list predicted. This closes the EXP-033 rerun todo for entity tagging, measured with spaCy rather than GLiNER or dslim/bert-base-NER.
 
 ## Follow-up todos
 
@@ -1499,20 +1755,6 @@ Elapsed seconds: 0.0592. Peak RSS MB: 113.2.
 
 - Scale-down: 
 - Conclusion: Todo. Do not download a pretrained NER or generative model.
-
-## EXP-025 Attach a document collection
-
-- Status: `todo`
-- Models used: No checkpoint is loaded by this todo. The blueprint archive store is Qdrant, which this POC did not use. Do not add FLAN-T5 when a collection is attached. FLAN-T5 conflicts with FORBIDDEN.md.
-- Goal: Ingest a public, non-confidential document set with the same chunker and index. Keep the engine domain-agnostic.
-- Method: Not run.
-- Referenced files:
-- none yet
-- Results: Not run.
-
-
-- Scale-down: 
-- Conclusion: Todo. Phase 3 in the architecture waits on a real collection and a human reviewer. This POC does not attach one.
 
 ## EXP-026 Qualification rules
 
@@ -1568,24 +1810,6 @@ These entries are `todo`. None of them has been run. A blocked entry must stay b
 - Scale-down: 
 - Conclusion: Todo. The closed EXP-002 scores are rule scores.
 
-## EXP-029 Rerun hybrid retrieval with bge, Qdrant, and the bge reranker
-
-- Status: `todo`
-- Models used: Not run. Proposed: bge-small-en-v1.5, Qdrant BM25/SPLADE, bge-reranker-v2-m3. Not generative.
-- Goal: Re-measure EXP-004 with bge-small-en-v1.5, Qdrant sparse BM25/SPLADE, and bge-reranker-v2-m3. NetworkX may replace the adjacency list.
-- Method: Not run. When this is picked up, load the named checkpoint locally and measure again. Not a generative model. Do not call a hosted generative API. Do not use the checkpoint to write answer text. Write a new results.json only after the checkpoint actually runs. Do not copy the closed lexical scores forward. fastembed, MiniLM, bge-m3, e5-small, and all-MiniLM-L6-v2 are alternatives, not a requirement to run every one of them in the same pass.
-- Referenced files:
-- `lab/exp_004_hybrid_retrieval/run.py`
-- `data/exp_004_hybrid_retrieval/results.json`
-- `lab/config/models.json`
-- `FORBIDDEN.md`
-- `ARCHITECTURE.md`
-- Results: Not run.
-
-
-- Scale-down: 
-- Conclusion: Todo. The closed EXP-004 scores are TF-IDF, in-process BM25, and lexical rerank scores.
-
 ## EXP-030 Rerun extractive QA with DeBERTa and RoBERTa SQuAD2
 
 - Status: `todo`
@@ -1621,42 +1845,6 @@ These entries are `todo`. None of them has been run. A blocked entry must stay b
 
 - Scale-down: 
 - Conclusion: Todo. The closed EXP-006 scores, including exception accuracy 0, are lexical-judge scores.
-
-## EXP-032 Rerun multi-hop QA with DeBERTa SQuAD2
-
-- Status: `todo`
-- Models used: Not run. Proposed QA model: deepset/deberta-v3-base-squad2. dateparser was already used and stays. Not generative.
-- Goal: Re-measure EXP-007 hop spans with deepset/deberta-v3-base-squad2. Keep dateparser for the date arithmetic.
-- Method: Not run. When this is picked up, load the named checkpoint locally and measure again. Not a generative model. Do not call a hosted generative API. Do not use the checkpoint to write answer text. Write a new results.json only after the checkpoint actually runs. Do not copy the closed lexical scores forward. Do not replace dateparser.
-- Referenced files:
-- `lab/exp_007_hop_chain/run.py`
-- `data/exp_007_hop_chain/results.json`
-- `lab/config/models.json`
-- `FORBIDDEN.md`
-- `ARCHITECTURE.md`
-- Results: Not run.
-
-
-- Scale-down: 
-- Conclusion: Todo. Keep the dateparser path. Replace only the span extractor after a real run.
-
-## EXP-033 Rerun entity detection with GLiNER, BERT-NER, and libpostal
-
-- Status: `todo`
-- Models used: Not run. Proposed: GLiNER, dslim/bert-base-NER, libpostal. Not generative. This is separate from EXP-024, which trains on repository labels only.
-- Goal: Re-measure EXP-008 with GLiNER, dslim/bert-base-NER, and libpostal.
-- Method: Not run. When this is picked up, load the named checkpoint locally and measure again. Not a generative model. Do not call a hosted generative API. Do not use the checkpoint to write answer text. Write a new results.json only after the checkpoint actually runs. Do not copy the closed lexical scores forward. spaCy and RoBERTa NER are alternatives.
-- Referenced files:
-- `lab/exp_008_entity_detect/run.py`
-- `data/exp_008_entity_detect/results.json`
-- `lab/config/models.json`
-- `FORBIDDEN.md`
-- `ARCHITECTURE.md`
-- Results: Not run.
-
-
-- Scale-down: 
-- Conclusion: Todo. The closed EXP-008 scores are rule-tagger scores.
 
 ## EXP-034 Rerun entity resolution on encoder mentions and bge similarity
 

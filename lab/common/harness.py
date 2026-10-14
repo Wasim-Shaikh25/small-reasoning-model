@@ -80,6 +80,7 @@ class Run:
         scale_down: str,
         referenced_files: list[str],
         follow_ups: list[str] | None = None,
+        models_used: str | None = None,
     ) -> dict:
         payload = {
             "id": self.exp_id,
@@ -96,6 +97,8 @@ class Run:
             "elapsed_sec": round(time.perf_counter() - self.t0, 4),
             "peak_rss_mb": peak_rss_mb(),
         }
+        if models_used is not None:
+            payload["models_used"] = models_used
         self.write_json("results.json", payload)
         print(f"{self.exp_id} {title}")
         print(json.dumps(metrics, indent=2))

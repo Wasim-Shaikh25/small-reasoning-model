@@ -21,10 +21,10 @@
             "canonical": "Ravi Sharma"
           }
         ],
-        "elapsed_sec": 0.0053,
-        "tokens_per_sec": 322303.72,
-        "rss_before_mb": 111.86,
-        "rss_after_mb": 112.96,
+        "elapsed_sec": 0.0146,
+        "tokens_per_sec": 117242.47,
+        "rss_before_mb": 141.05,
+        "rss_after_mb": 141.85,
         "sha256": "bff01e6e7e463a24cc6669db9dcedca82712bf57fef8f0538128643858b496e0"
       },
       {
@@ -42,10 +42,10 @@
             "canonical": "Ravi Sharma"
           }
         ],
-        "elapsed_sec": 0.0193,
-        "tokens_per_sec": 440183.67,
-        "rss_before_mb": 113.33,
-        "rss_after_mb": 114.46,
+        "elapsed_sec": 0.0286,
+        "tokens_per_sec": 297322.75,
+        "rss_before_mb": 142.23,
+        "rss_after_mb": 143.35,
         "sha256": "d60096f22c9b1de5bb3a8df21d7de8b9467ec43551354255964f07dcc1a69106"
       },
       {
@@ -63,10 +63,10 @@
             "canonical": "Ravi Sharma"
           }
         ],
-        "elapsed_sec": 0.3564,
-        "tokens_per_sec": 119261.48,
-        "rss_before_mb": 116.08,
-        "rss_after_mb": 131.35,
+        "elapsed_sec": 0.6849,
+        "tokens_per_sec": 62061.76,
+        "rss_before_mb": 144.98,
+        "rss_after_mb": 160.16,
         "sha256": "8f16ab373d09b89e12b98afeed44bcb46aebeebff7315c27dbb78a07ec6a4ef0"
       }
     ],
@@ -74,7 +74,7 @@
     "resumed_from_leaves": 2,
     "generator_used": false
   },
-  "results_prose": "Assembly sizes: 200 claims -> 1706 words, coverage 1.0, broken citations 0, repetition pairs 1, 322303.72 words/sec; 1000 claims -> 8506 words, coverage 1.0, broken citations 0, repetition pairs 1, 440183.67 words/sec; 5000 claims -> 42506 words, coverage 1.0, broken citations 0, repetition pairs 1, 119261.48 words/sec. Resume hash matches a full run: True.",
+  "results_prose": "Assembly sizes: 200 claims -> 1706 words, coverage 1.0, broken citations 0, repetition pairs 1, 117242.47 words/sec; 1000 claims -> 8506 words, coverage 1.0, broken citations 0, repetition pairs 1, 297322.75 words/sec; 5000 claims -> 42506 words, coverage 1.0, broken citations 0, repetition pairs 1, 62061.76 words/sec. Resume hash matches a full run: True.",
   "conclusion": "Coverage and citation integrity are properties of the assembler. Throughput is string assembly on this CPU, not a generative decoder. Resume reproduces the full document hash when the checkpoint is truncated and continued.",
   "scale_down": "Claims are templated verified findings, not 10 to 250 pages of model prose. The architecture's FLAN-T5 unit writer is not used.",
   "referenced_files": [
@@ -87,6 +87,6 @@
     "data/exp_018_longform/results.json"
   ],
   "follow_ups": [],
-  "elapsed_sec": 0.3986,
-  "peak_rss_mb": 131.35
+  "elapsed_sec": 0.7553,
+  "peak_rss_mb": 160.16
 }

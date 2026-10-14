@@ -38,6 +38,6 @@
   "follow_ups": [
     "Add an explicit qualification parser in code if exception accuracy stays too low for the tasks you care about. Do not add a generative NLI model."
   ],
-  "elapsed_sec": 0.0022,
-  "peak_rss_mb": 12.32
+  "elapsed_sec": 0.0039,
+  "peak_rss_mb": 11.79
 }

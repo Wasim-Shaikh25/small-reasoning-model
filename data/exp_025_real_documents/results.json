@@ -1,0 +1,44 @@
+{
+  "id": "EXP-025",
+  "title": "Attach a real document collection",
+  "status": "closed",
+  "goal": "Ingest a public, non-confidential document set with the same chunker and index used elsewhere, keeping the engine domain-agnostic, per OBJECTIVE.md.",
+  "method": "Downloaded the Reuters-21578 corpus zip directly from raw.githubusercontent.com/nltk/nltk_data (NLTK's own downloader refuses to run behind this sandbox's HTTPS proxy; see lab/common/real_corpus.py). Selected the first 25 training-split documents, sorted by file id, in the 'coffee' category -- a deterministic, reproducible selection, not a random sample. Cleaned wire-service line wrapping into paragraphs without altering content. Ran the existing lab/common/chunking.chunk_document on each real document, unmodified.",
+  "metrics": {
+    "source": "nltk reuters-21578 (real 1987 Reuters news wire stories)",
+    "category": "coffee",
+    "n_documents": 25,
+    "n_chunks": 76,
+    "chunks_per_document_mean": 3.04,
+    "chunk_type_counts": {
+      "clause": 75,
+      "definition": 1
+    },
+    "chunk_word_count_mean": 104.6447,
+    "chunk_word_count_min": 15,
+    "chunk_word_count_max": 120,
+    "chunks_below_min_words": 4,
+    "summary_sentences_are_substrings_rate": 0.9868,
+    "unique_source_documents_in_chunks": 25
+  },
+  "results_prose": "Fetched 25 real Reuters-21578 'coffee' category news stories and chunked them into 76 chunks with the same structure-aware chunker used on the lease fixtures. Chunk types: {'clause': 75, 'definition': 1}. Mean chunk length is 104.6447 words (range 15-120). 98.7% of extractive summaries are verified substrings of their own chunk.",
+  "conclusion": "The chunker, written for lease fixtures, runs unmodified on real, open-domain news text and produces well-formed chunks with verified-substring summaries. This closes the EXP-025 todo: a real, public, non-confidential document collection is now attached and reused by EXP-029, EXP-032, and EXP-033.",
+  "scale_down": "25 real documents / 76 chunks, not a full production collection. One Reuters category, not a cross-domain mix. The blueprint's archive store is Qdrant; this POC keeps the in-memory index.",
+  "referenced_files": [
+    "lab/exp_025_real_documents/run.py",
+    "lab/common/real_corpus.py",
+    "lab/common/chunking.py",
+    "lab/common/textutil.py",
+    "lab/common/harness.py",
+    "data/exp_025_real_documents/documents.json",
+    "data/exp_025_real_documents/chunks.json",
+    "data/exp_025_real_documents/results.json"
+  ],
+  "follow_ups": [
+    "Attach a second, unrelated category or a different real corpus to test cross-domain generalization.",
+    "Move the chunk/document store to an on-disk index once the collection grows past in-memory size (EXP-022)."
+  ],
+  "elapsed_sec": 2.2623,
+  "peak_rss_mb": 171.7,
+  "models_used": "No checkpoint is loaded by this exploration. Fetching and chunking real text uses no model, classical or neural. This is data attachment only; EXP-029, EXP-032, and EXP-033 add models on top of it."
+}

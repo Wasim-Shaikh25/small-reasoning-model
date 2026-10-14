@@ -5,3 +5,4 @@ __pycache__/
 .pytest_cache/
 data/**/resume/
 data/**/checkpoint.json
+.cache/

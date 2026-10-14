@@ -1,0 +1,80 @@
+{
+  "id": "EXP-029",
+  "title": "Hybrid retrieval with a real pretrained dense model, on real documents",
+  "status": "closed",
+  "goal": "Re-measure EXP-004-style hybrid retrieval with a real pretrained encoder for the dense leg, over the real document collection from EXP-025 instead of synthetic lease passages.",
+  "method": "Both indexes share the same Okapi BM25 sparse leg (lab/common/index.BM25, unchanged). The classical index's dense leg is sklearn TfidfVectorizer cosine (EXP-004's substitute). The real index's dense leg is mean-pooled spaCy en_core_web_md static word vectors, min-max normalized and averaged 0.5/0.5 with the sparse score, same fusion formula as lab/common/index.Index. Two query sets run over the same 76 real passages from 25 real documents: (1) each chunk's own verified-substring extractive summary, gold is that chunk's id -- a sanity check where the query is literally inside the gold passage; (2) each document's real headline, gold is every chunk of that document's body -- a harder test where the query wording is not copied into any chunk.",
+  "metrics": {
+    "n_passages": 76,
+    "n_summary_queries": 75,
+    "n_headline_queries": 25,
+    "summary_queries_sanity_check": {
+      "note": "query is a literal substring of the gold passage; both scorers can win on exact overlap",
+      "classical_tfidf_dense": {
+        "recall_at_5": 1.0,
+        "recall_at_10": 1.0,
+        "mrr": 0.9867
+      },
+      "real_pretrained_dense": {
+        "recall_at_5": 1.0,
+        "recall_at_10": 1.0,
+        "mrr": 0.9933
+      },
+      "lift_recall_at_5": 0.0,
+      "lift_mrr": 0.0066
+    },
+    "headline_queries_hard_test": {
+      "note": "query is the article's real headline, not copied verbatim into any chunk body",
+      "classical_tfidf_dense": {
+        "recall_at_5": 0.7379,
+        "recall_at_10": 0.869,
+        "mrr": 0.94
+      },
+      "real_pretrained_dense": {
+        "recall_at_5": 0.6769,
+        "recall_at_10": 0.7741,
+        "mrr": 0.94
+      },
+      "lift_recall_at_5": -0.061,
+      "lift_recall_at_10": -0.0949,
+      "lift_mrr": 0.0
+    },
+    "real_model_card": {
+      "ner_model": "en_core_web_sm",
+      "ner_source": "https://github.com/explosion/spacy-models (pip wheel, GitHub release asset)",
+      "ner_training_data": "OntoNotes 5 (real pretrained checkpoint, shipped by spaCy)",
+      "vector_model": "en_core_web_md",
+      "vector_source": "https://github.com/explosion/spacy-models (pip wheel, GitHub release asset)",
+      "vector_training_data": "GloVe-style static vectors trained on a large web/news crawl, shipped by spaCy",
+      "huggingface_blocked": true,
+      "huggingface_block_detail": "huggingface.co CONNECT rejected with 403 by this sandbox's egress policy",
+      "blueprint_checkpoints_named": [
+        "bge-small-en-v1.5",
+        "deepset/deberta-v3-base-squad2",
+        "GLiNER"
+      ],
+      "substitution_is_exact_blueprint_model": false
+    }
+  },
+  "results_prose": "Sanity check (75 substring-summary queries, 76 passages): classical Recall@5 1.0, real-model Recall@5 1.0 (lift +0.0000) -- both near ceiling because the query is literally inside the gold passage. Hard test (25 real-headline queries, gold is the whole document's chunk set): classical Recall@5 0.7379, Recall@10 0.869; real-model Recall@5 0.6769, Recall@10 0.7741 (lift -0.0610 at 5, -0.0949 at 10). On this harder, more realistic test the real pretrained static-vector dense leg does not beat classical TF-IDF; it measures lower. The measured number is reported as found, not adjusted.",
+  "conclusion": "The real pretrained dense leg is measured against the classical TF-IDF dense leg on the same real corpus and the same two query sets. See real_model_card in the metrics for exactly which checkpoint ran and why it is not bge-small-en-v1.5. The two tests disagree: on the substring sanity check both legs sit at the Recall@5/10 ceiling, matching EXP-004's own 'reranker lift 0.0' finding on an easy set. On the harder headline test the real pretrained static-vector leg scores lower than classical TF-IDF (Recall@5 and @10 both negative lift). A plausible reason: mean-pooling 300-d vectors over a short, all-caps wire headline likely washes out the few content words that matter, while TF-IDF's rare-term weighting keeps exact shared tokens (a name, a commodity) salient. This closes the EXP-029 rerun todo for the embeddings component -- it is no longer unrun -- but the honest result is that this particular real pretrained encoder did not outperform the classical substitute on real documents at this scale.",
+  "scale_down": "25 real documents / 76 chunks, not a 1,000-page collection (EXP-022 on-disk index is still a separate todo). bge-small-en-v1.5, Qdrant sparse vectors, and bge-reranker-v2-m3 remain unloaded because huggingface.co is blocked by this sandbox's egress policy; see real_model_card.",
+  "referenced_files": [
+    "lab/exp_029_real_retrieval/run.py",
+    "lab/common/real_index.py",
+    "lab/common/real_models.py",
+    "lab/common/index.py",
+    "lab/common/real_corpus.py",
+    "lab/common/harness.py",
+    "data/exp_025_real_documents/chunks.json",
+    "data/exp_029_real_retrieval/queries.json",
+    "data/exp_029_real_retrieval/results.json"
+  ],
+  "follow_ups": [
+    "If huggingface.co access is ever granted in this sandbox, rerun with the actual bge-small-en-v1.5 checkpoint and compare against this spaCy result.",
+    "Add a cross-encoder reranking pass once a real reranker checkpoint is reachable."
+  ],
+  "elapsed_sec": 4.6327,
+  "peak_rss_mb": 456.89,
+  "models_used": "Real pretrained spaCy en_core_web_md static word vectors (GloVe-style, trained on a web/news crawl) for the dense leg, fused with the unchanged in-process Okapi BM25 sparse leg. bge-small-en-v1.5, Qdrant, and bge-reranker-v2-m3 were not loaded: huggingface.co is blocked in this sandbox (403 CONNECT, policy denial). This is a real, reachable, non-generative encoder, not the exact blueprint checkpoint. See lab/common/real_models.py:model_card()."
+}

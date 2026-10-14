@@ -36,6 +36,6 @@
   "follow_ups": [
     "Collect a human 1-to-5 rating for sub-question quality before treating the proxy as a product metric."
   ],
-  "elapsed_sec": 0.0021,
-  "peak_rss_mb": 12.39
+  "elapsed_sec": 0.004,
+  "peak_rss_mb": 12.05
 }

@@ -18,5 +18,12 @@
     "vector_db": "in-memory index (in place of Qdrant)",
     "graph": "in-memory adjacency (in place of NetworkX/Kuzu/Neo4j)",
     "dates": "dateparser plus timedelta"
+  },
+  "real_model_reruns": {
+    "note": "EXP-025, EXP-029, EXP-032, and EXP-033 only. Every other exploration above still ran the classical substitutes in 'substitutes'.",
+    "huggingface_co_blocked": "This sandbox's egress policy denies huggingface.co (403 CONNECT, policy denial), so bge-small-en-v1.5, DeBERTa-v3, and GLiNER cannot be downloaded here. See lab/common/real_models.py.",
+    "embeddings": "spaCy en_core_web_md static word vectors (GloVe-style, real pretrained, not downloaded from huggingface.co) in place of TF-IDF, for EXP-029 and EXP-032's dense retrieval leg",
+    "entity_tagging": "spaCy en_core_web_sm NER (CNN tagger trained on OntoNotes 5, real pretrained) in place of the rule tagger, for EXP-032 and EXP-033",
+    "not_the_blueprint_checkpoint": "spaCy's pipelines are real, reachable, non-generative pretrained models, but they are not bge-small-en-v1.5, deepset/deberta-v3-base-squad2, or GLiNER. Do not cite EXP-029/032/033 numbers as bge, DeBERTa, or GLiNER results."
   }
 }

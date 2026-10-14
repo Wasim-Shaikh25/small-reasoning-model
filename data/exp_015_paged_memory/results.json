@@ -105,6 +105,6 @@
     "data/exp_015_paged_memory/results.json"
   ],
   "follow_ups": [],
-  "elapsed_sec": 0.0357,
-  "peak_rss_mb": 116.49
+  "elapsed_sec": 0.0666,
+  "peak_rss_mb": 145.63
 }

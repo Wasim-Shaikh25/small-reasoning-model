@@ -29,6 +29,6 @@
     "data/exp_005_extractive_qa/results.json"
   ],
   "follow_ups": [],
-  "elapsed_sec": 0.0029,
-  "peak_rss_mb": 12.39
+  "elapsed_sec": 0.0058,
+  "peak_rss_mb": 12.09
 }
