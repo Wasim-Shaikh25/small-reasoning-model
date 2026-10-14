@@ -56,6 +56,6 @@
     "data/exp_003_chunking/results.json"
   ],
   "follow_ups": [],
-  "elapsed_sec": 0.0031,
-  "peak_rss_mb": 18.79
+  "elapsed_sec": 0.0024,
+  "peak_rss_mb": 19.01
 }

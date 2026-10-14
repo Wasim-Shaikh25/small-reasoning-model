@@ -1,12 +1,17 @@
-numpy>=1.26
+# numpy<2 is load-bearing, not a style preference: scipy 1.11/pandas/sklearn
+# installed here are compiled against the numpy 1.x ABI and crash on import
+# under numpy 2.x ("AttributeError: _ARRAY_API not found"). Installing or
+# upgrading spacy without this pin pulls numpy 2.x in as a transitive
+# dependency and silently breaks every sklearn-based module in this repo.
+numpy>=1.26,<2
 scikit-learn>=1.4
 rapidfuzz>=3.6
 dateparser>=1.2
 
-# Real-model reruns only (EXP-029, EXP-032, EXP-033). Real, pretrained,
-# non-generative models: NER (OntoNotes) and static word vectors. Not
-# bge/DeBERTa/GLiNER -- huggingface.co is blocked by this sandbox's egress
-# policy. See lab/common/real_models.py.
+# Real-model reruns (EXP-029, EXP-032, EXP-033, and now that huggingface.co
+# is reachable, EXP-057's dependency parser). Real, pretrained, non-
+# generative models: NER (OntoNotes) and static word vectors. See
+# lab/common/real_models.py and lab/common/rules.py.
 spacy>=3.8
 # The pipelines themselves are not on PyPI by plain name; install with:
 #   python3 -m spacy download en_core_web_sm

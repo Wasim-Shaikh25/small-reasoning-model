@@ -1,0 +1,97 @@
+[
+  {
+    "id": "R01_match",
+    "ask": "Arjun murdered Neha. Is that a punishable crime?",
+    "decision": "supported",
+    "reason": "verb_match",
+    "text": "Arjun murdered Neha. [FACT1] This matches the rule's trigger (murder): If someone murders a person, it is a punishable crime. [RULE1] Therefore, it is a punishable crime.",
+    "rule_parsed": {
+      "raw": "If someone murders a person, it is a punishable crime.",
+      "subject_placeholder": "someone",
+      "trigger_lemma": "murder",
+      "consequence": "it is a punishable crime"
+    },
+    "fact_parsed": {
+      "raw": "Arjun murdered Neha.",
+      "subject": "Arjun",
+      "verb_lemma": "murder",
+      "object": "Neha"
+    },
+    "expect_decision": "supported",
+    "correct": true
+  },
+  {
+    "id": "R02_no_match_different_verb",
+    "ask": "Arjun borrowed money from Neha. Is that a punishable crime?",
+    "decision": "inconclusive",
+    "reason": "no_verb_match",
+    "text": "Insufficient evidence.",
+    "rule_parsed": {
+      "raw": "If someone murders a person, it is a punishable crime.",
+      "subject_placeholder": "someone",
+      "trigger_lemma": "murder",
+      "consequence": "it is a punishable crime"
+    },
+    "fact_parsed": {
+      "raw": "Arjun borrowed money from Neha.",
+      "subject": "Arjun",
+      "verb_lemma": "borrow",
+      "object": "money"
+    },
+    "expect_decision": "inconclusive",
+    "correct": true
+  },
+  {
+    "id": "R03_no_rule_present",
+    "ask": "Arjun murdered Neha. Is that a punishable crime?",
+    "decision": "inconclusive",
+    "reason": "missing_rule",
+    "text": "Insufficient evidence.",
+    "rule_parsed": null,
+    "fact_parsed": {
+      "raw": "Arjun murdered Neha.",
+      "subject": "Arjun",
+      "verb_lemma": "murder",
+      "object": "Neha"
+    },
+    "expect_decision": "inconclusive",
+    "correct": true
+  },
+  {
+    "id": "R04_match_different_entities",
+    "ask": "Is theft a punishable offense here?",
+    "decision": "supported",
+    "reason": "verb_match",
+    "text": "Priya stole the necklace. [FACT2] This matches the rule's trigger (steal): If a person steals property, it is a punishable offense. [RULE2] Therefore, it is a punishable offense.",
+    "rule_parsed": {
+      "raw": "If a person steals property, it is a punishable offense.",
+      "subject_placeholder": "a",
+      "trigger_lemma": "steal",
+      "consequence": "it is a punishable offense"
+    },
+    "fact_parsed": {
+      "raw": "Priya stole the necklace.",
+      "subject": "Priya",
+      "verb_lemma": "steal",
+      "object": "necklace"
+    },
+    "expect_decision": "supported",
+    "correct": true
+  },
+  {
+    "id": "R05_no_fact_present",
+    "ask": "Is murder a punishable crime?",
+    "decision": "inconclusive",
+    "reason": "missing_fact",
+    "text": "Insufficient evidence.",
+    "rule_parsed": {
+      "raw": "If someone murders a person, it is a punishable crime.",
+      "subject_placeholder": "someone",
+      "trigger_lemma": "murder",
+      "consequence": "it is a punishable crime"
+    },
+    "fact_parsed": null,
+    "expect_decision": "inconclusive",
+    "correct": true
+  }
+]

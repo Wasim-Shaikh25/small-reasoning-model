@@ -143,7 +143,7 @@ DeBERTa, GLiNER, BERT-NER, RoBERTa, bge, MiniLM, e5, spaCy, libpostal, Qdrant, S
 }
 ```
 
-Elapsed seconds: 0.0488. Peak RSS MB: 126.3.
+Elapsed seconds: 0.0202. Peak RSS MB: 126.83.
 - Scale-down: The loop is run on three passages, not a full archive. Logging is an in-memory trace rather than a log service.
 - Conclusion: The controller enforces schema validity, a single repair, depth caps, and the rule that retrieved text is data. 
 
@@ -243,7 +243,7 @@ Elapsed seconds: 0.0099. Peak RSS MB: 18.83.
 }
 ```
 
-Elapsed seconds: 0.0031. Peak RSS MB: 18.79.
+Elapsed seconds: 0.0024. Peak RSS MB: 19.01.
 - Scale-down: One short document plus one generated long clause. Token counts are whitespace words, not a model tokenizer. Production target of 200 to 400 tokens was not the setting for the short sample.
 - Conclusion: Chunk metadata and extractive summaries behave as specified on this sample. The word-window settings used here are smaller than the 200 to 400 token production window so the sample still splits.
 
@@ -561,7 +561,7 @@ Elapsed seconds: 0.0051. Peak RSS MB: 132.41.
 }
 ```
 
-Elapsed seconds: 0.0306. Peak RSS MB: 132.77.
+Elapsed seconds: 0.0138. Peak RSS MB: 133.61.
 - Scale-down: Six short documents replace 20 documents of 5 to 30 pages. The searchable context is the document itself, not a collection-wide index.
 - Conclusion: Wrong resolution is the headline number and is reported above. Ambiguous shared names are flagged instead of guessed when the rule can see two full names. No wrong example was written when the store required a gold-matching resolved span.
 
@@ -1068,7 +1068,7 @@ Elapsed seconds: 0.0627. Peak RSS MB: 30.84.
 }
 ```
 
-Elapsed seconds: 0.0716. Peak RSS MB: 130.37.
+Elapsed seconds: 0.0462. Peak RSS MB: 130.61.
 - Scale-down: Pages are short synthetic paragraphs, not scanned document pages. 1,000 pages were run. A multi-million-token archive was not.
 - Conclusion: Recall of a distinctive needle stayed available at the sizes that fit in this process. Eviction removes an unpinned page, and the next request brings it back as a page fault. The notebook, not the raw haystack, is what the reduce step would read.
 
@@ -1206,7 +1206,7 @@ Elapsed seconds: 0.0112. Peak RSS MB: 18.29.
 - `lab/common/harness.py`
 - `data/exp_018_longform/spec.json`
 - `data/exp_018_longform/results.json`
-- Results: Assembly sizes: 200 claims -> 1706 words, coverage 1.0, broken citations 0, repetition pairs 1, 35233.01 words/sec; 1000 claims -> 8506 words, coverage 1.0, broken citations 0, repetition pairs 1, 124529.32 words/sec; 5000 claims -> 42506 words, coverage 1.0, broken citations 0, repetition pairs 1, 20769.49 words/sec. Resume hash matches a full run: True.
+- Results: Assembly sizes: 200 claims -> 1706 words, coverage 1.0, broken citations 0, repetition pairs 1, 343093.88 words/sec; 1000 claims -> 8506 words, coverage 1.0, broken citations 0, repetition pairs 1, 391568.34 words/sec; 5000 claims -> 42506 words, coverage 1.0, broken citations 0, repetition pairs 1, 97551.77 words/sec. Resume hash matches a full run: True.
 ```json
 {
   "sizes": [
@@ -1225,10 +1225,10 @@ Elapsed seconds: 0.0112. Peak RSS MB: 18.29.
           "canonical": "Ravi Sharma"
         }
       ],
-      "elapsed_sec": 0.0484,
-      "tokens_per_sec": 35233.01,
-      "rss_before_mb": 126.25,
-      "rss_after_mb": 126.74,
+      "elapsed_sec": 0.005,
+      "tokens_per_sec": 343093.88,
+      "rss_before_mb": 126.35,
+      "rss_after_mb": 126.91,
       "sha256": "bff01e6e7e463a24cc6669db9dcedca82712bf57fef8f0538128643858b496e0"
     },
     {
@@ -1246,10 +1246,10 @@ Elapsed seconds: 0.0112. Peak RSS MB: 18.29.
           "canonical": "Ravi Sharma"
         }
       ],
-      "elapsed_sec": 0.0683,
-      "tokens_per_sec": 124529.32,
-      "rss_before_mb": 127.08,
-      "rss_after_mb": 128.38,
+      "elapsed_sec": 0.0217,
+      "tokens_per_sec": 391568.34,
+      "rss_before_mb": 127.2,
+      "rss_after_mb": 129.17,
       "sha256": "d60096f22c9b1de5bb3a8df21d7de8b9467ec43551354255964f07dcc1a69106"
     },
     {
@@ -1267,10 +1267,10 @@ Elapsed seconds: 0.0112. Peak RSS MB: 18.29.
           "canonical": "Ravi Sharma"
         }
       ],
-      "elapsed_sec": 2.0466,
-      "tokens_per_sec": 20769.49,
-      "rss_before_mb": 130.09,
-      "rss_after_mb": 162.79,
+      "elapsed_sec": 0.4357,
+      "tokens_per_sec": 97551.77,
+      "rss_before_mb": 130.91,
+      "rss_after_mb": 163.79,
       "sha256": "8f16ab373d09b89e12b98afeed44bcb46aebeebff7315c27dbb78a07ec6a4ef0"
     }
   ],
@@ -1280,7 +1280,7 @@ Elapsed seconds: 0.0112. Peak RSS MB: 18.29.
 }
 ```
 
-Elapsed seconds: 2.5154. Peak RSS MB: 162.79.
+Elapsed seconds: 0.4932. Peak RSS MB: 163.79.
 - Scale-down: Claims are templated verified findings, not 10 to 250 pages of model prose. The architecture's FLAN-T5 unit writer is not used.
 - Conclusion: Coverage and citation integrity are properties of the assembler. Throughput is string assembly on this CPU, not a generative decoder. Resume reproduces the full document hash when the checkpoint is truncated and continued.
 
@@ -21626,6 +21626,67 @@ Elapsed seconds: 0.0382. Peak RSS MB: 126.22.
 Elapsed seconds: 49.7613. Peak RSS MB: 683.06.
 - Scale-down: Same 13 findings as EXP-054/EXP-048, 5 hand-picked relevance sanity cases, not a large relevance benchmark.
 - Conclusion: The ask-relevance check itself is correct on 1.0 of 5 unambiguous sanity cases -- the function works as designed. But wiring it in with a literal high-level ask ("Summarize the lease's key terms.") against single-fact leaves backfires here: 5 leaves that were otherwise faithful, verified rewrites get rejected only because an isolated fact like 'Ravi Sharma is the Lessee.' doesn't happen to restate the words 'summarize', 'lease', or 'terms'. Token-overlap relevance works when a question's own key noun phrase naturally reappears in its answer (EXP-012's fixed-passage cases, or a direct QA ask); it does not work against an atomic fact drawn from a broader summarization ask, because there is no reason that fact's wording should echo the ask's wording. This is a real design gap in lab.common.relevance.ask_relevance as written, not a success to report quietly: the check needs to compare against something narrower than the whole-document ask (the leaf's own finding, or a sub-ask from EXP-052's eventual table of contents) before it is wired into the rewriter gate by default. Isolated from that problem, the more directive single-fact prompt alone did not clearly improve on EXP-054's numbers either.
+
+## EXP-057 Rule application: a given conditional rule applied to a given fact
+
+- Status: `closed`
+- Models used: No model decides the outcome. spaCy's en_core_web_sm dependency parser (already loaded for EXP-032/033's real-model NER, lab/common/real_models.py) extracts each sentence's main verb -- a narrow syntactic sub-task, not a reasoning judgment. The rule match and the final answer are deterministic code.
+- Goal: Build and measure the reasoning primitive raised directly in review: given a rule in context ('if X, then Y') and a fact in context, answer a question by matching the fact against the rule's trigger and applying its consequence -- without training or calling a generative model, using only the existing spaCy dependency parser already loaded for real-model NER (EXP-032/033) to extract each sentence's verb.
+- Method: lab.common.rules.parse_conditional_rule extracts an 'if <subject>, <verb phrase>, <consequence>' rule's trigger verb lemma via dependency parse. lab.common.rules.extract_fact_triple extracts a fact sentence's subject/verb lemma/object the same way. lab.common.rules.apply_rule compares the two verb lemmas -- the one judgment this module makes. lab.common.rules.answer_rule_question scans the given passages for the first rule and the first fact with a concrete subject, applies the rule if the verbs match, and returns the consequence with citations to both passages; it abstains (decision 'inconclusive') if no rule, no concrete fact, or no verb match is found, rather than guessing from the ask's own wording.
+- Referenced files:
+- `lab/exp_057_rule_application/run.py`
+- `lab/common/rules.py`
+- `lab/common/real_models.py`
+- `lab/common/harness.py`
+- `data/exp_057_rule_application/results.json`
+- Results: On 5 cases, 5 match the expected decision (accuracy 1.0). The headline case -- rule 'If someone murders a person, it is a punishable crime.' plus fact 'Arjun murdered Neha.' -- answers: "Arjun murdered Neha. [FACT1] This matches the rule's trigger (murder): If someone murders a person, it is a punishable crime. [RULE1] Therefore, it is a punishable crime.". A fact with a different verb (borrowed, not murdered) and a passage set with no rule sentence at all both correctly abstain rather than guess.
+```json
+{
+  "n": 5,
+  "accuracy": 1.0,
+  "headline_case": {
+    "ask": "Arjun murdered Neha. Is that a punishable crime?",
+    "decision": "supported",
+    "text": "Arjun murdered Neha. [FACT1] This matches the rule's trigger (murder): If someone murders a person, it is a punishable crime. [RULE1] Therefore, it is a punishable crime."
+  },
+  "cases": [
+    {
+      "id": "R01_match",
+      "decision": "supported",
+      "expected": "supported",
+      "correct": true
+    },
+    {
+      "id": "R02_no_match_different_verb",
+      "decision": "inconclusive",
+      "expected": "inconclusive",
+      "correct": true
+    },
+    {
+      "id": "R03_no_rule_present",
+      "decision": "inconclusive",
+      "expected": "inconclusive",
+      "correct": true
+    },
+    {
+      "id": "R04_match_different_entities",
+      "decision": "supported",
+      "expected": "supported",
+      "correct": true
+    },
+    {
+      "id": "R05_no_fact_present",
+      "decision": "inconclusive",
+      "expected": "inconclusive",
+      "correct": true
+    }
+  ]
+}
+```
+
+Elapsed seconds: 7.1496. Peak RSS MB: 286.42.
+- Scale-down: One rule sentence shape ('If <subject>, <verb phrase>, <consequence>.') and single-clause facts with no qualifier. A rule with an exception ('...unless committed in self-defense') is not parsed here -- the same qualifier gap EXP-006/EXP-026 already named for the lexical NLI judge. Multiple candidate rules or facts in the same passage set are not disambiguated; the first of each is used.
+- Conclusion: A general rule given in context can be applied to a specific fact given in context, and the result cited back to both, without a generative model and without training anything new -- a dependency parser's verb extraction plus one lemma comparison is enough for this shape of case. The system correctly abstains rather than answers when the fact doesn't match the rule's verb or when no rule sentence is present at all, instead of defaulting to a guess.
 
 ## Follow-up todos
 

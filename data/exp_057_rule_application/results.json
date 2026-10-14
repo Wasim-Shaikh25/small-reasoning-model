@@ -1,0 +1,66 @@
+{
+  "id": "EXP-057",
+  "title": "Rule application: a given conditional rule applied to a given fact",
+  "status": "closed",
+  "goal": "Build and measure the reasoning primitive raised directly in review: given a rule in context ('if X, then Y') and a fact in context, answer a question by matching the fact against the rule's trigger and applying its consequence -- without training or calling a generative model, using only the existing spaCy dependency parser already loaded for real-model NER (EXP-032/033) to extract each sentence's verb.",
+  "method": "lab.common.rules.parse_conditional_rule extracts an 'if <subject>, <verb phrase>, <consequence>' rule's trigger verb lemma via dependency parse. lab.common.rules.extract_fact_triple extracts a fact sentence's subject/verb lemma/object the same way. lab.common.rules.apply_rule compares the two verb lemmas -- the one judgment this module makes. lab.common.rules.answer_rule_question scans the given passages for the first rule and the first fact with a concrete subject, applies the rule if the verbs match, and returns the consequence with citations to both passages; it abstains (decision 'inconclusive') if no rule, no concrete fact, or no verb match is found, rather than guessing from the ask's own wording.",
+  "metrics": {
+    "n": 5,
+    "accuracy": 1.0,
+    "headline_case": {
+      "ask": "Arjun murdered Neha. Is that a punishable crime?",
+      "decision": "supported",
+      "text": "Arjun murdered Neha. [FACT1] This matches the rule's trigger (murder): If someone murders a person, it is a punishable crime. [RULE1] Therefore, it is a punishable crime."
+    },
+    "cases": [
+      {
+        "id": "R01_match",
+        "decision": "supported",
+        "expected": "supported",
+        "correct": true
+      },
+      {
+        "id": "R02_no_match_different_verb",
+        "decision": "inconclusive",
+        "expected": "inconclusive",
+        "correct": true
+      },
+      {
+        "id": "R03_no_rule_present",
+        "decision": "inconclusive",
+        "expected": "inconclusive",
+        "correct": true
+      },
+      {
+        "id": "R04_match_different_entities",
+        "decision": "supported",
+        "expected": "supported",
+        "correct": true
+      },
+      {
+        "id": "R05_no_fact_present",
+        "decision": "inconclusive",
+        "expected": "inconclusive",
+        "correct": true
+      }
+    ]
+  },
+  "results_prose": "On 5 cases, 5 match the expected decision (accuracy 1.0). The headline case -- rule 'If someone murders a person, it is a punishable crime.' plus fact 'Arjun murdered Neha.' -- answers: \"Arjun murdered Neha. [FACT1] This matches the rule's trigger (murder): If someone murders a person, it is a punishable crime. [RULE1] Therefore, it is a punishable crime.\". A fact with a different verb (borrowed, not murdered) and a passage set with no rule sentence at all both correctly abstain rather than guess.",
+  "conclusion": "A general rule given in context can be applied to a specific fact given in context, and the result cited back to both, without a generative model and without training anything new -- a dependency parser's verb extraction plus one lemma comparison is enough for this shape of case. The system correctly abstains rather than answers when the fact doesn't match the rule's verb or when no rule sentence is present at all, instead of defaulting to a guess.",
+  "scale_down": "One rule sentence shape ('If <subject>, <verb phrase>, <consequence>.') and single-clause facts with no qualifier. A rule with an exception ('...unless committed in self-defense') is not parsed here -- the same qualifier gap EXP-006/EXP-026 already named for the lexical NLI judge. Multiple candidate rules or facts in the same passage set are not disambiguated; the first of each is used.",
+  "referenced_files": [
+    "lab/exp_057_rule_application/run.py",
+    "lab/common/rules.py",
+    "lab/common/real_models.py",
+    "lab/common/harness.py",
+    "data/exp_057_rule_application/results.json"
+  ],
+  "follow_ups": [
+    "EXP-026's qualifier-rule todo (except/unless/provided that) applies here too: a rule with an exception clause would currently be matched and applied without checking whether the exception fires.",
+    "Wire this into lab/common/engine.run_task as a new task_type once the ask analyzer (lab/common/ask.py) can detect a rule-application question, so it isn't a separate standalone path.",
+    "Test against passage sets with more than one candidate rule or fact to measure disambiguation, not just presence/absence."
+  ],
+  "elapsed_sec": 7.1496,
+  "peak_rss_mb": 286.42,
+  "models_used": "No model decides the outcome. spaCy's en_core_web_sm dependency parser (already loaded for EXP-032/033's real-model NER, lab/common/real_models.py) extracts each sentence's main verb -- a narrow syntactic sub-task, not a reasoning judgment. The rule match and the final answer are deterministic code."
+}
