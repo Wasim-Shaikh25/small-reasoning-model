@@ -604,53 +604,6 @@ RERUN_TODOS = [
         "conclusion": "Blocked by FORBIDDEN.md. EXP-019 stays on the deterministic path. EXP-017 and EXP-018's fidelity/repetition checks are unaffected by this entry; a bounded-rewriter rerun of those two, once EXP-048 exists, would be a separate future todo.",
         "scale_down": "",
     },
-    {
-        "id": "EXP-048",
-        "title": "Bounded FLAN-T5 rewriter (small checkpoint, fidelity-gated)",
-        "status": "todo",
-        "goal": (
-            "Implement and measure the narrow rewriter exception recorded in FORBIDDEN.md on 2026-10-14 "
-            "(project owner's explicit decision): load flan-t5-small, feed it only already-verified "
-            "(statement, citation) findings plus a style instruction, run the section 3.7 fidelity validator "
-            "on its output, and fall back to the unchanged lab/common/assemble.py text on any failure. "
-            "Measure fidelity pass rate, fallback rate, and a human or proxy fluency rating, the same way "
-            "EXP-017 and EXP-023 (still todo) would."
-        ),
-        "method": (
-            "Not run. Blocked: huggingface.co is denied by this sandbox's egress policy, so flan-t5-small "
-            "cannot be downloaded here (same block that limits EXP-029/032/033/040/etc. to spaCy real-model "
-            "substitutes; see lab/common/real_models.py). This todo is expected to be picked up on a machine "
-            "or environment where huggingface.co is reachable -- for example, a laptop, rather than this "
-            "sandbox."
-        ),
-        "models_used": (
-            "Not run. Proposed: a small local flan-t5-small checkpoint (or comparably small T5 model, under "
-            "~300M params), loaded with transformers (or converted to CTranslate2 int8, as ARCHITECTURE.md "
-            "section 8 recommends, once the plain-transformers path is measured). Rewriter role only -- never "
-            "extraction, answering, or support/contradiction judging. Not an API call; a local checkpoint only."
-        ),
-        "referenced_files": [
-            "FORBIDDEN.md",
-            "OBJECTIVE.md",
-            "lab/config/models.json",
-            "ARCHITECTURE.md",
-            "lab/common/assemble.py",
-            "lab/common/harness.py",
-            "lab/exp_017_fidelity/run.py",
-            "lab/exp_018_longform/run.py",
-        ],
-        "results_prose": "Not run.",
-        "conclusion": (
-            "Todo, blocked on network access to huggingface.co from wherever this is run next. Once "
-            "unblocked: add lab/common/real_rewriter.py (model load, a render_unit_generative(leaf, glossary) "
-            "counterpart to assemble.render_unit, and the fidelity gate reusing harness.fidelity()), wire it "
-            "into assemble.assemble() behind a flag so the deterministic path remains the default and the "
-            "fallback, and write lab/exp_048_bounded_rewriter/run.py following the existing exploration "
-            "pattern (Run, write_json, finish, models_used). Do not let this checkpoint touch extraction or "
-            "verification; those stay on the existing lexical/real-NER/real-embedding substitutes."
-        ),
-        "scale_down": "",
-    },
 ]
 
 

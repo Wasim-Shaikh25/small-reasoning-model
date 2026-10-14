@@ -108,20 +108,51 @@ def glossary_flags(document: str, variants: dict[str, str]) -> list[dict]:
     return flags
 
 
-def assemble(findings: list[dict], task: str, glossary: dict[str, str], checkpoint: Path | None = None) -> dict:
+REWRITER_MODES = ("deterministic", "bounded_flan_t5_small")
+
+
+def assemble(
+    findings: list[dict],
+    task: str,
+    glossary: dict[str, str],
+    checkpoint: Path | None = None,
+    rewriter: str = "deterministic",
+) -> dict:
+    if rewriter not in REWRITER_MODES:
+        raise ValueError(f"unknown rewriter mode: {rewriter!r}, expected one of {REWRITER_MODES}")
     outline = build_outline(findings, task)
     rendered = []
     resumed_from = None
     done_ids = set()
+    rewrite_diagnostics = []
     if checkpoint and checkpoint.exists():
         saved = json.loads(checkpoint.read_text())
         rendered = saved["units"]
         done_ids = set(saved["done_leaf_ids"])
         resumed_from = len(done_ids)
+    tokenizer = model = None
+    if rewriter == "bounded_flan_t5_small":
+        # The generative checkpoint is loaded only when this narrow, explicitly
+        # requested mode is on -- the default path never imports it.
+        from lab.common.real_rewriter import load, rewrite_unit
+
+        tokenizer, model = load()
     for leaf in outline:
         if leaf["leaf_id"] in done_ids:
             continue
-        rendered.append(render_unit(leaf, glossary))
+        if rewriter == "bounded_flan_t5_small":
+            result = rewrite_unit(leaf, glossary, tokenizer=tokenizer, model=model)
+            rendered.append(result["text"])
+            rewrite_diagnostics.append(
+                {
+                    "leaf_id": leaf["leaf_id"],
+                    "used_generative": result["used_generative"],
+                    "fallback_reason": result["fallback_reason"],
+                    "checks": result["checks"],
+                }
+            )
+        else:
+            rendered.append(render_unit(leaf, glossary))
         done_ids.add(leaf["leaf_id"])
         if checkpoint:
             checkpoint.write_text(
@@ -130,7 +161,7 @@ def assemble(findings: list[dict], task: str, glossary: dict[str, str], checkpoi
     document = "\n\n".join(rendered)
     valid_ids = {f.get("citation") or f.get("evidence_id") for f in findings}
     raw_blob = "\n".join(f["statement"] for f in findings)
-    return {
+    result = {
         "document": document,
         "outline_leaves": len(outline),
         "word_count": word_count(document),
@@ -141,4 +172,8 @@ def assemble(findings: list[dict], task: str, glossary: dict[str, str], checkpoi
         "glossary_flags": glossary_flags(raw_blob, glossary),
         "resumed_from": resumed_from,
         "input_hash": hashlib.sha256(json.dumps([f["finding_id"] for f in findings]).encode()).hexdigest(),
+        "rewriter": rewriter,
     }
+    if rewrite_diagnostics:
+        result["rewrite_diagnostics"] = rewrite_diagnostics
+    return result

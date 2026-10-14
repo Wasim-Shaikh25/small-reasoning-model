@@ -15,3 +15,14 @@ spacy>=3.8
 # release wheel directly:
 #   pip install https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl
 #   pip install https://github.com/explosion/spacy-models/releases/download/en_core_web_md-3.8.0/en_core_web_md-3.8.0-py3-none-any.whl
+
+# EXP-048 only: the bounded FLAN-T5 rewriter exception recorded in
+# FORBIDDEN.md. Rewriter role only -- never extraction, answering, or
+# judging. See lab/common/real_rewriter.py.
+transformers>=4.40
+torch>=2.2
+sentencepiece>=0.2
+
+# Cross-platform peak-RSS measurement in lab/common/harness.py. `resource`
+# (the POSIX module the metric originally used) does not exist on Windows.
+psutil>=5.9

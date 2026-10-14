@@ -70,7 +70,7 @@ def main():
     run.finish(
         title="Stage latency and memory",
         goal="Record latency and peak RAM for ask analysis, chunking, retrieval, QA, NLI, and the controller on this machine.",
-        method="Each stage is warmed up once and then timed over repeated calls. Peak RSS is the process high-water mark from getrusage.",
+        method="Each stage is warmed up once and then timed over repeated calls. Peak RSS is the process high-water mark: getrusage on POSIX, psutil's peak working-set size on Windows (see lab/common/harness.peak_rss_mb).",
         metrics=metrics,
         results_prose=prose,
         conclusion="These times are for the lexical substitutes. They are not the latency of DeBERTa, GLiNER, or FLAN-T5, which are not loaded.",

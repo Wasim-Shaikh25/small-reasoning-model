@@ -20,11 +20,12 @@
     "dates": "dateparser plus timedelta"
   },
   "bounded_rewriter_exception": {
-    "status": "policy change recorded 2026-10-14 in FORBIDDEN.md; not yet implemented or measured",
+    "status": "policy change recorded 2026-10-14 in FORBIDDEN.md; implemented and measured as EXP-048 (lab/exp_048_bounded_rewriter/run.py, data/exp_048_bounded_rewriter/results.json), on a machine where huggingface.co is reachable",
     "allowed_checkpoint": "flan-t5-small (or comparably small, under ~300M params)",
     "allowed_role": "rewriter only (ARCHITECTURE.md section 3.7): join and grammar-correct already-verified findings into prose",
     "still_forbidden_for_this_checkpoint": "proposer role, extraction, answering, support/contradiction judging, any role that could assert a new fact",
-    "blocker": "huggingface.co is blocked by this sandbox's egress policy, so flan-t5-small cannot be downloaded here yet. See lab/common/real_models.py for the same block affecting bge/DeBERTa/GLiNER.",
+    "implementation": "lab/common/real_rewriter.py (load/rewrite_unit/fidelity_gate), wired into lab/common/assemble.assemble() behind rewriter='bounded_flan_t5_small', defaulting to rewriter='deterministic' so every other caller is unchanged",
+    "measured_result": "EXP-048, on 13 claim/paragraph findings also used by EXP-017: fidelity pass rate 0.0, fallback rate 1.0. flan-t5-small did not invent facts; it collapsed each 4-finding leaf to a near-copy of one finding, dropping the other three findings' numbers and citations, and the fidelity gate caught and discarded every one of those rewrites.",
     "required_guardrail": "every rewrite must pass the fidelity check (numbers/dates/names preserved, modals unchanged, bidirectional entailment, citations preserved) or fall back to the unchanged lab/common/assemble.py output"
   },
   "real_model_reruns": {

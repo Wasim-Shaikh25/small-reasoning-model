@@ -80,6 +80,6 @@
     "data/exp_011_decision_heads/results.json"
   ],
   "follow_ups": [],
-  "elapsed_sec": 0.1063,
-  "peak_rss_mb": 148.36
+  "elapsed_sec": 0.071,
+  "peak_rss_mb": 131.08
 }

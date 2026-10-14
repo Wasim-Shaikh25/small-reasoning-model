@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import json
-import resource
 import time
 from pathlib import Path
 
@@ -13,8 +12,21 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 def peak_rss_mb() -> float:
-    # Linux ru_maxrss is kilobytes.
-    return round(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024, 2)
+    try:
+        import resource  # POSIX only.
+
+        # Linux ru_maxrss is kilobytes.
+        return round(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024, 2)
+    except ImportError:
+        pass
+    try:
+        import psutil  # Windows substitute; reports the process's current/peak working set.
+
+        info = psutil.Process().memory_info()
+        peak_bytes = getattr(info, "peak_wset", None) or info.rss
+        return round(peak_bytes / (1024 * 1024), 2)
+    except ImportError:
+        return 0.0
 
 
 def prf(pred: set, gold: set) -> dict[str, float]:

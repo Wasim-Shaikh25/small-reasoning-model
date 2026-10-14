@@ -1,0 +1,93 @@
+[
+  {
+    "finding_id": "CL000",
+    "statement": "The notice period is 30 days.",
+    "citation": "CITE-CL000",
+    "evidence_id": "CITE-CL000",
+    "sort_key": 0
+  },
+  {
+    "finding_id": "CL001",
+    "statement": "The security deposit is INR 50000.",
+    "citation": "CITE-CL001",
+    "evidence_id": "CITE-CL001",
+    "sort_key": 1
+  },
+  {
+    "finding_id": "CL002",
+    "statement": "Ravi Sharma is the Lessee.",
+    "citation": "CITE-CL002",
+    "evidence_id": "CITE-CL002",
+    "sort_key": 2
+  },
+  {
+    "finding_id": "CL003",
+    "statement": "The lease was signed on 5 January 2024.",
+    "citation": "CITE-CL003",
+    "evidence_id": "CITE-CL003",
+    "sort_key": 3
+  },
+  {
+    "finding_id": "CL004",
+    "statement": "The tenant shall not sublet unless the Lessor consents.",
+    "citation": "CITE-CL004",
+    "evidence_id": "CITE-CL004",
+    "sort_key": 4
+  },
+  {
+    "finding_id": "CL005",
+    "statement": "The rent is INR 25000.",
+    "citation": "CITE-CL005",
+    "evidence_id": "CITE-CL005",
+    "sort_key": 5
+  },
+  {
+    "finding_id": "CL006",
+    "statement": "The cure period is 10 days.",
+    "citation": "CITE-CL006",
+    "evidence_id": "CITE-CL006",
+    "sort_key": 6
+  },
+  {
+    "finding_id": "CL007",
+    "statement": "ABC Pvt Ltd is the Lessor.",
+    "citation": "CITE-CL007",
+    "evidence_id": "CITE-CL007",
+    "sort_key": 7
+  },
+  {
+    "finding_id": "PG000",
+    "statement": "The tenant shall pay INR 25000 on the 1st of each month and shall not withhold rent.",
+    "citation": "CITE-PG000",
+    "evidence_id": "CITE-PG000",
+    "sort_key": 8
+  },
+  {
+    "finding_id": "PG001",
+    "statement": "Notice of 30 days must be given except where the premises are destroyed.",
+    "citation": "CITE-PG001",
+    "evidence_id": "CITE-PG001",
+    "sort_key": 9
+  },
+  {
+    "finding_id": "PG002",
+    "statement": "Meera Iyer signed on 5 January 2024 in the presence of the witness.",
+    "citation": "CITE-PG002",
+    "evidence_id": "CITE-PG002",
+    "sort_key": 10
+  },
+  {
+    "finding_id": "PG003",
+    "statement": "The deposit of INR 50000 is held until 14 days after the handover.",
+    "citation": "CITE-PG003",
+    "evidence_id": "CITE-PG003",
+    "sort_key": 11
+  },
+  {
+    "finding_id": "PG004",
+    "statement": "Entry is permitted only between 09:00 and 18:00.",
+    "citation": "CITE-PG004",
+    "evidence_id": "CITE-PG004",
+    "sort_key": 12
+  }
+]
