@@ -1,0 +1,286 @@
+{
+  "passages": [
+    {
+      "id": "P01",
+      "text": "The notice period under the lease is 30 days."
+    },
+    {
+      "id": "P02",
+      "text": "The garden notice board lists the period of the flower show."
+    },
+    {
+      "id": "P03",
+      "text": "The security deposit is INR 50000 payable on signing."
+    },
+    {
+      "id": "P04",
+      "text": "The deposit of silt in the river delta is seasonal."
+    },
+    {
+      "id": "P05",
+      "text": "Ravi Sharma is the Lessee of the Pune premises."
+    },
+    {
+      "id": "P06",
+      "text": "Anita Sharma teaches music in Pune."
+    },
+    {
+      "id": "P07",
+      "text": "Ravi Sharma resides at 14 MG Road, Pune 411001."
+    },
+    {
+      "id": "P08",
+      "text": "14 MG Road is closed for repairs on Sunday."
+    },
+    {
+      "id": "P09",
+      "text": "ABC Pvt Ltd is the Lessor."
+    },
+    {
+      "id": "P10",
+      "text": "Termination for breach requires a written notice."
+    },
+    {
+      "id": "P11",
+      "text": "The licence may be terminated except where the fee is paid."
+    },
+    {
+      "id": "P12",
+      "text": "A sprint in this handbook lasts 9 days."
+    },
+    {
+      "id": "P13",
+      "text": "Bake the cake for 9 minutes at 180 C."
+    },
+    {
+      "id": "P14",
+      "text": "The violet quorum code is 41827."
+    },
+    {
+      "id": "P15",
+      "text": "The committee quorum is three members."
+    },
+    {
+      "id": "P16",
+      "text": "Invoice 19 is due on 2 March 2024."
+    },
+    {
+      "id": "P17",
+      "text": "Invoice 19 was cancelled and replaced by invoice 20."
+    },
+    {
+      "id": "P18",
+      "text": "The boiling point listed in this lab sheet is 98 C."
+    },
+    {
+      "id": "P19",
+      "text": "Water the plants every 98 hours during the trial."
+    },
+    {
+      "id": "P20",
+      "text": "Defined term: a zorb is a refund issued after 14 days."
+    },
+    {
+      "id": "P21",
+      "text": "The refund desk opens at 14:00."
+    },
+    {
+      "id": "P22",
+      "text": "Match length in this league is 40 minutes."
+    },
+    {
+      "id": "P23",
+      "text": "The patient leaflet says take 40 mg at night."
+    },
+    {
+      "id": "P24",
+      "text": "Interest on the sample bond is 7 percent."
+    },
+    {
+      "id": "P25",
+      "text": "Seven players stood in the penalty area."
+    },
+    {
+      "id": "P26",
+      "text": "The recipe uses 7 grams of salt."
+    },
+    {
+      "id": "P27",
+      "text": "Clause 4.2: the tenant shall not sublet the premises."
+    },
+    {
+      "id": "P28",
+      "text": "Clause 4.3: the tenant may keep one pet."
+    },
+    {
+      "id": "P29",
+      "text": "Schedule A lists the furniture: one table and four chairs."
+    },
+    {
+      "id": "P30",
+      "text": "Signed by Meera Iyer on 5 January 2024."
+    },
+    {
+      "id": "P31",
+      "text": "The former tenant was Kapil Iyer."
+    },
+    {
+      "id": "P32",
+      "text": "Premises means the flat at Plot 14, Sector 5, Ashok Nagar."
+    },
+    {
+      "id": "P33",
+      "text": "Park Street market opens at dawn."
+    },
+    {
+      "id": "P34",
+      "text": "The said premises include the parking slot."
+    },
+    {
+      "id": "P35",
+      "text": "Version 2 amended the lease: the notice period is 45 days."
+    }
+  ],
+  "queries": [
+    {
+      "id": "Q01",
+      "query": "notice period under the lease",
+      "gold": [
+        "P01"
+      ]
+    },
+    {
+      "id": "Q02",
+      "query": "security deposit amount payable on signing",
+      "gold": [
+        "P03"
+      ]
+    },
+    {
+      "id": "Q03",
+      "query": "who is the Lessor",
+      "gold": [
+        "P09"
+      ]
+    },
+    {
+      "id": "Q04",
+      "query": "violet quorum code",
+      "gold": [
+        "P14"
+      ]
+    },
+    {
+      "id": "Q05",
+      "query": "what is a zorb",
+      "gold": [
+        "P20"
+      ]
+    },
+    {
+      "id": "Q06",
+      "query": "sprint length in this handbook",
+      "gold": [
+        "P12"
+      ]
+    },
+    {
+      "id": "Q07",
+      "query": "tenant shall not sublet",
+      "gold": [
+        "P27"
+      ]
+    },
+    {
+      "id": "Q08",
+      "query": "Plot 14 Sector 5 premises",
+      "gold": [
+        "P32"
+      ]
+    },
+    {
+      "id": "Q09",
+      "query": "invoice 19 due date",
+      "gold": [
+        "P16"
+      ]
+    },
+    {
+      "id": "Q10",
+      "query": "interest on the sample bond",
+      "gold": [
+        "P24"
+      ]
+    },
+    {
+      "id": "Q11",
+      "query": "furniture listed in schedule A",
+      "gold": [
+        "P29"
+      ]
+    },
+    {
+      "id": "Q12",
+      "query": "signed by Meera Iyer",
+      "gold": [
+        "P30"
+      ]
+    },
+    {
+      "id": "Q13",
+      "query": "termination for breach written notice",
+      "gold": [
+        "P10"
+      ]
+    },
+    {
+      "id": "Q14",
+      "query": "patient leaflet dose at night",
+      "gold": [
+        "P23"
+      ]
+    },
+    {
+      "id": "Q15",
+      "query": "match length in this league",
+      "gold": [
+        "P22"
+      ]
+    },
+    {
+      "id": "Q16",
+      "query": "boiling point on the lab sheet",
+      "gold": [
+        "P18"
+      ]
+    },
+    {
+      "id": "Q17",
+      "query": "recipe grams of salt",
+      "gold": [
+        "P26"
+      ]
+    },
+    {
+      "id": "Q18",
+      "query": "Park Street market opening",
+      "gold": [
+        "P33"
+      ]
+    },
+    {
+      "id": "Q19",
+      "query": "amended notice period version 2",
+      "gold": [
+        "P35"
+      ]
+    },
+    {
+      "id": "Q20",
+      "query": "former tenant Kapil",
+      "gold": [
+        "P31"
+      ]
+    }
+  ]
+}

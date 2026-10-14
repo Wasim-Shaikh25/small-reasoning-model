@@ -1,0 +1,85 @@
+{
+  "id": "EXP-011",
+  "title": "Decision and next-action heads",
+  "status": "closed",
+  "goal": "Train the small decision head and next-action head on pipeline features and measure abstention, calibration, and unsupported claims.",
+  "method": "Scenarios with known labels are featurized by the real lexical QA and NLI judges. Logistic regression is trained offline. A validation sweep picks the highest-coverage threshold whose unsupported-claim rate is at most 5 percent. The next-action head is a second logistic regression. Rendering for the chain check is deterministic.",
+  "metrics": {
+    "train": 252,
+    "validation": 54,
+    "test": 54,
+    "test_accuracy": 1.0,
+    "abstention_threshold": 0.4,
+    "threshold_met_unsupported_target_on_validation": true,
+    "test_unsupported_claim_rate_when_asserted": 0.0,
+    "test_supported_coverage": 0.3333,
+    "abstain_precision_on_non_supported": 1.0,
+    "abstain_recall_on_non_supported": 1.0,
+    "reliability_supported": [
+      {
+        "bin": [
+          0.0,
+          0.2
+        ],
+        "n": 36,
+        "mean_p": 0.0178,
+        "empirical": 0.0
+      },
+      {
+        "bin": [
+          0.2,
+          0.4
+        ],
+        "n": 0,
+        "mean_p": null,
+        "empirical": null
+      },
+      {
+        "bin": [
+          0.4,
+          0.6
+        ],
+        "n": 0,
+        "mean_p": null,
+        "empirical": null
+      },
+      {
+        "bin": [
+          0.6,
+          0.8
+        ],
+        "n": 0,
+        "mean_p": null,
+        "empirical": null
+      },
+      {
+        "bin": [
+          0.8,
+          1.0
+        ],
+        "n": 18,
+        "mean_p": 0.9471,
+        "empirical": 1.0
+      }
+    ],
+    "chain_items": 30,
+    "chain_number_errors": 0,
+    "next_action_accuracy": 0.8667,
+    "aggregation_check": 0.6175
+  },
+  "results_prose": "Decision head test accuracy is 1.0 on 54 items. Validation selected threshold 0.4 (target met: True). At that threshold the test unsupported-claim rate among assertions is 0.0 and supported coverage is 0.3333. Abstain precision 1.0, recall 1.0. Deterministic rendering of 30 supported claims had 0 number mismatches. Next-action head accuracy is 0.8667.",
+  "conclusion": "The heads learn the feature patterns in this generated set. The unsupported-claim target is evaluated at the validation threshold and reported on the held-out slice, not assumed.",
+  "scale_down": "Training rows are generated from six slots rather than MNLI, ANLI, FEVER, SQuAD2, and HotpotQA. No neural encoder is run to build the features.",
+  "referenced_files": [
+    "lab/exp_011_decision_heads/run.py",
+    "lab/common/qa.py",
+    "lab/common/nli.py",
+    "lab/common/harness.py",
+    "lab/common/textutil.py",
+    "data/exp_011_decision_heads/items.json",
+    "data/exp_011_decision_heads/results.json"
+  ],
+  "follow_ups": [],
+  "elapsed_sec": 0.1063,
+  "peak_rss_mb": 148.36
+}

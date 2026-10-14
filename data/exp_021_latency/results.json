@@ -1,0 +1,41 @@
+{
+  "id": "EXP-021",
+  "title": "Stage latency and memory",
+  "status": "closed",
+  "goal": "Record latency and peak RAM for ask analysis, chunking, retrieval, QA, NLI, and the controller on this machine.",
+  "method": "Each stage is warmed up once and then timed over repeated calls. Peak RSS is the process high-water mark from getrusage.",
+  "metrics": {
+    "mean_seconds": {
+      "ask_analyze_sec": 2.4e-05,
+      "chunk_sec": 0.000536,
+      "search_sec": 0.001011,
+      "qa_sec": 0.000446,
+      "nli_sec": 1.9e-05,
+      "e2e_sec": 0.011296
+    },
+    "peak_rss_mb": 141.67,
+    "cpu_note": "Measured on this process. RSS is peak resident set for the whole run, not a per-model load.",
+    "models_loaded": []
+  },
+  "results_prose": "Mean stage times in seconds: ask_analyze_sec 2.4e-05, chunk_sec 0.000536, search_sec 0.001011, qa_sec 0.000446, nli_sec 1.9e-05, e2e_sec 0.011296. Peak RSS 141.67 MB. No neural checkpoint was loaded.",
+  "conclusion": "These times are for the lexical substitutes. They are not the latency of DeBERTa, GLiNER, or FLAN-T5, which are not loaded.",
+  "scale_down": "Forty short passages. Quantized ONNX and CTranslate2 runtimes from the architecture are not used.",
+  "referenced_files": [
+    "lab/exp_021_latency/run.py",
+    "lab/common/ask.py",
+    "lab/common/chunking.py",
+    "lab/common/engine.py",
+    "lab/common/index.py",
+    "lab/common/nli.py",
+    "lab/common/qa.py",
+    "lab/common/harness.py",
+    "lab/common/textutil.py",
+    "lab/common/verify.py",
+    "lab/common/budget.py",
+    "lab/common/schemas.py",
+    "data/exp_021_latency/results.json"
+  ],
+  "follow_ups": [],
+  "elapsed_sec": 0.1245,
+  "peak_rss_mb": 141.67
+}

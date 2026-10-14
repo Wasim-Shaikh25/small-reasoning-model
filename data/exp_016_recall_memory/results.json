@@ -1,0 +1,42 @@
+{
+  "id": "EXP-016",
+  "title": "Recall memory and revalidation",
+  "status": "closed",
+  "goal": "Show that only verified notes are stored, that a changed source invalidates them, and that a conflict flips the note.",
+  "method": "SQLite stores the note schema from the architecture: statement, source pointer, version hash, and exact text. Recall reopens the archive and checks the hash and the exact text before the note can be used.",
+  "metrics": {
+    "unverified_write_rejected": true,
+    "schema_errors": [
+      "missing:note_id",
+      "missing:kind",
+      "missing:source",
+      "source_missing:doc_id",
+      "source_missing:version",
+      "source_missing:chunk_id",
+      "source_missing:exact_text",
+      "bad_kind"
+    ],
+    "verified_write_accepted": true,
+    "recall_valid_hits": 1,
+    "stale_version_caught": true,
+    "missing_source_caught": true,
+    "edited_text_caught": true,
+    "conflict_status": "conflicted",
+    "wrong_verified_notes_without_text": 0,
+    "notes_stored": 2
+  },
+  "results_prose": "An unverified note was rejected: True. A verified note was stored and recalled (1 valid hit). A changed version hash is caught: True. A missing source is caught: True. Edited exact text is caught: True. After a conflicting source the status is conflicted. Verified notes with an empty pointer: 0.",
+  "conclusion": "Unverified writes are refused. Version changes and missing exact text invalidate a note. A conflicting source marks the note conflicted instead of leaving it as verified truth.",
+  "scale_down": "One note and one edited chunk stand in for a full archive replay. The index is SQLite, not Qdrant.",
+  "referenced_files": [
+    "lab/exp_016_recall_memory/run.py",
+    "lab/common/memory.py",
+    "lab/common/schemas.py",
+    "lab/common/harness.py",
+    "data/exp_016_recall_memory/memory.sqlite",
+    "data/exp_016_recall_memory/results.json"
+  ],
+  "follow_ups": [],
+  "elapsed_sec": 0.0102,
+  "peak_rss_mb": 13.04
+}

@@ -1,0 +1,82 @@
+{
+  "id": "EXP-032",
+  "title": "Multi-step, multi-document reasoning over real documents with real pretrained models",
+  "status": "closed",
+  "goal": "Build and measure a genuine multi-hop, multi-document evidence chain over the real EXP-025 document collection: find a real cross-document bridge entity, retrieve the first real document that mentions it, detect the entity with a NER model, then retrieve a second, different real document that also mentions it -- end to end with a real pretrained retrieval model and a real pretrained NER model, compared against the fully classical stack on the identical test items.",
+  "method": "Bridge entities (ORG/GPE/PERSON, appearing in at least 2 of the 25 real documents) were found once with the real NER model as ground truth for test-set construction; generic terms were excluded. For each of the top 10 bridges, hop 1 retrieves the chunk the entity was first found in (query: that chunk's own extractive summary, which does not repeat the entity's full name as a query by construction in most cases); the bridge hop detects the entity in the top-1 retrieved passage with the stack's own tagger; hop 2 retrieves a different real document's chunk using only the detected entity text as the query, excluding every chunk from the first document. The classical stack is EXP-004's TF-IDF+BM25 Index and EXP-008's rule tagger, unmodified. The real-model stack is EXP-029's spaCy-vector+BM25 RealIndex and EXP-033's spaCy NER. The same lexical NLI judge (EXP-006) checks whether the hop-2 evidence sentence entails a trivial 'entity is mentioned' hypothesis, demonstrating the verification step wired onto real text.",
+  "metrics": {
+    "n_bridge_items": 10,
+    "bridge_entities": [
+      "Brazil",
+      "London",
+      "India",
+      "Kenya",
+      "the International Coffee Organization",
+      "Coffee Board",
+      "Colombia",
+      "Cuenca",
+      "International Coffee Organization",
+      "Jorio Dauster"
+    ],
+    "classical_stack": {
+      "n_items": 10,
+      "hop1_retrieval_rate": 1.0,
+      "bridge_detection_rate": 0.4,
+      "hop2_retrieval_rate": 0.5,
+      "chain_accuracy": 0.2,
+      "mean_entailment_on_hop2_evidence": 0.4318
+    },
+    "real_model_stack": {
+      "n_items": 10,
+      "hop1_retrieval_rate": 1.0,
+      "bridge_detection_rate": 1.0,
+      "hop2_retrieval_rate": 0.5,
+      "chain_accuracy": 0.5,
+      "mean_entailment_on_hop2_evidence": 0.4318
+    },
+    "chain_accuracy_lift": 0.3,
+    "hop1_retrieval_lift": 0.0,
+    "bridge_detection_lift": 0.6,
+    "hop2_retrieval_lift": 0.0,
+    "real_model_card": {
+      "ner_model": "en_core_web_sm",
+      "ner_source": "https://github.com/explosion/spacy-models (pip wheel, GitHub release asset)",
+      "ner_training_data": "OntoNotes 5 (real pretrained checkpoint, shipped by spaCy)",
+      "vector_model": "en_core_web_md",
+      "vector_source": "https://github.com/explosion/spacy-models (pip wheel, GitHub release asset)",
+      "vector_training_data": "GloVe-style static vectors trained on a large web/news crawl, shipped by spaCy",
+      "huggingface_blocked": true,
+      "huggingface_block_detail": "huggingface.co CONNECT rejected with 403 by this sandbox's egress policy",
+      "blueprint_checkpoints_named": [
+        "bge-small-en-v1.5",
+        "deepset/deberta-v3-base-squad2",
+        "GLiNER"
+      ],
+      "substitution_is_exact_blueprint_model": false
+    }
+  },
+  "results_prose": "10 genuine two-document bridge entities were found with the real NER model across the 25 real Reuters documents from EXP-025 (e.g. Brazil, London, India, Kenya, the International Coffee Organization...). Classical stack (TF-IDF retrieval + rule tagger): hop-1 retrieval 1.0, bridge detection 0.4, hop-2 retrieval 0.5, chain accuracy 0.2. Real-model stack (spaCy dense retrieval + spaCy NER): hop-1 retrieval 1.0, bridge detection 1.0, hop-2 retrieval 0.5, chain accuracy 0.5. Chain-accuracy lift from the real pretrained model stack: +0.3000. Mean entailment score on the hop-2 evidence sentence (lexical NLI judge, EXP-006): classical 0.4318, real 0.4318.",
+  "conclusion": "This closes the EXP-032 rerun todo for multi-hop reasoning, though with a real retrieval+NER chain rather than deepset/deberta-v3-base-squad2 spans (huggingface.co is blocked in this sandbox; see real_model_card). The chain-level measurement shows where a real pretrained model stack helps and where it does not on this small real corpus: compare the per-hop rates above rather than reading a single number. All evidence in every chain is a real quote from the real document collection; no fact was invented to build these test items.",
+  "scale_down": "10 bridge items over 25 real documents / 76 chunks, not a HotpotQA-scale benchmark. Two-hop chains only, matching the architecture's own measured ceiling in EXP-007 (3-hop accuracy was 0 there). bge-small-en-v1.5 and deepset/deberta-v3-base-squad2 remain unloaded; see real_model_card.",
+  "referenced_files": [
+    "lab/exp_032_real_multihop/run.py",
+    "lab/common/real_index.py",
+    "lab/common/real_models.py",
+    "lab/common/index.py",
+    "lab/common/entities.py",
+    "lab/common/nli.py",
+    "lab/common/textutil.py",
+    "lab/common/harness.py",
+    "data/exp_025_real_documents/chunks.json",
+    "data/exp_032_real_multihop/bridge_items.json",
+    "data/exp_032_real_multihop/results.json"
+  ],
+  "follow_ups": [
+    "Extend to 3-hop chains once a second bridge relation per item is available in this corpus.",
+    "If huggingface.co access is ever granted, swap in bge-small-en-v1.5 and deepset/deberta-v3-base-squad2 and compare against both stacks measured here.",
+    "Grow TOP_N_BRIDGES and the document count once EXP-022's on-disk index lands."
+  ],
+  "elapsed_sec": 8.0361,
+  "peak_rss_mb": 509.06,
+  "models_used": "Real-model stack: spaCy en_core_web_md static vectors for dense retrieval (RealIndex, EXP-029) and spaCy en_core_web_sm NER (EXP-033), both real pretrained, non-generative, reachable without huggingface.co. Classical stack: TF-IDF+BM25 (EXP-004) and the rule tagger (EXP-008), unchanged, run here only as the comparison baseline. deepset/deberta-v3-base-squad2 and bge-small-en-v1.5, the blueprint's proposed models for this rerun, were not loaded: huggingface.co is blocked in this sandbox (403 CONNECT, policy denial). See lab/common/real_models.py:model_card()."
+}

@@ -1,0 +1,11 @@
+{
+  "counts": [
+    200,
+    1000,
+    5000
+  ],
+  "seed": "template-item-{i}",
+  "glossary": {
+    "R. Sharma": "Ravi Sharma"
+  }
+}

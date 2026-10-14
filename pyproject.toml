@@ -1,0 +1,23 @@
+[project]
+name = "evidence-grounded-poc"
+version = "0.2.0"
+description = "Evidence-grounded reasoning proof of concept. No generative language model."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+  "numpy>=1.26",
+  "scikit-learn>=1.4",
+  "rapidfuzz>=3.6",
+  "dateparser>=1.2",
+]
+
+[project.optional-dependencies]
+# Real-model reruns only (EXP-029, EXP-032, EXP-033): a real, pretrained,
+# non-generative NER model and static word vectors, loaded in place of the
+# blueprint's bge/DeBERTa/GLiNER, which huggingface.co is unreachable for in
+# this sandbox. See requirements.txt for the model-pipeline install commands
+# and lab/common/real_models.py for why.
+real-models = ["spacy>=3.8"]
+
+[tool.setuptools.packages.find]
+include = ["lab*"]

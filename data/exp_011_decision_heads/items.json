@@ -1,0 +1,282 @@
+[
+  {
+    "slot": "cure period",
+    "passage": "The cure period is 20 days.",
+    "claim_span": "20 days",
+    "label": "supported",
+    "question": "What is the cure period?"
+  },
+  {
+    "slot": "cure period",
+    "passage": "The cure period is 20 days.",
+    "claim_span": "20 days",
+    "label": "supported",
+    "question": "What is the cure period?"
+  },
+  {
+    "slot": "security deposit",
+    "passage": "The security deposit is INR 10000.",
+    "claim_span": "INR 10000",
+    "label": "supported",
+    "question": "What is the security deposit?"
+  },
+  {
+    "slot": "dose",
+    "passage": "The dose is 80 mg.",
+    "claim_span": "80 mg",
+    "label": "supported",
+    "question": "What is the dose?"
+  },
+  {
+    "slot": "notice period",
+    "passage": "The notice period is 45 days.",
+    "claim_span": "45 days",
+    "label": "supported",
+    "question": "What is the notice period?"
+  },
+  {
+    "slot": "security deposit",
+    "passage": "The security deposit is INR 50000.",
+    "claim_span": "INR 50000",
+    "label": "supported",
+    "question": "What is the security deposit?"
+  },
+  {
+    "slot": "bond interest",
+    "passage": "The bond interest is 12 percent.",
+    "claim_span": "12 percent",
+    "label": "supported",
+    "question": "What is the bond interest?"
+  },
+  {
+    "slot": "dose",
+    "passage": "The dose is 80 mg.",
+    "claim_span": "80 mg",
+    "label": "supported",
+    "question": "What is the dose?"
+  },
+  {
+    "slot": "bond interest",
+    "passage": "The bond interest is 7 percent.",
+    "claim_span": "7 percent",
+    "label": "supported",
+    "question": "What is the bond interest?"
+  },
+  {
+    "slot": "notice period",
+    "passage": "The notice period is 30 days.",
+    "claim_span": "30 days",
+    "label": "supported",
+    "question": "What is the notice period?"
+  },
+  {
+    "slot": "security deposit",
+    "passage": "The security deposit is INR 10000.",
+    "claim_span": "INR 10000",
+    "label": "supported",
+    "question": "What is the security deposit?"
+  },
+  {
+    "slot": "cure period",
+    "passage": "The cure period is 5 days.",
+    "claim_span": "5 days",
+    "label": "supported",
+    "question": "What is the cure period?"
+  },
+  {
+    "slot": "bond interest",
+    "passage": "The bond interest is 7 percent.",
+    "claim_span": "7 percent",
+    "label": "supported",
+    "question": "What is the bond interest?"
+  },
+  {
+    "slot": "dose",
+    "passage": "The dose is 10 mg.",
+    "claim_span": "10 mg",
+    "label": "supported",
+    "question": "What is the dose?"
+  },
+  {
+    "slot": "notice period",
+    "passage": "The notice period is 60 days.",
+    "claim_span": "60 days",
+    "label": "supported",
+    "question": "What is the notice period?"
+  },
+  {
+    "slot": "cure period",
+    "passage": "The cure period is 20 days.",
+    "claim_span": "20 days",
+    "label": "supported",
+    "question": "What is the cure period?"
+  },
+  {
+    "slot": "cure period",
+    "passage": "The cure period is 20 days.",
+    "claim_span": "20 days",
+    "label": "supported",
+    "question": "What is the cure period?"
+  },
+  {
+    "slot": "dose",
+    "passage": "The dose is 10 mg.",
+    "claim_span": "10 mg",
+    "label": "supported",
+    "question": "What is the dose?"
+  },
+  {
+    "slot": "security deposit",
+    "passage": "The security deposit is INR 10000.",
+    "claim_span": "INR 10000",
+    "label": "supported",
+    "question": "What is the security deposit?"
+  },
+  {
+    "slot": "notice period",
+    "passage": "The notice period is 30 days.",
+    "claim_span": "30 days",
+    "label": "supported",
+    "question": "What is the notice period?"
+  },
+  {
+    "slot": "cure period",
+    "passage": "The cure period is 10 days.",
+    "claim_span": "10 days",
+    "label": "supported",
+    "question": "What is the cure period?"
+  },
+  {
+    "slot": "cure period",
+    "passage": "The cure period is 10 days.",
+    "claim_span": "10 days",
+    "label": "supported",
+    "question": "What is the cure period?"
+  },
+  {
+    "slot": "dose",
+    "passage": "The dose is 40 mg.",
+    "claim_span": "40 mg",
+    "label": "supported",
+    "question": "What is the dose?"
+  },
+  {
+    "slot": "security deposit",
+    "passage": "The security deposit is INR 50000.",
+    "claim_span": "INR 50000",
+    "label": "supported",
+    "question": "What is the security deposit?"
+  },
+  {
+    "slot": "cure period",
+    "passage": "The cure period is 20 days.",
+    "claim_span": "20 days",
+    "label": "supported",
+    "question": "What is the cure period?"
+  },
+  {
+    "slot": "cure period",
+    "passage": "The cure period is 10 days.",
+    "claim_span": "10 days",
+    "label": "supported",
+    "question": "What is the cure period?"
+  },
+  {
+    "slot": "dose",
+    "passage": "The dose is 10 mg.",
+    "claim_span": "10 mg",
+    "label": "supported",
+    "question": "What is the dose?"
+  },
+  {
+    "slot": "notice period",
+    "passage": "The notice period is 45 days.",
+    "claim_span": "45 days",
+    "label": "supported",
+    "question": "What is the notice period?"
+  },
+  {
+    "slot": "notice period",
+    "passage": "The notice period is 45 days.",
+    "claim_span": "45 days",
+    "label": "supported",
+    "question": "What is the notice period?"
+  },
+  {
+    "slot": "security deposit",
+    "passage": "The security deposit is INR 50000.",
+    "claim_span": "INR 50000",
+    "label": "supported",
+    "question": "What is the security deposit?"
+  },
+  {
+    "slot": "notice period",
+    "passage": "The notice period is 30 days.",
+    "claim_span": "30 days",
+    "label": "supported",
+    "question": "What is the notice period?"
+  },
+  {
+    "slot": "cure period",
+    "passage": "The cure period is 10 days.",
+    "claim_span": "10 days",
+    "label": "supported",
+    "question": "What is the cure period?"
+  },
+  {
+    "slot": "cure period",
+    "passage": "The cure period is 20 days.",
+    "claim_span": "20 days",
+    "label": "supported",
+    "question": "What is the cure period?"
+  },
+  {
+    "slot": "dose",
+    "passage": "The dose is 40 mg.",
+    "claim_span": "40 mg",
+    "label": "supported",
+    "question": "What is the dose?"
+  },
+  {
+    "slot": "dose",
+    "passage": "The dose is 10 mg.",
+    "claim_span": "10 mg",
+    "label": "supported",
+    "question": "What is the dose?"
+  },
+  {
+    "slot": "cure period",
+    "passage": "The cure period is 5 days.",
+    "claim_span": "5 days",
+    "label": "supported",
+    "question": "What is the cure period?"
+  },
+  {
+    "slot": "notice period",
+    "passage": "The notice period is 45 days.",
+    "claim_span": "45 days",
+    "label": "supported",
+    "question": "What is the notice period?"
+  },
+  {
+    "slot": "notice period",
+    "passage": "The notice period is 30 days.",
+    "claim_span": "30 days",
+    "label": "supported",
+    "question": "What is the notice period?"
+  },
+  {
+    "slot": "cure period",
+    "passage": "The cure period is 20 days.",
+    "claim_span": "20 days",
+    "label": "supported",
+    "question": "What is the cure period?"
+  },
+  {
+    "slot": "notice period",
+    "passage": "The notice period is 30 days.",
+    "claim_span": "30 days",
+    "label": "supported",
+    "question": "What is the notice period?"
+  }
+]

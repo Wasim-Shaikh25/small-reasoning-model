@@ -1,0 +1,106 @@
+[
+  {
+    "text": "notice period",
+    "kind": "good",
+    "keep": true,
+    "reason": "grounded"
+  },
+  {
+    "text": "notice period under the lease",
+    "kind": "good",
+    "keep": true,
+    "reason": "grounded"
+  },
+  {
+    "text": "what is the notice period",
+    "kind": "good",
+    "keep": true,
+    "reason": "grounded"
+  },
+  {
+    "text": "lease notice period",
+    "kind": "good",
+    "keep": true,
+    "reason": "grounded"
+  },
+  {
+    "text": "the notice period",
+    "kind": "good",
+    "keep": true,
+    "reason": "grounded"
+  },
+  {
+    "text": "notice period is 90 days",
+    "kind": "hallucinated",
+    "keep": false,
+    "reason": "new_name_number_or_date",
+    "new_numbers": [
+      "90"
+    ],
+    "new_dates": [],
+    "new_names": []
+  },
+  {
+    "text": "Ravi Sharma notice period",
+    "kind": "hallucinated",
+    "keep": false,
+    "reason": "new_name_number_or_date",
+    "new_numbers": [],
+    "new_dates": [],
+    "new_names": [
+      "Ravi Sharma"
+    ]
+  },
+  {
+    "text": "notice period on 1 January 2024",
+    "kind": "hallucinated",
+    "keep": false,
+    "reason": "new_name_number_or_date",
+    "new_numbers": [
+      "1",
+      "2024"
+    ],
+    "new_dates": [],
+    "new_names": []
+  },
+  {
+    "text": "the cure period is 10 days",
+    "kind": "hallucinated",
+    "keep": false,
+    "reason": "new_name_number_or_date",
+    "new_numbers": [
+      "10"
+    ],
+    "new_dates": [],
+    "new_names": []
+  },
+  {
+    "text": "Kapil Menon lease",
+    "kind": "hallucinated",
+    "keep": false,
+    "reason": "new_name_number_or_date",
+    "new_numbers": [],
+    "new_dates": [],
+    "new_names": [
+      "Kapil Menon"
+    ]
+  },
+  {
+    "text": "",
+    "kind": "malformed",
+    "keep": false,
+    "reason": "malformed"
+  },
+  {
+    "text": "   ",
+    "kind": "malformed",
+    "keep": false,
+    "reason": "malformed"
+  },
+  {
+    "text": "notice\n\nperiod with a second paragraph that should not parse as a list item notice\n\nperiod with a second paragraph that should not parse as a list item notice\n\nperiod with a second paragraph that should not parse as a list item notice\n\nperiod with a second paragraph that should not parse as a list item ",
+    "kind": "malformed",
+    "keep": false,
+    "reason": "malformed"
+  }
+]

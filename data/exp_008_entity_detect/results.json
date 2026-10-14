@@ -1,0 +1,84 @@
+{
+  "id": "EXP-008",
+  "title": "Entity detection and roles",
+  "status": "closed",
+  "goal": "Score rule taggers per label, flag ambiguous place names, parse an address, and answer role questions from the passage.",
+  "method": "A primary rule tagger marks person, organization, address, defined term, date, and amount. A stricter second tagger covers titled people and suffixed organizations. Exact character offsets are compared with gold. Role questions use extractive QA.",
+  "metrics": {
+    "lines": 52,
+    "overall": {
+      "precision": 0.9556,
+      "recall": 0.8269,
+      "f1": 0.8866,
+      "tp": 43
+    },
+    "per_label": {
+      "person": {
+        "precision": 0.9048,
+        "recall": 0.9048,
+        "f1": 0.9048,
+        "tp": 19
+      },
+      "organization": {
+        "precision": 1.0,
+        "recall": 0.75,
+        "f1": 0.8571,
+        "tp": 6
+      },
+      "address": {
+        "precision": 1.0,
+        "recall": 0.7778,
+        "f1": 0.875,
+        "tp": 7
+      },
+      "defined term": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "tp": 3
+      },
+      "date": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "tp": 4
+      },
+      "amount": {
+        "precision": 1.0,
+        "recall": 0.5714,
+        "f1": 0.7273,
+        "tp": 4
+      }
+    },
+    "easy_f1": 0.962,
+    "hard_f1": 0.4615,
+    "ambiguous_place_flag_rate": 0.6667,
+    "ambiguous_place_n": 3,
+    "address_parse_sample": {
+      "house_number": "14",
+      "road": "MG Road",
+      "city": "Pune",
+      "postcode": "411001"
+    },
+    "role_questions": 12,
+    "role_accuracy": 0.9167
+  },
+  "results_prose": "On 52 lines, overall exact-span F1 is 0.8866 (precision 0.9556, recall 0.8269). Person F1 0.9048, organization F1 0.8571, address F1 0.875, defined term F1 1.0, date F1 1.0, amount F1 0.7273. Easy-slice F1 is 0.962; hard-slice F1 is 0.4615. Ambiguous place names were flagged unsure in 0.6667 of 3 cases. Role and address questions: 0.9167 on 12 passages. Address parse of the sample: {'house_number': '14', 'road': 'MG Road', 'city': 'Pune', 'postcode': '411001'}.",
+  "conclusion": "Exact-span F1 is high on easy titled names, suffixed organizations, and fully patterned addresses, and lower on the hard slice (bare company names, amounts in words, lowercase names, courts). Ambiguous place names are flagged rather than treated as high-confidence addresses.",
+  "scale_down": "52 short lines and 12 role passages replace the blueprint's 150 to 200 detection lines and 30 role passages. GLiNER, BERT-NER, and libpostal are not loaded.",
+  "referenced_files": [
+    "lab/exp_008_entity_detect/run.py",
+    "lab/common/entities.py",
+    "lab/common/qa.py",
+    "lab/common/textutil.py",
+    "lab/common/harness.py",
+    "lab/common/nli.py",
+    "data/exp_008_entity_detect/lines.json",
+    "data/exp_008_entity_detect/results.json"
+  ],
+  "follow_ups": [
+    "If hard-slice F1 is not enough, train a span tagger only on locally labeled spans. Do not download a pretrained NER model."
+  ],
+  "elapsed_sec": 0.0041,
+  "peak_rss_mb": 147.93
+}

@@ -1,0 +1,20 @@
+{
+  "depths": {
+    "none": {"passages_kept": 0, "max_rounds": 0},
+    "light": {"passages_kept": 5, "max_rounds": 2},
+    "medium": {"passages_kept": 8, "max_rounds": 3},
+    "deep": {"passages_kept": 12, "max_rounds": 5},
+    "review": {"passages_kept": 15, "max_rounds": 6}
+  },
+  "caps": {
+    "max_rounds": 6,
+    "max_passages_kept": 15,
+    "max_gap_rounds": 3,
+    "max_entity_rounds": 3,
+    "working_set_passages": 4,
+    "no_answer_tau": 0.34,
+    "nli_entail_tau": 0.55,
+    "supported_confidence_floor": 0.6
+  },
+  "notes": "The ask analyzer proposes a depth. The controller caps it at caps.max_rounds and caps.max_passages_kept. These numbers follow architecture section 7."
+}

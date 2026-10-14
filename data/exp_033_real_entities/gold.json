@@ -1,0 +1,150 @@
+[
+  {
+    "doc_id": "training-10014",
+    "sentence": "The New York Coffee, Sugar and Cocoa Exchange (CSCE) elected former first vice chairman Gerald Clancy to a two-year term as chairman of the board of managers, replacing previous chairman Howard Katz.",
+    "entities": [
+      {
+        "text": "Gerald Clancy",
+        "label": "PERSON"
+      },
+      {
+        "text": "Howard Katz",
+        "label": "PERSON"
+      },
+      {
+        "text": "CSCE",
+        "label": "ORG"
+      }
+    ]
+  },
+  {
+    "doc_id": "training-10014",
+    "sentence": "Clancy currently serves on the Exchange board of managers as chairman of its appeals, executive, pension and political action committees.",
+    "entities": [
+      {
+        "text": "Clancy",
+        "label": "PERSON"
+      }
+    ]
+  },
+  {
+    "doc_id": "training-10100",
+    "sentence": "Jorge Cardenas, manager of Colombia's coffee growers' federation, said he did not believe any important decisions would emerge from an upcoming meeting of the International Coffee Organization (ICO).",
+    "entities": [
+      {
+        "text": "Jorge Cardenas",
+        "label": "PERSON"
+      },
+      {
+        "text": "International Coffee Organization",
+        "label": "ORG"
+      }
+    ]
+  },
+  {
+    "doc_id": "training-1026",
+    "sentence": "President Daniel Arap Moi said.",
+    "entities": [
+      {
+        "text": "Daniel Arap Moi",
+        "label": "PERSON"
+      }
+    ]
+  },
+  {
+    "doc_id": "training-1030",
+    "sentence": "Administrative Executive Robin Taylor told the domestic news agency ZIANA that Zimbabwe earned the equivalent of 33 mln U.S.",
+    "entities": [
+      {
+        "text": "Robin Taylor",
+        "label": "PERSON"
+      },
+      {
+        "text": "ZIANA",
+        "label": "ORG"
+      }
+    ]
+  },
+  {
+    "doc_id": "training-10640",
+    "sentence": "Nicaraguan Foreign Trade Minister Alejandro Martinez Cuenca was in London to brief International Coffee Organisation (ICO) executive board producer members after a meeting last weekend in Managua attended by eight Latin American coffee producers to discuss the fall in coffee prices.",
+    "entities": [
+      {
+        "text": "Alejandro Martinez Cuenca",
+        "label": "PERSON"
+      },
+      {
+        "text": "International Coffee Organisation",
+        "label": "ORG"
+      }
+    ]
+  },
+  {
+    "doc_id": "training-10682",
+    "sentence": "roastings of green coffee in the week ended March 21 were about 250,000 (60-kilo) bags, including that used for soluble production, compared with 195,000 bags in the corresponding week of last year and about 300,000 bags in the week ended March 14, George Gordon Paton and Co Inc reported.",
+    "entities": [
+      {
+        "text": "George Gordon Paton and Co Inc",
+        "label": "ORG"
+      }
+    ]
+  },
+  {
+    "doc_id": "training-10902",
+    "sentence": "Chances that the International Coffee Organization, ICO, executive board meeting this week will agree to resume negotiations on export quotas soon look remote, ICO delegates and trade sources said.",
+    "entities": [
+      {
+        "text": "International Coffee Organization",
+        "label": "ORG"
+      }
+    ]
+  },
+  {
+    "doc_id": "training-10959",
+    "sentence": "They said IBC President Jorio Dauster is likely to leave the basic formula for the minimum registration price unchanged but raise the contribution quota to partially offset the effects of cruzado devaluation since April registrations were closed in mid-February.",
+    "entities": [
+      {
+        "text": "Jorio Dauster",
+        "label": "PERSON"
+      },
+      {
+        "text": "IBC",
+        "label": "ORG"
+      }
+    ]
+  },
+  {
+    "doc_id": "training-11372",
+    "sentence": "No firm date has been set for the talks, Ambassador Rene Montes told reporters at the ICO executive board meeting here.",
+    "entities": [
+      {
+        "text": "Rene Montes",
+        "label": "PERSON"
+      }
+    ]
+  },
+  {
+    "doc_id": "training-11816",
+    "sentence": "Singapore's United Industrial Corp Ltd (UIC) has agreed in principle to inject 16 mln dlrs in convertible loan stock into Teck Hock and Co (Pte) Ltd, a creditor bank official said.",
+    "entities": [
+      {
+        "text": "United Industrial Corp Ltd",
+        "label": "ORG"
+      },
+      {
+        "text": "Teck Hock and Co",
+        "label": "ORG"
+      }
+    ]
+  },
+  {
+    "doc_id": "training-11183",
+    "sentence": "India cut the export duty on coffee to 330 rupees per 100 kg from 600 rupees, effective March 23, a Coffee Board official said.",
+    "entities": [
+      {
+        "text": "Coffee Board",
+        "label": "ORG"
+      }
+    ]
+  }
+]

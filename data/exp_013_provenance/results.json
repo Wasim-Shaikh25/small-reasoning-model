@@ -1,0 +1,35 @@
+{
+  "id": "EXP-013",
+  "title": "Provenance and context faithfulness",
+  "status": "closed",
+  "goal": "Check that answers follow supplied context, that undefined invented terms stay unresolved, and that provenance tags separate evidence, inference, and background.",
+  "method": "A fixed background table holds ordinary facts such as Paris and a 14-day sprint. Extractive QA reads only the passage. If the span is not in the passage, the answer is dropped even when the background table has a value.",
+  "metrics": {
+    "h1_n": 8,
+    "context_faithfulness": 1.0,
+    "answered_with_background_fact": 0,
+    "h1_abstain": 0,
+    "h2_n": 6,
+    "correct_with_definition": 1.0,
+    "unresolved_without_definition": 1.0,
+    "evidence_tag_kept": true,
+    "inference_tag_kept": true,
+    "background_only_dropped": true,
+    "background_consultations_logged": 1
+  },
+  "results_prose": "H1 context-faithfulness is 1.0 on 8 altered-fact items. Answers that matched the background prior: 0. Abstentions: 0. H2 correct with the definition present: 1.0. Unresolved (no guess) when the definition is removed: 1.0. Provenance tags kept evidence True, inference True, and dropped a background-only capital claim: True.",
+  "conclusion": "Factual answers are copied from the passage. The background table is logged and is not allowed to fill a missing fact. Invented terms are answered only while their definition is in the context.",
+  "scale_down": "Eight counterfactual items and six invented terms replace a larger probe set. There is no pretrained model whose memorized facts could leak; the background table is the stand-in prior.",
+  "referenced_files": [
+    "lab/exp_013_provenance/run.py",
+    "lab/common/provenance.py",
+    "lab/common/qa.py",
+    "lab/common/textutil.py",
+    "lab/common/harness.py",
+    "data/exp_013_provenance/items.json",
+    "data/exp_013_provenance/results.json"
+  ],
+  "follow_ups": [],
+  "elapsed_sec": 0.0018,
+  "peak_rss_mb": 11.63
+}

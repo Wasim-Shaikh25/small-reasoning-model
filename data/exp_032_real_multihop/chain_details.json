@@ -1,0 +1,226 @@
+{
+  "classical_stack": [
+    {
+      "bridge_entity": "Brazil",
+      "doc_a": "training-10100",
+      "doc_b": "training-10268",
+      "hop1_hit": true,
+      "bridge_found_in_top_passage": false,
+      "hop2_hit": false,
+      "chain_correct": false,
+      "evidence_sentence": null,
+      "entail_score": null
+    },
+    {
+      "bridge_entity": "London",
+      "doc_a": "training-10100",
+      "doc_b": "training-1026",
+      "hop1_hit": true,
+      "bridge_found_in_top_passage": false,
+      "hop2_hit": false,
+      "chain_correct": false,
+      "evidence_sentence": null,
+      "entail_score": null
+    },
+    {
+      "bridge_entity": "India",
+      "doc_a": "training-10268",
+      "doc_b": "training-10406",
+      "hop1_hit": true,
+      "bridge_found_in_top_passage": false,
+      "hop2_hit": true,
+      "chain_correct": false,
+      "evidence_sentence": "INDIA STEPS UP COUNTERTRADE DEALS India is searching for non-communist countertrade partners to help it cut its trade deficit and conserve foreign exchange.",
+      "entail_score": 0.3697
+    },
+    {
+      "bridge_entity": "Kenya",
+      "doc_a": "training-1026",
+      "doc_b": "training-10752",
+      "hop1_hit": true,
+      "bridge_found_in_top_passage": false,
+      "hop2_hit": false,
+      "chain_correct": false,
+      "evidence_sentence": null,
+      "entail_score": null
+    },
+    {
+      "bridge_entity": "the International Coffee Organization",
+      "doc_a": "training-10876",
+      "doc_b": "training-10902",
+      "hop1_hit": true,
+      "bridge_found_in_top_passage": true,
+      "hop2_hit": true,
+      "chain_correct": true,
+      "evidence_sentence": "ICO BOARD SEEN UNLIKELY TO SET NEW COFFEE TALKS Chances that the International Coffee Organization, ICO, executive board meeting this week will agree to resume negotiations on export quotas soon look remote, ICO delegates and trade sources said.",
+      "entail_score": 0.6175
+    },
+    {
+      "bridge_entity": "Coffee Board",
+      "doc_a": "training-11183",
+      "doc_b": "training-11882",
+      "hop1_hit": true,
+      "bridge_found_in_top_passage": true,
+      "hop2_hit": false,
+      "chain_correct": false,
+      "evidence_sentence": null,
+      "entail_score": null
+    },
+    {
+      "bridge_entity": "Colombia",
+      "doc_a": "training-10100",
+      "doc_b": "training-11372",
+      "hop1_hit": true,
+      "bridge_found_in_top_passage": false,
+      "hop2_hit": true,
+      "chain_correct": false,
+      "evidence_sentence": "Producer countries Brazil, Colombia, and a member of OAMCAF, the African and Malagasy Coffee Organization, may also be invited for consultation, he said.",
+      "entail_score": 0.3697
+    },
+    {
+      "bridge_entity": "Cuenca",
+      "doc_a": "training-10640",
+      "doc_b": "training-10902",
+      "hop1_hit": true,
+      "bridge_found_in_top_passage": false,
+      "hop2_hit": true,
+      "chain_correct": false,
+      "evidence_sentence": "At a recent meeting in Managua of Latin American producers, Costa Rica and Honduras said they were willing to put their objections as members of the group of eight ICO \"dissident\" producers aside, in order to stem the damaging decline in prices, Nicaraguan External Trade Minister Alejandro Martinez Cuenca told reporters Saturday.",
+      "entail_score": 0.3697
+    },
+    {
+      "bridge_entity": "International Coffee Organization",
+      "doc_a": "training-1085",
+      "doc_b": "training-11866",
+      "hop1_hit": true,
+      "bridge_found_in_top_passage": true,
+      "hop2_hit": false,
+      "chain_correct": false,
+      "evidence_sentence": null,
+      "entail_score": null
+    },
+    {
+      "bridge_entity": "Jorio Dauster",
+      "doc_a": "training-10100",
+      "doc_b": "training-10902",
+      "hop1_hit": true,
+      "bridge_found_in_top_passage": true,
+      "hop2_hit": true,
+      "chain_correct": true,
+      "evidence_sentence": "The fact that Brazilian Coffee Institute president Jorio Dauster, Assistant U.S.",
+      "entail_score": 0.4323
+    }
+  ],
+  "real_model_stack": [
+    {
+      "bridge_entity": "Brazil",
+      "doc_a": "training-10100",
+      "doc_b": "training-10268",
+      "hop1_hit": true,
+      "bridge_found_in_top_passage": true,
+      "hop2_hit": false,
+      "chain_correct": false,
+      "evidence_sentence": null,
+      "entail_score": null
+    },
+    {
+      "bridge_entity": "London",
+      "doc_a": "training-10100",
+      "doc_b": "training-1026",
+      "hop1_hit": true,
+      "bridge_found_in_top_passage": true,
+      "hop2_hit": false,
+      "chain_correct": false,
+      "evidence_sentence": null,
+      "entail_score": null
+    },
+    {
+      "bridge_entity": "India",
+      "doc_a": "training-10268",
+      "doc_b": "training-10406",
+      "hop1_hit": true,
+      "bridge_found_in_top_passage": true,
+      "hop2_hit": true,
+      "chain_correct": true,
+      "evidence_sentence": "INDIA STEPS UP COUNTERTRADE DEALS India is searching for non-communist countertrade partners to help it cut its trade deficit and conserve foreign exchange.",
+      "entail_score": 0.3697
+    },
+    {
+      "bridge_entity": "Kenya",
+      "doc_a": "training-1026",
+      "doc_b": "training-10752",
+      "hop1_hit": true,
+      "bridge_found_in_top_passage": true,
+      "hop2_hit": false,
+      "chain_correct": false,
+      "evidence_sentence": null,
+      "entail_score": null
+    },
+    {
+      "bridge_entity": "the International Coffee Organization",
+      "doc_a": "training-10876",
+      "doc_b": "training-10902",
+      "hop1_hit": true,
+      "bridge_found_in_top_passage": true,
+      "hop2_hit": false,
+      "chain_correct": false,
+      "evidence_sentence": null,
+      "entail_score": null
+    },
+    {
+      "bridge_entity": "Coffee Board",
+      "doc_a": "training-11183",
+      "doc_b": "training-11882",
+      "hop1_hit": true,
+      "bridge_found_in_top_passage": true,
+      "hop2_hit": false,
+      "chain_correct": false,
+      "evidence_sentence": null,
+      "entail_score": null
+    },
+    {
+      "bridge_entity": "Colombia",
+      "doc_a": "training-10100",
+      "doc_b": "training-11372",
+      "hop1_hit": true,
+      "bridge_found_in_top_passage": true,
+      "hop2_hit": true,
+      "chain_correct": true,
+      "evidence_sentence": "Producer countries Brazil, Colombia, and a member of OAMCAF, the African and Malagasy Coffee Organization, may also be invited for consultation, he said.",
+      "entail_score": 0.3697
+    },
+    {
+      "bridge_entity": "Cuenca",
+      "doc_a": "training-10640",
+      "doc_b": "training-10902",
+      "hop1_hit": true,
+      "bridge_found_in_top_passage": true,
+      "hop2_hit": true,
+      "chain_correct": true,
+      "evidence_sentence": "At a recent meeting in Managua of Latin American producers, Costa Rica and Honduras said they were willing to put their objections as members of the group of eight ICO \"dissident\" producers aside, in order to stem the damaging decline in prices, Nicaraguan External Trade Minister Alejandro Martinez Cuenca told reporters Saturday.",
+      "entail_score": 0.3697
+    },
+    {
+      "bridge_entity": "International Coffee Organization",
+      "doc_a": "training-1085",
+      "doc_b": "training-11866",
+      "hop1_hit": true,
+      "bridge_found_in_top_passage": true,
+      "hop2_hit": true,
+      "chain_correct": true,
+      "evidence_sentence": "ICO COFFEE PRODUCERS TO DISCUSS MARKET SITUATION International Coffee Organization, ICO, producers will meet at 1500 GMT (0900 est) for a general discussion of the market situation, producer spokesman Lindenberg Sette said.",
+      "entail_score": 0.6175
+    },
+    {
+      "bridge_entity": "Jorio Dauster",
+      "doc_a": "training-10100",
+      "doc_b": "training-10902",
+      "hop1_hit": true,
+      "bridge_found_in_top_passage": true,
+      "hop2_hit": true,
+      "chain_correct": true,
+      "evidence_sentence": "The fact that Brazilian Coffee Institute president Jorio Dauster, Assistant U.S.",
+      "entail_score": 0.4323
+    }
+  ]
+}

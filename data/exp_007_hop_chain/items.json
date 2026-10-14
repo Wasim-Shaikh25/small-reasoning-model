@@ -1,0 +1,219 @@
+[
+  {
+    "id": "D01",
+    "hops": 2,
+    "preds": [
+      "Ravi Sharma",
+      "Ravi Sharma (the Lessee) signed the deed."
+    ],
+    "golds": [
+      "Ravi Sharma",
+      "14 MG Road, Pune 411001"
+    ],
+    "hop_hits": [
+      true,
+      false
+    ],
+    "chain_correct": false
+  },
+  {
+    "id": "D02",
+    "hops": 2,
+    "preds": [
+      "Pvt Ltd",
+      "48 Park Street, Kolkata 700016"
+    ],
+    "golds": [
+      "ABC Pvt Ltd",
+      "48 Park Street, Kolkata 700016"
+    ],
+    "hop_hits": [
+      true,
+      true
+    ],
+    "chain_correct": true
+  },
+  {
+    "id": "D03",
+    "hops": 2,
+    "preds": [
+      "1 January 2024",
+      "30 days",
+      "31 January 2024"
+    ],
+    "golds": [
+      "1 January 2024",
+      "30 days"
+    ],
+    "hop_hits": [
+      true,
+      true,
+      true
+    ],
+    "chain_correct": true
+  },
+  {
+    "id": "D04",
+    "hops": 3,
+    "preds": [
+      "Ravi Sharma",
+      "the Lessee",
+      "the Lessee"
+    ],
+    "golds": [
+      "Ravi Sharma",
+      "Pune",
+      "411001"
+    ],
+    "hop_hits": [
+      true,
+      false,
+      false
+    ],
+    "chain_correct": false
+  },
+  {
+    "id": "D05",
+    "hops": 2,
+    "preds": [
+      "INR 50000",
+      "INR 25000"
+    ],
+    "golds": [
+      "INR 50000",
+      "INR 25000"
+    ],
+    "hop_hits": [
+      true,
+      true
+    ],
+    "chain_correct": true
+  },
+  {
+    "id": "D06",
+    "hops": 2,
+    "preds": [
+      "a refund issued after 14 days",
+      null
+    ],
+    "golds": [
+      "a refund issued after 14 days",
+      "14"
+    ],
+    "hop_hits": [
+      true,
+      false
+    ],
+    "chain_correct": false
+  },
+  {
+    "id": "D07",
+    "hops": 3,
+    "preds": [
+      "Meera Iyer",
+      "5 January 2024",
+      null
+    ],
+    "golds": [
+      "Meera Iyer",
+      "5 January 2024",
+      "5 January 2024"
+    ],
+    "hop_hits": [
+      true,
+      true,
+      false
+    ],
+    "chain_correct": false
+  },
+  {
+    "id": "D08",
+    "hops": 2,
+    "preds": [
+      "10 days",
+      "30 days"
+    ],
+    "golds": [
+      "10 days",
+      "30 days"
+    ],
+    "hop_hits": [
+      true,
+      true
+    ],
+    "chain_correct": true
+  },
+  {
+    "id": "D09",
+    "hops": 2,
+    "preds": [
+      "1 March 2024",
+      "15 days",
+      "16 March 2024"
+    ],
+    "golds": [
+      "1 March 2024",
+      "15 days"
+    ],
+    "hop_hits": [
+      true,
+      true,
+      true
+    ],
+    "chain_correct": true
+  },
+  {
+    "id": "D10",
+    "hops": 2,
+    "preds": [
+      "Kapil Iyer",
+      "Meera Iyer"
+    ],
+    "golds": [
+      "Kapil Iyer",
+      "Meera Iyer"
+    ],
+    "hop_hits": [
+      true,
+      true
+    ],
+    "chain_correct": true
+  },
+  {
+    "id": "D11",
+    "hops": 3,
+    "preds": [
+      "INR 50000 and it is the deposit",
+      "INR 50000 and it is the deposit",
+      null
+    ],
+    "golds": [
+      "INR 50000",
+      "INR 25000",
+      "INR 50000"
+    ],
+    "hop_hits": [
+      true,
+      false,
+      false
+    ],
+    "chain_correct": false
+  },
+  {
+    "id": "D12",
+    "hops": 2,
+    "preds": [
+      "41827",
+      "three members"
+    ],
+    "golds": [
+      "41827",
+      "three members"
+    ],
+    "hop_hits": [
+      true,
+      true
+    ],
+    "chain_correct": true
+  }
+]

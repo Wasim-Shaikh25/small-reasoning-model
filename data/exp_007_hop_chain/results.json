@@ -1,0 +1,34 @@
+{
+  "id": "EXP-007",
+  "title": "Multi-hop chaining",
+  "status": "closed",
+  "goal": "Measure 2-hop and 3-hop extractive chaining, including date arithmetic done in code.",
+  "method": "Each hop inserts the previous span into the next question and runs extractive QA. Date endings call add_period on the extracted start and length. A chain is correct only if every hop matches.",
+  "metrics": {
+    "n": 12,
+    "chain_accuracy": 0.5833,
+    "accuracy_2hop": 0.7778,
+    "n_2hop": 9,
+    "accuracy_3hop": 0.0,
+    "n_3hop": 3,
+    "calculator_cases": 2,
+    "calculator_accuracy": 1.0,
+    "max_reliable_hop_count": 2
+  },
+  "results_prose": "Chain accuracy on 12 items is 0.5833. 2-hop accuracy is 0.7778 (n=9). 3-hop accuracy is 0.0 (n=3). Calculator checks: 1.0 on 2 cases. Recorded maximum reliable hop count at the 0.5 cutoff used here: 2.",
+  "conclusion": "The reliable hop depth on this small set, using a 0.5 accuracy cutoff, is 2. The controller should keep asks inside that depth and send arithmetic to the calculator.",
+  "scale_down": "Twelve original chains replace HotpotQA plus 30 custom items. No pretrained QA model is loaded.",
+  "referenced_files": [
+    "lab/exp_007_hop_chain/run.py",
+    "lab/common/qa.py",
+    "lab/common/calc.py",
+    "lab/common/nli.py",
+    "lab/common/textutil.py",
+    "lab/common/harness.py",
+    "data/exp_007_hop_chain/items.json",
+    "data/exp_007_hop_chain/results.json"
+  ],
+  "follow_ups": [],
+  "elapsed_sec": 0.0665,
+  "peak_rss_mb": 27.95
+}

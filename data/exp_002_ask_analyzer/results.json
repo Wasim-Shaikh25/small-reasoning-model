@@ -1,0 +1,41 @@
+{
+  "id": "EXP-002",
+  "title": "Ask analyzer templates",
+  "status": "closed",
+  "goal": "Measure task-type accuracy, depth accuracy, and template decomposition on 60 asks without a generative proposer.",
+  "method": "Rule cues classify task type and depth. Sub-questions come from conjunction splits and per-type templates. A fact counts as covered when half of its content tokens appear in a sub-question. The raw ask is always retained as a query.",
+  "metrics": {
+    "n": 60,
+    "task_type_accuracy": 0.95,
+    "depth_accuracy": 0.9333,
+    "mean_fact_coverage": 0.8667,
+    "decomposition_failure_rate": 0.1167,
+    "multi_fact_count": 19,
+    "multi_fact_full_coverage_rate": 0.8947,
+    "raw_ask_always_in_queries": true,
+    "automatic_quality_proxy_1_to_5": 4.4667,
+    "human_rating_collected": false,
+    "misses": [
+      "F09",
+      "F17",
+      "F20",
+      "F30"
+    ]
+  },
+  "results_prose": "On 60 hand-labeled asks, task-type accuracy is 0.95 and depth accuracy is 0.9333. Mean gold-fact coverage of template sub-questions is 0.8667. Decomposition failure rate (coverage under 0.5) is 0.1167. The raw ask stays in the query list for every item: True. No human 1-to-5 rating was collected; the automatic proxy is 4.4667. Misses: F09, F17, F20, F30.",
+  "conclusion": "Template analysis covers ordinary asks and keeps the raw ask as a fallback. Unusual multi-clause asks remain the weak spot, which matches the architecture's known limit. A human sub-question rating was not collected.",
+  "scale_down": "Sixty original asks stand in for a larger labeled set. Experiment F's human 1-to-5 rating is not fabricated; only an automatic coverage proxy is reported.",
+  "referenced_files": [
+    "lab/exp_002_ask_analyzer/run.py",
+    "lab/common/ask.py",
+    "lab/common/textutil.py",
+    "lab/common/harness.py",
+    "data/exp_002_ask_analyzer/asks.json",
+    "data/exp_002_ask_analyzer/results.json"
+  ],
+  "follow_ups": [
+    "Collect a human 1-to-5 rating for sub-question quality before treating the proxy as a product metric."
+  ],
+  "elapsed_sec": 0.0053,
+  "peak_rss_mb": 12.09
+}

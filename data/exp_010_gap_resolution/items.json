@@ -1,0 +1,138 @@
+[
+  {
+    "id": "G01",
+    "gap": "unknown_term",
+    "gold_status": "resolved",
+    "status": "resolved",
+    "span": "a refund issued after 14 days",
+    "round": 0,
+    "evidence_id": "P0",
+    "correct": true
+  },
+  {
+    "id": "G02",
+    "gap": "unknown_term",
+    "gold_status": "unresolved",
+    "status": "unresolved",
+    "span": null,
+    "alternatives": [],
+    "correct": true
+  },
+  {
+    "id": "G03",
+    "gap": "unknown_term",
+    "gold_status": "resolved",
+    "status": "resolved",
+    "span": "30 days",
+    "round": 0,
+    "evidence_id": "P0",
+    "correct": true
+  },
+  {
+    "id": "G04",
+    "gap": "ambiguous_reference",
+    "gold_status": "resolved",
+    "status": "resolved",
+    "span": "The said premises include a parking slot.",
+    "round": 0,
+    "evidence_id": "P1",
+    "correct": false
+  },
+  {
+    "id": "G05",
+    "gap": "ambiguous_reference",
+    "gold_status": "resolved",
+    "status": "resolved",
+    "span": "Kapil Iyer",
+    "round": 0,
+    "evidence_id": "P0",
+    "correct": true
+  },
+  {
+    "id": "G06",
+    "gap": "ambiguous_reference",
+    "gold_status": "unresolved",
+    "status": "resolved",
+    "span": "Nothing points at a referent.",
+    "round": 0,
+    "evidence_id": "P1",
+    "correct": false
+  },
+  {
+    "id": "G07",
+    "gap": "missing_premise",
+    "gold_status": "unresolved",
+    "status": "unresolved",
+    "span": null,
+    "alternatives": [],
+    "correct": true
+  },
+  {
+    "id": "G08",
+    "gap": "missing_premise",
+    "gold_status": "resolved",
+    "status": "resolved",
+    "span": "10 days",
+    "round": 0,
+    "evidence_id": "P1",
+    "correct": true
+  },
+  {
+    "id": "G09",
+    "gap": "conflicting_values",
+    "gold_status": "ambiguous",
+    "status": "ambiguous",
+    "span": null,
+    "alternatives": [
+      "30 days",
+      "version 2 sets the notice period at 45 days.",
+      "30 days",
+      "version 2 sets the notice period at 45 days.",
+      "30 days",
+      "version 2 sets the notice period at 45 days."
+    ],
+    "correct": true
+  },
+  {
+    "id": "G10",
+    "gap": "conflicting_values",
+    "gold_status": "ambiguous",
+    "status": "ambiguous",
+    "span": null,
+    "alternatives": [
+      "inr 50000",
+      "inr 75000",
+      "inr 50000",
+      "inr 75000",
+      "inr 50000",
+      "inr 75000"
+    ],
+    "correct": true
+  },
+  {
+    "id": "G11",
+    "gap": "vague_criterion",
+    "gold_status": "ambiguous",
+    "status": "ambiguous",
+    "span": null,
+    "alternatives": [
+      "Repairs shall be done within a reasonable time.",
+      "Repairs shall be done within a reasonable time.",
+      "Repairs shall be done within a reasonable time."
+    ],
+    "correct": true
+  },
+  {
+    "id": "G12",
+    "gap": "vague_criterion",
+    "gold_status": "ambiguous",
+    "status": "ambiguous",
+    "span": null,
+    "alternatives": [
+      "The tenant shall give prompt notice of damage.",
+      "The tenant shall give prompt notice of damage.",
+      "The tenant shall give prompt notice of damage."
+    ],
+    "correct": true
+  }
+]

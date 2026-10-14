@@ -1,0 +1,43 @@
+{
+  "id": "EXP-006",
+  "title": "NLI judge and claim templates",
+  "status": "closed",
+  "goal": "Compare claim templates and measure support, contradiction, negation, and exception behavior of the lexical judge.",
+  "method": "Each gold relation is turned into a hypothesis by three templates. The judge uses token coverage, number mismatch, and polarity. Exception words are not given a special parser, so that weakness can show up in the score.",
+  "metrics": {
+    "n_base_items": 30,
+    "template_accuracy": {
+      "T1": 0.7667,
+      "T2": 0.7667,
+      "T3": 0.7
+    },
+    "best_template": "T1",
+    "accuracy_by_category_best_template": {
+      "exception": 0.0,
+      "negation": 1.0,
+      "neutral": 1.0,
+      "number": 1.0,
+      "supported": 0.875
+    },
+    "negation_accuracy": 1.0,
+    "exception_accuracy": 0.0,
+    "number_conflict_accuracy": 1.0,
+    "pairwise_conflict_note": "Number mismatches are the pairwise value test; exception probes are expected to be weaker."
+  },
+  "results_prose": "Three claim templates were scored on 30 premise/span pairs. Accuracy by template: {'T1': 0.7667, 'T2': 0.7667, 'T3': 0.7}. Best template is T1. On that template, number conflicts are 1.0, negation is 1.0, and exception/qualification probes are 0.0. Category breakdown: {'exception': 0.0, 'negation': 1.0, 'neutral': 1.0, 'number': 1.0, 'supported': 0.875}.",
+  "conclusion": "Template T1 is the strongest of the three on this set. Number mismatches and direct negation are handled more reliably than except/unless/provided qualifications.",
+  "scale_down": "MNLI, ANLI, and ContractNLI were not downloaded. Thirty original pairs replace those dev subsets plus 40 custom items.",
+  "referenced_files": [
+    "lab/exp_006_nli_judge/run.py",
+    "lab/common/nli.py",
+    "lab/common/textutil.py",
+    "lab/common/harness.py",
+    "data/exp_006_nli_judge/items.json",
+    "data/exp_006_nli_judge/results.json"
+  ],
+  "follow_ups": [
+    "Add an explicit qualification parser in code if exception accuracy stays too low for the tasks you care about. Do not add a generative NLI model."
+  ],
+  "elapsed_sec": 0.0041,
+  "peak_rss_mb": 11.66
+}

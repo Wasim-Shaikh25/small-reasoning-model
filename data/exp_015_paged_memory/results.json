@@ -1,0 +1,110 @@
+{
+  "id": "EXP-015",
+  "title": "Paged memory and needle recall",
+  "status": "closed",
+  "goal": "Measure needle recall as the haystack grows, page-fault restoration after eviction, and the effect of the working-set budget.",
+  "method": "Synthetic pages are indexed with the hybrid retriever. The working set pins the ask, evicts the lowest-relevance unpinned page, and counts a page fault when a missing passage is admitted again. A notebook stores one row per sub-question.",
+  "metrics": {
+    "needle_recall": [
+      {
+        "pages": 10,
+        "recall_at_5": 1.0,
+        "top": [
+          "PG0005",
+          "PG0000",
+          "PG0001"
+        ]
+      },
+      {
+        "pages": 100,
+        "recall_at_5": 1.0,
+        "top": [
+          "PG0050",
+          "PG0000",
+          "PG0001"
+        ]
+      },
+      {
+        "pages": 1000,
+        "recall_at_5": 1.0,
+        "top": [
+          "PG0500",
+          "PG0000",
+          "PG0001"
+        ]
+      }
+    ],
+    "needle_evicted": true,
+    "page_fault_fired": true,
+    "needle_restored": true,
+    "page_faults": 1,
+    "budget_effect": [
+      {
+        "budget": 1,
+        "coverage": {
+          "found": 1,
+          "total": 3,
+          "ratio": 0.3333
+        },
+        "evictions": 2,
+        "working_ids": [
+          "F2"
+        ]
+      },
+      {
+        "budget": 3,
+        "coverage": {
+          "found": 3,
+          "total": 3,
+          "ratio": 1.0
+        },
+        "evictions": 0,
+        "working_ids": [
+          "F0",
+          "F1",
+          "F2"
+        ]
+      },
+      {
+        "budget": 8,
+        "coverage": {
+          "found": 3,
+          "total": 3,
+          "ratio": 1.0
+        },
+        "evictions": 0,
+        "working_ids": [
+          "D0",
+          "D1",
+          "D2",
+          "D3",
+          "D4",
+          "F0",
+          "F1",
+          "F2"
+        ]
+      }
+    ],
+    "coverage_report_matches": true,
+    "coverage_report": {
+      "chunks_scanned": 1000,
+      "chunks_total": 1000,
+      "ratio": 1.0
+    }
+  },
+  "results_prose": "Needle Recall@5 at 10, 100, and 1000 pages: [{'pages': 10, 'recall_at_5': 1.0, 'top': ['PG0005', 'PG0000', 'PG0001']}, {'pages': 100, 'recall_at_5': 1.0, 'top': ['PG0050', 'PG0000', 'PG0001']}, {'pages': 1000, 'recall_at_5': 1.0, 'top': ['PG0500', 'PG0000', 'PG0001']}]. The needle was evicted under a one-page budget: True. A later request page-faulted it back: True, restored True. Fact coverage by working-set budget: [{'budget': 1, 'coverage': {'found': 1, 'total': 3, 'ratio': 0.3333}, 'evictions': 2, 'working_ids': ['F2']}, {'budget': 3, 'coverage': {'found': 3, 'total': 3, 'ratio': 1.0}, 'evictions': 0, 'working_ids': ['F0', 'F1', 'F2']}, {'budget': 8, 'coverage': {'found': 3, 'total': 3, 'ratio': 1.0}, 'evictions': 0, 'working_ids': ['D0', 'D1', 'D2', 'D3', 'D4', 'F0', 'F1', 'F2']}]. Coverage report scanned/total matched the counter: True.",
+  "conclusion": "Recall of a distinctive needle stayed available at the sizes that fit in this process. Eviction removes an unpinned page, and the next request brings it back as a page fault. The notebook, not the raw haystack, is what the reduce step would read.",
+  "scale_down": "Pages are short synthetic paragraphs, not scanned document pages. 1,000 pages were run. A multi-million-token archive was not.",
+  "referenced_files": [
+    "lab/exp_015_paged_memory/run.py",
+    "lab/common/paged.py",
+    "lab/common/index.py",
+    "lab/common/qa.py",
+    "lab/common/textutil.py",
+    "lab/common/harness.py",
+    "data/exp_015_paged_memory/results.json"
+  ],
+  "follow_ups": [],
+  "elapsed_sec": 0.0929,
+  "peak_rss_mb": 145.24
+}

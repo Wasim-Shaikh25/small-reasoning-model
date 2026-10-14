@@ -1,0 +1,92 @@
+[
+  {
+    "bridge_entity": "Brazil",
+    "bridge_key": "brazil",
+    "doc_a": "training-10100",
+    "doc_b": "training-10268",
+    "chunk_a_id": "training-10100-p1-c2",
+    "chunk_b_id": "training-10268-p1-c3",
+    "hop1_query": "Colombian finance minister Cesar Gaviria, also talking to reporters at the end of the weekly National Coffee Committee meeting, said the positions of Brazil and of the United States were too far apart to allow a prompt agreement on quotas. He said according to ICO statistics there was a shortfall of nine mln (60-kg) bags on the world market between October, the start of the coffee year, and February."
+  },
+  {
+    "bridge_entity": "London",
+    "bridge_key": "london",
+    "doc_a": "training-10100",
+    "doc_b": "training-1026",
+    "chunk_a_id": "training-10100-p1-c1",
+    "chunk_b_id": "training-1026-p1-c2",
+    "hop1_query": "CARDENAS SEES NO MAJOR DECISIONS AT ICO MEETING Jorge Cardenas, manager of Colombia's coffee growers' federation, said he did not believe any important decisions would emerge from an upcoming meeting of the International Coffee Organization (ICO). The ICO executive board is set to meet in London from March 31 and could decide to call a special council session by the end of April to discuss export quotas."
+  },
+  {
+    "bridge_entity": "India",
+    "bridge_key": "india",
+    "doc_a": "training-10268",
+    "doc_b": "training-10406",
+    "chunk_a_id": "training-10268-p1-c1",
+    "chunk_b_id": "training-10406-p1-c1",
+    "hop1_query": "INDIA STEPS UP COUNTERTRADE DEALS TO CUT TRADE GAP India is searching for non-communist countertrade partners to help it cut its trade deficit and conserve foreign exchange. Wheat, tobacco, tea, coffee, jute, engineering and electronic goods, as well as minerals including iron ore, are all on offer in return for crude oil, petroleum products, chemicals, steel and machinery, trade sources told Reuters."
+  },
+  {
+    "bridge_entity": "Kenya",
+    "bridge_key": "kenya",
+    "doc_a": "training-1026",
+    "doc_b": "training-10752",
+    "chunk_a_id": "training-1026-p1-c2",
+    "chunk_b_id": "training-10752-p1-c1",
+    "hop1_query": "The price of coffee, Kenya's main source of foreign exchange, fell in London today to about 94 cents a pound from a peak of 2.14 dlrs in January 1986. Moi said the price changes, coupled with a general decline in the flow of capital from the rest of the world, made it more difficult to finance the government's budget deficit."
+  },
+  {
+    "bridge_entity": "the International Coffee Organization",
+    "bridge_key": "the international coffee organization",
+    "doc_a": "training-10876",
+    "doc_b": "training-10902",
+    "chunk_a_id": "training-10876-p1-c1",
+    "chunk_b_id": "training-10902-p1-c1",
+    "hop1_query": "SEES NO NEW COFFEE AGREEMENT TALKS SOON The United States does not expect the executive board meeting of the International Coffee Organization, ICO, to call for a new round of negotiations on reinstating coffee quotas, a U.S. delegation to ICO talks earlier this year, said no new coffee agreement talks are expected because there is no indication the negotiating positions of major producers and consumers have changed."
+  },
+  {
+    "bridge_entity": "Coffee Board",
+    "bridge_key": "coffee board",
+    "doc_a": "training-11183",
+    "doc_b": "training-11882",
+    "chunk_a_id": "training-11183-p1-c1",
+    "chunk_b_id": "training-11882-p1-c3",
+    "hop1_query": "INDIA REDUCES EXPORT DUTY ON COFFEE India cut the export duty on coffee to 330 rupees per 100 kg from 600 rupees, effective March 23, a Coffee Board official said. The reduction should help India reach its coffee export target of 90,000 tonnes in fiscal 1987/88 ending March 31, against provisionally estimated exports of 75,000 tonnes in 1986/87 and an actual 99,254 tonnes in 1985/86, he said."
+  },
+  {
+    "bridge_entity": "Colombia",
+    "bridge_key": "colombia",
+    "doc_a": "training-10100",
+    "doc_b": "training-11372",
+    "chunk_a_id": "training-10100-p1-c1",
+    "chunk_b_id": "training-11372-p1-c1",
+    "hop1_query": "CARDENAS SEES NO MAJOR DECISIONS AT ICO MEETING Jorge Cardenas, manager of Colombia's coffee growers' federation, said he did not believe any important decisions would emerge from an upcoming meeting of the International Coffee Organization (ICO). The ICO executive board is set to meet in London from March 31 and could decide to call a special council session by the end of April to discuss export quotas."
+  },
+  {
+    "bridge_entity": "Cuenca",
+    "bridge_key": "cuenca",
+    "doc_a": "training-10640",
+    "doc_b": "training-10902",
+    "chunk_a_id": "training-10640-p1-c1",
+    "chunk_b_id": "training-10902-p1-c4",
+    "hop1_query": "COFFEE PRICES BAD NEWS FOR LATIN AMERICA -MINISTER A senior Nicaraguan official said a recent plunge in coffee prices was economically and politically disastrous for Latin American coffee-producing countries. Nicaraguan Foreign Trade Minister Alejandro Martinez Cuenca was in London to brief International Coffee Organisation (ICO) executive board producer members after a meeting last weekend in Managua attended by eight Latin American coffee producers to discuss the fall in coffee prices."
+  },
+  {
+    "bridge_entity": "International Coffee Organization",
+    "bridge_key": "international coffee organization",
+    "doc_a": "training-1085",
+    "doc_b": "training-11866",
+    "chunk_a_id": "training-1085-p1-c1",
+    "chunk_b_id": "training-11866-p1-c1",
+    "hop1_query": "BILL The collapse of International Coffee Organization, ICO, talks on export quotas yesterday removes the immediate need to reinstate U.S. The Reagan administration proposed in trade legislation offered Congress last month that authority to monitor coffee imports be resumed."
+  },
+  {
+    "bridge_entity": "Jorio Dauster",
+    "bridge_key": "jorio dauster",
+    "doc_a": "training-10100",
+    "doc_b": "training-10902",
+    "chunk_a_id": "training-10100-p1-c2",
+    "chunk_b_id": "training-10902-p1-c2",
+    "hop1_query": "Colombian finance minister Cesar Gaviria, also talking to reporters at the end of the weekly National Coffee Committee meeting, said the positions of Brazil and of the United States were too far apart to allow a prompt agreement on quotas. He said according to ICO statistics there was a shortfall of nine mln (60-kg) bags on the world market between October, the start of the coffee year, and February."
+  }
+]

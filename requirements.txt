@@ -1,0 +1,17 @@
+numpy>=1.26
+scikit-learn>=1.4
+rapidfuzz>=3.6
+dateparser>=1.2
+
+# Real-model reruns only (EXP-029, EXP-032, EXP-033). Real, pretrained,
+# non-generative models: NER (OntoNotes) and static word vectors. Not
+# bge/DeBERTa/GLiNER -- huggingface.co is blocked by this sandbox's egress
+# policy. See lab/common/real_models.py.
+spacy>=3.8
+# The pipelines themselves are not on PyPI by plain name; install with:
+#   python3 -m spacy download en_core_web_sm
+#   python3 -m spacy download en_core_web_md
+# or, if that command's own network path is blocked, install the GitHub
+# release wheel directly:
+#   pip install https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl
+#   pip install https://github.com/explosion/spacy-models/releases/download/en_core_web_md-3.8.0/en_core_web_md-3.8.0-py3-none-any.whl

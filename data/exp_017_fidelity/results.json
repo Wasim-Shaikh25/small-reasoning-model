@@ -1,0 +1,80 @@
+{
+  "id": "EXP-017",
+  "title": "Rewrite fidelity without a generator",
+  "status": "closed",
+  "goal": "Measure fact, number, and modality preservation for a deterministic renderer, and show that the fidelity checks catch planted edits.",
+  "method": "The renderer joins already verified sentences and normalizes whitespace. It does not paraphrase. Fidelity uses the architecture's number and modal comparison. Planted edits drop a number, add a number, or flip shall/not. Bidirectional NLI is the lexical judge.",
+  "metrics": {
+    "renders": 65,
+    "fact_preservation_rate": 1.0,
+    "added_content_rate": 0.0,
+    "modal_error_rate": 0.0,
+    "bidirectional_nli_pass_rate": 1.0,
+    "fluency_human_rating": null,
+    "mutation_catch": [
+      {
+        "kind": "drop_number",
+        "caught": true,
+        "numbers": {
+          "numbers_dropped": [
+            "30"
+          ],
+          "numbers_added": [],
+          "ok": false
+        },
+        "modal_changed": false
+      },
+      {
+        "kind": "add_number",
+        "caught": true,
+        "numbers": {
+          "numbers_dropped": [],
+          "numbers_added": [
+            "99"
+          ],
+          "ok": false
+        },
+        "modal_changed": false
+      },
+      {
+        "kind": "flip_modal",
+        "caught": true,
+        "numbers": {
+          "numbers_dropped": [],
+          "numbers_added": [],
+          "ok": true
+        },
+        "modal_changed": true
+      },
+      {
+        "kind": "drop_not",
+        "caught": true,
+        "numbers": {
+          "numbers_dropped": [],
+          "numbers_added": [],
+          "ok": true
+        },
+        "modal_changed": true
+      }
+    ],
+    "mutation_catch_rate": 1.0,
+    "generator_used": false
+  },
+  "results_prose": "Deterministic rendering of 65 claim and paragraph cases preserved numbers in 1.0 and added numbers in 0.0. Modal error rate is 0.0. Bidirectional lexical NLI pass rate is 1.0. Planted bad edits were caught at 1.0: [{'kind': 'drop_number', 'caught': True, 'numbers': {'numbers_dropped': ['30'], 'numbers_added': [], 'ok': False}, 'modal_changed': False}, {'kind': 'add_number', 'caught': True, 'numbers': {'numbers_dropped': [], 'numbers_added': ['99'], 'ok': False}, 'modal_changed': False}, {'kind': 'flip_modal', 'caught': True, 'numbers': {'numbers_dropped': [], 'numbers_added': [], 'ok': True}, 'modal_changed': True}, {'kind': 'drop_not', 'caught': True, 'numbers': {'numbers_dropped': [], 'numbers_added': [], 'ok': True}, 'modal_changed': True}]. No human fluency score was collected.",
+  "conclusion": "Because the renderer copies verified sentences, number and modal preservation is a property of that copy step and was measured, not assumed. The validator catches the planted edits. Fluency was not rated by a person. A generative rewriter is not part of this run.",
+  "scale_down": "Eight claims and five paragraphs, each rendered in five style labels that all take the copy path. This is smaller than 50 paragraphs and 50 claim lists, and it does not call FLAN-T5.",
+  "referenced_files": [
+    "lab/exp_017_fidelity/run.py",
+    "lab/common/harness.py",
+    "lab/common/verify.py",
+    "lab/common/nli.py",
+    "lab/common/textutil.py",
+    "data/exp_017_fidelity/items.json",
+    "data/exp_017_fidelity/results.json"
+  ],
+  "follow_ups": [
+    "A human 1-to-5 fluency rating can be added later. It must not be replaced with a generative model."
+  ],
+  "elapsed_sec": 0.0052,
+  "peak_rss_mb": 11.61
+}
