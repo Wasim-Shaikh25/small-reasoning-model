@@ -1,0 +1,107 @@
+[
+  {
+    "regime": "lookup",
+    "id": "L01_notice_period",
+    "decision": "supported",
+    "text": "30 days [A]",
+    "trace_steps": [
+      "analyze_ask",
+      "lookup_fallback"
+    ],
+    "correct_decision": true,
+    "correct_content": true
+  },
+  {
+    "regime": "lookup",
+    "id": "L02_deposit",
+    "decision": "supported",
+    "text": "INR 50000 [A]",
+    "trace_steps": [
+      "analyze_ask",
+      "lookup_fallback"
+    ],
+    "correct_decision": true,
+    "correct_content": true
+  },
+  {
+    "regime": "lookup",
+    "id": "L03_invented_term",
+    "decision": "supported",
+    "text": "a refund issued after 14 days [A]",
+    "trace_steps": [
+      "analyze_ask",
+      "lookup_fallback"
+    ],
+    "correct_decision": true,
+    "correct_content": true
+  },
+  {
+    "regime": "lookup",
+    "id": "L04_who_is_lessee",
+    "decision": "supported",
+    "text": "Ravi Sharma [A].",
+    "trace_steps": [
+      "analyze_ask",
+      "extract_identity"
+    ],
+    "correct_decision": true,
+    "correct_content": true
+  },
+  {
+    "regime": "lookup",
+    "id": "L05_unanswerable",
+    "decision": "inconclusive",
+    "text": "Insufficient evidence.",
+    "trace_steps": [
+      "analyze_ask",
+      "lookup_fallback"
+    ],
+    "correct_decision": true,
+    "correct_content": true
+  },
+  {
+    "regime": "rule",
+    "id": "R01_murder",
+    "decision": "supported",
+    "text": "Arjun murdered Neha. [FACT1] matches the rule's trigger (murder): If someone murders a person, it is a punishable crime. [RULE1] Therefore, it is a punishable crime..",
+    "trace_steps": [
+      "analyze_ask",
+      "find_rule",
+      "apply_rule"
+    ],
+    "correct_decision": true,
+    "correct_content": true
+  },
+  {
+    "regime": "integrated",
+    "id": "I01_contractor",
+    "decision": "supported",
+    "text": "Priya Nair, Residency Road [B1]. total 40,000 [B3, B4]. policy applies: the payment requires finance head approval [POLICY].",
+    "trace_steps": [
+      "analyze_ask",
+      "disambiguate",
+      "extract_identity",
+      "compute_total",
+      "find_rule",
+      "apply_rule"
+    ],
+    "correct_decision": true,
+    "correct_content": true
+  },
+  {
+    "regime": "integrated",
+    "id": "I02_sales_manager",
+    "decision": "supported",
+    "text": "Ravi Sharma, MG Road [A1]. total 45,000 [A3, A4]. policy does not apply (role mismatch with 'a contractor') [POLICY].",
+    "trace_steps": [
+      "analyze_ask",
+      "disambiguate",
+      "extract_identity",
+      "compute_total",
+      "find_rule",
+      "apply_rule"
+    ],
+    "correct_decision": true,
+    "correct_content": true
+  }
+]

@@ -21684,7 +21684,7 @@ Elapsed seconds: 49.7613. Peak RSS MB: 683.06.
 }
 ```
 
-Elapsed seconds: 7.3509. Peak RSS MB: 293.12.
+Elapsed seconds: 5.1671. Peak RSS MB: 292.98.
 - Scale-down: One rule sentence shape ('If <subject>, <verb phrase>, <consequence>.') and single-clause facts with no qualifier. A rule with an exception ('...unless committed in self-defense') is not parsed here -- the same qualifier gap EXP-006/EXP-026 already named for the lexical NLI judge. Multiple candidate rules or facts in the same passage set are not disambiguated; the first of each is used.
 - Conclusion: A general rule given in context can be applied to a specific fact given in context, and the result cited back to both, without a generative model and without training anything new -- a dependency parser's verb extraction plus one lemma comparison is enough for this shape of case. The system correctly abstains rather than answers when the fact doesn't match the rule's verb or when no rule sentence is present at all, instead of defaulting to a guess.
 
@@ -21740,7 +21740,7 @@ Elapsed seconds: 7.3509. Peak RSS MB: 293.12.
 }
 ```
 
-Elapsed seconds: 0.0168. Peak RSS MB: 139.71.
+Elapsed seconds: 0.0075. Peak RSS MB: 139.84.
 - Scale-down: Two stories, one policy, one role-class check. Real documents would have more distractors, multiple candidate policies, and roles stated less explicitly than 'is a contractor for Zenith Corp.' -- this is a scaled-down integration test of the chain, not a benchmark of its ceiling.
 - Conclusion: Disambiguating between two multi-sentence stories by a cue in the ask (not a name), extracting a name and address, summing money mentioned across separate sentences, and applying a company policy threshold rule all chain correctly end to end, each step citable to its own source passage. The second case is the one worth dwelling on: Ravi Sharma's total (INR 45,000) is well over the policy's INR 30,000 threshold, and a rule engine that only checked the number would have incorrectly fired approval on him. Checking that his own story actually describes him with the policy's subject role ('a contractor') -- and finding it doesn't, he's a sales manager -- is what keeps the decision correct. A rule matching a number is not the same as a rule applying to the right person.
 
@@ -21778,9 +21778,124 @@ Elapsed seconds: 0.0168. Peak RSS MB: 139.71.
 }
 ```
 
-Elapsed seconds: 7.5978. Peak RSS MB: 293.5.
+Elapsed seconds: 9.1666. Peak RSS MB: 293.0.
 - Scale-down: Six domains, 11 hand-written cases, single-clause rules and facts only -- not a benchmark of how many domains or how complex a rule this can handle, a targeted test of whether the existing mechanism needed domain-specific code to extend, which it did not.
 - Conclusion: The objection this exploration tests directly -- that a 'rule engine' which secretly needs a new rule per question isn't a rule engine at all -- does not hold for the two rule shapes built so far. The verb-trigger matcher works by extracting a sentence's main verb via spaCy's dependency parser and comparing lemmas; that mechanism has no idea whether the verb is 'murder', 'contain', 'run', or 'have' -- it would work on a verb this project has never seen written down anywhere, because the verb comes from the parser's general training, not from a lookup table this project wrote. The threshold matcher works by extracting a number near 'exceeds' and comparing it with the same calc.compare_numbers function EXP-007/014 already used for dates and amounts; it has no idea whether the number is rupees, degrees, or kilometers per hour. This is category A from the research pasted in review (a rule-based expert system: explicit rules and facts, a deterministic reasoning engine) with the narrow end of category B (a neural parser for natural-language understanding feeding a symbolic match step) -- one engine, run on different rulebooks, not a new engine per rulebook. What would genuinely need new code is a *third rule shape* this project hasn't built yet (a rule with an exception clause, a rule comparing two extracted facts to each other rather than to a fixed threshold) -- and that is a real, acknowledged limit, not a hidden one.
+
+## EXP-060 One reasoning brain: lookup, rule application, and integration through a single entry point
+
+- Status: `closed`
+- Models used: No generative model. Every step is a previously-measured classical/deterministic primitive; this module's only new code is the control flow that chains them.
+- Goal: Prove lab.common.brain.reason is a single unified controller, not a dispatcher that routes to separate engines, by running plain lookup items, a rule-application case, and the full integrated scenario through the identical function call with no case-specific wiring at the call site.
+- Method: lab.common.brain.reason(ask, passages) first runs lab.common.ask.analyze (existing task-type classification, reused not duplicated), then checks four independent, domain-agnostic signals: more than one passage group present (disambiguate via lab.common.index.Index), the ask wants an identity (lab.common.entities), the ask wants a total (lab.common.calc.sum_amounts), and whether any passage parses as a rule (lab.common.rules, either shape). Only the tools whose signal fires run; a plain lookup with none of them falls back to lab.common.qa.answer_with_agreement, the same extractor EXP-005 and lab.common.engine already use. 8 cases: 5 lookup (EXP-005 subset), 1 rule (EXP-057's headline case), 2 integrated (EXP-058's both cases).
+- Referenced files:
+- `lab/exp_060_unified_brain/run.py`
+- `lab/common/brain.py`
+- `lab/common/ask.py`
+- `lab/common/index.py`
+- `lab/common/entities.py`
+- `lab/common/calc.py`
+- `lab/common/rules.py`
+- `lab/common/qa.py`
+- `lab/common/verify.py`
+- `lab/common/harness.py`
+- `data/exp_057_rule_application/results.json`
+- `data/exp_058_integrated_scenario/results.json`
+- `data/exp_060_unified_brain/results.json`
+- Results: On 8 cases spanning three regimes (plain lookup, rule application, integrated disambiguation+arithmetic+policy), all through the identical lab.common.brain.reason(ask, passages) call, 8 are correct (accuracy 1.0). The trace shows which internal steps fired per regime: lookup cases use ['analyze_ask', 'extract_identity', 'lookup_fallback'], the rule case uses ['analyze_ask', 'apply_rule', 'find_rule'], the integrated cases use ['analyze_ask', 'apply_rule', 'compute_total', 'disambiguate', 'extract_identity', 'find_rule'] -- different internal steps, same external call.
+```json
+{
+  "n": 8,
+  "accuracy": 1.0,
+  "by_regime": {
+    "lookup": {
+      "n": 5,
+      "correct": 5,
+      "trace_steps_used": [
+        "analyze_ask",
+        "extract_identity",
+        "lookup_fallback"
+      ]
+    },
+    "rule": {
+      "n": 1,
+      "correct": 1,
+      "trace_steps_used": [
+        "analyze_ask",
+        "apply_rule",
+        "find_rule"
+      ]
+    },
+    "integrated": {
+      "n": 2,
+      "correct": 2,
+      "trace_steps_used": [
+        "analyze_ask",
+        "apply_rule",
+        "compute_total",
+        "disambiguate",
+        "extract_identity",
+        "find_rule"
+      ]
+    }
+  },
+  "same_function_called_every_time": "lab.common.brain.reason(ask, passages) -- no case-specific branch at the call site",
+  "cases": [
+    {
+      "regime": "lookup",
+      "id": "L01_notice_period",
+      "decision": "supported",
+      "correct": true
+    },
+    {
+      "regime": "lookup",
+      "id": "L02_deposit",
+      "decision": "supported",
+      "correct": true
+    },
+    {
+      "regime": "lookup",
+      "id": "L03_invented_term",
+      "decision": "supported",
+      "correct": true
+    },
+    {
+      "regime": "lookup",
+      "id": "L04_who_is_lessee",
+      "decision": "supported",
+      "correct": true
+    },
+    {
+      "regime": "lookup",
+      "id": "L05_unanswerable",
+      "decision": "inconclusive",
+      "correct": true
+    },
+    {
+      "regime": "rule",
+      "id": "R01_murder",
+      "decision": "supported",
+      "correct": true
+    },
+    {
+      "regime": "integrated",
+      "id": "I01_contractor",
+      "decision": "supported",
+      "correct": true
+    },
+    {
+      "regime": "integrated",
+      "id": "I02_sales_manager",
+      "decision": "supported",
+      "correct": true
+    }
+  ]
+}
+```
+
+Elapsed seconds: 4.72. Peak RSS MB: 385.41.
+- Scale-down: 8 cases across 3 regimes, not a benchmark of the brain's ceiling -- a targeted test that the single entry point reproduces every prior exploration's answer without per-case wiring.
+- Conclusion: One function handles a plain lookup, a rule-application question, and a multi-signal integrated scenario without the caller choosing a path. The difference between regimes shows up only in the trace -- which internal signal checks fired -- never in which function was called or how it was called. A lookup question fires none of the extra signals and falls back to the same single-slot extractor lab.common.engine already uses; the integrated cases fire three signals at once and chain their results. This is the unification the prior three explorations (EXP-057/058/059) proved piece by piece, now proved as one entry point rather than three scripts a person chooses between.
 
 ## Follow-up todos
 
