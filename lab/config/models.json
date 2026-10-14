@@ -1,5 +1,5 @@
 {
-  "policy": "This POC loads no pretrained language model and no generative model.",
+  "policy": "This POC loads no generative language model, with one narrow, bounded exception recorded in FORBIDDEN.md: a small local FLAN-T5/T5 checkpoint, rewriter role only, fidelity-gated. See bounded_rewriter_exception below. Every other component stays non-generative.",
   "substitutes": {
     "embeddings": "sklearn TfidfVectorizer cosine (in place of bge-small-en-v1.5)",
     "sparse_retrieval": "in-process Okapi BM25 (in place of Qdrant sparse / SPLADE)",
@@ -13,11 +13,19 @@
     "pair_matcher": "logistic regression over string and context features",
     "decision_head": "logistic regression with Platt scaling",
     "next_action_head": "multinomial logistic regression",
-    "rewriter": "deterministic assembly of verified findings (FLAN-T5 is forbidden)",
+    "rewriter": "deterministic assembly of verified findings is still the default and the fallback; a small local FLAN-T5/T5 checkpoint is allowed only under the bounded_rewriter_exception below, and only once it has actually been loaded and measured",
     "proposer": "not used; template analyzer plus grounding filter only",
     "vector_db": "in-memory index (in place of Qdrant)",
     "graph": "in-memory adjacency (in place of NetworkX/Kuzu/Neo4j)",
     "dates": "dateparser plus timedelta"
+  },
+  "bounded_rewriter_exception": {
+    "status": "policy change recorded 2026-10-14 in FORBIDDEN.md; not yet implemented or measured",
+    "allowed_checkpoint": "flan-t5-small (or comparably small, under ~300M params)",
+    "allowed_role": "rewriter only (ARCHITECTURE.md section 3.7): join and grammar-correct already-verified findings into prose",
+    "still_forbidden_for_this_checkpoint": "proposer role, extraction, answering, support/contradiction judging, any role that could assert a new fact",
+    "blocker": "huggingface.co is blocked by this sandbox's egress policy, so flan-t5-small cannot be downloaded here yet. See lab/common/real_models.py for the same block affecting bge/DeBERTa/GLiNER.",
+    "required_guardrail": "every rewrite must pass the fidelity check (numbers/dates/names preserved, modals unchanged, bidirectional entailment, citations preserved) or fall back to the unchanged lab/common/assemble.py output"
   },
   "real_model_reruns": {
     "note": "EXP-025, EXP-029, EXP-032, and EXP-033 only. Every other exploration above still ran the classical substitutes in 'substitutes'.",

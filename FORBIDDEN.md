@@ -2,19 +2,32 @@
 
 These are prohibited at any cost, including for a demo, a test, a fixture, or a "temporary" shortcut.
 
-## No generative language models
+## No generative language models, with one narrow, bounded exception
 
-Do not use an LLM or any pure generative language model of any size.
+Do not use an LLM or any pure generative language model of any size, **except**
+a small local FLAN-T5/T5 checkpoint (project owner's call, 2026-10-14) used
+**only** as the rewriter in section 3.7 of the blueprint: joining and grammar-
+correcting sentences that another, non-generative component has already
+extracted and verified. The exception does not reopen anything else.
 
-- No pretrained or hosted LLM.
+- No pretrained or hosted LLM for any role except the bounded rewriter below.
 - No GPT-style generative model.
-- No API call to OpenAI, Anthropic, Google, Cohere, Mistral, Groq, Together, Hugging Face inference, or any similar endpoint.
-- No local generative runtime: llama.cpp, vLLM, Ollama, CTranslate2 generation, or a FLAN-T5 / T5 / GPT-2 / Llama / Mistral checkpoint.
-- No "small" generative model. Size is not an exception.
-- The blueprint mentions FLAN-T5 as an untrusted proposer and as a rewriter. Those calls are not allowed here. Use the deterministic fallback: template queries, copied verified findings, and the fidelity checks.
+- No API call to OpenAI, Anthropic, Google, Cohere, Mistral, Groq, Together, Hugging Face inference, or any similar endpoint. The bounded rewriter is a local checkpoint, never an API call.
+- No local generative runtime beyond the bounded rewriter: llama.cpp, vLLM, Ollama, CTranslate2 generation, or any GPT-2 / Llama / Mistral checkpoint are still fully forbidden. A FLAN-T5 / T5 checkpoint is allowed only in the bounded rewriter role described below.
 - Do not ask another agent or chat product to generate the answer text that this system would attribute to evidence.
 
-Encoder checkpoints named in the blueprint (DeBERTa, GLiNER, BERT-NER, bge) are also not loaded in this POC. The explorations use classical substitutes and say so. A later experiment may train a small head or a span tagger only on labels stored in this repository. It still may not download or call a generative model.
+### The bounded rewriter exception, in full
+
+This exception exists so verified findings can be joined into flowing prose instead of a bulleted list of cited sentences (`ARCHITECTURE.md` sections 3.7 and 3.10), while every other hard constraint in section 1 of `ARCHITECTURE.md` still holds. All of the following must be true, or the exception does not apply and the deterministic fallback (`lab/common/assemble.py`, unchanged) is used instead:
+
+- **Small checkpoint only.** `flan-t5-small` (or a comparably small T5 checkpoint, roughly under 300M parameters). Not `flan-t5-base`, not `flan-t5-large`, not any larger or non-T5 generative model, without a separate, explicit decision recorded here.
+- **Rewriter role only, never proposer, extractor, or judge.** It receives a batch of already-verified `(statement, citation)` findings and a style instruction, and returns prose covering only those findings. It is never given raw retrieved passages to search, never asked to answer a question, decide a fact, or judge support/contradiction. Extraction stays on the lexical QA extractor (and, when reachable, a real non-generative extractive QA encoder); verification stays on the NLI judge (and, when reachable, a real NLI encoder). A generative model never grades its own output.
+- **Fidelity-gated.** Every rewrite is checked before use: every number, date, name, and amount in the input must appear in the output; `not/no/shall/may/must/unless/except/only/provided` must not change; input and output must entail each other both ways; every citation marker must survive. On any failure, the rewrite is discarded and the deterministic verbatim-findings text (`lab/common/assemble.py`'s current behavior) is returned instead. This is `ARCHITECTURE.md` section 3.7's fidelity validator, not a new invention.
+- **No new facts, ever.** If a rewrite introduces a name, number, date, or claim absent from its input findings, that is a fidelity failure, not a style choice, and is rejected.
+- **Measured, not assumed.** Any exploration using the bounded rewriter reports exactly which checkpoint ran, the fidelity pass/fail rate, and the fallback rate, the same as every other exploration in `EXPLORATIONS.md`.
+- **Reversible.** If measurement shows the fidelity failure rate is unacceptable, the exception is withdrawn and the deterministic fallback becomes the only path again.
+
+Encoder checkpoints named in the blueprint (DeBERTa, GLiNER, BERT-NER, bge) are still not loaded in this POC. The explorations use classical substitutes, or, where reachable, real non-generative pretrained substitutes (see `lab/common/real_models.py`), and say so either way. A later experiment may train a small head or a span tagger only on labels stored in this repository. Outside the one bounded rewriter exception above, nothing here may download or call a generative model.
 
 ## No fabricated measurements
 
