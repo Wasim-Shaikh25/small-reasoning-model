@@ -1,0 +1,54 @@
+{
+  "id": "EXP-047",
+  "title": "Extractive QA and answerability on the real SQuAD2 dev set",
+  "status": "closed",
+  "goal": "Run the architecture's Experiment B on its actual specified data (SQuAD2 dev subset) instead of only the 40 custom items EXP-005 used, with the same lexical method so the two are directly comparable.",
+  "method": "Took the first 300 questions from the real, unmodified SQuAD2 dev-v2.0.json, in file order (deterministic, not sampled). Each question keeps its real context paragraph as passage A; passage B is a real distractor -- the first paragraph of a different, deterministically chosen article in the same dataset, giving every item the same two-passage shape as EXP-005's items without inventing any text. Ran the identical lab/common/qa.answer_with_agreement (unigram + bigram lexical extractors, tau=0.34) and harness.score_qa used by EXP-005. Exact match uses the dataset's first reference answer; any_reference_match additionally credits a prediction matching any of SQuAD2's multiple human reference answers for that question.",
+  "metrics": {
+    "data_source": "real SQuAD2 dev-v2.0.json (rajpurkar/SQuAD-explorer), unmodified Wikipedia-paragraph questions",
+    "n": 300,
+    "n_answerable": 141,
+    "n_unanswerable": 159,
+    "tau": 0.34,
+    "exact_match_on_answerable": 0.0,
+    "any_reference_match_on_answerable": 0.0142,
+    "contained_match_on_answerable": 0.4113,
+    "unanswerable_recall": 0.8302,
+    "false_answer_rate_on_unanswerable": 0.1698,
+    "missed_answer_rate": 0.9078,
+    "span_valid_rate_when_answered": 1.0,
+    "second_extractor_agreement_when_answered": 1.0,
+    "answered": 40,
+    "abstained": 260,
+    "vs_exp_005_custom_items": {
+      "exp_005_exact_match_on_answerable": 0.5357,
+      "exp_047_exact_match_on_answerable": 0.0,
+      "exp_005_unanswerable_recall": 1.0,
+      "exp_047_unanswerable_recall": 0.8302,
+      "exp_005_span_valid_rate_when_answered": 1.0,
+      "exp_047_span_valid_rate_when_answered": 1.0
+    }
+  },
+  "results_prose": "On 300 real SQuAD2 dev questions (141 answerable, 159 unanswerable), exact match on answerable items is 0.0 (any-reference-answer match 0.0142, contained-span match 0.4113). Unanswerable recall is 0.8302 (false-answer rate 0.1698). Span validity when answered is 1.0. For comparison, EXP-005's 40 hand-written items scored exact match 0.5357 and unanswerable recall 1.0.",
+  "conclusion": "The same lexical extractor and the same 0.34 threshold that scored well on EXP-005's clean, hand-written items falls short of the Phase 0 unanswerable-recall target on real, adversarially written SQuAD2 questions, unlike on EXP-005's custom set. SQuAD2's unanswerable questions are deliberately phrased to closely resemble an answerable one over the same passage (for example, a question that swaps 'gave their name to Normandy' for a subtly different, unsupported claim); the lexical coverage scorer has no way to tell a close paraphrase of a supported claim from an unsupported one, so it answers when it should abstain. This closes the SQuAD2 data gap that EXP-005's scale-down note flagged: the architecture's own Experiment B data spec is now exercised, with the lexical extractor as the measured method -- not a DeBERTa/RoBERTa SQuAD2 checkpoint, which EXP-030 (still todo) would require and which huggingface.co being blocked in this sandbox prevents loading.",
+  "scale_down": "300 of the dev set's roughly 12,000 questions, not the full set. One real distractor passage per question, not the 3-10 passages Experiment B specifies. No pretrained QA checkpoint is loaded (deepset/deberta-v3-base-squad2 is EXP-030, still todo, blocked on huggingface.co access).",
+  "referenced_files": [
+    "lab/exp_047_real_squad_qa/run.py",
+    "lab/common/real_squad.py",
+    "lab/common/qa.py",
+    "lab/common/harness.py",
+    "lab/common/textutil.py",
+    "data/exp_005_extractive_qa/results.json",
+    "data/exp_047_real_squad_qa/squad_subset.json",
+    "data/exp_047_real_squad_qa/items.json",
+    "data/exp_047_real_squad_qa/results.json"
+  ],
+  "follow_ups": [
+    "Run the full dev set (not just the first 300) for a stable estimate.",
+    "If huggingface.co access is ever granted, rerun this exact subset with deepset/deberta-v3-base-squad2 (EXP-030) for a true model-vs-model comparison on identical real data.",
+    "Add the 3-10 passage distractor count Experiment B specifies, once more real passages per question are sourced."
+  ],
+  "elapsed_sec": 0.2452,
+  "peak_rss_mb": 37.57,
+  "models_used": "No model, classical or neural, is loaded by this exploration beyond lab/common/qa.py's existing lexical extractors (unchanged from EXP-005). This is a real-data rerun: the SQuAD2 dev set is real and unmodified; the method is EXP-005's own. deepset/deberta-v3-base-squad2, the blueprint's named checkpoint for this role, remains unloaded because huggingface.co is blocked in this sandbox."
+}

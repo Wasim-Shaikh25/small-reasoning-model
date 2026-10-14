@@ -76,7 +76,7 @@
     "If huggingface.co access is ever granted, swap in bge-small-en-v1.5 and deepset/deberta-v3-base-squad2 and compare against both stacks measured here.",
     "Grow TOP_N_BRIDGES and the document count once EXP-022's on-disk index lands."
   ],
-  "elapsed_sec": 6.8893,
-  "peak_rss_mb": 509.79,
+  "elapsed_sec": 8.0361,
+  "peak_rss_mb": 509.06,
   "models_used": "Real-model stack: spaCy en_core_web_md static vectors for dense retrieval (RealIndex, EXP-029) and spaCy en_core_web_sm NER (EXP-033), both real pretrained, non-generative, reachable without huggingface.co. Classical stack: TF-IDF+BM25 (EXP-004) and the rule tagger (EXP-008), unchanged, run here only as the comparison baseline. deepset/deberta-v3-base-squad2 and bge-small-en-v1.5, the blueprint's proposed models for this rerun, were not loaded: huggingface.co is blocked in this sandbox (403 CONNECT, policy denial). See lab/common/real_models.py:model_card()."
 }

@@ -35,3 +35,17 @@ EXP-025 fetches the real document collection once and writes it to
 `data/exp_025_real_documents/`; the other three load it from there, so run
 EXP-025 first (`lab/run_all.py` already does this, since it runs
 alphabetically).
+
+## Real-data rerun (EXP-047)
+
+EXP-047 is a different kind of rerun: it loads no new model at all, only real
+data. ARCHITECTURE.md's own Experiment B specifies "SQuAD2 dev subset plus 40
+custom items" for extractive QA; EXP-005 only ever ran the 40 custom items.
+EXP-047 fetches the real SQuAD2 dev set (`rajpurkar/SQuAD-explorer` on GitHub,
+reachable without huggingface.co) and runs EXP-005's own lexical extractor on
+300 real, unmodified questions, reporting the same metrics next to EXP-005's
+for direct comparison:
+
+```bash
+python3 lab/exp_047_real_squad_qa/run.py
+```

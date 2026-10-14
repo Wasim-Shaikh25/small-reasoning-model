@@ -38,7 +38,7 @@
     "Attach a second, unrelated category or a different real corpus to test cross-domain generalization.",
     "Move the chunk/document store to an on-disk index once the collection grows past in-memory size (EXP-022)."
   ],
-  "elapsed_sec": 2.2623,
-  "peak_rss_mb": 171.7,
+  "elapsed_sec": 3.0143,
+  "peak_rss_mb": 170.86,
   "models_used": "No checkpoint is loaded by this exploration. Fetching and chunking real text uses no model, classical or neural. This is data attachment only; EXP-029, EXP-032, and EXP-033 add models on top of it."
 }

@@ -143,7 +143,7 @@ DeBERTa, GLiNER, BERT-NER, RoBERTa, bge, MiniLM, e5, spaCy, libpostal, Qdrant, S
 }
 ```
 
-Elapsed seconds: 0.0499. Peak RSS MB: 142.23.
+Elapsed seconds: 1.6942. Peak RSS MB: 140.54.
 - Scale-down: The loop is run on three passages, not a full archive. Logging is an in-memory trace rather than a log service.
 - Conclusion: The controller enforces schema validity, a single repair, depth caps, and the rule that retrieved text is data. 
 
@@ -182,7 +182,7 @@ Elapsed seconds: 0.0499. Peak RSS MB: 142.23.
 }
 ```
 
-Elapsed seconds: 0.004. Peak RSS MB: 12.05.
+Elapsed seconds: 0.0053. Peak RSS MB: 12.09.
 - Scale-down: Sixty original asks stand in for a larger labeled set. Experiment F's human 1-to-5 rating is not fabricated; only an automatic coverage proxy is reported.
 - Conclusion: Template analysis covers ordinary asks and keeps the raw ask as a fallback. Unusual multi-clause asks remain the weak spot, which matches the architecture's known limit. A human sub-question rating was not collected.
 
@@ -243,7 +243,7 @@ Elapsed seconds: 0.004. Peak RSS MB: 12.05.
 }
 ```
 
-Elapsed seconds: 0.0023. Peak RSS MB: 15.09.
+Elapsed seconds: 0.0023. Peak RSS MB: 15.14.
 - Scale-down: One short document plus one generated long clause. Token counts are whitespace words, not a model tokenizer. Production target of 200 to 400 tokens was not the setting for the short sample.
 - Conclusion: Chunk metadata and extractive summaries behave as specified on this sample. The word-window settings used here are smaller than the 200 to 400 token production window so the sample still splits.
 
@@ -293,7 +293,7 @@ Elapsed seconds: 0.0023. Peak RSS MB: 15.09.
 }
 ```
 
-Elapsed seconds: 0.048. Peak RSS MB: 141.91.
+Elapsed seconds: 0.0456. Peak RSS MB: 141.66.
 - Scale-down: In-memory BM25 and TF-IDF stand in for Qdrant dense plus sparse vectors and a cross-encoder reranker. The corpus is 35 passages, not a 1,000-page collection.
 - Conclusion: Hybrid search finds the labeled passage for most of these queries. The entity link is what connects Lessee to the residence sentence when that sentence does not repeat the role word.
 
@@ -327,7 +327,7 @@ Elapsed seconds: 0.048. Peak RSS MB: 141.91.
 }
 ```
 
-Elapsed seconds: 0.0058. Peak RSS MB: 12.09.
+Elapsed seconds: 0.0054. Peak RSS MB: 12.18.
 - Scale-down: Forty original items replace the SQuAD2 dev subset plus 40 custom items. No pretrained QA checkpoint is loaded.
 - Conclusion: Quote validity holds when a span is returned, because the span is copied from the passage. Unanswerable recall meets the 90 percent Phase 0 target on this set.
 
@@ -368,7 +368,7 @@ Elapsed seconds: 0.0058. Peak RSS MB: 12.09.
 }
 ```
 
-Elapsed seconds: 0.0039. Peak RSS MB: 11.79.
+Elapsed seconds: 0.0041. Peak RSS MB: 11.66.
 - Scale-down: MNLI, ANLI, and ContractNLI were not downloaded. Thirty original pairs replace those dev subsets plus 40 custom items.
 - Conclusion: Template T1 is the strongest of the three on this set. Number mismatches and direct negation are handled more reliably than except/unless/provided qualifications.
 
@@ -402,7 +402,7 @@ Elapsed seconds: 0.0039. Peak RSS MB: 11.79.
 }
 ```
 
-Elapsed seconds: 0.0708. Peak RSS MB: 28.11.
+Elapsed seconds: 0.0665. Peak RSS MB: 27.95.
 - Scale-down: Twelve original chains replace HotpotQA plus 30 custom items. No pretrained QA model is loaded.
 - Conclusion: The reliable hop depth on this small set, using a 0.5 accuracy cutoff, is 2. The controller should keep asks inside that depth and send arithmetic to the calculator.
 
@@ -484,7 +484,7 @@ Elapsed seconds: 0.0708. Peak RSS MB: 28.11.
 }
 ```
 
-Elapsed seconds: 0.0076. Peak RSS MB: 148.63.
+Elapsed seconds: 0.0041. Peak RSS MB: 147.93.
 - Scale-down: 52 short lines and 12 role passages replace the blueprint's 150 to 200 detection lines and 30 role passages. GLiNER, BERT-NER, and libpostal are not loaded.
 - Conclusion: Exact-span F1 is high on easy titled names, suffixed organizations, and fully patterned addresses, and lower on the hard slice (bare company names, amounts in words, lowercase names, courts). Ambiguous place names are flagged rather than treated as high-confidence addresses.
 
@@ -561,7 +561,7 @@ Elapsed seconds: 0.0076. Peak RSS MB: 148.63.
 }
 ```
 
-Elapsed seconds: 0.0267. Peak RSS MB: 150.98.
+Elapsed seconds: 0.4613. Peak RSS MB: 149.98.
 - Scale-down: Six short documents replace 20 documents of 5 to 30 pages. The searchable context is the document itself, not a collection-wide index.
 - Conclusion: Wrong resolution is the headline number and is reported above. Ambiguous shared names are flagged instead of guessed when the rule can see two full names. No wrong example was written when the store required a gold-matching resolved span.
 
@@ -734,7 +734,7 @@ Elapsed seconds: 0.0267. Peak RSS MB: 150.98.
 }
 ```
 
-Elapsed seconds: 0.0618. Peak RSS MB: 142.05.
+Elapsed seconds: 0.0715. Peak RSS MB: 141.95.
 - Scale-down: Twelve items, two or three per gap type, replace the requested 10 items per gap type. Context is pasted, which is the Phase 0 setup.
 - Conclusion: The loop can close a gap only when a passage states the missing piece, and it refuses a single answer when two values or a vague criterion remain.
 
@@ -819,7 +819,7 @@ Elapsed seconds: 0.0618. Peak RSS MB: 142.05.
 }
 ```
 
-Elapsed seconds: 0.1011. Peak RSS MB: 148.73.
+Elapsed seconds: 0.1063. Peak RSS MB: 148.36.
 - Scale-down: Training rows are generated from six slots rather than MNLI, ANLI, FEVER, SQuAD2, and HotpotQA. No neural encoder is run to build the features.
 - Conclusion: The heads learn the feature patterns in this generated set. The unsupported-claim target is evaluated at the validation threshold and reported on the held-out slice, not assumed.
 
@@ -871,7 +871,7 @@ Elapsed seconds: 0.1011. Peak RSS MB: 148.73.
 }
 ```
 
-Elapsed seconds: 0.0601. Peak RSS MB: 27.71.
+Elapsed seconds: 0.0792. Peak RSS MB: 27.86.
 - Scale-down: Fixture-level checks, not a full corpus replay.
 - Conclusion: The checks catch altered spans, conflicting numbers, bad arithmetic, and unsupported qualifiers on these fixtures. An instruction embedded in the passage is not treated as a quote.
 
@@ -906,7 +906,7 @@ Elapsed seconds: 0.0601. Peak RSS MB: 27.71.
 }
 ```
 
-Elapsed seconds: 0.0019. Peak RSS MB: 11.84.
+Elapsed seconds: 0.0018. Peak RSS MB: 11.63.
 - Scale-down: Eight counterfactual items and six invented terms replace a larger probe set. There is no pretrained model whose memorized facts could leak; the background table is the stand-in prior.
 - Conclusion: Factual answers are copied from the passage. The background table is logged and is not allowed to fill a missing fact. Invented terms are answered only while their definition is in the context.
 
@@ -958,7 +958,7 @@ Elapsed seconds: 0.0019. Peak RSS MB: 11.84.
 }
 ```
 
-Elapsed seconds: 0.0624. Peak RSS MB: 27.9.
+Elapsed seconds: 0.0765. Peak RSS MB: 27.95.
 - Scale-down: Four items in each of six domains replace 20 items in five domains. Ordering uses dateparser rather than a learned temporal model.
 - Conclusion: Domain differences on this set come from wording, not from pretrained domain knowledge, because no pretrained model is loaded. The engine does comparison, counting, ordering, sum, conditional_if and fails conditional_unless_blocked.
 
@@ -1068,7 +1068,7 @@ Elapsed seconds: 0.0624. Peak RSS MB: 27.9.
 }
 ```
 
-Elapsed seconds: 0.0666. Peak RSS MB: 145.63.
+Elapsed seconds: 0.0929. Peak RSS MB: 145.24.
 - Scale-down: Pages are short synthetic paragraphs, not scanned document pages. 1,000 pages were run. A multi-million-token archive was not.
 - Conclusion: Recall of a distinctive needle stayed available at the sizes that fit in this process. Eviction removes an unpinned page, and the next request brings it back as a page fault. The notebook, not the raw haystack, is what the reduce step would read.
 
@@ -1110,7 +1110,7 @@ Elapsed seconds: 0.0666. Peak RSS MB: 145.63.
 }
 ```
 
-Elapsed seconds: 0.0125. Peak RSS MB: 13.39.
+Elapsed seconds: 0.0102. Peak RSS MB: 13.04.
 - Scale-down: One note and one edited chunk stand in for a full archive replay. The index is SQLite, not Qdrant.
 - Conclusion: Unverified writes are refused. Version changes and missing exact text invalidate a note. A conflicting source marks the note conflicted instead of leaving it as verified truth.
 
@@ -1188,7 +1188,7 @@ Elapsed seconds: 0.0125. Peak RSS MB: 13.39.
 }
 ```
 
-Elapsed seconds: 0.0089. Peak RSS MB: 11.66.
+Elapsed seconds: 0.0052. Peak RSS MB: 11.61.
 - Scale-down: Eight claims and five paragraphs, each rendered in five style labels that all take the copy path. This is smaller than 50 paragraphs and 50 claim lists, and it does not call FLAN-T5.
 - Conclusion: Because the renderer copies verified sentences, number and modal preservation is a property of that copy step and was measured, not assumed. The validator catches the planted edits. Fluency was not rated by a person. A generative rewriter is not part of this run.
 
@@ -1206,7 +1206,7 @@ Elapsed seconds: 0.0089. Peak RSS MB: 11.66.
 - `lab/common/harness.py`
 - `data/exp_018_longform/spec.json`
 - `data/exp_018_longform/results.json`
-- Results: Assembly sizes: 200 claims -> 1706 words, coverage 1.0, broken citations 0, repetition pairs 1, 117242.47 words/sec; 1000 claims -> 8506 words, coverage 1.0, broken citations 0, repetition pairs 1, 297322.75 words/sec; 5000 claims -> 42506 words, coverage 1.0, broken citations 0, repetition pairs 1, 62061.76 words/sec. Resume hash matches a full run: True.
+- Results: Assembly sizes: 200 claims -> 1706 words, coverage 1.0, broken citations 0, repetition pairs 1, 94013.07 words/sec; 1000 claims -> 8506 words, coverage 1.0, broken citations 0, repetition pairs 1, 262486.04 words/sec; 5000 claims -> 42506 words, coverage 1.0, broken citations 0, repetition pairs 1, 74000.5 words/sec. Resume hash matches a full run: True.
 ```json
 {
   "sizes": [
@@ -1225,10 +1225,10 @@ Elapsed seconds: 0.0089. Peak RSS MB: 11.66.
           "canonical": "Ravi Sharma"
         }
       ],
-      "elapsed_sec": 0.0146,
-      "tokens_per_sec": 117242.47,
-      "rss_before_mb": 141.05,
-      "rss_after_mb": 141.85,
+      "elapsed_sec": 0.0181,
+      "tokens_per_sec": 94013.07,
+      "rss_before_mb": 140.75,
+      "rss_after_mb": 141.62,
       "sha256": "bff01e6e7e463a24cc6669db9dcedca82712bf57fef8f0538128643858b496e0"
     },
     {
@@ -1246,10 +1246,10 @@ Elapsed seconds: 0.0089. Peak RSS MB: 11.66.
           "canonical": "Ravi Sharma"
         }
       ],
-      "elapsed_sec": 0.0286,
-      "tokens_per_sec": 297322.75,
-      "rss_before_mb": 142.23,
-      "rss_after_mb": 143.35,
+      "elapsed_sec": 0.0324,
+      "tokens_per_sec": 262486.04,
+      "rss_before_mb": 142.0,
+      "rss_after_mb": 143.12,
       "sha256": "d60096f22c9b1de5bb3a8df21d7de8b9467ec43551354255964f07dcc1a69106"
     },
     {
@@ -1267,10 +1267,10 @@ Elapsed seconds: 0.0089. Peak RSS MB: 11.66.
           "canonical": "Ravi Sharma"
         }
       ],
-      "elapsed_sec": 0.6849,
-      "tokens_per_sec": 62061.76,
-      "rss_before_mb": 144.98,
-      "rss_after_mb": 160.16,
+      "elapsed_sec": 0.5744,
+      "tokens_per_sec": 74000.5,
+      "rss_before_mb": 144.75,
+      "rss_after_mb": 159.98,
       "sha256": "8f16ab373d09b89e12b98afeed44bcb46aebeebff7315c27dbb78a07ec6a4ef0"
     }
   ],
@@ -1280,7 +1280,7 @@ Elapsed seconds: 0.0089. Peak RSS MB: 11.66.
 }
 ```
 
-Elapsed seconds: 0.7553. Peak RSS MB: 160.16.
+Elapsed seconds: 0.663. Peak RSS MB: 159.98.
 - Scale-down: Claims are templated verified findings, not 10 to 250 pages of model prose. The architecture's FLAN-T5 unit writer is not used.
 - Conclusion: Coverage and citation integrity are properties of the assembler. Throughput is string assembly on this CPU, not a generative decoder. Resume reproduces the full document hash when the checkpoint is truncated and continued.
 
@@ -1317,7 +1317,7 @@ Elapsed seconds: 0.7553. Peak RSS MB: 160.16.
 }
 ```
 
-Elapsed seconds: 0.0173. Peak RSS MB: 141.84.
+Elapsed seconds: 0.0166. Peak RSS MB: 141.77.
 - Scale-down: Hand-written good and bad proposals stand in for FLAN-T5 samples. Input-size, hop, and sampling ladders that require a generative model are out of scope.
 - Conclusion: The filter drops proposals that introduce new names, numbers, or dates. Template queries are allowed only as additional searches; the raw ask remains in the list, so a bad extra query cannot remove the baseline. Experiment P's model ladder was not run.
 
@@ -1413,7 +1413,7 @@ Elapsed seconds: 0.0173. Peak RSS MB: 141.84.
 }
 ```
 
-Elapsed seconds: 0.0564. Peak RSS MB: 141.95.
+Elapsed seconds: 0.0571. Peak RSS MB: 141.95.
 - Scale-down: Eight passages and six asks. This is a controller smoke test, not the full red-team catalog.
 - Conclusion: The loop returns a cited answer only for the single-value deposit question. Conflicting notice periods and the injected '1 day' instruction do not become a supported answer. A pure rewrite ask does not fetch.
 
@@ -1437,24 +1437,24 @@ Elapsed seconds: 0.0564. Peak RSS MB: 141.95.
 - `lab/common/budget.py`
 - `lab/common/schemas.py`
 - `data/exp_021_latency/results.json`
-- Results: Mean stage times in seconds: ask_analyze_sec 3.5e-05, chunk_sec 0.000514, search_sec 0.000984, qa_sec 0.000498, nli_sec 1.7e-05, e2e_sec 0.009995. Peak RSS 142.08 MB. No neural checkpoint was loaded.
+- Results: Mean stage times in seconds: ask_analyze_sec 2.4e-05, chunk_sec 0.000536, search_sec 0.001011, qa_sec 0.000446, nli_sec 1.9e-05, e2e_sec 0.011296. Peak RSS 141.67 MB. No neural checkpoint was loaded.
 ```json
 {
   "mean_seconds": {
-    "ask_analyze_sec": 3.5e-05,
-    "chunk_sec": 0.000514,
-    "search_sec": 0.000984,
-    "qa_sec": 0.000498,
-    "nli_sec": 1.7e-05,
-    "e2e_sec": 0.009995
+    "ask_analyze_sec": 2.4e-05,
+    "chunk_sec": 0.000536,
+    "search_sec": 0.001011,
+    "qa_sec": 0.000446,
+    "nli_sec": 1.9e-05,
+    "e2e_sec": 0.011296
   },
-  "peak_rss_mb": 142.08,
+  "peak_rss_mb": 141.67,
   "cpu_note": "Measured on this process. RSS is peak resident set for the whole run, not a per-model load.",
   "models_loaded": []
 }
 ```
 
-Elapsed seconds: 0.1168. Peak RSS MB: 142.08.
+Elapsed seconds: 0.1245. Peak RSS MB: 141.67.
 - Scale-down: Forty short passages. Quantized ONNX and CTranslate2 runtimes from the architecture are not used.
 - Conclusion: These times are for the lexical substitutes. They are not the latency of DeBERTa, GLiNER, or FLAN-T5, which are not loaded.
 
@@ -1494,7 +1494,7 @@ Elapsed seconds: 0.1168. Peak RSS MB: 142.08.
 }
 ```
 
-Elapsed seconds: 2.2623. Peak RSS MB: 171.7.
+Elapsed seconds: 3.0143. Peak RSS MB: 170.86.
 - Scale-down: 25 real documents / 76 chunks, not a full production collection. One Reuters category, not a cross-domain mix. The blueprint's archive store is Qdrant; this POC keeps the in-memory index.
 - Conclusion: The chunker, written for lease fixtures, runs unmodified on real, open-domain news text and produces well-formed chunks with verified-substring summaries. This closes the EXP-025 todo: a real, public, non-confidential document collection is now attached and reused by EXP-029, EXP-032, and EXP-033.
 
@@ -1570,7 +1570,7 @@ Elapsed seconds: 2.2623. Peak RSS MB: 171.7.
 }
 ```
 
-Elapsed seconds: 4.6327. Peak RSS MB: 456.89.
+Elapsed seconds: 7.4689. Peak RSS MB: 456.49.
 - Scale-down: 25 real documents / 76 chunks, not a 1,000-page collection (EXP-022 on-disk index is still a separate todo). bge-small-en-v1.5, Qdrant sparse vectors, and bge-reranker-v2-m3 remain unloaded because huggingface.co is blocked by this sandbox's egress policy; see real_model_card.
 - Conclusion: The real pretrained dense leg is measured against the classical TF-IDF dense leg on the same real corpus and the same two query sets. See real_model_card in the metrics for exactly which checkpoint ran and why it is not bge-small-en-v1.5. The two tests disagree: on the substring sanity check both legs sit at the Recall@5/10 ceiling, matching EXP-004's own 'reranker lift 0.0' finding on an easy set. On the harder headline test the real pretrained static-vector leg scores lower than classical TF-IDF (Recall@5 and @10 both negative lift). A plausible reason: mean-pooling 300-d vectors over a short, all-caps wire headline likely washes out the few content words that matter, while TF-IDF's rare-term weighting keeps exact shared tokens (a name, a commodity) salient. This closes the EXP-029 rerun todo for the embeddings component -- it is no longer unrun -- but the honest result is that this particular real pretrained encoder did not outperform the classical substitute on real documents at this scale.
 
@@ -1647,7 +1647,7 @@ Elapsed seconds: 4.6327. Peak RSS MB: 456.89.
 }
 ```
 
-Elapsed seconds: 6.8893. Peak RSS MB: 509.79.
+Elapsed seconds: 8.0361. Peak RSS MB: 509.06.
 - Scale-down: 10 bridge items over 25 real documents / 76 chunks, not a HotpotQA-scale benchmark. Two-hop chains only, matching the architecture's own measured ceiling in EXP-007 (3-hop accuracy was 0 there). bge-small-en-v1.5 and deepset/deberta-v3-base-squad2 remain unloaded; see real_model_card.
 - Conclusion: This closes the EXP-032 rerun todo for multi-hop reasoning, though with a real retrieval+NER chain rather than deepset/deberta-v3-base-squad2 spans (huggingface.co is blocked in this sandbox; see real_model_card). The chain-level measurement shows where a real pretrained model stack helps and where it does not on this small real corpus: compare the per-hop rates above rather than reading a single number. All evidence in every chain is a real quote from the real document collection; no fact was invented to build these test items.
 
@@ -1708,9 +1708,58 @@ Elapsed seconds: 6.8893. Peak RSS MB: 509.79.
 }
 ```
 
-Elapsed seconds: 0.6798. Peak RSS MB: 249.68.
+Elapsed seconds: 0.6716. Peak RSS MB: 249.04.
 - Scale-down: 12 hand-labeled sentences, not a held-out annotated corpus (EXP-008 used 52 lines on the lease domain). GLiNER, dslim/bert-base-NER, and libpostal remain unloaded because huggingface.co is blocked by this sandbox's egress policy; see real_model_card. Address/GPE detection is out of scope for this head-to-head since the rule tagger has no general place category.
 - Conclusion: The rule tagger was written against lease-fixture patterns (two-capitalized-word names, Pvt Ltd/Inc suffixes, a fixed exclusion list for false positives like 'New Delhi'). On real open-domain news text it both misses organization abbreviations it has no pattern for (ZIANA, IBC, UIC, Coffee Board) and can mistag place names its exclusion list does not cover as PERSON. The real pretrained OntoNotes NER generalizes across domains without hand-written patterns, which is exactly the generalization gap FORBIDDEN.md's own substitute list predicted. This closes the EXP-033 rerun todo for entity tagging, measured with spaCy rather than GLiNER or dslim/bert-base-NER.
+
+## EXP-047 Extractive QA and answerability on the real SQuAD2 dev set
+
+- Status: `closed`
+- Models used: No model, classical or neural, is loaded by this exploration beyond lab/common/qa.py's existing lexical extractors (unchanged from EXP-005). This is a real-data rerun: the SQuAD2 dev set is real and unmodified; the method is EXP-005's own. deepset/deberta-v3-base-squad2, the blueprint's named checkpoint for this role, remains unloaded because huggingface.co is blocked in this sandbox.
+- Goal: Run the architecture's Experiment B on its actual specified data (SQuAD2 dev subset) instead of only the 40 custom items EXP-005 used, with the same lexical method so the two are directly comparable.
+- Method: Took the first 300 questions from the real, unmodified SQuAD2 dev-v2.0.json, in file order (deterministic, not sampled). Each question keeps its real context paragraph as passage A; passage B is a real distractor -- the first paragraph of a different, deterministically chosen article in the same dataset, giving every item the same two-passage shape as EXP-005's items without inventing any text. Ran the identical lab/common/qa.answer_with_agreement (unigram + bigram lexical extractors, tau=0.34) and harness.score_qa used by EXP-005. Exact match uses the dataset's first reference answer; any_reference_match additionally credits a prediction matching any of SQuAD2's multiple human reference answers for that question.
+- Referenced files:
+- `lab/exp_047_real_squad_qa/run.py`
+- `lab/common/real_squad.py`
+- `lab/common/qa.py`
+- `lab/common/harness.py`
+- `lab/common/textutil.py`
+- `data/exp_005_extractive_qa/results.json`
+- `data/exp_047_real_squad_qa/squad_subset.json`
+- `data/exp_047_real_squad_qa/items.json`
+- `data/exp_047_real_squad_qa/results.json`
+- Results: On 300 real SQuAD2 dev questions (141 answerable, 159 unanswerable), exact match on answerable items is 0.0 (any-reference-answer match 0.0142, contained-span match 0.4113). Unanswerable recall is 0.8302 (false-answer rate 0.1698). Span validity when answered is 1.0. For comparison, EXP-005's 40 hand-written items scored exact match 0.5357 and unanswerable recall 1.0.
+```json
+{
+  "data_source": "real SQuAD2 dev-v2.0.json (rajpurkar/SQuAD-explorer), unmodified Wikipedia-paragraph questions",
+  "n": 300,
+  "n_answerable": 141,
+  "n_unanswerable": 159,
+  "tau": 0.34,
+  "exact_match_on_answerable": 0.0,
+  "any_reference_match_on_answerable": 0.0142,
+  "contained_match_on_answerable": 0.4113,
+  "unanswerable_recall": 0.8302,
+  "false_answer_rate_on_unanswerable": 0.1698,
+  "missed_answer_rate": 0.9078,
+  "span_valid_rate_when_answered": 1.0,
+  "second_extractor_agreement_when_answered": 1.0,
+  "answered": 40,
+  "abstained": 260,
+  "vs_exp_005_custom_items": {
+    "exp_005_exact_match_on_answerable": 0.5357,
+    "exp_047_exact_match_on_answerable": 0.0,
+    "exp_005_unanswerable_recall": 1.0,
+    "exp_047_unanswerable_recall": 0.8302,
+    "exp_005_span_valid_rate_when_answered": 1.0,
+    "exp_047_span_valid_rate_when_answered": 1.0
+  }
+}
+```
+
+Elapsed seconds: 0.2452. Peak RSS MB: 37.57.
+- Scale-down: 300 of the dev set's roughly 12,000 questions, not the full set. One real distractor passage per question, not the 3-10 passages Experiment B specifies. No pretrained QA checkpoint is loaded (deepset/deberta-v3-base-squad2 is EXP-030, still todo, blocked on huggingface.co access).
+- Conclusion: The same lexical extractor and the same 0.34 threshold that scored well on EXP-005's clean, hand-written items falls short of the Phase 0 unanswerable-recall target on real, adversarially written SQuAD2 questions, unlike on EXP-005's custom set. SQuAD2's unanswerable questions are deliberately phrased to closely resemble an answerable one over the same passage (for example, a question that swaps 'gave their name to Normandy' for a subtly different, unsupported claim); the lexical coverage scorer has no way to tell a close paraphrase of a supported claim from an unsupported one, so it answers when it should abstain. This closes the SQuAD2 data gap that EXP-005's scale-down note flagged: the architecture's own Experiment B data spec is now exercised, with the lexical extractor as the measured method -- not a DeBERTa/RoBERTa SQuAD2 checkpoint, which EXP-030 (still todo) would require and which huggingface.co being blocked in this sandbox prevents loading.
 
 ## Follow-up todos
 

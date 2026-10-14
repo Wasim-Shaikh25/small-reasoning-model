@@ -37,6 +37,6 @@
     "data/exp_016_recall_memory/results.json"
   ],
   "follow_ups": [],
-  "elapsed_sec": 0.0125,
-  "peak_rss_mb": 13.39
+  "elapsed_sec": 0.0102,
+  "peak_rss_mb": 13.04
 }

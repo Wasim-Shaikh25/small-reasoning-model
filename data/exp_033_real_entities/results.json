@@ -59,7 +59,7 @@
     "Hand-label a larger gold sentence set (EXP-008-sized, 50+) for a more stable F1 estimate.",
     "If huggingface.co access is ever granted, rerun with GLiNER and dslim/bert-base-NER and compare against this spaCy result."
   ],
-  "elapsed_sec": 0.6798,
-  "peak_rss_mb": 249.68,
+  "elapsed_sec": 0.6716,
+  "peak_rss_mb": 249.04,
   "models_used": "Real pretrained spaCy en_core_web_sm NER (CNN tagger trained on OntoNotes 5) compared against the unmodified EXP-008 rule tagger. GLiNER, dslim/bert-base-NER, and libpostal were not loaded: huggingface.co is blocked in this sandbox (403 CONNECT, policy denial). This is a real, reachable, non-generative pretrained model, not the exact blueprint checkpoint. See lab/common/real_models.py:model_card()."
 }

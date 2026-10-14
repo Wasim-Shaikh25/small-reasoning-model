@@ -42,6 +42,6 @@
     "data/exp_001_controller/results.json"
   ],
   "follow_ups": [],
-  "elapsed_sec": 0.0499,
-  "peak_rss_mb": 142.23
+  "elapsed_sec": 1.6942,
+  "peak_rss_mb": 140.54
 }

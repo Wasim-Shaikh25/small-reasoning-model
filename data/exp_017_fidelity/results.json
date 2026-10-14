@@ -75,6 +75,6 @@
   "follow_ups": [
     "A human 1-to-5 fluency rating can be added later. It must not be replaced with a generative model."
   ],
-  "elapsed_sec": 0.0089,
-  "peak_rss_mb": 11.66
+  "elapsed_sec": 0.0052,
+  "peak_rss_mb": 11.61
 }
