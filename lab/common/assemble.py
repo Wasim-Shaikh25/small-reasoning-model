@@ -108,7 +108,7 @@ def glossary_flags(document: str, variants: dict[str, str]) -> list[dict]:
     return flags
 
 
-REWRITER_MODES = ("deterministic", "bounded_flan_t5_small")
+REWRITER_MODES = ("deterministic", "template_splice", "bounded_flan_t5_small")
 
 
 def assemble(
@@ -152,6 +152,10 @@ def assemble(
                     "checks": result["checks"],
                 }
             )
+        elif rewriter == "template_splice":
+            from lab.common.template_rewriter import splice_unit
+
+            rendered.append(splice_unit(leaf, glossary))
         else:
             rendered.append(render_unit(leaf, glossary))
         done_ids.add(leaf["leaf_id"])

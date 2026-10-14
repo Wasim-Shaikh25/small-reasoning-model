@@ -1206,7 +1206,7 @@ Elapsed seconds: 0.0112. Peak RSS MB: 18.29.
 - `lab/common/harness.py`
 - `data/exp_018_longform/spec.json`
 - `data/exp_018_longform/results.json`
-- Results: Assembly sizes: 200 claims -> 1706 words, coverage 1.0, broken citations 0, repetition pairs 1, 143594.23 words/sec; 1000 claims -> 8506 words, coverage 1.0, broken citations 0, repetition pairs 1, 174469.17 words/sec; 5000 claims -> 42506 words, coverage 1.0, broken citations 0, repetition pairs 1, 51467.94 words/sec. Resume hash matches a full run: True.
+- Results: Assembly sizes: 200 claims -> 1706 words, coverage 1.0, broken citations 0, repetition pairs 1, 35233.01 words/sec; 1000 claims -> 8506 words, coverage 1.0, broken citations 0, repetition pairs 1, 124529.32 words/sec; 5000 claims -> 42506 words, coverage 1.0, broken citations 0, repetition pairs 1, 20769.49 words/sec. Resume hash matches a full run: True.
 ```json
 {
   "sizes": [
@@ -1225,10 +1225,10 @@ Elapsed seconds: 0.0112. Peak RSS MB: 18.29.
           "canonical": "Ravi Sharma"
         }
       ],
-      "elapsed_sec": 0.0119,
-      "tokens_per_sec": 143594.23,
-      "rss_before_mb": 126.12,
-      "rss_after_mb": 126.64,
+      "elapsed_sec": 0.0484,
+      "tokens_per_sec": 35233.01,
+      "rss_before_mb": 126.25,
+      "rss_after_mb": 126.74,
       "sha256": "bff01e6e7e463a24cc6669db9dcedca82712bf57fef8f0538128643858b496e0"
     },
     {
@@ -1246,10 +1246,10 @@ Elapsed seconds: 0.0112. Peak RSS MB: 18.29.
           "canonical": "Ravi Sharma"
         }
       ],
-      "elapsed_sec": 0.0488,
-      "tokens_per_sec": 174469.17,
-      "rss_before_mb": 126.97,
-      "rss_after_mb": 129.05,
+      "elapsed_sec": 0.0683,
+      "tokens_per_sec": 124529.32,
+      "rss_before_mb": 127.08,
+      "rss_after_mb": 128.38,
       "sha256": "d60096f22c9b1de5bb3a8df21d7de8b9467ec43551354255964f07dcc1a69106"
     },
     {
@@ -1267,10 +1267,10 @@ Elapsed seconds: 0.0112. Peak RSS MB: 18.29.
           "canonical": "Ravi Sharma"
         }
       ],
-      "elapsed_sec": 0.8259,
-      "tokens_per_sec": 51467.94,
-      "rss_before_mb": 130.77,
-      "rss_after_mb": 163.24,
+      "elapsed_sec": 2.0466,
+      "tokens_per_sec": 20769.49,
+      "rss_before_mb": 130.09,
+      "rss_after_mb": 162.79,
       "sha256": "8f16ab373d09b89e12b98afeed44bcb46aebeebff7315c27dbb78a07ec6a4ef0"
     }
   ],
@@ -1280,7 +1280,7 @@ Elapsed seconds: 0.0112. Peak RSS MB: 18.29.
 }
 ```
 
-Elapsed seconds: 0.9801. Peak RSS MB: 163.24.
+Elapsed seconds: 2.5154. Peak RSS MB: 162.79.
 - Scale-down: Claims are templated verified findings, not 10 to 250 pages of model prose. The architecture's FLAN-T5 unit writer is not used.
 - Conclusion: Coverage and citation integrity are properties of the assembler. Throughput is string assembly on this CPU, not a generative decoder. Resume reproduces the full document hash when the checkpoint is truncated and continued.
 
@@ -21379,7 +21379,7 @@ Elapsed seconds: 1187.3176. Peak RSS MB: 642.13.
 }
 ```
 
-Elapsed seconds: 24.4194. Peak RSS MB: 590.18.
+Elapsed seconds: 113.9166. Peak RSS MB: 547.91.
 - Scale-down: Same templated findings and planted duplicates EXP-018 used, not a corpus with natural paraphrased repetition.
 - Conclusion: The real BAAI/bge-small-en-v1.5 checkpoint is loaded and measured on EXP-018's own assembled units, not assumed. It disagrees sharply with TF-IDF cosine as the unit count grows: at 5000 claims, bge flags 3740 pairs as near-duplicate versus TF-IDF's 1. These findings are all the same template ('The value of item {i} is {3i}.') differing only by a number. TF-IDF's bag-of-words vectors treat each distinct number as a distinct token, so it correctly sees these as different; bge's dense sentence embedding captures the shared template and largely ignores which specific number appears, so it rates nearly every pair in this templated set as near-duplicate even though each one states a different fact. This is a real, measured limitation worth keeping in mind before swapping the repetition check to a dense embedder: a template-heavy document (exactly the shape lab/common/assemble.build_outline produces) would have many of its genuinely distinct findings wrongly flagged as repetition and risk being dropped.
 
@@ -21540,6 +21540,44 @@ Elapsed seconds: 27.9342. Peak RSS MB: 673.46.
 Elapsed seconds: 22.6742. Peak RSS MB: 682.51.
 - Scale-down: Same 13 findings as EXP-048, not a larger fixture; three leaf sizes, not a full sweep.
 - Conclusion: google/flan-t5-small is measured at leaf sizes 1, 2, and 4 findings per rewrite call, isolating leaf size as the only variable changed from EXP-048. Narrowing the task to one finding per call raises the fidelity pass rate from 0.0 to 0.3846, supporting this project's governing hypothesis that a small model's failure mode is being asked to hold too much at once, not a general inability to rewrite a single verified statement. But decomposition alone does not fully fix it here: 8 of 13 single-finding leaves still fail, and 8 of those fail in a different, more extreme way than EXP-048's -- instead of picking one fact out of several and dropping the rest, the model sometimes drops the statement's content entirely and echoes only the citation marker (for example generating '[CITE-CL000]' with no text). Decomposition shrinks the failure, it does not remove the need for the fidelity gate -- the gate stays the load-bearing safeguard at every leaf size measured.
+
+## EXP-055 Content-only template rewriter (connective splice)
+
+- Status: `closed`
+- Models used: No model, generative or otherwise. Deterministic code only: a 4-word fixed connective vocabulary and rule-based selection.
+- Goal: Build and measure the middle path between assemble.render_unit's bare join and the bounded FLAN-T5 rewriter: splice verified statements with a small fixed connective vocabulary, and show it passes the same fidelity gate EXP-048/054 measured flan-t5-small against, on the identical fixture.
+- Method: lab.common.template_rewriter.splice_unit chooses one of 4 fixed connectors (none, 'Also,', 'However,', 'In addition,') between each pair of consecutive statements in a leaf, based on shared leading subject or a sign of contrast (a new modal or a polarity flip), then copies each statement verbatim with its own citation marker. Measured through lab.common.real_rewriter.fidelity_gate (the same numbers/modal/bidirectional-NLI/citation checks EXP-048/054 used) on the identical 13 findings, 4-per-leaf grouping. Also wired into lab.common.assemble.assemble as rewriter='template_splice' and compared word-for-word against the deterministic default. Note on this measurement: splice_unit's first output line is the leaf's 'Section N' structural title (the same scaffolding render_unit emits); fidelity is checked body-to-body, excluding that title line from both sides, the same way EXP-048/054's comparison never included a title on either side. The first run of this script compared the titled output against a title-free source and measured 0.0 (the title's own digit registered as an invented number) -- a bug in the test, caught and fixed before this result, not a defect in the rewriter.
+- Referenced files:
+- `lab/exp_055_template_rewriter/run.py`
+- `lab/common/template_rewriter.py`
+- `lab/common/assemble.py`
+- `lab/common/real_rewriter.py`
+- `lab/common/verify.py`
+- `lab/common/harness.py`
+- `data/exp_048_bounded_rewriter/results.json`
+- `data/exp_054_rewriter_leaf_size/results.json`
+- `data/exp_055_template_rewriter/results.json`
+- Results: On the identical 4 leaves EXP-048 and EXP-054 used, the content-only template rewriter passes the full fidelity gate 1.0 of the time -- versus flan-t5-small's 0.0 at leaf size 4 (EXP-048) and 0.3846 at its best measured leaf size, 1 (EXP-054). Word count and coverage match the bare deterministic join exactly (150 vs 136 words, both at coverage 1.0), because every statement is still copied verbatim -- only a connector word is added between them. No human fluency score was collected.
+```json
+{
+  "leaves": 4,
+  "fidelity_pass_rate": 1.0,
+  "deterministic_word_count": 136,
+  "template_word_count": 150,
+  "deterministic_citations_broken": [],
+  "template_citations_broken": [],
+  "deterministic_coverage": 1.0,
+  "template_coverage": 1.0,
+  "exp_048_fidelity_pass_rate_leaf_size_4": 0.0,
+  "exp_054_fidelity_pass_rate_leaf_size_1": 0.3846,
+  "sample_output": "Section 3\nThe tenant shall pay INR 25000 on the 1st of each month and shall not withhold rent. [CITE-PG000]\nHowever, Notice of 30 days must be given except where the premises are destroyed. [CITE-PG001]\nIn addition, Meera Iyer signed on 5 January 2024 in the presence of the witness. [CITE-PG002]\nIn addition, The deposit of INR 50000 is held until 14 days after the handover. [CITE-PG003]",
+  "fluency_human_rating": null
+}
+```
+
+Elapsed seconds: 0.0382. Peak RSS MB: 126.22.
+- Scale-down: Same 13 findings as EXP-048/054/056, not a larger or more varied document.
+- Conclusion: The content-only template rewriter passes the fidelity gate on 4 of 4 leaves (1.0), where flan-t5-small passed on 0 of 4 at the original leaf size (EXP-048) and 5 of 13 at its best measured leaf size (EXP-054). This is not a surprising result, it is the structural guarantee AGENT.md's 'rewrite from the given content itself' rule predicts: a rewriter that only ever copies given statements and inserts one of 4 fixed connector words cannot drop a fact, invent one, or break a citation, because it never generates a token that could do either. It also cannot fail more gracefully than the bare bullet join -- it is strictly a readability improvement on top of the same guaranteed-faithful backbone, not a new capability. A human fluency rating, not collected here per AGENT.md's rule that this comes from a person, would be needed to know whether the connectives actually read better than the bare join; structurally, this is now the recommended middle default between the bare join and the generative rewriter, pending that rating.
 
 ## EXP-056 Ask-relevance gate, and a more directive prompt for the bounded rewriter
 

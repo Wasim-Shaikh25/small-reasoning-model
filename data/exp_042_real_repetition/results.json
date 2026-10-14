@@ -19333,7 +19333,7 @@
   "follow_ups": [
     "A paraphrased (not verbatim) repetition probe would better separate bge from TF-IDF than this fixture does."
   ],
-  "elapsed_sec": 24.4194,
-  "peak_rss_mb": 590.18,
+  "elapsed_sec": 113.9166,
+  "peak_rss_mb": 547.91,
   "models_used": "BAAI/bge-small-en-v1.5, a local checkpoint loaded with sentence-transformers (not an API call). The unit text itself is still produced by the unchanged deterministic assembler; FLAN-T5 as the unit writer is out of scope here, per EXP-046."
 }
