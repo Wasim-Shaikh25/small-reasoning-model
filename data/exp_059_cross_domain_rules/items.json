@@ -1,0 +1,140 @@
+{
+  "verb_trigger": [
+    {
+      "id": "V01_legal",
+      "domain": "legal",
+      "rule": "If someone murders a person, it is a punishable crime.",
+      "fact": "Arjun murdered Neha.",
+      "matched": true,
+      "expect_matched": true,
+      "correct": true
+    },
+    {
+      "id": "V02_geometry",
+      "domain": "geometry",
+      "rule": "If a triangle has two equal sides, it is isosceles.",
+      "fact": "This triangle has two equal sides.",
+      "matched": true,
+      "expect_matched": true,
+      "correct": true
+    },
+    {
+      "id": "V03_cooking",
+      "domain": "cooking/allergens",
+      "rule": "If a dish contains peanuts, it is not safe for a peanut allergy.",
+      "fact": "This dish contains peanuts.",
+      "matched": true,
+      "expect_matched": true,
+      "correct": true
+    },
+    {
+      "id": "V04_traffic",
+      "domain": "traffic law",
+      "rule": "If a driver runs a red light, it is a traffic violation.",
+      "fact": "The driver ran the red light.",
+      "matched": true,
+      "expect_matched": true,
+      "correct": true
+    },
+    {
+      "id": "V05_geometry_no_match",
+      "domain": "geometry",
+      "rule": "If a triangle has two equal sides, it is isosceles.",
+      "fact": "This triangle was drawn by Priya.",
+      "matched": false,
+      "expect_matched": false,
+      "correct": true
+    },
+    {
+      "id": "V06_cooking_no_match",
+      "domain": "cooking/allergens",
+      "rule": "If a dish contains peanuts, it is not safe for a peanut allergy.",
+      "fact": "This dish was served cold.",
+      "matched": false,
+      "expect_matched": false,
+      "correct": true
+    }
+  ],
+  "threshold": [
+    {
+      "id": "T01_finance",
+      "domain": "finance",
+      "rule": "If a contractor's total billed amount exceeds INR 30000, approval is required.",
+      "value": 40000,
+      "parsed": {
+        "raw": "If a contractor's total billed amount exceeds INR 30000, approval is required.",
+        "subject_placeholder": "a contractor",
+        "metric": "total billed amount",
+        "threshold": "INR 30000",
+        "consequence": "approval is required"
+      },
+      "matched": true,
+      "expect_matched": true,
+      "correct": true
+    },
+    {
+      "id": "T02_geometry",
+      "domain": "geometry",
+      "rule": "If an angle's measure exceeds 90 degrees, it is obtuse.",
+      "value": 120,
+      "parsed": {
+        "raw": "If an angle's measure exceeds 90 degrees, it is obtuse.",
+        "subject_placeholder": "an angle",
+        "metric": "measure",
+        "threshold": "90 degrees",
+        "consequence": "it is obtuse"
+      },
+      "matched": true,
+      "expect_matched": true,
+      "correct": true
+    },
+    {
+      "id": "T03_physics",
+      "domain": "physics/traffic",
+      "rule": "If a vehicle's speed exceeds 80 km, it is a speeding violation.",
+      "value": 95,
+      "parsed": {
+        "raw": "If a vehicle's speed exceeds 80 km, it is a speeding violation.",
+        "subject_placeholder": "a vehicle",
+        "metric": "speed",
+        "threshold": "80 km",
+        "consequence": "it is a speeding violation"
+      },
+      "matched": true,
+      "expect_matched": true,
+      "correct": true
+    },
+    {
+      "id": "T04_geometry_below",
+      "domain": "geometry",
+      "rule": "If an angle's measure exceeds 90 degrees, it is obtuse.",
+      "value": 45,
+      "parsed": {
+        "raw": "If an angle's measure exceeds 90 degrees, it is obtuse.",
+        "subject_placeholder": "an angle",
+        "metric": "measure",
+        "threshold": "90 degrees",
+        "consequence": "it is obtuse"
+      },
+      "matched": false,
+      "expect_matched": false,
+      "correct": true
+    },
+    {
+      "id": "T05_finance_below",
+      "domain": "finance",
+      "rule": "If a contractor's total billed amount exceeds INR 30000, approval is required.",
+      "value": 10000,
+      "parsed": {
+        "raw": "If a contractor's total billed amount exceeds INR 30000, approval is required.",
+        "subject_placeholder": "a contractor",
+        "metric": "total billed amount",
+        "threshold": "INR 30000",
+        "consequence": "approval is required"
+      },
+      "matched": false,
+      "expect_matched": false,
+      "correct": true
+    }
+  ]
+}

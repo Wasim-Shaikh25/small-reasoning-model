@@ -1,0 +1,64 @@
+[
+  {
+    "id": "C01_contractor_reimbursement",
+    "ask": "A contractor filed a reimbursement claim in April. Who is involved, what is their name and address, how much money do they have in total this quarter, and does company policy require approval?",
+    "resolved_story": "B",
+    "matched_passage": "B4",
+    "name": "Priya Nair",
+    "address": {
+      "house_number": "9",
+      "road": "Residency Road",
+      "city": "Bengaluru",
+      "postcode": "560001"
+    },
+    "total": 40000.0,
+    "amount_sources": [
+      "B3",
+      "B4"
+    ],
+    "role_matches_policy_subject": true,
+    "policy_fires": true,
+    "citations": [
+      "B1",
+      "B3",
+      "B4",
+      "POLICY"
+    ],
+    "text": "Priya Nair [B1], Residency Road [B1]. Total this quarter: INR 40,000 [B3, B4]. Company policy [POLICY] applies (total billed amount in a quarter exceeds INR 30000): the payment requires finance head approval.",
+    "correct_story": true,
+    "correct_name": true,
+    "correct_total": true,
+    "correct_policy_outcome": true
+  },
+  {
+    "id": "C02_sales_manager_bonus",
+    "ask": "A sales manager received a performance bonus in February. Who is involved, what is their name and address, how much money do they have in total, and does company policy require approval?",
+    "resolved_story": "A",
+    "matched_passage": "A4",
+    "name": "Ravi Sharma",
+    "address": {
+      "house_number": "14",
+      "road": "MG Road",
+      "city": "Pune",
+      "postcode": "411001"
+    },
+    "total": 45000.0,
+    "amount_sources": [
+      "A3",
+      "A4"
+    ],
+    "role_matches_policy_subject": false,
+    "policy_fires": false,
+    "citations": [
+      "A1",
+      "A3",
+      "A4",
+      "POLICY"
+    ],
+    "text": "Ravi Sharma [A1], MG Road [A1]. Total this quarter: INR 45,000 [A3, A4]. Company policy [POLICY] does not apply: resolved person's role does not match the policy's subject class ('a contractor')",
+    "correct_story": true,
+    "correct_name": true,
+    "correct_total": true,
+    "correct_policy_outcome": true
+  }
+]

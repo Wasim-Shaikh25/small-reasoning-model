@@ -33,8 +33,22 @@ from __future__ import annotations
 
 import re
 
+from lab.common.calc import compare_numbers, sum_amounts
+
 RULE_RE = re.compile(
     r"^\s*if\s+(?P<subject>.+?)\s+(?P<verb_phrase>.+?),\s*(?P<consequence>.+?)\.?\s*$",
+    re.I,
+)
+
+THRESHOLD_RULE_RE = re.compile(
+    r"if\s+(?P<subject>.+?)'s\s+(?P<metric>.+?)\s+"
+    r"(?:exceeds|is (?:greater|more) than|is over|goes over)\s+"
+    # The number can be unit-prefixed ("INR 30000") or unit-suffixed ("90
+    # degrees", "3 days") -- the same two shapes textutil.NUM_RE/qa.AMOUNT_RE
+    # already both handle elsewhere in this repo. A rule shouldn't need a
+    # new regex every time the quantity's unit happens to sit on the other
+    # side of the number.
+    r"(?P<threshold>[a-z]*\s*[\d,]+(?:\.\d+)?\s*[a-z%]*)\s*,\s*(?P<consequence>.+?)\.?\s*$",
     re.I,
 )
 
@@ -108,6 +122,57 @@ def extract_fact_triple(text: str) -> dict | None:
         "verb_lemma": root.lemma_.lower(),
         "object": obj.text if obj is not None else None,
     }
+
+
+def parse_threshold_rule(text: str) -> dict | None:
+    """A second rule shape: 'if <subject>'s <metric> exceeds <threshold>, <consequence>.'
+
+    Same principle as `parse_conditional_rule`, a different trigger: instead
+    of a verb match, the trigger is a numeric comparison (lab.common.calc.
+    compare_numbers), which this project already has and already uses for
+    date/amount arithmetic (EXP-007, EXP-014). A company policy phrased this
+    way ("if a contractor's total billed amount exceeds INR 30000...") is a
+    threshold rule, not a verb-trigger rule, and needs its own parser rather
+    than forcing it through parse_conditional_rule's shape.
+    """
+    match = THRESHOLD_RULE_RE.search(text.strip())
+    if not match:
+        return None
+    return {
+        "raw": text.strip(),
+        "subject_placeholder": match.group("subject").strip(),
+        "metric": match.group("metric").strip(),
+        "threshold": match.group("threshold").strip(),
+        "consequence": match.group("consequence").strip().rstrip("."),
+    }
+
+
+def apply_threshold_rule(rule: dict, computed_value: float) -> dict:
+    """The one comparison this rule shape makes: is the computed value over the threshold."""
+    comparison = compare_numbers(str(computed_value), rule["threshold"])
+    matched = bool(comparison.get("ok")) and comparison["relation"] == "greater"
+    return {
+        "matched": matched,
+        "computed_value": computed_value,
+        "threshold": rule["threshold"],
+        "comparison": comparison,
+        "consequence": rule["consequence"] if matched else None,
+    }
+
+
+def sum_amounts_for_subject(passages: list[dict], amount_re) -> dict:
+    """Sum every amount span found across a subject's own passages (lab.common.calc.sum_amounts),
+    recording which passage each amount came from so the total stays citable, not just a number.
+    """
+    spans = []
+    sources = []
+    for passage in passages:
+        for found in amount_re.findall(passage.get("text", "")):
+            spans.append(found)
+            sources.append(passage.get("id"))
+    result = sum_amounts(spans)
+    result["sources"] = sources
+    return result
 
 
 def apply_rule(rule: dict, fact: dict) -> dict:

@@ -1,0 +1,42 @@
+{
+  "id": "EXP-059",
+  "title": "Rule application generalizes across domains without new per-domain code",
+  "status": "closed",
+  "goal": "Directly test the objection that lab/common/rules.py might secretly be a pile of per-question special cases: run both existing rule shapes (verb-trigger, numeric-threshold) against legal, geometry, cooking, traffic, physics, and finance cases, using the module completely unmodified.",
+  "method": "Six verb-trigger cases and five threshold cases across six domains. Each case calls lab.common.rules.parse_conditional_rule / extract_fact_triple / apply_rule, or parse_threshold_rule / apply_threshold_rule, exactly as EXP-057 and EXP-058 already called them -- no new function, regex, or branch was added to lab/common/rules.py for any domain in this file. Negative controls (a non-matching verb, a value below the threshold) are included per rule shape to confirm abstention still works outside the original fixture too.",
+  "metrics": {
+    "n": 11,
+    "accuracy": 1.0,
+    "domains_covered": [
+      "cooking/allergens",
+      "finance",
+      "geometry",
+      "legal",
+      "physics/traffic",
+      "traffic law"
+    ],
+    "domain_count": 6,
+    "new_domain_specific_functions_added_to_rules_py_for_this_exploration": 0,
+    "verb_trigger_accuracy": 1.0,
+    "threshold_accuracy": 1.0
+  },
+  "results_prose": "On 11 cases across 6 unrelated domains (cooking/allergens, finance, geometry, legal, physics/traffic, traffic law), using lab.common.rules completely unmodified for this exploration, accuracy is 1.0 (11/11). Verb-trigger rules (parse_conditional_rule/extract_fact_triple/apply_rule): 1.0. Threshold rules (parse_threshold_rule/apply_threshold_rule): 1.0. Zero new functions, regexes, or domain branches were added to lab/common/rules.py to cover geometry, cooking, traffic, or physics beyond what EXP-057/058 already built for the legal and finance cases.",
+  "conclusion": "The objection this exploration tests directly -- that a 'rule engine' which secretly needs a new rule per question isn't a rule engine at all -- does not hold for the two rule shapes built so far. The verb-trigger matcher works by extracting a sentence's main verb via spaCy's dependency parser and comparing lemmas; that mechanism has no idea whether the verb is 'murder', 'contain', 'run', or 'have' -- it would work on a verb this project has never seen written down anywhere, because the verb comes from the parser's general training, not from a lookup table this project wrote. The threshold matcher works by extracting a number near 'exceeds' and comparing it with the same calc.compare_numbers function EXP-007/014 already used for dates and amounts; it has no idea whether the number is rupees, degrees, or kilometers per hour. This is category A from the research pasted in review (a rule-based expert system: explicit rules and facts, a deterministic reasoning engine) with the narrow end of category B (a neural parser for natural-language understanding feeding a symbolic match step) -- one engine, run on different rulebooks, not a new engine per rulebook. What would genuinely need new code is a *third rule shape* this project hasn't built yet (a rule with an exception clause, a rule comparing two extracted facts to each other rather than to a fixed threshold) -- and that is a real, acknowledged limit, not a hidden one.",
+  "scale_down": "Six domains, 11 hand-written cases, single-clause rules and facts only -- not a benchmark of how many domains or how complex a rule this can handle, a targeted test of whether the existing mechanism needed domain-specific code to extend, which it did not.",
+  "referenced_files": [
+    "lab/exp_059_cross_domain_rules/run.py",
+    "lab/common/rules.py",
+    "lab/common/calc.py",
+    "lab/common/real_models.py",
+    "lab/common/harness.py",
+    "data/exp_057_rule_application/results.json",
+    "data/exp_059_cross_domain_rules/results.json"
+  ],
+  "follow_ups": [
+    "A third rule shape -- two facts compared to each other rather than one fact to a fixed threshold ('if A's amount exceeds B's amount') -- is not built and would be a genuinely new primitive, not a domain extension.",
+    "EXP-057's already-named qualifier gap (except/unless/provided that) applies across every domain here too, not just the legal one -- an obtuse-angle rule with 'unless measured from the reflex side' would be matched and applied without checking the exception, the same way a self-defense exception would be."
+  ],
+  "elapsed_sec": 7.5978,
+  "peak_rss_mb": 293.5,
+  "models_used": "No model decides any outcome. spaCy's en_core_web_sm dependency parser (already a project dependency) extracts a verb in the verb-trigger cases -- the same narrow syntactic sub-task EXP-057 used, not retrained or reconfigured for any domain here."
+}

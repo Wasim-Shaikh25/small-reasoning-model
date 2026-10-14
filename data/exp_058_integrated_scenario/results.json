@@ -1,0 +1,60 @@
+{
+  "id": "EXP-058",
+  "title": "Integrated scenario: disambiguation, extraction, arithmetic, and policy rule application",
+  "status": "closed",
+  "goal": "Chain multiple already-measured primitives (hybrid retrieval, entity/address extraction, amount summation, rule application) across a richer fixture than any single prior exploration: two distractor multi-sentence stories and a company policy, with a question that names only a cue, not a person, and must resolve, extract, compute, and decide correctly end to end.",
+  "method": "Two 4-5 sentence stories (Story A: Ravi Sharma, salaried sales manager; Story B: Priya Nair, contractor) plus one company policy sentence. For each case: (1) lab.common.index.Index resolves which story the ask's cue matches; (2) lab.common.entities.detect_primary and parse_address extract the resolved story's name and address; (3) lab.common.rules.sum_amounts_for_subject sums every currency-prefixed amount in that story's own passages, keeping each amount's source passage; (4) lab.common.rules.parse_threshold_rule parses the policy sentence; (5) a role check confirms the resolved person's own story text actually describes them with the policy's subject class before lab.common.rules.apply_threshold_rule is allowed to fire.",
+  "metrics": {
+    "n": 2,
+    "cases_fully_correct": 2,
+    "policy_parsed": {
+      "raw": "Company policy: if a contractor's total billed amount in a quarter exceeds INR 30000, the payment requires finance head approval.",
+      "subject_placeholder": "a contractor",
+      "metric": "total billed amount in a quarter",
+      "threshold": "INR 30000",
+      "consequence": "the payment requires finance head approval"
+    },
+    "per_check_accuracy": {
+      "correct_story": 1.0,
+      "correct_name": 1.0,
+      "correct_total": 1.0,
+      "correct_policy_outcome": 1.0
+    },
+    "cases": [
+      {
+        "id": "C01_contractor_reimbursement",
+        "correct_story": true,
+        "correct_name": true,
+        "correct_total": true,
+        "correct_policy_outcome": true
+      },
+      {
+        "id": "C02_sales_manager_bonus",
+        "correct_story": true,
+        "correct_name": true,
+        "correct_total": true,
+        "correct_policy_outcome": true
+      }
+    ]
+  },
+  "results_prose": "On 2 integrated cases, 2 get every check right (story resolution, name, total, and policy outcome). Case 1: Priya Nair [B1], Residency Road [B1]. Total this quarter: INR 40,000 [B3, B4]. Company policy [POLICY] applies (total billed amount in a quarter exceeds INR 30000): the payment requires finance head approval. Case 2: Ravi Sharma [A1], MG Road [A1]. Total this quarter: INR 45,000 [A3, A4]. Company policy [POLICY] does not apply: resolved person's role does not match the policy's subject class ('a contractor')",
+  "conclusion": "Disambiguating between two multi-sentence stories by a cue in the ask (not a name), extracting a name and address, summing money mentioned across separate sentences, and applying a company policy threshold rule all chain correctly end to end, each step citable to its own source passage. The second case is the one worth dwelling on: Ravi Sharma's total (INR 45,000) is well over the policy's INR 30,000 threshold, and a rule engine that only checked the number would have incorrectly fired approval on him. Checking that his own story actually describes him with the policy's subject role ('a contractor') -- and finding it doesn't, he's a sales manager -- is what keeps the decision correct. A rule matching a number is not the same as a rule applying to the right person.",
+  "scale_down": "Two stories, one policy, one role-class check. Real documents would have more distractors, multiple candidate policies, and roles stated less explicitly than 'is a contractor for Zenith Corp.' -- this is a scaled-down integration test of the chain, not a benchmark of its ceiling.",
+  "referenced_files": [
+    "lab/exp_058_integrated_scenario/run.py",
+    "lab/common/rules.py",
+    "lab/common/entities.py",
+    "lab/common/index.py",
+    "lab/common/calc.py",
+    "lab/common/harness.py",
+    "data/exp_057_rule_application/results.json",
+    "data/exp_058_integrated_scenario/results.json"
+  ],
+  "follow_ups": [
+    "Add a third, harder case: a story where the role noun appears but negated ('is not a contractor') or where two people in the same story could both match, to test the role check and disambiguation under more adversarial phrasing.",
+    "Wire role_matches's substring check through the NLI judge instead, now that EXP-056 showed naive wiring needs care -- measure before assuming it helps."
+  ],
+  "elapsed_sec": 0.0168,
+  "peak_rss_mb": 139.71,
+  "models_used": "No generative model. lab.common.index's hybrid retriever (TF-IDF + BM25, the same classical substitute EXP-004/015/029/040 measured) for disambiguation; lab.common.entities' rule taggers (EXP-009) for name/address; deterministic arithmetic and rule matching for the rest."
+}

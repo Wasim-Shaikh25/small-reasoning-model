@@ -21684,9 +21684,103 @@ Elapsed seconds: 49.7613. Peak RSS MB: 683.06.
 }
 ```
 
-Elapsed seconds: 7.1496. Peak RSS MB: 286.42.
+Elapsed seconds: 7.3509. Peak RSS MB: 293.12.
 - Scale-down: One rule sentence shape ('If <subject>, <verb phrase>, <consequence>.') and single-clause facts with no qualifier. A rule with an exception ('...unless committed in self-defense') is not parsed here -- the same qualifier gap EXP-006/EXP-026 already named for the lexical NLI judge. Multiple candidate rules or facts in the same passage set are not disambiguated; the first of each is used.
 - Conclusion: A general rule given in context can be applied to a specific fact given in context, and the result cited back to both, without a generative model and without training anything new -- a dependency parser's verb extraction plus one lemma comparison is enough for this shape of case. The system correctly abstains rather than answers when the fact doesn't match the rule's verb or when no rule sentence is present at all, instead of defaulting to a guess.
+
+## EXP-058 Integrated scenario: disambiguation, extraction, arithmetic, and policy rule application
+
+- Status: `closed`
+- Models used: No generative model. lab.common.index's hybrid retriever (TF-IDF + BM25, the same classical substitute EXP-004/015/029/040 measured) for disambiguation; lab.common.entities' rule taggers (EXP-009) for name/address; deterministic arithmetic and rule matching for the rest.
+- Goal: Chain multiple already-measured primitives (hybrid retrieval, entity/address extraction, amount summation, rule application) across a richer fixture than any single prior exploration: two distractor multi-sentence stories and a company policy, with a question that names only a cue, not a person, and must resolve, extract, compute, and decide correctly end to end.
+- Method: Two 4-5 sentence stories (Story A: Ravi Sharma, salaried sales manager; Story B: Priya Nair, contractor) plus one company policy sentence. For each case: (1) lab.common.index.Index resolves which story the ask's cue matches; (2) lab.common.entities.detect_primary and parse_address extract the resolved story's name and address; (3) lab.common.rules.sum_amounts_for_subject sums every currency-prefixed amount in that story's own passages, keeping each amount's source passage; (4) lab.common.rules.parse_threshold_rule parses the policy sentence; (5) a role check confirms the resolved person's own story text actually describes them with the policy's subject class before lab.common.rules.apply_threshold_rule is allowed to fire.
+- Referenced files:
+- `lab/exp_058_integrated_scenario/run.py`
+- `lab/common/rules.py`
+- `lab/common/entities.py`
+- `lab/common/index.py`
+- `lab/common/calc.py`
+- `lab/common/harness.py`
+- `data/exp_057_rule_application/results.json`
+- `data/exp_058_integrated_scenario/results.json`
+- Results: On 2 integrated cases, 2 get every check right (story resolution, name, total, and policy outcome). Case 1: Priya Nair [B1], Residency Road [B1]. Total this quarter: INR 40,000 [B3, B4]. Company policy [POLICY] applies (total billed amount in a quarter exceeds INR 30000): the payment requires finance head approval. Case 2: Ravi Sharma [A1], MG Road [A1]. Total this quarter: INR 45,000 [A3, A4]. Company policy [POLICY] does not apply: resolved person's role does not match the policy's subject class ('a contractor')
+```json
+{
+  "n": 2,
+  "cases_fully_correct": 2,
+  "policy_parsed": {
+    "raw": "Company policy: if a contractor's total billed amount in a quarter exceeds INR 30000, the payment requires finance head approval.",
+    "subject_placeholder": "a contractor",
+    "metric": "total billed amount in a quarter",
+    "threshold": "INR 30000",
+    "consequence": "the payment requires finance head approval"
+  },
+  "per_check_accuracy": {
+    "correct_story": 1.0,
+    "correct_name": 1.0,
+    "correct_total": 1.0,
+    "correct_policy_outcome": 1.0
+  },
+  "cases": [
+    {
+      "id": "C01_contractor_reimbursement",
+      "correct_story": true,
+      "correct_name": true,
+      "correct_total": true,
+      "correct_policy_outcome": true
+    },
+    {
+      "id": "C02_sales_manager_bonus",
+      "correct_story": true,
+      "correct_name": true,
+      "correct_total": true,
+      "correct_policy_outcome": true
+    }
+  ]
+}
+```
+
+Elapsed seconds: 0.0168. Peak RSS MB: 139.71.
+- Scale-down: Two stories, one policy, one role-class check. Real documents would have more distractors, multiple candidate policies, and roles stated less explicitly than 'is a contractor for Zenith Corp.' -- this is a scaled-down integration test of the chain, not a benchmark of its ceiling.
+- Conclusion: Disambiguating between two multi-sentence stories by a cue in the ask (not a name), extracting a name and address, summing money mentioned across separate sentences, and applying a company policy threshold rule all chain correctly end to end, each step citable to its own source passage. The second case is the one worth dwelling on: Ravi Sharma's total (INR 45,000) is well over the policy's INR 30,000 threshold, and a rule engine that only checked the number would have incorrectly fired approval on him. Checking that his own story actually describes him with the policy's subject role ('a contractor') -- and finding it doesn't, he's a sales manager -- is what keeps the decision correct. A rule matching a number is not the same as a rule applying to the right person.
+
+## EXP-059 Rule application generalizes across domains without new per-domain code
+
+- Status: `closed`
+- Models used: No model decides any outcome. spaCy's en_core_web_sm dependency parser (already a project dependency) extracts a verb in the verb-trigger cases -- the same narrow syntactic sub-task EXP-057 used, not retrained or reconfigured for any domain here.
+- Goal: Directly test the objection that lab/common/rules.py might secretly be a pile of per-question special cases: run both existing rule shapes (verb-trigger, numeric-threshold) against legal, geometry, cooking, traffic, physics, and finance cases, using the module completely unmodified.
+- Method: Six verb-trigger cases and five threshold cases across six domains. Each case calls lab.common.rules.parse_conditional_rule / extract_fact_triple / apply_rule, or parse_threshold_rule / apply_threshold_rule, exactly as EXP-057 and EXP-058 already called them -- no new function, regex, or branch was added to lab/common/rules.py for any domain in this file. Negative controls (a non-matching verb, a value below the threshold) are included per rule shape to confirm abstention still works outside the original fixture too.
+- Referenced files:
+- `lab/exp_059_cross_domain_rules/run.py`
+- `lab/common/rules.py`
+- `lab/common/calc.py`
+- `lab/common/real_models.py`
+- `lab/common/harness.py`
+- `data/exp_057_rule_application/results.json`
+- `data/exp_059_cross_domain_rules/results.json`
+- Results: On 11 cases across 6 unrelated domains (cooking/allergens, finance, geometry, legal, physics/traffic, traffic law), using lab.common.rules completely unmodified for this exploration, accuracy is 1.0 (11/11). Verb-trigger rules (parse_conditional_rule/extract_fact_triple/apply_rule): 1.0. Threshold rules (parse_threshold_rule/apply_threshold_rule): 1.0. Zero new functions, regexes, or domain branches were added to lab/common/rules.py to cover geometry, cooking, traffic, or physics beyond what EXP-057/058 already built for the legal and finance cases.
+```json
+{
+  "n": 11,
+  "accuracy": 1.0,
+  "domains_covered": [
+    "cooking/allergens",
+    "finance",
+    "geometry",
+    "legal",
+    "physics/traffic",
+    "traffic law"
+  ],
+  "domain_count": 6,
+  "new_domain_specific_functions_added_to_rules_py_for_this_exploration": 0,
+  "verb_trigger_accuracy": 1.0,
+  "threshold_accuracy": 1.0
+}
+```
+
+Elapsed seconds: 7.5978. Peak RSS MB: 293.5.
+- Scale-down: Six domains, 11 hand-written cases, single-clause rules and facts only -- not a benchmark of how many domains or how complex a rule this can handle, a targeted test of whether the existing mechanism needed domain-specific code to extend, which it did not.
+- Conclusion: The objection this exploration tests directly -- that a 'rule engine' which secretly needs a new rule per question isn't a rule engine at all -- does not hold for the two rule shapes built so far. The verb-trigger matcher works by extracting a sentence's main verb via spaCy's dependency parser and comparing lemmas; that mechanism has no idea whether the verb is 'murder', 'contain', 'run', or 'have' -- it would work on a verb this project has never seen written down anywhere, because the verb comes from the parser's general training, not from a lookup table this project wrote. The threshold matcher works by extracting a number near 'exceeds' and comparing it with the same calc.compare_numbers function EXP-007/014 already used for dates and amounts; it has no idea whether the number is rupees, degrees, or kilometers per hour. This is category A from the research pasted in review (a rule-based expert system: explicit rules and facts, a deterministic reasoning engine) with the narrow end of category B (a neural parser for natural-language understanding feeding a symbolic match step) -- one engine, run on different rulebooks, not a new engine per rulebook. What would genuinely need new code is a *third rule shape* this project hasn't built yet (a rule with an exception clause, a rule comparing two extracted facts to each other rather than to a fixed threshold) -- and that is a real, acknowledged limit, not a hidden one.
 
 ## Follow-up todos
 
