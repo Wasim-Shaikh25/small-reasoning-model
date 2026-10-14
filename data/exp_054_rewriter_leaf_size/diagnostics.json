@@ -1,0 +1,266 @@
+[
+  {
+    "leaf_id": "L0000",
+    "leaf_size": 1,
+    "findings_in_leaf": 1,
+    "used_generative": false,
+    "fallback_reason": [
+      "numbers",
+      "nli"
+    ],
+    "generated_text": "[CITE-CL000]"
+  },
+  {
+    "leaf_id": "L0001",
+    "leaf_size": 1,
+    "findings_in_leaf": 1,
+    "used_generative": true,
+    "fallback_reason": null,
+    "generated_text": "The security deposit is INR 50000. [CITE-CL001]"
+  },
+  {
+    "leaf_id": "L0002",
+    "leaf_size": 1,
+    "findings_in_leaf": 1,
+    "used_generative": true,
+    "fallback_reason": null,
+    "generated_text": "Ravi Sharma is the Lessee. [CITE-CL002]"
+  },
+  {
+    "leaf_id": "L0003",
+    "leaf_size": 1,
+    "findings_in_leaf": 1,
+    "used_generative": false,
+    "fallback_reason": [
+      "numbers",
+      "nli"
+    ],
+    "generated_text": "[CITE-CL003]"
+  },
+  {
+    "leaf_id": "L0004",
+    "leaf_size": 1,
+    "findings_in_leaf": 1,
+    "used_generative": false,
+    "fallback_reason": [
+      "modal",
+      "nli"
+    ],
+    "generated_text": "[CITE-CL004]"
+  },
+  {
+    "leaf_id": "L0005",
+    "leaf_size": 1,
+    "findings_in_leaf": 1,
+    "used_generative": false,
+    "fallback_reason": [
+      "numbers",
+      "nli"
+    ],
+    "generated_text": "[CITE-CL005]"
+  },
+  {
+    "leaf_id": "L0006",
+    "leaf_size": 1,
+    "findings_in_leaf": 1,
+    "used_generative": false,
+    "fallback_reason": [
+      "numbers",
+      "nli"
+    ],
+    "generated_text": "[CITE-CL006]"
+  },
+  {
+    "leaf_id": "L0007",
+    "leaf_size": 1,
+    "findings_in_leaf": 1,
+    "used_generative": true,
+    "fallback_reason": null,
+    "generated_text": "ABC Pvt Ltd is the Lessor. [CITE-CL007]"
+  },
+  {
+    "leaf_id": "L0008",
+    "leaf_size": 1,
+    "findings_in_leaf": 1,
+    "used_generative": true,
+    "fallback_reason": null,
+    "generated_text": "The tenant shall pay INR 25000 on the 1st of each month and shall not withhold rent. [CITE-PG000]"
+  },
+  {
+    "leaf_id": "L0009",
+    "leaf_size": 1,
+    "findings_in_leaf": 1,
+    "used_generative": false,
+    "fallback_reason": [
+      "numbers",
+      "modal",
+      "nli"
+    ],
+    "generated_text": "[CITE-PG001]"
+  },
+  {
+    "leaf_id": "L0010",
+    "leaf_size": 1,
+    "findings_in_leaf": 1,
+    "used_generative": true,
+    "fallback_reason": null,
+    "generated_text": "Meera Iyer signed on 5 January 2024 in the presence of the witness. [CITE-PG002]"
+  },
+  {
+    "leaf_id": "L0011",
+    "leaf_size": 1,
+    "findings_in_leaf": 1,
+    "used_generative": false,
+    "fallback_reason": [
+      "numbers",
+      "nli"
+    ],
+    "generated_text": "[CITE-PG003]"
+  },
+  {
+    "leaf_id": "L0012",
+    "leaf_size": 1,
+    "findings_in_leaf": 1,
+    "used_generative": false,
+    "fallback_reason": [
+      "numbers",
+      "modal",
+      "nli"
+    ],
+    "generated_text": "[CITE-PG004]"
+  },
+  {
+    "leaf_id": "L0000",
+    "leaf_size": 2,
+    "findings_in_leaf": 2,
+    "used_generative": false,
+    "fallback_reason": [
+      "numbers",
+      "nli",
+      "citations"
+    ],
+    "generated_text": "The security deposit is INR 50000. [CITE-CL001]"
+  },
+  {
+    "leaf_id": "L0002",
+    "leaf_size": 2,
+    "findings_in_leaf": 2,
+    "used_generative": false,
+    "fallback_reason": [
+      "nli",
+      "citations"
+    ],
+    "generated_text": "The lease was signed on 5 January 2024. [CITE-CL003]"
+  },
+  {
+    "leaf_id": "L0004",
+    "leaf_size": 2,
+    "findings_in_leaf": 2,
+    "used_generative": false,
+    "fallback_reason": [
+      "modal",
+      "nli",
+      "citations"
+    ],
+    "generated_text": "The rent is INR 25000. [CITE-CL005]"
+  },
+  {
+    "leaf_id": "L0006",
+    "leaf_size": 2,
+    "findings_in_leaf": 2,
+    "used_generative": false,
+    "fallback_reason": [
+      "numbers",
+      "nli",
+      "citations"
+    ],
+    "generated_text": "ABC Pvt Ltd is the Lessor. [CITE-CL007]"
+  },
+  {
+    "leaf_id": "L0008",
+    "leaf_size": 2,
+    "findings_in_leaf": 2,
+    "used_generative": false,
+    "fallback_reason": [
+      "numbers",
+      "modal",
+      "nli",
+      "citations"
+    ],
+    "generated_text": "The tenant shall pay INR 25000 on the 1st of each month and shall not withhold rent. [CITE-PG000]"
+  },
+  {
+    "leaf_id": "L0010",
+    "leaf_size": 2,
+    "findings_in_leaf": 2,
+    "used_generative": false,
+    "fallback_reason": [
+      "numbers",
+      "nli",
+      "citations"
+    ],
+    "generated_text": "The deposit of INR 50000 is held until 14 days after the handover."
+  },
+  {
+    "leaf_id": "L0012",
+    "leaf_size": 2,
+    "findings_in_leaf": 1,
+    "used_generative": false,
+    "fallback_reason": [
+      "numbers",
+      "modal",
+      "nli"
+    ],
+    "generated_text": "[CITE-PG004]"
+  },
+  {
+    "leaf_id": "L0000",
+    "leaf_size": 4,
+    "findings_in_leaf": 4,
+    "used_generative": false,
+    "fallback_reason": [
+      "numbers",
+      "nli",
+      "citations"
+    ],
+    "generated_text": "The lease was signed on 5 January 2024. [CITE-CL003]"
+  },
+  {
+    "leaf_id": "L0004",
+    "leaf_size": 4,
+    "findings_in_leaf": 4,
+    "used_generative": false,
+    "fallback_reason": [
+      "numbers",
+      "modal",
+      "nli",
+      "citations"
+    ],
+    "generated_text": "ABC Pvt Ltd is the Lessor. [CITE-CL007]"
+  },
+  {
+    "leaf_id": "L0008",
+    "leaf_size": 4,
+    "findings_in_leaf": 4,
+    "used_generative": false,
+    "fallback_reason": [
+      "numbers",
+      "modal",
+      "nli",
+      "citations"
+    ],
+    "generated_text": "The tenant shall pay INR 25000 on the 1st of each month and shall not withhold rent. [CITE-PG003]"
+  },
+  {
+    "leaf_id": "L0012",
+    "leaf_size": 4,
+    "findings_in_leaf": 1,
+    "used_generative": false,
+    "fallback_reason": [
+      "numbers",
+      "modal",
+      "nli"
+    ],
+    "generated_text": "[CITE-PG004]"
+  }
+]

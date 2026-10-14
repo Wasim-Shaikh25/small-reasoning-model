@@ -21495,6 +21495,52 @@ Elapsed seconds: 19.075. Peak RSS MB: 670.21.
 - Scale-down: 13 findings across 4 leaves, not a full document. The same small fixture EXP-017 used, chosen so fidelity numbers are directly comparable, not a large or adversarial rewriting benchmark. No CTranslate2 int8 conversion (ARCHITECTURE.md section 8/14, EXP-045) -- plain transformers inference only, as the handoff asked for first.
 - Conclusion: The bounded rewriter exception is implemented and measured, not assumed: google/flan-t5-small is loaded locally (no API call), used only to rewrite findings this run already treats as verified, and every output goes through the same fidelity checks EXP-017 validated on the deterministic path before this run accepts it. The gate caught and discarded 4 of 4 rewrites (1.0 fallback rate), for the reasons counted above. Inspecting the generated text (not stored in results.json, re-run with a debug print to reproduce) shows a consistent failure mode, not hallucination: on every leaf flan-t5-small collapsed the 4 verified statements down to a near-copy of just one of them, silently dropping the other three findings' numbers, names, and citation markers instead of inventing new ones. That is exactly the failure the fidelity gate (entity_number_check plus citation survival) is built to catch, and it caught it every time -- a failing rewrite was replaced, never partially accepted. At this prompt and this checkpoint size, the gate's job is less about guarding against invention and more about guarding against silent omission. Extraction and verification are unaffected: this checkpoint never touched the QA extractor or the NLI judge, only text that those components had already verified.
 
+## EXP-054 Does narrowing the rewriter's task size prevent EXP-048's collapse?
+
+- Status: `closed`
+- Models used: google/flan-t5-small, the same local checkpoint EXP-048 measured. Rewriter role only, fidelity-gated, identical to EXP-048's contract.
+- Goal: Test whether EXP-048's fidelity failure (flan-t5-small collapsing 4 findings to a near-copy of 1) is a leaf-size problem -- i.e. whether bounding the model to fewer findings per call raises the fidelity pass rate, as this project's decomposition-over-capacity design principle predicts.
+- Method: Identical checkpoint, fixture, and fidelity gate as EXP-048 (same 13 claims/paragraphs, same lab.common.real_rewriter.rewrite_unit). The only variable changed is how many findings are grouped into each leaf before one rewrite call: 1, 2, or 4 (EXP-048's original grouping).
+- Referenced files:
+- `lab/exp_054_rewriter_leaf_size/run.py`
+- `lab/common/real_rewriter.py`
+- `lab/common/assemble.py`
+- `lab/common/harness.py`
+- `data/exp_048_bounded_rewriter/results.json`
+- `data/exp_054_rewriter_leaf_size/results.json`
+- Results: Fidelity pass rate by leaf size on the identical 13 findings EXP-048 used: 1 finding(s)/leaf -> 0.3846, 2 finding(s)/leaf -> 0.0, 4 finding(s)/leaf -> 0.0.
+```json
+{
+  "model": "google/flan-t5-small",
+  "by_leaf_size": {
+    "1": {
+      "leaves": 13,
+      "fidelity_pass_rate": 0.3846,
+      "fallback_rate": 0.6154
+    },
+    "2": {
+      "leaves": 7,
+      "fidelity_pass_rate": 0.0,
+      "fallback_rate": 1.0
+    },
+    "4": {
+      "leaves": 4,
+      "fidelity_pass_rate": 0.0,
+      "fallback_rate": 1.0
+    }
+  },
+  "exp_048_leaf_size_4_fidelity_pass_rate": 0.0,
+  "leaf_size_1_residual_failure_mode": {
+    "failures": 8,
+    "dropped_statement_kept_only_citation": 8
+  }
+}
+```
+
+Elapsed seconds: 22.6742. Peak RSS MB: 682.51.
+- Scale-down: Same 13 findings as EXP-048, not a larger fixture; three leaf sizes, not a full sweep.
+- Conclusion: google/flan-t5-small is measured at leaf sizes 1, 2, and 4 findings per rewrite call, isolating leaf size as the only variable changed from EXP-048. Narrowing the task to one finding per call raises the fidelity pass rate from 0.0 to 0.3846, supporting this project's governing hypothesis that a small model's failure mode is being asked to hold too much at once, not a general inability to rewrite a single verified statement. But decomposition alone does not fully fix it here: 8 of 13 single-finding leaves still fail, and 8 of those fail in a different, more extreme way than EXP-048's -- instead of picking one fact out of several and dropping the rest, the model sometimes drops the statement's content entirely and echoes only the citation marker (for example generating '[CITE-CL000]' with no text). Decomposition shrinks the failure, it does not remove the need for the fidelity gate -- the gate stays the load-bearing safeguard at every leaf size measured.
+
 ## Follow-up todos
 
 ## EXP-022 On-disk hybrid index
@@ -21639,6 +21685,24 @@ Elapsed seconds: 19.075. Peak RSS MB: 670.21.
 
 - Scale-down: 
 - Conclusion: Todo. Depends on EXP-052's outline existing first, so there are multiple pages worth checking against each other.
+
+## EXP-055 Content-only template rewriter (connective splice, no generative model)
+
+- Status: `todo`
+- Models used: Deterministic code only: a small fixed connective-word table and rule-based selection (shared subject, number contrast, sequence). No model, generative or otherwise.
+- Goal: Build a middle path between lab/common/assemble.render_unit's bare 'statement [citation]' join and the bounded FLAN-T5 rewriter (EXP-048): splice verified statements into one paragraph using only a small fixed connective vocabulary (and, in addition, separately, however) chosen by simple rules (shared subject, number contrast, sequence), never generating a token outside that fixed vocabulary and the statements themselves. EXP-054 measured that even a single-fact generative rewrite can drop the given content outright (producing only the citation marker); a connective-splice rewriter cannot do that, because it has no mechanism to omit or invent -- it only ever rearranges and lightly joins the exact given content, per AGENT.md's 'rewrite from the given content itself' rule.
+- Method: Not run.
+- Referenced files:
+- `lab/common/assemble.py`
+- `lab/common/real_rewriter.py`
+- `data/exp_048_bounded_rewriter/results.json`
+- `data/exp_054_rewriter_leaf_size/results.json`
+- `AGENT.md`
+- Results: Not run.
+
+
+- Scale-down: 
+- Conclusion: Todo. A candidate default rewrite mode, ahead of the generative one, once built and measured against EXP-017's fidelity checks.
 
 ## Proposed-model reruns
 
