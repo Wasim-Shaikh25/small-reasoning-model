@@ -1,0 +1,172 @@
+[
+  {
+    "id": "E01_legal_exact",
+    "domain": "legal",
+    "kind": "exact_phrasing",
+    "rule": "If someone murders a person, it is a punishable crime.",
+    "fact": "Arjun murdered Neha.",
+    "expect": true,
+    "exact_matched": true,
+    "exact_correct": true,
+    "semantic_matched": true,
+    "semantic_nli": {
+      "entail": 0.9848,
+      "neutral": 0.0144,
+      "contradict": 0.0008
+    },
+    "semantic_correct": true
+  },
+  {
+    "id": "E02_theft_exact",
+    "domain": "theft",
+    "kind": "exact_phrasing",
+    "rule": "If a person steals property, it is a punishable offense.",
+    "fact": "Priya stole the necklace.",
+    "expect": true,
+    "exact_matched": true,
+    "exact_correct": true,
+    "semantic_matched": true,
+    "semantic_nli": {
+      "entail": 0.9809,
+      "neutral": 0.0183,
+      "contradict": 0.0008
+    },
+    "semantic_correct": true
+  },
+  {
+    "id": "P01_legal_paraphrase",
+    "domain": "legal",
+    "kind": "paraphrase",
+    "rule": "If someone murders a person, it is a punishable crime.",
+    "fact": "Arjun unlawfully took Neha's life.",
+    "expect": true,
+    "exact_matched": false,
+    "exact_correct": false,
+    "semantic_matched": true,
+    "semantic_nli": {
+      "entail": 0.7959,
+      "neutral": 0.2004,
+      "contradict": 0.0038
+    },
+    "semantic_correct": true
+  },
+  {
+    "id": "P02_theft_paraphrase",
+    "domain": "theft",
+    "kind": "paraphrase",
+    "rule": "If a person steals property, it is a punishable offense.",
+    "fact": "Priya secretly took the necklace without permission and kept it for herself.",
+    "expect": true,
+    "exact_matched": false,
+    "exact_correct": false,
+    "semantic_matched": true,
+    "semantic_nli": {
+      "entail": 0.8751,
+      "neutral": 0.1233,
+      "contradict": 0.0016
+    },
+    "semantic_correct": true
+  },
+  {
+    "id": "P03_cooking_paraphrase",
+    "domain": "cooking/allergens",
+    "kind": "paraphrase",
+    "rule": "If a dish contains peanuts, it is not safe for a peanut allergy.",
+    "fact": "The dish includes ground peanuts as an ingredient.",
+    "expect": true,
+    "exact_matched": false,
+    "exact_correct": false,
+    "semantic_matched": true,
+    "semantic_nli": {
+      "entail": 0.9959,
+      "neutral": 0.0037,
+      "contradict": 0.0004
+    },
+    "semantic_correct": true
+  },
+  {
+    "id": "P04_geometry_paraphrase",
+    "domain": "geometry",
+    "kind": "paraphrase",
+    "rule": "If a triangle has two equal sides, it is isosceles.",
+    "fact": "This triangle's two sides are of identical length.",
+    "expect": true,
+    "exact_matched": false,
+    "exact_correct": false,
+    "semantic_matched": true,
+    "semantic_nli": {
+      "entail": 0.9713,
+      "neutral": 0.0275,
+      "contradict": 0.0012
+    },
+    "semantic_correct": true
+  },
+  {
+    "id": "N01_legal_unrelated",
+    "domain": "legal",
+    "kind": "unrelated",
+    "rule": "If someone murders a person, it is a punishable crime.",
+    "fact": "Arjun paid Neha back the money he had borrowed.",
+    "expect": false,
+    "exact_matched": false,
+    "exact_correct": true,
+    "semantic_matched": false,
+    "semantic_nli": {
+      "entail": 0.0005,
+      "neutral": 0.1193,
+      "contradict": 0.8801
+    },
+    "semantic_correct": true
+  },
+  {
+    "id": "N02_theft_unrelated",
+    "domain": "theft",
+    "kind": "unrelated",
+    "rule": "If a person steals property, it is a punishable offense.",
+    "fact": "Priya donated the necklace to a charity auction.",
+    "expect": false,
+    "exact_matched": false,
+    "exact_correct": true,
+    "semantic_matched": false,
+    "semantic_nli": {
+      "entail": 0.0002,
+      "neutral": 0.0017,
+      "contradict": 0.9981
+    },
+    "semantic_correct": true
+  },
+  {
+    "id": "M01_legal_near_miss",
+    "domain": "legal",
+    "kind": "near_miss",
+    "rule": "If someone murders a person, it is a punishable crime.",
+    "fact": "Arjun seriously injured Neha in a car accident.",
+    "expect": false,
+    "exact_matched": false,
+    "exact_correct": true,
+    "semantic_matched": false,
+    "semantic_nli": {
+      "entail": 0.0012,
+      "neutral": 0.3954,
+      "contradict": 0.6035
+    },
+    "semantic_correct": true
+  },
+  {
+    "id": "M02_cooking_near_miss",
+    "domain": "cooking/allergens",
+    "kind": "near_miss",
+    "rule": "If a dish contains peanuts, it is not safe for a peanut allergy.",
+    "fact": "The dish was prepared in a kitchen that also handles peanuts.",
+    "expect": false,
+    "exact_matched": false,
+    "exact_correct": true,
+    "semantic_matched": true,
+    "semantic_nli": {
+      "entail": 0.9656,
+      "neutral": 0.0331,
+      "contradict": 0.0013
+    },
+    "semantic_correct": false
+  }
+]

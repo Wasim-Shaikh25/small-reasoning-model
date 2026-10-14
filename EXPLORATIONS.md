@@ -21684,7 +21684,7 @@ Elapsed seconds: 49.7613. Peak RSS MB: 683.06.
 }
 ```
 
-Elapsed seconds: 5.1671. Peak RSS MB: 292.98.
+Elapsed seconds: 5.6702. Peak RSS MB: 292.88.
 - Scale-down: One rule sentence shape ('If <subject>, <verb phrase>, <consequence>.') and single-clause facts with no qualifier. A rule with an exception ('...unless committed in self-defense') is not parsed here -- the same qualifier gap EXP-006/EXP-026 already named for the lexical NLI judge. Multiple candidate rules or facts in the same passage set are not disambiguated; the first of each is used.
 - Conclusion: A general rule given in context can be applied to a specific fact given in context, and the result cited back to both, without a generative model and without training anything new -- a dependency parser's verb extraction plus one lemma comparison is enough for this shape of case. The system correctly abstains rather than answers when the fact doesn't match the rule's verb or when no rule sentence is present at all, instead of defaulting to a guess.
 
@@ -21740,7 +21740,7 @@ Elapsed seconds: 5.1671. Peak RSS MB: 292.98.
 }
 ```
 
-Elapsed seconds: 0.0075. Peak RSS MB: 139.84.
+Elapsed seconds: 0.0216. Peak RSS MB: 139.74.
 - Scale-down: Two stories, one policy, one role-class check. Real documents would have more distractors, multiple candidate policies, and roles stated less explicitly than 'is a contractor for Zenith Corp.' -- this is a scaled-down integration test of the chain, not a benchmark of its ceiling.
 - Conclusion: Disambiguating between two multi-sentence stories by a cue in the ask (not a name), extracting a name and address, summing money mentioned across separate sentences, and applying a company policy threshold rule all chain correctly end to end, each step citable to its own source passage. The second case is the one worth dwelling on: Ravi Sharma's total (INR 45,000) is well over the policy's INR 30,000 threshold, and a rule engine that only checked the number would have incorrectly fired approval on him. Checking that his own story actually describes him with the policy's subject role ('a contractor') -- and finding it doesn't, he's a sales manager -- is what keeps the decision correct. A rule matching a number is not the same as a rule applying to the right person.
 
@@ -21778,7 +21778,7 @@ Elapsed seconds: 0.0075. Peak RSS MB: 139.84.
 }
 ```
 
-Elapsed seconds: 9.1666. Peak RSS MB: 293.0.
+Elapsed seconds: 4.9969. Peak RSS MB: 292.8.
 - Scale-down: Six domains, 11 hand-written cases, single-clause rules and facts only -- not a benchmark of how many domains or how complex a rule this can handle, a targeted test of whether the existing mechanism needed domain-specific code to extend, which it did not.
 - Conclusion: The objection this exploration tests directly -- that a 'rule engine' which secretly needs a new rule per question isn't a rule engine at all -- does not hold for the two rule shapes built so far. The verb-trigger matcher works by extracting a sentence's main verb via spaCy's dependency parser and comparing lemmas; that mechanism has no idea whether the verb is 'murder', 'contain', 'run', or 'have' -- it would work on a verb this project has never seen written down anywhere, because the verb comes from the parser's general training, not from a lookup table this project wrote. The threshold matcher works by extracting a number near 'exceeds' and comparing it with the same calc.compare_numbers function EXP-007/014 already used for dates and amounts; it has no idea whether the number is rupees, degrees, or kilometers per hour. This is category A from the research pasted in review (a rule-based expert system: explicit rules and facts, a deterministic reasoning engine) with the narrow end of category B (a neural parser for natural-language understanding feeding a symbolic match step) -- one engine, run on different rulebooks, not a new engine per rulebook. What would genuinely need new code is a *third rule shape* this project hasn't built yet (a rule with an exception clause, a rule comparing two extracted facts to each other rather than to a fixed threshold) -- and that is a real, acknowledged limit, not a hidden one.
 
@@ -21893,9 +21893,131 @@ Elapsed seconds: 9.1666. Peak RSS MB: 293.0.
 }
 ```
 
-Elapsed seconds: 4.72. Peak RSS MB: 385.41.
+Elapsed seconds: 4.8751. Peak RSS MB: 385.39.
 - Scale-down: 8 cases across 3 regimes, not a benchmark of the brain's ceiling -- a targeted test that the single entry point reproduces every prior exploration's answer without per-case wiring.
 - Conclusion: One function handles a plain lookup, a rule-application question, and a multi-signal integrated scenario without the caller choosing a path. The difference between regimes shows up only in the trace -- which internal signal checks fired -- never in which function was called or how it was called. A lookup question fires none of the extra signals and falls back to the same single-slot extractor lab.common.engine already uses; the integrated cases fire three signals at once and chain their results. This is the unification the prior three explorations (EXP-057/058/059) proved piece by piece, now proved as one entry point rather than three scripts a person chooses between.
+
+## EXP-061 Semantic (NLI) rule matching survives paraphrase where exact-lemma matching fails
+
+- Status: `closed`
+- Models used: MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli, a local checkpoint loaded with transformers (not an API call), the same real NLI judge EXP-031 measured. Used here for one bounded judgment (does this fact entail this rule's condition), not as a general-purpose reasoner.
+- Goal: Directly test the objection that lab/common/rules.py's exact-lemma matching only works on sentences phrased to match its own pattern, not on a messy real document's own wording, and measure whether real NLI entailment (semantic_apply_rule) closes that gap without costing accuracy on the harder near-miss cases.
+- Method: 10 cases across 4 domains and 4 kinds: exact-phrasing baselines, genuine paraphrases (the fact shares no verb lemma with the rule but means the same thing), unrelated negative controls, and near-miss controls (related but insufficient to satisfy the rule). Each case is scored by both lab.common.rules.apply_rule (exact lemma equality) and the new lab.common.rules.semantic_apply_rule (one-directional NLI entailment from the fact to the rule's condition clause, using MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli, the same checkpoint EXP-031/041/056 already measured).
+- Referenced files:
+- `lab/exp_061_semantic_rule_matching/run.py`
+- `lab/common/rules.py`
+- `lab/common/real_encoders.py`
+- `lab/common/harness.py`
+- `data/exp_057_rule_application/results.json`
+- `data/exp_059_cross_domain_rules/results.json`
+- `data/exp_061_semantic_rule_matching/results.json`
+- Results: Overall: exact-lemma matching 0.6, semantic (NLI) matching 0.9 on 10 cases. By kind -- exact phrasing (both should agree): exact 1.0, semantic 1.0. Paraphrase (the real test, no shared verb lemma): exact 0.0, semantic 1.0. Unrelated facts (negative control): exact 1.0, semantic 1.0. Near-miss (related but doesn't actually satisfy the condition, the hardest case): exact 1.0, semantic 0.5.
+```json
+{
+  "model": "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli",
+  "n": 10,
+  "exact_overall_accuracy": 0.6,
+  "semantic_overall_accuracy": 0.9,
+  "by_kind": {
+    "exact_phrasing": {
+      "n": 2,
+      "exact_accuracy": 1.0,
+      "semantic_accuracy": 1.0
+    },
+    "paraphrase": {
+      "n": 4,
+      "exact_accuracy": 0.0,
+      "semantic_accuracy": 1.0
+    },
+    "unrelated": {
+      "n": 2,
+      "exact_accuracy": 1.0,
+      "semantic_accuracy": 1.0
+    },
+    "near_miss": {
+      "n": 2,
+      "exact_accuracy": 1.0,
+      "semantic_accuracy": 0.5
+    }
+  },
+  "cases": [
+    {
+      "id": "E01_legal_exact",
+      "kind": "exact_phrasing",
+      "expect": true,
+      "exact_matched": true,
+      "semantic_matched": true
+    },
+    {
+      "id": "E02_theft_exact",
+      "kind": "exact_phrasing",
+      "expect": true,
+      "exact_matched": true,
+      "semantic_matched": true
+    },
+    {
+      "id": "P01_legal_paraphrase",
+      "kind": "paraphrase",
+      "expect": true,
+      "exact_matched": false,
+      "semantic_matched": true
+    },
+    {
+      "id": "P02_theft_paraphrase",
+      "kind": "paraphrase",
+      "expect": true,
+      "exact_matched": false,
+      "semantic_matched": true
+    },
+    {
+      "id": "P03_cooking_paraphrase",
+      "kind": "paraphrase",
+      "expect": true,
+      "exact_matched": false,
+      "semantic_matched": true
+    },
+    {
+      "id": "P04_geometry_paraphrase",
+      "kind": "paraphrase",
+      "expect": true,
+      "exact_matched": false,
+      "semantic_matched": true
+    },
+    {
+      "id": "N01_legal_unrelated",
+      "kind": "unrelated",
+      "expect": false,
+      "exact_matched": false,
+      "semantic_matched": false
+    },
+    {
+      "id": "N02_theft_unrelated",
+      "kind": "unrelated",
+      "expect": false,
+      "exact_matched": false,
+      "semantic_matched": false
+    },
+    {
+      "id": "M01_legal_near_miss",
+      "kind": "near_miss",
+      "expect": false,
+      "exact_matched": false,
+      "semantic_matched": false
+    },
+    {
+      "id": "M02_cooking_near_miss",
+      "kind": "near_miss",
+      "expect": false,
+      "exact_matched": false,
+      "semantic_matched": true
+    }
+  ]
+}
+```
+
+Elapsed seconds: 118.4022. Peak RSS MB: 725.19.
+- Scale-down: 10 hand-written cases across 4 domains, not a paraphrase benchmark -- a targeted test of one specific, named brittleness.
+- Conclusion: Exact-lemma matching is exactly as brittle on messy phrasing as the objection predicted: 0.0 accuracy on paraphrased facts that share no verb with their rule, because 'took her life' and 'murdered' are different lemmas even though they describe the same act. Semantic matching recovers all of that gap (1.0 accuracy), using the real DeBERTa-v3 MNLI checkpoint to check whether the specific fact entails the rule's general condition, rather than requiring the same word. This is not a free upgrade: near-miss accuracy drops from 1.0 to 0.5 -- a related-but-insufficient fact (injuring someone in an accident, cooking in a shared kitchen) is exactly where a model that generalizes by meaning risks over-matching where exact lemma comparison, by being too strict, accidentally got it right for the wrong reason. Both numbers are reported, not just the one that favors the fix.
 
 ## Follow-up todos
 

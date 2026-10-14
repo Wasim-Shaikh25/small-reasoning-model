@@ -99,10 +99,14 @@ def parse_conditional_rule(text: str) -> dict | None:
     verb = _main_verb(doc, within=within)
     if verb is None:
         return None
+    condition_start = text.lower().find("if") + 2
+    condition_end_char = comma_idx if comma_idx >= 0 else len(text)
+    condition_text = text[condition_start:condition_end_char].strip()
     return {
         "raw": text,
         "subject_placeholder": match.group("subject").strip(),
         "trigger_lemma": verb.lemma_.lower(),
+        "condition_text": condition_text,
         "consequence": match.group("consequence").strip().rstrip("."),
     }
 
@@ -176,12 +180,47 @@ def sum_amounts_for_subject(passages: list[dict], amount_re) -> dict:
 
 
 def apply_rule(rule: dict, fact: dict) -> dict:
-    """The one comparison this module makes: do the rule's and the fact's verb lemmas match."""
+    """The one comparison this module makes: do the rule's and the fact's verb lemmas match.
+
+    Exact: catches "murders"/"murdered" (same lemma) but not "unlawfully took
+    her life" (different lemma, same meaning). Fast, no model, no network --
+    the right default when the fact is phrased close to the rule. See
+    `semantic_apply_rule` for the paraphrase-robust alternative, which costs
+    a real NLI call.
+    """
     matched = rule["trigger_lemma"] == fact["verb_lemma"]
     return {
         "matched": matched,
         "trigger_lemma": rule["trigger_lemma"],
         "fact_verb_lemma": fact["verb_lemma"],
+        "consequence": rule["consequence"] if matched else None,
+    }
+
+
+def semantic_apply_rule(rule: dict, fact_text: str, tau: float = 0.75) -> dict:
+    """Does the fact satisfy the rule's condition, by meaning rather than by shared verb.
+
+    `apply_rule`'s lemma check is exact-match brittle: a fact phrased without
+    the rule's trigger verb at all ("Arjun unlawfully took Neha's life" for a
+    rule triggered on "murders") fails it even though the fact plainly
+    satisfies the rule. This checks one-directional entailment instead --
+    does the specific fact entail that the rule's general condition holds --
+    using the real DeBERTa-v3 MNLI checkpoint (lab.common.real_encoders,
+    already measured in EXP-031/041/056), not lexical overlap. Still one
+    bounded judgment (one NLI call, one threshold), just a more capable one
+    than lemma equality. The direction matters: the condition does not
+    entail the fact (a general rule doesn't imply any one specific
+    instance), only the fact entails the condition is satisfied.
+    """
+    from lab.common.real_encoders import real_nli
+
+    probs = real_nli(fact_text, rule["condition_text"])
+    matched = probs["entail"] >= tau and probs["contradict"] < 0.2
+    return {
+        "matched": matched,
+        "condition_text": rule["condition_text"],
+        "fact_text": fact_text,
+        "nli": probs,
         "consequence": rule["consequence"] if matched else None,
     }
 

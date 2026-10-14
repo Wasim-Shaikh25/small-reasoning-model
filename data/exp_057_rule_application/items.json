@@ -9,6 +9,7 @@
       "raw": "If someone murders a person, it is a punishable crime.",
       "subject_placeholder": "someone",
       "trigger_lemma": "murder",
+      "condition_text": "someone murders a person",
       "consequence": "it is a punishable crime"
     },
     "fact_parsed": {
@@ -30,6 +31,7 @@
       "raw": "If someone murders a person, it is a punishable crime.",
       "subject_placeholder": "someone",
       "trigger_lemma": "murder",
+      "condition_text": "someone murders a person",
       "consequence": "it is a punishable crime"
     },
     "fact_parsed": {
@@ -67,6 +69,7 @@
       "raw": "If a person steals property, it is a punishable offense.",
       "subject_placeholder": "a",
       "trigger_lemma": "steal",
+      "condition_text": "a person steals property",
       "consequence": "it is a punishable offense"
     },
     "fact_parsed": {
@@ -88,6 +91,7 @@
       "raw": "If someone murders a person, it is a punishable crime.",
       "subject_placeholder": "someone",
       "trigger_lemma": "murder",
+      "condition_text": "someone murders a person",
       "consequence": "it is a punishable crime"
     },
     "fact_parsed": null,
