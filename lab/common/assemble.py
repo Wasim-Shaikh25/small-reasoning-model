@@ -117,6 +117,7 @@ def assemble(
     glossary: dict[str, str],
     checkpoint: Path | None = None,
     rewriter: str = "deterministic",
+    ask: str | None = None,
 ) -> dict:
     if rewriter not in REWRITER_MODES:
         raise ValueError(f"unknown rewriter mode: {rewriter!r}, expected one of {REWRITER_MODES}")
@@ -141,7 +142,7 @@ def assemble(
         if leaf["leaf_id"] in done_ids:
             continue
         if rewriter == "bounded_flan_t5_small":
-            result = rewrite_unit(leaf, glossary, tokenizer=tokenizer, model=model)
+            result = rewrite_unit(leaf, glossary, tokenizer=tokenizer, model=model, ask=ask)
             rendered.append(result["text"])
             rewrite_diagnostics.append(
                 {

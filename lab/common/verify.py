@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from lab.common.nli import judge
 from lab.common.qa import spans_overlap
+from lab.common.relevance import ask_relevance
 from lab.common.textutil import modals, normalize, numbers, span_in_passage
 
 QUALIFIERS = ("clearly", "always", "obviously", "undoubtedly", "certainly")
@@ -102,7 +103,15 @@ def contradiction_queries(slot: str) -> list[str]:
     ]
 
 
-def output_validator(text: str, findings_text: str, citations: list[str], decision: str) -> dict:
+def output_validator(text: str, findings_text: str, citations: list[str], decision: str, ask: str | None = None) -> dict:
+    """The final gate before an answer leaves the controller.
+
+    `ask`, when supplied, adds one more check on top of the existing faithful-
+    to-findings checks: the text must still contain the ask's own key terms,
+    not just whatever the findings happened to say (lab.common.relevance).
+    Optional and off by default so every existing caller (EXP-012's fixtures,
+    which test this against a fixed passage with no ask) is unaffected.
+    """
     missing_citations = [c for c in citations if f"[{c}]" not in text]
     qualifiers = qualifier_added(findings_text, text)
     numbers_ok = entity_number_check(findings_text, text)["ok"]
@@ -110,7 +119,9 @@ def output_validator(text: str, findings_text: str, citations: list[str], decisi
     caveat_ok = True
     if decision in {"inconclusive", "ambiguous"}:
         caveat_ok = any(word in text.lower() for word in ("insufficient", "ambiguous", "unresolved", "missing"))
-    ok = not missing_citations and not qualifiers and numbers_ok and modals_ok and caveat_ok
+    relevance = ask_relevance(ask, text) if ask else None
+    ask_ok = relevance is None or relevance["relevant"]
+    ok = not missing_citations and not qualifiers and numbers_ok and modals_ok and caveat_ok and ask_ok
     return {
         "ok": ok,
         "missing_citations": missing_citations,
@@ -118,4 +129,5 @@ def output_validator(text: str, findings_text: str, citations: list[str], decisi
         "numbers_ok": numbers_ok,
         "modals_ok": modals_ok,
         "caveat_ok": caveat_ok,
+        "ask_relevance": relevance,
     }

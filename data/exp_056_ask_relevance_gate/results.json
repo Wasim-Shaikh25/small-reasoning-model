@@ -1,0 +1,52 @@
+{
+  "id": "EXP-056",
+  "title": "Ask-relevance gate, and a more directive prompt for the bounded rewriter",
+  "status": "closed",
+  "goal": "Add an ask-relevance check to the fidelity gate (a rewrite can be faithful to its source and still fail to serve the ask) and test whether a more directive single-fact prompt reduces EXP-054's leaf-size-1 citation-only collapse.",
+  "method": "Part A: lab.common.relevance.ask_relevance scored on 5 unambiguous ask/text pairs, including EXP-054's own citation-only collapse shape. Part B: EXP-054's identical 13 findings, leaf size 1, rerun with lab.common.real_rewriter.build_prompt's new single-finding instruction ('do not leave it blank') and an ask passed through the gate, compared directly against EXP-054's leaf-size-1 numbers.",
+  "metrics": {
+    "model": "google/flan-t5-small",
+    "relevance_sanity_cases": 5,
+    "relevance_sanity_accuracy": 1.0,
+    "leaf_size_1_leaves": 13,
+    "prompt_only_no_ask_gate": {
+      "leaves": 13,
+      "fidelity_pass_rate": 0.3077,
+      "citation_only_collapse_count": 8
+    },
+    "prompt_and_ask_gate": {
+      "leaves": 13,
+      "fidelity_pass_rate": 0.0,
+      "citation_only_collapse_count": 2
+    },
+    "ask_relevance_gate_triggered_count": 9,
+    "failures_caused_only_by_ask_relevance": 5,
+    "vs_exp_054_leaf_size_1_original_prompt": {
+      "exp_054_fidelity_pass_rate": 0.3846,
+      "exp_054_citation_only_collapse_count": 8,
+      "exp_056_prompt_only_fidelity_pass_rate": 0.3077,
+      "exp_056_prompt_only_citation_only_collapse_count": 8
+    }
+  },
+  "results_prose": "Ask-relevance sanity check: 1.0 correct on 5 clear-cut cases, including catching EXP-054's exact collapse shape (bare citation marker, no content) as irrelevant. Isolating the two changes: prompt alone (no ask gate) scores fidelity pass rate 0.3077 with 8 citation-only collapses (EXP-054's original prompt scored 0.3846 with 8 collapses). Adding the ask-relevance gate on top drops pass rate to 0.0: it triggered on 9 of 13 leaves, 5 of which would otherwise have passed every other check.",
+  "conclusion": "The ask-relevance check itself is correct on 1.0 of 5 unambiguous sanity cases -- the function works as designed. But wiring it in with a literal high-level ask (\"Summarize the lease's key terms.\") against single-fact leaves backfires here: 5 leaves that were otherwise faithful, verified rewrites get rejected only because an isolated fact like 'Ravi Sharma is the Lessee.' doesn't happen to restate the words 'summarize', 'lease', or 'terms'. Token-overlap relevance works when a question's own key noun phrase naturally reappears in its answer (EXP-012's fixed-passage cases, or a direct QA ask); it does not work against an atomic fact drawn from a broader summarization ask, because there is no reason that fact's wording should echo the ask's wording. This is a real design gap in lab.common.relevance.ask_relevance as written, not a success to report quietly: the check needs to compare against something narrower than the whole-document ask (the leaf's own finding, or a sub-ask from EXP-052's eventual table of contents) before it is wired into the rewriter gate by default. Isolated from that problem, the more directive single-fact prompt alone did not clearly improve on EXP-054's numbers either.",
+  "scale_down": "Same 13 findings as EXP-054/EXP-048, 5 hand-picked relevance sanity cases, not a large relevance benchmark.",
+  "referenced_files": [
+    "lab/exp_056_ask_relevance_gate/run.py",
+    "lab/common/relevance.py",
+    "lab/common/real_rewriter.py",
+    "lab/common/verify.py",
+    "lab/common/engine.py",
+    "lab/common/assemble.py",
+    "lab/common/harness.py",
+    "data/exp_054_rewriter_leaf_size/results.json",
+    "data/exp_056_ask_relevance_gate/results.json"
+  ],
+  "follow_ups": [
+    "EXP-052's ask-driven table of contents would give this gate a fixture where ask-relevance actually needs to catch something numbers/NLI don't.",
+    "If the prompt fix's gain holds up on a larger fixture, make it the default single-finding prompt rather than an experimental variant."
+  ],
+  "elapsed_sec": 49.7613,
+  "peak_rss_mb": 683.06,
+  "models_used": "google/flan-t5-small, the same local checkpoint EXP-048/054 measured. Part A uses no model, classical token-coverage only."
+}

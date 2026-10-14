@@ -1,0 +1,57 @@
+[
+  {
+    "ask": "What is the notice period?",
+    "text": "The notice period is 30 days. [C1]",
+    "expect_relevant": true,
+    "got": {
+      "coverage": 1.0,
+      "relevant": true,
+      "ask_tokens": 2
+    },
+    "correct": true
+  },
+  {
+    "ask": "What is the notice period?",
+    "text": "[C1]",
+    "expect_relevant": false,
+    "got": {
+      "coverage": 0.0,
+      "relevant": false,
+      "ask_tokens": 2
+    },
+    "correct": true
+  },
+  {
+    "ask": "What is the security deposit?",
+    "text": "Ravi Sharma is the Lessee. [C1]",
+    "expect_relevant": false,
+    "got": {
+      "coverage": 0.0,
+      "relevant": false,
+      "ask_tokens": 2
+    },
+    "correct": true
+  },
+  {
+    "ask": "Who is the Lessee?",
+    "text": "Ravi Sharma is the Lessee. [C1]",
+    "expect_relevant": true,
+    "got": {
+      "coverage": 1.0,
+      "relevant": true,
+      "ask_tokens": 1
+    },
+    "correct": true
+  },
+  {
+    "ask": "",
+    "text": "Anything at all. [C1]",
+    "expect_relevant": true,
+    "got": {
+      "coverage": null,
+      "relevant": true,
+      "ask_tokens": 0
+    },
+    "correct": true
+  }
+]

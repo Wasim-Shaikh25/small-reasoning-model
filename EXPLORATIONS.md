@@ -143,7 +143,7 @@ DeBERTa, GLiNER, BERT-NER, RoBERTa, bge, MiniLM, e5, spaCy, libpostal, Qdrant, S
 }
 ```
 
-Elapsed seconds: 0.0553. Peak RSS MB: 126.15.
+Elapsed seconds: 0.0488. Peak RSS MB: 126.3.
 - Scale-down: The loop is run on three passages, not a full archive. Logging is an in-memory trace rather than a log service.
 - Conclusion: The controller enforces schema validity, a single repair, depth caps, and the rule that retrieved text is data. 
 
@@ -182,7 +182,7 @@ Elapsed seconds: 0.0553. Peak RSS MB: 126.15.
 }
 ```
 
-Elapsed seconds: 0.005. Peak RSS MB: 19.0.
+Elapsed seconds: 0.0099. Peak RSS MB: 18.83.
 - Scale-down: Sixty original asks stand in for a larger labeled set. Experiment F's human 1-to-5 rating is not fabricated; only an automatic coverage proxy is reported.
 - Conclusion: Template analysis covers ordinary asks and keeps the raw ask as a fallback. Unusual multi-clause asks remain the weak spot, which matches the architecture's known limit. A human sub-question rating was not collected.
 
@@ -327,7 +327,7 @@ Elapsed seconds: 0.0386. Peak RSS MB: 125.79.
 }
 ```
 
-Elapsed seconds: 0.0051. Peak RSS MB: 19.02.
+Elapsed seconds: 0.0115. Peak RSS MB: 19.02.
 - Scale-down: Forty original items replace the SQuAD2 dev subset plus 40 custom items. No pretrained QA checkpoint is loaded.
 - Conclusion: Quote validity holds when a span is returned, because the span is copied from the passage. Unanswerable recall meets the 90 percent Phase 0 target on this set.
 
@@ -368,7 +368,7 @@ Elapsed seconds: 0.0051. Peak RSS MB: 19.02.
 }
 ```
 
-Elapsed seconds: 0.01. Peak RSS MB: 18.29.
+Elapsed seconds: 0.0107. Peak RSS MB: 18.32.
 - Scale-down: MNLI, ANLI, and ContractNLI were not downloaded. Thirty original pairs replace those dev subsets plus 40 custom items.
 - Conclusion: Template T1 is the strongest of the three on this set. Number mismatches and direct negation are handled more reliably than except/unless/provided qualifications.
 
@@ -871,7 +871,7 @@ Elapsed seconds: 0.071. Peak RSS MB: 131.08.
 }
 ```
 
-Elapsed seconds: 0.1403. Peak RSS MB: 30.53.
+Elapsed seconds: 0.114. Peak RSS MB: 30.61.
 - Scale-down: Fixture-level checks, not a full corpus replay.
 - Conclusion: The checks catch altered spans, conflicting numbers, bad arithmetic, and unsupported qualifiers on these fixtures. An instruction embedded in the passage is not treated as a quote.
 
@@ -1188,7 +1188,7 @@ Elapsed seconds: 0.0317. Peak RSS MB: 19.21.
 }
 ```
 
-Elapsed seconds: 0.0093. Peak RSS MB: 18.67.
+Elapsed seconds: 0.0112. Peak RSS MB: 18.29.
 - Scale-down: Eight claims and five paragraphs, each rendered in five style labels that all take the copy path. This is smaller than 50 paragraphs and 50 claim lists, and it does not call FLAN-T5.
 - Conclusion: Because the renderer copies verified sentences, number and modal preservation is a property of that copy step and was measured, not assumed. The validator catches the planted edits. Fluency was not rated by a person. A generative rewriter is not part of this run.
 
@@ -1206,7 +1206,7 @@ Elapsed seconds: 0.0093. Peak RSS MB: 18.67.
 - `lab/common/harness.py`
 - `data/exp_018_longform/spec.json`
 - `data/exp_018_longform/results.json`
-- Results: Assembly sizes: 200 claims -> 1706 words, coverage 1.0, broken citations 0, repetition pairs 1, 128432.91 words/sec; 1000 claims -> 8506 words, coverage 1.0, broken citations 0, repetition pairs 1, 160090.04 words/sec; 5000 claims -> 42506 words, coverage 1.0, broken citations 0, repetition pairs 1, 54597.61 words/sec. Resume hash matches a full run: True.
+- Results: Assembly sizes: 200 claims -> 1706 words, coverage 1.0, broken citations 0, repetition pairs 1, 143594.23 words/sec; 1000 claims -> 8506 words, coverage 1.0, broken citations 0, repetition pairs 1, 174469.17 words/sec; 5000 claims -> 42506 words, coverage 1.0, broken citations 0, repetition pairs 1, 51467.94 words/sec. Resume hash matches a full run: True.
 ```json
 {
   "sizes": [
@@ -1225,10 +1225,10 @@ Elapsed seconds: 0.0093. Peak RSS MB: 18.67.
           "canonical": "Ravi Sharma"
         }
       ],
-      "elapsed_sec": 0.0133,
-      "tokens_per_sec": 128432.91,
-      "rss_before_mb": 125.72,
-      "rss_after_mb": 126.26,
+      "elapsed_sec": 0.0119,
+      "tokens_per_sec": 143594.23,
+      "rss_before_mb": 126.12,
+      "rss_after_mb": 126.64,
       "sha256": "bff01e6e7e463a24cc6669db9dcedca82712bf57fef8f0538128643858b496e0"
     },
     {
@@ -1246,10 +1246,10 @@ Elapsed seconds: 0.0093. Peak RSS MB: 18.67.
           "canonical": "Ravi Sharma"
         }
       ],
-      "elapsed_sec": 0.0531,
-      "tokens_per_sec": 160090.04,
-      "rss_before_mb": 126.57,
-      "rss_after_mb": 128.7,
+      "elapsed_sec": 0.0488,
+      "tokens_per_sec": 174469.17,
+      "rss_before_mb": 126.97,
+      "rss_after_mb": 129.05,
       "sha256": "d60096f22c9b1de5bb3a8df21d7de8b9467ec43551354255964f07dcc1a69106"
     },
     {
@@ -1267,10 +1267,10 @@ Elapsed seconds: 0.0093. Peak RSS MB: 18.67.
           "canonical": "Ravi Sharma"
         }
       ],
-      "elapsed_sec": 0.7785,
-      "tokens_per_sec": 54597.61,
-      "rss_before_mb": 130.46,
-      "rss_after_mb": 163.32,
+      "elapsed_sec": 0.8259,
+      "tokens_per_sec": 51467.94,
+      "rss_before_mb": 130.77,
+      "rss_after_mb": 163.24,
       "sha256": "8f16ab373d09b89e12b98afeed44bcb46aebeebff7315c27dbb78a07ec6a4ef0"
     }
   ],
@@ -1280,7 +1280,7 @@ Elapsed seconds: 0.0093. Peak RSS MB: 18.67.
 }
 ```
 
-Elapsed seconds: 0.934. Peak RSS MB: 163.32.
+Elapsed seconds: 0.9801. Peak RSS MB: 163.24.
 - Scale-down: Claims are templated verified findings, not 10 to 250 pages of model prose. The architecture's FLAN-T5 unit writer is not used.
 - Conclusion: Coverage and citation integrity are properties of the assembler. Throughput is string assembly on this CPU, not a generative decoder. Resume reproduces the full document hash when the checkpoint is truncated and continued.
 
@@ -1317,7 +1317,7 @@ Elapsed seconds: 0.934. Peak RSS MB: 163.32.
 }
 ```
 
-Elapsed seconds: 0.0062. Peak RSS MB: 125.84.
+Elapsed seconds: 0.0179. Peak RSS MB: 125.96.
 - Scale-down: Hand-written good and bad proposals stand in for FLAN-T5 samples. Input-size, hop, and sampling ladders that require a generative model are out of scope.
 - Conclusion: The filter drops proposals that introduce new names, numbers, or dates. Template queries are allowed only as additional searches; the raw ask remains in the list, so a bad extra query cannot remove the baseline. Experiment P's model ladder was not run.
 
@@ -1413,7 +1413,7 @@ Elapsed seconds: 0.0062. Peak RSS MB: 125.84.
 }
 ```
 
-Elapsed seconds: 0.0459. Peak RSS MB: 126.3.
+Elapsed seconds: 0.1029. Peak RSS MB: 126.25.
 - Scale-down: Eight passages and six asks. This is a controller smoke test, not the full red-team catalog.
 - Conclusion: The loop returns a cited answer only for the single-value deposit question. Conflicting notice periods and the injected '1 day' instruction do not become a supported answer. A pure rewrite ask does not fetch.
 
@@ -21491,7 +21491,7 @@ Elapsed seconds: 0.2452. Peak RSS MB: 37.57.
 }
 ```
 
-Elapsed seconds: 19.075. Peak RSS MB: 670.21.
+Elapsed seconds: 27.9342. Peak RSS MB: 673.46.
 - Scale-down: 13 findings across 4 leaves, not a full document. The same small fixture EXP-017 used, chosen so fidelity numbers are directly comparable, not a large or adversarial rewriting benchmark. No CTranslate2 int8 conversion (ARCHITECTURE.md section 8/14, EXP-045) -- plain transformers inference only, as the handoff asked for first.
 - Conclusion: The bounded rewriter exception is implemented and measured, not assumed: google/flan-t5-small is loaded locally (no API call), used only to rewrite findings this run already treats as verified, and every output goes through the same fidelity checks EXP-017 validated on the deterministic path before this run accepts it. The gate caught and discarded 4 of 4 rewrites (1.0 fallback rate), for the reasons counted above. Inspecting the generated text (not stored in results.json, re-run with a debug print to reproduce) shows a consistent failure mode, not hallucination: on every leaf flan-t5-small collapsed the 4 verified statements down to a near-copy of just one of them, silently dropping the other three findings' numbers, names, and citation markers instead of inventing new ones. That is exactly the failure the fidelity gate (entity_number_check plus citation survival) is built to catch, and it caught it every time -- a failing rewrite was replaced, never partially accepted. At this prompt and this checkpoint size, the gate's job is less about guarding against invention and more about guarding against silent omission. Extraction and verification are unaffected: this checkpoint never touched the QA extractor or the NLI judge, only text that those components had already verified.
 
@@ -21540,6 +21540,54 @@ Elapsed seconds: 19.075. Peak RSS MB: 670.21.
 Elapsed seconds: 22.6742. Peak RSS MB: 682.51.
 - Scale-down: Same 13 findings as EXP-048, not a larger fixture; three leaf sizes, not a full sweep.
 - Conclusion: google/flan-t5-small is measured at leaf sizes 1, 2, and 4 findings per rewrite call, isolating leaf size as the only variable changed from EXP-048. Narrowing the task to one finding per call raises the fidelity pass rate from 0.0 to 0.3846, supporting this project's governing hypothesis that a small model's failure mode is being asked to hold too much at once, not a general inability to rewrite a single verified statement. But decomposition alone does not fully fix it here: 8 of 13 single-finding leaves still fail, and 8 of those fail in a different, more extreme way than EXP-048's -- instead of picking one fact out of several and dropping the rest, the model sometimes drops the statement's content entirely and echoes only the citation marker (for example generating '[CITE-CL000]' with no text). Decomposition shrinks the failure, it does not remove the need for the fidelity gate -- the gate stays the load-bearing safeguard at every leaf size measured.
+
+## EXP-056 Ask-relevance gate, and a more directive prompt for the bounded rewriter
+
+- Status: `closed`
+- Models used: google/flan-t5-small, the same local checkpoint EXP-048/054 measured. Part A uses no model, classical token-coverage only.
+- Goal: Add an ask-relevance check to the fidelity gate (a rewrite can be faithful to its source and still fail to serve the ask) and test whether a more directive single-fact prompt reduces EXP-054's leaf-size-1 citation-only collapse.
+- Method: Part A: lab.common.relevance.ask_relevance scored on 5 unambiguous ask/text pairs, including EXP-054's own citation-only collapse shape. Part B: EXP-054's identical 13 findings, leaf size 1, rerun with lab.common.real_rewriter.build_prompt's new single-finding instruction ('do not leave it blank') and an ask passed through the gate, compared directly against EXP-054's leaf-size-1 numbers.
+- Referenced files:
+- `lab/exp_056_ask_relevance_gate/run.py`
+- `lab/common/relevance.py`
+- `lab/common/real_rewriter.py`
+- `lab/common/verify.py`
+- `lab/common/engine.py`
+- `lab/common/assemble.py`
+- `lab/common/harness.py`
+- `data/exp_054_rewriter_leaf_size/results.json`
+- `data/exp_056_ask_relevance_gate/results.json`
+- Results: Ask-relevance sanity check: 1.0 correct on 5 clear-cut cases, including catching EXP-054's exact collapse shape (bare citation marker, no content) as irrelevant. Isolating the two changes: prompt alone (no ask gate) scores fidelity pass rate 0.3077 with 8 citation-only collapses (EXP-054's original prompt scored 0.3846 with 8 collapses). Adding the ask-relevance gate on top drops pass rate to 0.0: it triggered on 9 of 13 leaves, 5 of which would otherwise have passed every other check.
+```json
+{
+  "model": "google/flan-t5-small",
+  "relevance_sanity_cases": 5,
+  "relevance_sanity_accuracy": 1.0,
+  "leaf_size_1_leaves": 13,
+  "prompt_only_no_ask_gate": {
+    "leaves": 13,
+    "fidelity_pass_rate": 0.3077,
+    "citation_only_collapse_count": 8
+  },
+  "prompt_and_ask_gate": {
+    "leaves": 13,
+    "fidelity_pass_rate": 0.0,
+    "citation_only_collapse_count": 2
+  },
+  "ask_relevance_gate_triggered_count": 9,
+  "failures_caused_only_by_ask_relevance": 5,
+  "vs_exp_054_leaf_size_1_original_prompt": {
+    "exp_054_fidelity_pass_rate": 0.3846,
+    "exp_054_citation_only_collapse_count": 8,
+    "exp_056_prompt_only_fidelity_pass_rate": 0.3077,
+    "exp_056_prompt_only_citation_only_collapse_count": 8
+  }
+}
+```
+
+Elapsed seconds: 49.7613. Peak RSS MB: 683.06.
+- Scale-down: Same 13 findings as EXP-054/EXP-048, 5 hand-picked relevance sanity cases, not a large relevance benchmark.
+- Conclusion: The ask-relevance check itself is correct on 1.0 of 5 unambiguous sanity cases -- the function works as designed. But wiring it in with a literal high-level ask ("Summarize the lease's key terms.") against single-fact leaves backfires here: 5 leaves that were otherwise faithful, verified rewrites get rejected only because an isolated fact like 'Ravi Sharma is the Lessee.' doesn't happen to restate the words 'summarize', 'lease', or 'terms'. Token-overlap relevance works when a question's own key noun phrase naturally reappears in its answer (EXP-012's fixed-passage cases, or a direct QA ask); it does not work against an atomic fact drawn from a broader summarization ask, because there is no reason that fact's wording should echo the ask's wording. This is a real design gap in lab.common.relevance.ask_relevance as written, not a success to report quietly: the check needs to compare against something narrower than the whole-document ask (the leaf's own finding, or a sub-ask from EXP-052's eventual table of contents) before it is wired into the rewriter gate by default. Isolated from that problem, the more directive single-fact prompt alone did not clearly improve on EXP-054's numbers either.
 
 ## Follow-up todos
 

@@ -246,11 +246,11 @@ def run_task(ask: str, passages: list[dict], *, depth_cap: str | None = None, ta
     citations = [eid for f in facts for eid in f.get("evidence_ids") or []]
     findings_text = " ".join(f["claim_statement"] for f in facts if f.get("claim_statement") and f.get("status") == "found")
     if decision["label"] == "supported":
-        final_check = output_validator(text, findings_text or text, citations, decision["label"])
+        final_check = output_validator(text, findings_text or text, citations, decision["label"], ask=ask)
         if not final_check["ok"]:
             text = findings_text or ABSTAIN_TEXT
     else:
-        final_check = output_validator(text, text, [], decision["label"])
+        final_check = output_validator(text, text, [], decision["label"], ask=ask)
     return _finish(ask, plan, facts, decision, text, trace, budget, validator=final_check)
 
 

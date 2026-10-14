@@ -15,6 +15,7 @@ from __future__ import annotations
 import re
 
 from lab.common.assemble import render_unit
+from lab.common.relevance import ask_relevance
 from lab.common.verify import bidirectional_nli, citation_markers, entity_number_check, modality_preserved
 
 MODEL_NAME = "google/flan-t5-small"
@@ -58,25 +59,42 @@ def _source_lines(leaf: dict, glossary: dict[str, str]) -> tuple[list[str], list
     return lines, cite_ids
 
 
-def build_prompt(leaf: dict, glossary: dict[str, str]) -> tuple[str, str, list[str]]:
+def build_prompt(leaf: dict, glossary: dict[str, str], ask: str | None = None) -> tuple[str, str, list[str]]:
     lines, cite_ids = _source_lines(leaf, glossary)
     src_text = "\n".join(lines)
-    prompt = (
-        "Combine these verified facts into one flowing paragraph. Do not add any fact, name, "
-        "number, or date not listed below. Keep every citation marker exactly as written, in "
-        "square brackets.\n\n" + src_text
+    instruction = (
+        "Rewrite the single verified fact below as one grammatically correct sentence. "
+        "Do not remove it, shorten it, or leave it blank. Do not add any fact, name, number, "
+        "or date not listed below. Keep the citation marker exactly as written, in square "
+        "brackets."
+        if len(leaf["findings"]) == 1
+        else "Combine these verified facts into one flowing paragraph. Do not drop any of them. "
+        "Do not add any fact, name, number, or date not listed below. Keep every citation "
+        "marker exactly as written, in square brackets."
     )
+    if ask:
+        instruction += f" This is for answering: {ask.strip()}"
+    prompt = instruction + "\n\n" + src_text
     return prompt, src_text, cite_ids
 
 
-def fidelity_gate(src_text: str, out_text: str, cite_ids: list[str]) -> dict:
-    """ARCHITECTURE.md section 3.7's fidelity validator, applied to a rewrite candidate."""
+def fidelity_gate(src_text: str, out_text: str, cite_ids: list[str], ask: str | None = None) -> dict:
+    """ARCHITECTURE.md section 3.7's fidelity validator, applied to a rewrite candidate.
+
+    Checks faithfulness to the source findings (numbers, modals, bidirectional
+    entailment, citations) and, when an `ask` is supplied, also checks the
+    output didn't drift away from what was actually asked (lab.common.relevance).
+    A rewrite can stay perfectly faithful to its source and still be useless if
+    it no longer serves the ask -- these are two different failure modes, not
+    one.
+    """
     numbers = entity_number_check(src_text, out_text)
     modal_ok = modality_preserved(src_text, out_text)
     nli = bidirectional_nli(src_text, out_text)
     found_markers = set(citation_markers(out_text))
     missing_citations = sorted(set(cite_ids) - found_markers)
     broken_citations = sorted(found_markers - set(cite_ids))
+    relevance = ask_relevance(ask, out_text) if ask else None
     reasons = []
     if not numbers["ok"]:
         reasons.append("numbers")
@@ -86,6 +104,8 @@ def fidelity_gate(src_text: str, out_text: str, cite_ids: list[str]) -> dict:
         reasons.append("nli")
     if missing_citations or broken_citations:
         reasons.append("citations")
+    if relevance is not None and not relevance["relevant"]:
+        reasons.append("ask_relevance")
     return {
         "ok": not reasons,
         "numbers": numbers,
@@ -93,6 +113,7 @@ def fidelity_gate(src_text: str, out_text: str, cite_ids: list[str]) -> dict:
         "nli": nli,
         "missing_citations": missing_citations,
         "broken_citations": broken_citations,
+        "ask_relevance": relevance,
         "fail_reasons": reasons,
     }
 
@@ -103,15 +124,17 @@ def rewrite_unit(
     tokenizer=None,
     model=None,
     max_new_tokens: int = 160,
+    ask: str | None = None,
 ) -> dict:
     """Generative counterpart to `assemble.render_unit`. Same input shape, fidelity-gated.
 
     Returns {"text", "used_generative", "generated_text", "checks", "fallback_reason"}.
     `text` is the generated prose when it passes the gate, otherwise the unchanged
-    deterministic output -- never a partial accept of a failing rewrite.
+    deterministic output -- never a partial accept of a failing rewrite. `ask`,
+    when supplied, is also checked for relevance (see `fidelity_gate`).
     """
     deterministic_text = render_unit(leaf, glossary)
-    prompt, src_text, cite_ids = build_prompt(leaf, glossary)
+    prompt, src_text, cite_ids = build_prompt(leaf, glossary, ask=ask)
     tok, mdl = (tokenizer, model) if tokenizer is not None and model is not None else load()
 
     import torch
@@ -121,7 +144,7 @@ def rewrite_unit(
         out_ids = mdl.generate(**inputs, max_new_tokens=max_new_tokens, num_beams=4)
     generated = tok.decode(out_ids[0], skip_special_tokens=True).strip()
 
-    checks = fidelity_gate(src_text, generated, cite_ids)
+    checks = fidelity_gate(src_text, generated, cite_ids, ask=ask)
     if checks["ok"]:
         return {
             "text": generated,
