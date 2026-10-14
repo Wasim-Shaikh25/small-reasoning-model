@@ -1,0 +1,52 @@
+{
+  "id": "EXP-012",
+  "title": "Verification engine",
+  "status": "closed",
+  "goal": "Exercise quote, support, agreement, conflict, calculation, coverage, contradiction queries, and the output validator.",
+  "method": "Each check is run on a fixed passage and a planted failure. The calculator recomputes the date from the same spans. Qualifiers that were not in the source fail validation.",
+  "metrics": {
+    "checks": {
+      "quote_accepts_real_span": true,
+      "quote_rejects_absent_span": true,
+      "support_accepts_matching_claim": true,
+      "support_rejects_different_number": true,
+      "conflict_detected": true,
+      "same_span_not_conflict": true,
+      "second_span_overlap": true,
+      "second_span_rejects_unrelated": true,
+      "calculation_accepts_recompute": true,
+      "calculation_rejects_wrong_date": true,
+      "coverage_ratio": 0.3333,
+      "coverage_complete": true,
+      "contradiction_queries": [
+        "notice period except",
+        "notice period unless",
+        "notice period not",
+        "notice period provided that",
+        "no notice period"
+      ],
+      "injection_not_a_quote": true,
+      "qualifier_caught": true,
+      "clean_output_passes": true,
+      "qualifier_output_fails": true
+    },
+    "passed": 15,
+    "considered": 15
+  },
+  "results_prose": "15 of 15 verification checks behaved as specified. Quote check accepts '30 days' and rejects '60 days'. Support check on the matching claim is True and on 60 days is False. A 30-versus-45 pair is a conflict: True. Recomputing 1 January 2024 plus 30 days yields 31 January 2024 (match True). Added qualifier 'clearly' fails the output validator: True. Contradiction queries: ['notice period except', 'notice period unless', 'notice period not', 'notice period provided that', 'no notice period'].",
+  "conclusion": "The checks catch altered spans, conflicting numbers, bad arithmetic, and unsupported qualifiers on these fixtures. An instruction embedded in the passage is not treated as a quote.",
+  "scale_down": "Fixture-level checks, not a full corpus replay.",
+  "referenced_files": [
+    "lab/exp_012_verification/run.py",
+    "lab/common/verify.py",
+    "lab/common/calc.py",
+    "lab/common/nli.py",
+    "lab/common/qa.py",
+    "lab/common/textutil.py",
+    "lab/common/harness.py",
+    "data/exp_012_verification/results.json"
+  ],
+  "follow_ups": [],
+  "elapsed_sec": 0.0323,
+  "peak_rss_mb": 28.48
+}

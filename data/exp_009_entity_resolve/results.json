@@ -1,0 +1,77 @@
+{
+  "id": "EXP-009",
+  "title": "Entity resolution and example store",
+  "status": "closed",
+  "goal": "Measure wrong resolutions, ambiguous flags, a pair matcher, and whether verified examples are stored without errors.",
+  "method": "Documents are chunked and passed through the resolution loop. Shared surnames and two addresses force an ambiguous status. The pair matcher is logistic regression on string and context features. The example store accepts only resolved mentions that match the gold name.",
+  "metrics": {
+    "documents": 6,
+    "wrong_resolutions": 0,
+    "wrong_resolution_rate": 0.0,
+    "ambiguous_gold": 3,
+    "ambiguous_flagged": 3,
+    "ambiguous_flag_rate": 1.0,
+    "resolved_gold": 2,
+    "resolved_correct": 2,
+    "pair_heldout_accuracy": 1.0,
+    "doc5_pair_decisions": [],
+    "example_store_size": 2,
+    "wrong_examples_stored": 0,
+    "confidence_before_store": 0.62,
+    "confidence_after_store": 0.67,
+    "outcomes": [
+      {
+        "id": "E3-1",
+        "status": "resolved",
+        "correct": true
+      },
+      {
+        "id": "E3-2",
+        "status": "ambiguous",
+        "text": "Mr. Sharma",
+        "wrong": false
+      },
+      {
+        "id": "E3-3",
+        "status": "ambiguous",
+        "text": "Kapil Menon",
+        "wrong": false
+      },
+      {
+        "id": "E3-4",
+        "status": "ambiguous",
+        "text": "R. Sharma",
+        "wrong": false
+      },
+      {
+        "id": "E3-5",
+        "found": [
+          "resolved",
+          "resolved"
+        ],
+        "wrong": false
+      },
+      {
+        "id": "E3-6",
+        "status": "resolved",
+        "correct": true
+      }
+    ]
+  },
+  "results_prose": "On 6 short documents, wrong resolutions are 0 (rate 0.0). Ambiguous cases flagged: 3 of 3 (rate 1.0). Clearly unique people resolved correctly: 2 of 2. Held-out pair accuracy is 1.0. Example store size 2, wrong examples stored 0. Confidence on a repeated Ravi Sharma line moved from 0.62 to 0.67.",
+  "conclusion": "Wrong resolution is the headline number and is reported above. Ambiguous shared names are flagged instead of guessed when the rule can see two full names. No wrong example was written when the store required a gold-matching resolved span.",
+  "scale_down": "Six short documents replace 20 documents of 5 to 30 pages. The searchable context is the document itself, not a collection-wide index.",
+  "referenced_files": [
+    "lab/exp_009_entity_resolve/run.py",
+    "lab/common/entities.py",
+    "lab/common/chunking.py",
+    "lab/common/qa.py",
+    "lab/common/textutil.py",
+    "lab/common/harness.py",
+    "data/exp_009_entity_resolve/docs.json",
+    "data/exp_009_entity_resolve/results.json"
+  ],
+  "follow_ups": [],
+  "elapsed_sec": 0.0095,
+  "peak_rss_mb": 121.75
+}

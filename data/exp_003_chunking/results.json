@@ -1,0 +1,61 @@
+{
+  "id": "EXP-003",
+  "title": "Structure-aware chunking",
+  "status": "closed",
+  "goal": "Chunk a small contract-shaped document by headings, pages, and block type, and keep summaries extractive.",
+  "method": "Headings and page markers split the document. Each chunk stores doc id, version hash, page, section path, offsets, and chunk type. Summaries are the highest-salience sentences already in the chunk.",
+  "metrics": {
+    "chunks": 5,
+    "chunk_types": {
+      "party_block": 1,
+      "definition": 1,
+      "clause": 1,
+      "schedule": 1,
+      "signature": 1
+    },
+    "expected_types_found": [
+      "clause",
+      "definition",
+      "party_block",
+      "schedule",
+      "signature"
+    ],
+    "missing_expected_types": [],
+    "word_counts": [
+      25,
+      13,
+      24,
+      9,
+      13
+    ],
+    "long_doc_chunks": 19,
+    "long_doc_max_words": 50,
+    "adjacent_overlap_pairs": 18,
+    "single_version_hash": true,
+    "version_hash": "sha256:46cf631e177d9b743288f155165251e0a4b4646623d18639c7981db64b524a22",
+    "summaries_are_substrings": true,
+    "summaries_marked_not_evidence": true,
+    "sample_summary": "Ravi Sharma (the Lessee) residing at 14 MG Road, Pune 411001. ABC Pvt Ltd (the Lessor) having its office at 48 Park Street, Kolkata 700016.",
+    "pages": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ]
+  },
+  "results_prose": "The sample document produced 5 chunks with types {'party_block': 1, 'definition': 1, 'clause': 1, 'schedule': 1, 'signature': 1}. Missing expected types: none. All chunks share one version hash: True. Extractive summaries are substrings and are marked not evidence: True. A 80-sentence obligation block split into 19 chunks (max 50 words) with 18 adjacent overlapping pairs. Pages seen: [1, 2, 3, 4, 5].",
+  "conclusion": "Chunk metadata and extractive summaries behave as specified on this sample. The word-window settings used here are smaller than the 200 to 400 token production window so the sample still splits.",
+  "scale_down": "One short document plus one generated long clause. Token counts are whitespace words, not a model tokenizer. Production target of 200 to 400 tokens was not the setting for the short sample.",
+  "referenced_files": [
+    "lab/exp_003_chunking/run.py",
+    "lab/common/chunking.py",
+    "lab/common/textutil.py",
+    "lab/common/harness.py",
+    "data/exp_003_chunking/document.txt",
+    "data/exp_003_chunking/results.json"
+  ],
+  "follow_ups": [],
+  "elapsed_sec": 0.0012,
+  "peak_rss_mb": 15.97
+}

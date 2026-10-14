@@ -1,0 +1,520 @@
+[
+  {
+    "text": "Ravi Sharma signed the page.",
+    "gold": [
+      [
+        "Ravi Sharma",
+        "person"
+      ]
+    ],
+    "slice": "easy"
+  },
+  {
+    "text": "Witnessed by Dr. Sharma.",
+    "gold": [
+      [
+        "Dr. Sharma",
+        "person"
+      ]
+    ],
+    "slice": "easy"
+  },
+  {
+    "text": "Anita Desai signed the page.",
+    "gold": [
+      [
+        "Anita Desai",
+        "person"
+      ]
+    ],
+    "slice": "easy"
+  },
+  {
+    "text": "Witnessed by Dr. Desai.",
+    "gold": [
+      [
+        "Dr. Desai",
+        "person"
+      ]
+    ],
+    "slice": "easy"
+  },
+  {
+    "text": "Meera Iyer signed the page.",
+    "gold": [
+      [
+        "Meera Iyer",
+        "person"
+      ]
+    ],
+    "slice": "easy"
+  },
+  {
+    "text": "Witnessed by Dr. Iyer.",
+    "gold": [
+      [
+        "Dr. Iyer",
+        "person"
+      ]
+    ],
+    "slice": "easy"
+  },
+  {
+    "text": "Kapil Menon signed the page.",
+    "gold": [
+      [
+        "Kapil Menon",
+        "person"
+      ]
+    ],
+    "slice": "easy"
+  },
+  {
+    "text": "Witnessed by Dr. Menon.",
+    "gold": [
+      [
+        "Dr. Menon",
+        "person"
+      ]
+    ],
+    "slice": "easy"
+  },
+  {
+    "text": "Sara Khan signed the page.",
+    "gold": [
+      [
+        "Sara Khan",
+        "person"
+      ]
+    ],
+    "slice": "easy"
+  },
+  {
+    "text": "Witnessed by Dr. Khan.",
+    "gold": [
+      [
+        "Dr. Khan",
+        "person"
+      ]
+    ],
+    "slice": "easy"
+  },
+  {
+    "text": "Owen Blake signed the page.",
+    "gold": [
+      [
+        "Owen Blake",
+        "person"
+      ]
+    ],
+    "slice": "easy"
+  },
+  {
+    "text": "Witnessed by Dr. Blake.",
+    "gold": [
+      [
+        "Dr. Blake",
+        "person"
+      ]
+    ],
+    "slice": "easy"
+  },
+  {
+    "text": "Priya Nair signed the page.",
+    "gold": [
+      [
+        "Priya Nair",
+        "person"
+      ]
+    ],
+    "slice": "easy"
+  },
+  {
+    "text": "Witnessed by Dr. Nair.",
+    "gold": [
+      [
+        "Dr. Nair",
+        "person"
+      ]
+    ],
+    "slice": "easy"
+  },
+  {
+    "text": "John Adeyemi signed the page.",
+    "gold": [
+      [
+        "John Adeyemi",
+        "person"
+      ]
+    ],
+    "slice": "easy"
+  },
+  {
+    "text": "Witnessed by Dr. Adeyemi.",
+    "gold": [
+      [
+        "Dr. Adeyemi",
+        "person"
+      ]
+    ],
+    "slice": "easy"
+  },
+  {
+    "text": "ABC Pvt Ltd is a party.",
+    "gold": [
+      [
+        "ABC Pvt Ltd",
+        "organization"
+      ]
+    ],
+    "slice": "easy"
+  },
+  {
+    "text": "Northwind LLC is a party.",
+    "gold": [
+      [
+        "Northwind LLC",
+        "organization"
+      ]
+    ],
+    "slice": "easy"
+  },
+  {
+    "text": "Helios GmbH is a party.",
+    "gold": [
+      [
+        "Helios GmbH",
+        "organization"
+      ]
+    ],
+    "slice": "easy"
+  },
+  {
+    "text": "Kite Corp is a party.",
+    "gold": [
+      [
+        "Kite Corp",
+        "organization"
+      ]
+    ],
+    "slice": "easy"
+  },
+  {
+    "text": "Blue Oak LLP is a party.",
+    "gold": [
+      [
+        "Blue Oak LLP",
+        "organization"
+      ]
+    ],
+    "slice": "easy"
+  },
+  {
+    "text": "Sable Inc is a party.",
+    "gold": [
+      [
+        "Sable Inc",
+        "organization"
+      ]
+    ],
+    "slice": "easy"
+  },
+  {
+    "text": "Address: 14 MG Road, Pune 411001.",
+    "gold": [
+      [
+        "14 MG Road, Pune 411001",
+        "address"
+      ]
+    ],
+    "slice": "easy"
+  },
+  {
+    "text": "Address: 221B Baker Street, London.",
+    "gold": [
+      [
+        "221B Baker Street, London",
+        "address"
+      ]
+    ],
+    "slice": "easy"
+  },
+  {
+    "text": "Address: 9 Residency Road, Bengaluru 560001.",
+    "gold": [
+      [
+        "9 Residency Road, Bengaluru 560001",
+        "address"
+      ]
+    ],
+    "slice": "easy"
+  },
+  {
+    "text": "Address: 48 Park Street, Kolkata 700016.",
+    "gold": [
+      [
+        "48 Park Street, Kolkata 700016",
+        "address"
+      ]
+    ],
+    "slice": "easy"
+  },
+  {
+    "text": "Dated 5 January 2024.",
+    "gold": [
+      [
+        "5 January 2024",
+        "date"
+      ]
+    ],
+    "slice": "easy"
+  },
+  {
+    "text": "Dated 2 March 2024.",
+    "gold": [
+      [
+        "2 March 2024",
+        "date"
+      ]
+    ],
+    "slice": "easy"
+  },
+  {
+    "text": "Dated 14/10/2024.",
+    "gold": [
+      [
+        "14/10/2024",
+        "date"
+      ]
+    ],
+    "slice": "easy"
+  },
+  {
+    "text": "Dated 2024-10-14.",
+    "gold": [
+      [
+        "2024-10-14",
+        "date"
+      ]
+    ],
+    "slice": "easy"
+  },
+  {
+    "text": "Amount due: INR 50000.",
+    "gold": [
+      [
+        "INR 50000",
+        "amount"
+      ]
+    ],
+    "slice": "easy"
+  },
+  {
+    "text": "Amount due: USD 250.",
+    "gold": [
+      [
+        "USD 250",
+        "amount"
+      ]
+    ],
+    "slice": "easy"
+  },
+  {
+    "text": "Amount due: $80.",
+    "gold": [
+      [
+        "$80",
+        "amount"
+      ]
+    ],
+    "slice": "easy"
+  },
+  {
+    "text": "Amount due: 30 days.",
+    "gold": [
+      [
+        "30 days",
+        "amount"
+      ]
+    ],
+    "slice": "easy"
+  },
+  {
+    "text": "Amount due: 7 percent.",
+    "gold": [
+      [
+        "7 percent",
+        "amount"
+      ]
+    ],
+    "slice": "easy"
+  },
+  {
+    "text": "Ravi Sharma (the Lessee) resides at 14 MG Road, Pune 411001.",
+    "gold": [
+      [
+        "Ravi Sharma",
+        "person"
+      ],
+      [
+        "the Lessee",
+        "defined term"
+      ],
+      [
+        "14 MG Road, Pune 411001",
+        "address"
+      ]
+    ],
+    "slice": "easy"
+  },
+  {
+    "text": "Infosys bid for the work.",
+    "gold": [
+      [
+        "Infosys",
+        "organization"
+      ]
+    ],
+    "slice": "hard"
+  },
+  {
+    "text": "Please pay fifty thousand rupees.",
+    "gold": [
+      [
+        "fifty thousand rupees",
+        "amount"
+      ]
+    ],
+    "slice": "hard"
+  },
+  {
+    "text": "Contact R. Sharma about the keys.",
+    "gold": [
+      [
+        "R. Sharma",
+        "person"
+      ]
+    ],
+    "slice": "hard"
+  },
+  {
+    "text": "Mr. Sharma called twice.",
+    "gold": [
+      [
+        "Mr. Sharma",
+        "person"
+      ]
+    ],
+    "slice": "hard"
+  },
+  {
+    "text": "Park Street is busy at noon.",
+    "gold": [
+      [
+        "Park Street",
+        "address"
+      ]
+    ],
+    "slice": "ambiguous_place"
+  },
+  {
+    "text": "Ashok Nagar flooded after the rain.",
+    "gold": [
+      [
+        "Ashok Nagar",
+        "address"
+      ]
+    ],
+    "slice": "ambiguous_place"
+  },
+  {
+    "text": "The flat is at Plot 14, Sector 5.",
+    "gold": [
+      [
+        "Plot 14, Sector 5",
+        "address"
+      ]
+    ],
+    "slice": "hard"
+  },
+  {
+    "text": "ravi sharma sent the scan.",
+    "gold": [
+      [
+        "ravi sharma",
+        "person"
+      ]
+    ],
+    "slice": "hard"
+  },
+  {
+    "text": "New Delhi High Court dismissed the appeal.",
+    "gold": [
+      [
+        "New Delhi High Court",
+        "organization"
+      ]
+    ],
+    "slice": "hard"
+  },
+  {
+    "text": "The said premises include a parking slot.",
+    "gold": [],
+    "slice": "hard"
+  },
+  {
+    "text": "May Sharma join the call?",
+    "gold": [
+      [
+        "Sharma",
+        "person"
+      ]
+    ],
+    "slice": "hard"
+  },
+  {
+    "text": "Rent is due each Monday.",
+    "gold": [],
+    "slice": "easy"
+  },
+  {
+    "text": "the Lessee must pay.",
+    "gold": [
+      [
+        "the Lessee",
+        "defined term"
+      ]
+    ],
+    "slice": "easy"
+  },
+  {
+    "text": "Helios (the Company) signed.",
+    "gold": [
+      [
+        "the Company",
+        "defined term"
+      ]
+    ],
+    "slice": "easy"
+  },
+  {
+    "text": "Notice period is thirty days in words only.",
+    "gold": [
+      [
+        "thirty days",
+        "amount"
+      ]
+    ],
+    "slice": "hard"
+  },
+  {
+    "text": "Meet at Baker Street tomorrow.",
+    "gold": [
+      [
+        "Baker Street",
+        "address"
+      ]
+    ],
+    "slice": "ambiguous_place"
+  }
+]

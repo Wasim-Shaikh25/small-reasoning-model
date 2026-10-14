@@ -1,0 +1,22 @@
+{
+  "policy": "This POC loads no pretrained language model and no generative model.",
+  "substitutes": {
+    "embeddings": "sklearn TfidfVectorizer cosine (in place of bge-small-en-v1.5)",
+    "sparse_retrieval": "in-process Okapi BM25 (in place of Qdrant sparse / SPLADE)",
+    "reranker": "lexical coverage cross-score (in place of bge-reranker-v2-m3)",
+    "ask_classifier": "feature rules (in place of zero-shot DeBERTa NLI)",
+    "keyphrases": "content-term salience (in place of KeyBERT)",
+    "entity_tagging": "rule tagger plus a stricter second rule tagger (in place of GLiNER and dslim/bert-base-NER)",
+    "address_parsing": "regex field parser (in place of libpostal)",
+    "extractive_qa": "two lexical span extractors (in place of DeBERTa/RoBERTa SQuAD2)",
+    "nli": "polarity, number, and coverage judge (in place of DeBERTa-v3 MNLI)",
+    "pair_matcher": "logistic regression over string and context features",
+    "decision_head": "logistic regression with Platt scaling",
+    "next_action_head": "multinomial logistic regression",
+    "rewriter": "deterministic assembly of verified findings (FLAN-T5 is forbidden)",
+    "proposer": "not used; template analyzer plus grounding filter only",
+    "vector_db": "in-memory index (in place of Qdrant)",
+    "graph": "in-memory adjacency (in place of NetworkX/Kuzu/Neo4j)",
+    "dates": "dateparser plus timedelta"
+  }
+}

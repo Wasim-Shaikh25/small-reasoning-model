@@ -1,0 +1,52 @@
+{
+  "id": "EXP-014",
+  "title": "Cross-domain lookup and reasoning skills",
+  "status": "closed",
+  "goal": "Compare extractive accuracy across unrelated domains and record which reasoning skills the non-generative engine actually performs.",
+  "method": "Six domains have four original passages each. Comparison, counting, ordering, and sums run in code on extracted values. The conditional probe is a single if/unless sentence.",
+  "metrics": {
+    "per_domain_accuracy": {
+      "software": 0.75,
+      "recipes": 0.25,
+      "sports": 0.75,
+      "finance": 0.75,
+      "medical": 0.75,
+      "legal": 1.0
+    },
+    "domain_gap": 0.75,
+    "items_per_domain": 4,
+    "skills": {
+      "comparison": true,
+      "counting": true,
+      "ordering": true,
+      "sum": true,
+      "conditional_if": true,
+      "conditional_unless_blocked": false
+    },
+    "skills_handled": [
+      "comparison",
+      "counting",
+      "ordering",
+      "sum",
+      "conditional_if"
+    ],
+    "skills_failed": [
+      "conditional_unless_blocked"
+    ]
+  },
+  "results_prose": "Per-domain accuracy on 4 items each: {'software': 0.75, 'recipes': 0.25, 'sports': 0.75, 'finance': 0.75, 'medical': 0.75, 'legal': 1.0}. The gap between the highest and lowest domain is 0.75. Skills that succeeded: ['comparison', 'counting', 'ordering', 'sum', 'conditional_if']. Skills that failed: ['conditional_unless_blocked']. The conditional helper returns the 'if' result and does not block on 'unless', so the unless probe fails on purpose.",
+  "conclusion": "Domain differences on this set come from wording, not from pretrained domain knowledge, because no pretrained model is loaded. The engine does comparison, counting, ordering, sum, conditional_if and fails conditional_unless_blocked.",
+  "scale_down": "Four items in each of six domains replace 20 items in five domains. Ordering uses dateparser rather than a learned temporal model.",
+  "referenced_files": [
+    "lab/exp_014_reasoning/run.py",
+    "lab/common/qa.py",
+    "lab/common/calc.py",
+    "lab/common/textutil.py",
+    "lab/common/harness.py",
+    "data/exp_014_reasoning/items.json",
+    "data/exp_014_reasoning/results.json"
+  ],
+  "follow_ups": [],
+  "elapsed_sec": 0.0355,
+  "peak_rss_mb": 28.55
+}

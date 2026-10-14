@@ -1,0 +1,170 @@
+[
+  {
+    "domain": "software",
+    "question": "What is the retry count?",
+    "gold": "3",
+    "span": null,
+    "hit": false
+  },
+  {
+    "domain": "software",
+    "question": "What is the timeout?",
+    "gold": "15 seconds",
+    "span": "15 seconds",
+    "hit": true
+  },
+  {
+    "domain": "software",
+    "question": "Which port is documented?",
+    "gold": "8080",
+    "span": "The service listens on port 8080.",
+    "hit": true
+  },
+  {
+    "domain": "software",
+    "question": "What does the flag do?",
+    "gold": "skips writes",
+    "span": "The flag dry-run skips writes.",
+    "hit": true
+  },
+  {
+    "domain": "recipes",
+    "question": "How much salt is used?",
+    "gold": "7 grams",
+    "span": null,
+    "hit": false
+  },
+  {
+    "domain": "recipes",
+    "question": "How long is the bake?",
+    "gold": "35 minutes",
+    "span": "35 minutes",
+    "hit": true
+  },
+  {
+    "domain": "recipes",
+    "question": "What temperature is stated?",
+    "gold": "180 C",
+    "span": null,
+    "hit": false
+  },
+  {
+    "domain": "recipes",
+    "question": "How many eggs are required?",
+    "gold": "2",
+    "span": null,
+    "hit": false
+  },
+  {
+    "domain": "sports",
+    "question": "What is the match length?",
+    "gold": "40 minutes",
+    "span": "40 minutes",
+    "hit": true
+  },
+  {
+    "domain": "sports",
+    "question": "How many players are on the field?",
+    "gold": "11",
+    "span": "11",
+    "hit": true
+  },
+  {
+    "domain": "sports",
+    "question": "What is the overtime length?",
+    "gold": "5 minutes",
+    "span": "Overtime lasts 5 minutes.",
+    "hit": true
+  },
+  {
+    "domain": "sports",
+    "question": "How many substitutions are allowed?",
+    "gold": "3",
+    "span": null,
+    "hit": false
+  },
+  {
+    "domain": "finance",
+    "question": "What is the interest rate?",
+    "gold": "7 percent",
+    "span": null,
+    "hit": false
+  },
+  {
+    "domain": "finance",
+    "question": "What is the fee?",
+    "gold": "USD 12",
+    "span": "USD 12",
+    "hit": true
+  },
+  {
+    "domain": "finance",
+    "question": "When is the coupon paid?",
+    "gold": "1 June 2024",
+    "span": "1 June 2024",
+    "hit": true
+  },
+  {
+    "domain": "finance",
+    "question": "What is the face value?",
+    "gold": "INR 1000",
+    "span": "INR 1000",
+    "hit": true
+  },
+  {
+    "domain": "medical",
+    "question": "What dose is printed?",
+    "gold": "40 mg",
+    "span": "40 mg",
+    "hit": true
+  },
+  {
+    "domain": "medical",
+    "question": "How often is the dose taken?",
+    "gold": "once daily",
+    "span": "Take the dose once daily.",
+    "hit": true
+  },
+  {
+    "domain": "medical",
+    "question": "What is the storage temperature?",
+    "gold": "25 C",
+    "span": null,
+    "hit": false
+  },
+  {
+    "domain": "medical",
+    "question": "How many tablets are in the pack?",
+    "gold": "14",
+    "span": "14 tablets",
+    "hit": true
+  },
+  {
+    "domain": "legal",
+    "question": "What is the notice period?",
+    "gold": "30 days",
+    "span": "30 days",
+    "hit": true
+  },
+  {
+    "domain": "legal",
+    "question": "What is the deposit?",
+    "gold": "INR 50000",
+    "span": "INR 50000",
+    "hit": true
+  },
+  {
+    "domain": "legal",
+    "question": "Who is the Lessee?",
+    "gold": "Ravi Sharma",
+    "span": "Ravi Sharma",
+    "hit": true
+  },
+  {
+    "domain": "legal",
+    "question": "What is the cure period?",
+    "gold": "10 days",
+    "span": "10 days",
+    "hit": true
+  }
+]

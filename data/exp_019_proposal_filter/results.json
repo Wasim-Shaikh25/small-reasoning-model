@@ -1,0 +1,37 @@
+{
+  "id": "EXP-019",
+  "title": "Proposal grounding filter",
+  "status": "closed",
+  "goal": "Measure the grounding filter and the retrieval lift of template queries over the raw ask, without calling a generative proposer.",
+  "method": "Candidate strings are kept only when they are well formed and their names, numbers, dates, and content terms already occur in the ask or the pasted context. Template queries come from the ask analyzer. Recall of the gold lease passage is compared with the raw ask.",
+  "metrics": {
+    "good_kept": 5,
+    "good_total": 5,
+    "hallucination_catch_rate": 1.0,
+    "malformed_catch_rate": 1.0,
+    "deduped_count": 1,
+    "format_valid_rate_on_good": 1.0,
+    "raw_ask_recall_at_5": 1.0,
+    "template_query_recall_at_5": 1.0,
+    "retrieval_lift": 0.0,
+    "harm_template_lowered_recall": false,
+    "proposer_model_called": false,
+    "raw_ask_in_template_queries": true
+  },
+  "results_prose": "The grounding filter kept 5 of 5 source-bound queries and caught 1.0 of the queries that introduced a new name, number, or date. Malformed items caught: 1.0. Duplicates collapsed to 1. Raw-ask Recall@5 is 1.0; template queries reach 1.0 (lift 0.0, harm False). No proposer model was called.",
+  "conclusion": "The filter drops proposals that introduce new names, numbers, or dates. Template queries are allowed only as additional searches; the raw ask remains in the list, so a bad extra query cannot remove the baseline. Experiment P's model ladder was not run.",
+  "scale_down": "Hand-written good and bad proposals stand in for FLAN-T5 samples. Input-size, hop, and sampling ladders that require a generative model are out of scope.",
+  "referenced_files": [
+    "lab/exp_019_proposal_filter/run.py",
+    "lab/common/proposals.py",
+    "lab/common/ask.py",
+    "lab/common/index.py",
+    "lab/common/textutil.py",
+    "lab/common/harness.py",
+    "data/exp_019_proposal_filter/proposals.json",
+    "data/exp_019_proposal_filter/results.json"
+  ],
+  "follow_ups": [],
+  "elapsed_sec": 0.0068,
+  "peak_rss_mb": 112.79
+}

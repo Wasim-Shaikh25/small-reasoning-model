@@ -1,0 +1,173 @@
+{
+  "id": "EXP-010",
+  "title": "Gap resolution loop",
+  "status": "closed",
+  "goal": "Run the budgeted gap loop on unknown terms, ambiguous references, missing premises, conflicting values, and vague criteria.",
+  "method": "Each round searches the supplied passages, reranks, and re-reads with extractive QA. Disagreeing spans stay open. After at most 3 rounds the gap is resolved, ambiguous, or unresolved. No weights change.",
+  "metrics": {
+    "n": 12,
+    "accuracy": 0.8333,
+    "by_gap": {
+      "unknown_term": 1.0,
+      "ambiguous_reference": 0.3333,
+      "missing_premise": 1.0,
+      "conflicting_values": 1.0,
+      "vague_criterion": 1.0
+    },
+    "max_rounds": 3,
+    "rows": [
+      {
+        "id": "G01",
+        "gap": "unknown_term",
+        "gold_status": "resolved",
+        "status": "resolved",
+        "span": "a refund issued after 14 days",
+        "round": 0,
+        "evidence_id": "P0",
+        "correct": true
+      },
+      {
+        "id": "G02",
+        "gap": "unknown_term",
+        "gold_status": "unresolved",
+        "status": "unresolved",
+        "span": null,
+        "alternatives": [],
+        "correct": true
+      },
+      {
+        "id": "G03",
+        "gap": "unknown_term",
+        "gold_status": "resolved",
+        "status": "resolved",
+        "span": "30 days",
+        "round": 0,
+        "evidence_id": "P0",
+        "correct": true
+      },
+      {
+        "id": "G04",
+        "gap": "ambiguous_reference",
+        "gold_status": "resolved",
+        "status": "resolved",
+        "span": "The said premises include a parking slot.",
+        "round": 0,
+        "evidence_id": "P1",
+        "correct": false
+      },
+      {
+        "id": "G05",
+        "gap": "ambiguous_reference",
+        "gold_status": "resolved",
+        "status": "resolved",
+        "span": "Kapil Iyer",
+        "round": 0,
+        "evidence_id": "P0",
+        "correct": true
+      },
+      {
+        "id": "G06",
+        "gap": "ambiguous_reference",
+        "gold_status": "unresolved",
+        "status": "resolved",
+        "span": "Nothing points at a referent.",
+        "round": 0,
+        "evidence_id": "P1",
+        "correct": false
+      },
+      {
+        "id": "G07",
+        "gap": "missing_premise",
+        "gold_status": "unresolved",
+        "status": "unresolved",
+        "span": null,
+        "alternatives": [],
+        "correct": true
+      },
+      {
+        "id": "G08",
+        "gap": "missing_premise",
+        "gold_status": "resolved",
+        "status": "resolved",
+        "span": "10 days",
+        "round": 0,
+        "evidence_id": "P1",
+        "correct": true
+      },
+      {
+        "id": "G09",
+        "gap": "conflicting_values",
+        "gold_status": "ambiguous",
+        "status": "ambiguous",
+        "span": null,
+        "alternatives": [
+          "30 days",
+          "version 2 sets the notice period at 45 days.",
+          "30 days",
+          "version 2 sets the notice period at 45 days.",
+          "30 days",
+          "version 2 sets the notice period at 45 days."
+        ],
+        "correct": true
+      },
+      {
+        "id": "G10",
+        "gap": "conflicting_values",
+        "gold_status": "ambiguous",
+        "status": "ambiguous",
+        "span": null,
+        "alternatives": [
+          "inr 50000",
+          "inr 75000",
+          "inr 50000",
+          "inr 75000",
+          "inr 50000",
+          "inr 75000"
+        ],
+        "correct": true
+      },
+      {
+        "id": "G11",
+        "gap": "vague_criterion",
+        "gold_status": "ambiguous",
+        "status": "ambiguous",
+        "span": null,
+        "alternatives": [
+          "Repairs shall be done within a reasonable time.",
+          "Repairs shall be done within a reasonable time.",
+          "Repairs shall be done within a reasonable time."
+        ],
+        "correct": true
+      },
+      {
+        "id": "G12",
+        "gap": "vague_criterion",
+        "gold_status": "ambiguous",
+        "status": "ambiguous",
+        "span": null,
+        "alternatives": [
+          "The tenant shall give prompt notice of damage.",
+          "The tenant shall give prompt notice of damage.",
+          "The tenant shall give prompt notice of damage."
+        ],
+        "correct": true
+      }
+    ]
+  },
+  "results_prose": "Gap resolution accuracy on 12 items is 0.8333. By type: {'unknown_term': 1.0, 'ambiguous_reference': 0.3333, 'missing_premise': 1.0, 'conflicting_values': 1.0, 'vague_criterion': 1.0}. Conflicts and vague criteria are closed as ambiguous. Missing definitions with no passage stay unresolved.",
+  "conclusion": "The loop can close a gap only when a passage states the missing piece, and it refuses a single answer when two values or a vague criterion remain.",
+  "scale_down": "Twelve items, two or three per gap type, replace the requested 10 items per gap type. Context is pasted, which is the Phase 0 setup.",
+  "referenced_files": [
+    "lab/exp_010_gap_resolution/run.py",
+    "lab/common/index.py",
+    "lab/common/qa.py",
+    "lab/common/nli.py",
+    "lab/common/textutil.py",
+    "lab/common/harness.py",
+    "data/exp_010_gap_resolution/items.json",
+    "data/exp_010_gap_resolution/results.json"
+  ],
+  "follow_ups": [],
+  "elapsed_sec": 0.0261,
+  "peak_rss_mb": 113.07
+}

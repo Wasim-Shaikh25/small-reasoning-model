@@ -1,0 +1,52 @@
+{
+  "id": "EXP-004",
+  "title": "Hybrid retrieval and rerank",
+  "status": "closed",
+  "goal": "Measure dense-plus-sparse retrieval, reranker lift, and whether one entity link recovers a cross-passage address.",
+  "method": "Okapi BM25 and TF-IDF cosine are min-max normalized and averaged. A lexical coverage score reranks the top 30. The graph links Lessee to Ravi Sharma and then to the residence passage, which does not contain the word Lessee.",
+  "metrics": {
+    "n_queries": 20,
+    "n_passages": 35,
+    "hybrid_recall_at_5": 1.0,
+    "hybrid_recall_at_10": 1.0,
+    "rerank_recall_at_5": 1.0,
+    "reranker_lift_recall_at_5": 0.0,
+    "mrr": 1.0,
+    "answer_passage_present_at_10": 1.0,
+    "graph_query": "Lessee address",
+    "lexical_top5": [
+      "P05",
+      "P01",
+      "P02",
+      "P03",
+      "P04"
+    ],
+    "lexical_hits_address": false,
+    "graph_expanded_ids": [
+      "P01",
+      "P02",
+      "P03",
+      "P04",
+      "P05",
+      "P07"
+    ],
+    "graph_hits_address": true
+  },
+  "results_prose": "On 20 queries over 35 passages, hybrid Recall@5 is 1.0, Recall@10 is 1.0, MRR is 1.0, and answer-passage-present@10 is 1.0. Reranking the top 30 changes Recall@5 to 1.0 (lift 0.0). The Lessee-address hop is in the lexical top 5: False. After the entity-link expansion it is present: True.",
+  "conclusion": "Hybrid search finds the labeled passage for most of these queries. The entity link is what connects Lessee to the residence sentence when that sentence does not repeat the role word.",
+  "scale_down": "In-memory BM25 and TF-IDF stand in for Qdrant dense plus sparse vectors and a cross-encoder reranker. The corpus is 35 passages, not a 1,000-page collection.",
+  "referenced_files": [
+    "lab/exp_004_hybrid_retrieval/run.py",
+    "lab/common/index.py",
+    "lab/common/graph.py",
+    "lab/common/textutil.py",
+    "lab/common/harness.py",
+    "data/exp_004_hybrid_retrieval/corpus.json",
+    "data/exp_004_hybrid_retrieval/results.json"
+  ],
+  "follow_ups": [
+    "Re-measure Recall@k on a larger corpus with an on-disk index once one is added. Do not add a generative retriever."
+  ],
+  "elapsed_sec": 0.0219,
+  "peak_rss_mb": 113.04
+}

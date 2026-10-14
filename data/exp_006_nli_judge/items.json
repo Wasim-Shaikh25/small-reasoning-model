@@ -1,0 +1,1262 @@
+[
+  {
+    "template": "T1",
+    "category": "supported",
+    "gold": "entail",
+    "pred": "entail",
+    "claim": "The notice period is 30 days.",
+    "premise": "The notice period is 30 days.",
+    "probs": {
+      "entail": 0.6175,
+      "neutral": 0.2056,
+      "contradict": 0.1769
+    },
+    "correct": true
+  },
+  {
+    "template": "T2",
+    "category": "supported",
+    "gold": "entail",
+    "pred": "entail",
+    "claim": "notice period: 30 days.",
+    "premise": "The notice period is 30 days.",
+    "probs": {
+      "entail": 0.6175,
+      "neutral": 0.2056,
+      "contradict": 0.1769
+    },
+    "correct": true
+  },
+  {
+    "template": "T3",
+    "category": "supported",
+    "gold": "entail",
+    "pred": "entail",
+    "claim": "Regarding notice period, the stated value is 30 days.",
+    "premise": "The notice period is 30 days.",
+    "probs": {
+      "entail": 0.3964,
+      "neutral": 0.3436,
+      "contradict": 0.2601
+    },
+    "correct": true
+  },
+  {
+    "template": "T1",
+    "category": "supported",
+    "gold": "entail",
+    "pred": "entail",
+    "claim": "The security deposit is INR 50000.",
+    "premise": "The security deposit is INR 50000.",
+    "probs": {
+      "entail": 0.6175,
+      "neutral": 0.2056,
+      "contradict": 0.1769
+    },
+    "correct": true
+  },
+  {
+    "template": "T2",
+    "category": "supported",
+    "gold": "entail",
+    "pred": "entail",
+    "claim": "security deposit: INR 50000.",
+    "premise": "The security deposit is INR 50000.",
+    "probs": {
+      "entail": 0.6175,
+      "neutral": 0.2056,
+      "contradict": 0.1769
+    },
+    "correct": true
+  },
+  {
+    "template": "T3",
+    "category": "supported",
+    "gold": "entail",
+    "pred": "entail",
+    "claim": "Regarding security deposit, the stated value is INR 50000.",
+    "premise": "The security deposit is INR 50000.",
+    "probs": {
+      "entail": 0.3964,
+      "neutral": 0.3436,
+      "contradict": 0.2601
+    },
+    "correct": true
+  },
+  {
+    "template": "T1",
+    "category": "supported",
+    "gold": "entail",
+    "pred": "entail",
+    "claim": "The Lessee is Ravi Sharma.",
+    "premise": "Ravi Sharma is the Lessee.",
+    "probs": {
+      "entail": 0.6175,
+      "neutral": 0.2056,
+      "contradict": 0.1769
+    },
+    "correct": true
+  },
+  {
+    "template": "T2",
+    "category": "supported",
+    "gold": "entail",
+    "pred": "entail",
+    "claim": "Lessee: Ravi Sharma.",
+    "premise": "Ravi Sharma is the Lessee.",
+    "probs": {
+      "entail": 0.6175,
+      "neutral": 0.2056,
+      "contradict": 0.1769
+    },
+    "correct": true
+  },
+  {
+    "template": "T3",
+    "category": "supported",
+    "gold": "entail",
+    "pred": "entail",
+    "claim": "Regarding Lessee, the stated value is Ravi Sharma.",
+    "premise": "Ravi Sharma is the Lessee.",
+    "probs": {
+      "entail": 0.3697,
+      "neutral": 0.3697,
+      "contradict": 0.2605
+    },
+    "correct": true
+  },
+  {
+    "template": "T1",
+    "category": "supported",
+    "gold": "entail",
+    "pred": "entail",
+    "claim": "The signing date is 5 January 2024.",
+    "premise": "The lease was signed on 5 January 2024.",
+    "probs": {
+      "entail": 0.3697,
+      "neutral": 0.3697,
+      "contradict": 0.2605
+    },
+    "correct": true
+  },
+  {
+    "template": "T2",
+    "category": "supported",
+    "gold": "entail",
+    "pred": "entail",
+    "claim": "signing date: 5 January 2024.",
+    "premise": "The lease was signed on 5 January 2024.",
+    "probs": {
+      "entail": 0.3697,
+      "neutral": 0.3697,
+      "contradict": 0.2605
+    },
+    "correct": true
+  },
+  {
+    "template": "T3",
+    "category": "supported",
+    "gold": "entail",
+    "pred": "neutral",
+    "claim": "Regarding signing date, the stated value is 5 January 2024.",
+    "premise": "The lease was signed on 5 January 2024.",
+    "probs": {
+      "entail": 0.2934,
+      "neutral": 0.4504,
+      "contradict": 0.2562
+    },
+    "correct": false
+  },
+  {
+    "template": "T1",
+    "category": "supported",
+    "gold": "entail",
+    "pred": "entail",
+    "claim": "The zorb is a refund issued after 14 days.",
+    "premise": "A zorb is a refund issued after 14 days.",
+    "probs": {
+      "entail": 0.6175,
+      "neutral": 0.2056,
+      "contradict": 0.1769
+    },
+    "correct": true
+  },
+  {
+    "template": "T2",
+    "category": "supported",
+    "gold": "entail",
+    "pred": "entail",
+    "claim": "zorb: a refund issued after 14 days.",
+    "premise": "A zorb is a refund issued after 14 days.",
+    "probs": {
+      "entail": 0.6175,
+      "neutral": 0.2056,
+      "contradict": 0.1769
+    },
+    "correct": true
+  },
+  {
+    "template": "T3",
+    "category": "supported",
+    "gold": "entail",
+    "pred": "entail",
+    "claim": "Regarding zorb, the stated value is a refund issued after 14 days.",
+    "premise": "A zorb is a refund issued after 14 days.",
+    "probs": {
+      "entail": 0.4323,
+      "neutral": 0.3098,
+      "contradict": 0.2579
+    },
+    "correct": true
+  },
+  {
+    "template": "T1",
+    "category": "supported",
+    "gold": "entail",
+    "pred": "entail",
+    "claim": "The sprint length is 9 days.",
+    "premise": "In this handbook a sprint lasts 9 days.",
+    "probs": {
+      "entail": 0.4323,
+      "neutral": 0.3098,
+      "contradict": 0.2579
+    },
+    "correct": true
+  },
+  {
+    "template": "T2",
+    "category": "supported",
+    "gold": "entail",
+    "pred": "entail",
+    "claim": "sprint length: 9 days.",
+    "premise": "In this handbook a sprint lasts 9 days.",
+    "probs": {
+      "entail": 0.4323,
+      "neutral": 0.3098,
+      "contradict": 0.2579
+    },
+    "correct": true
+  },
+  {
+    "template": "T3",
+    "category": "supported",
+    "gold": "entail",
+    "pred": "neutral",
+    "claim": "Regarding sprint length, the stated value is 9 days.",
+    "premise": "In this handbook a sprint lasts 9 days.",
+    "probs": {
+      "entail": 0.3098,
+      "neutral": 0.4323,
+      "contradict": 0.2579
+    },
+    "correct": false
+  },
+  {
+    "template": "T1",
+    "category": "supported",
+    "gold": "neutral",
+    "pred": "contradict",
+    "claim": "The subletting is prohibited.",
+    "premise": "The tenant shall not sublet.",
+    "probs": {
+      "entail": 0.1645,
+      "neutral": 0.2009,
+      "contradict": 0.6346
+    },
+    "correct": false
+  },
+  {
+    "template": "T2",
+    "category": "supported",
+    "gold": "neutral",
+    "pred": "contradict",
+    "claim": "subletting: prohibited.",
+    "premise": "The tenant shall not sublet.",
+    "probs": {
+      "entail": 0.1645,
+      "neutral": 0.2009,
+      "contradict": 0.6346
+    },
+    "correct": false
+  },
+  {
+    "template": "T3",
+    "category": "supported",
+    "gold": "neutral",
+    "pred": "neutral",
+    "claim": "Regarding subletting, the stated value is prohibited.",
+    "premise": "The tenant shall not sublet.",
+    "probs": {
+      "entail": 0.265,
+      "neutral": 0.4829,
+      "contradict": 0.2521
+    },
+    "correct": true
+  },
+  {
+    "template": "T1",
+    "category": "supported",
+    "gold": "entail",
+    "pred": "entail",
+    "claim": "The rent is INR 25000.",
+    "premise": "The monthly rent is INR 25000.",
+    "probs": {
+      "entail": 0.6175,
+      "neutral": 0.2056,
+      "contradict": 0.1769
+    },
+    "correct": true
+  },
+  {
+    "template": "T2",
+    "category": "supported",
+    "gold": "entail",
+    "pred": "entail",
+    "claim": "rent: INR 25000.",
+    "premise": "The monthly rent is INR 25000.",
+    "probs": {
+      "entail": 0.6175,
+      "neutral": 0.2056,
+      "contradict": 0.1769
+    },
+    "correct": true
+  },
+  {
+    "template": "T3",
+    "category": "supported",
+    "gold": "entail",
+    "pred": "entail",
+    "claim": "Regarding rent, the stated value is INR 25000.",
+    "premise": "The monthly rent is INR 25000.",
+    "probs": {
+      "entail": 0.3697,
+      "neutral": 0.3697,
+      "contradict": 0.2605
+    },
+    "correct": true
+  },
+  {
+    "template": "T1",
+    "category": "number",
+    "gold": "contradict",
+    "pred": "contradict",
+    "claim": "The notice period is 60 days.",
+    "premise": "The notice period is 30 days.",
+    "probs": {
+      "entail": 0.1645,
+      "neutral": 0.2009,
+      "contradict": 0.6346
+    },
+    "correct": true
+  },
+  {
+    "template": "T2",
+    "category": "number",
+    "gold": "contradict",
+    "pred": "contradict",
+    "claim": "notice period: 60 days.",
+    "premise": "The notice period is 30 days.",
+    "probs": {
+      "entail": 0.1645,
+      "neutral": 0.2009,
+      "contradict": 0.6346
+    },
+    "correct": true
+  },
+  {
+    "template": "T3",
+    "category": "number",
+    "gold": "contradict",
+    "pred": "contradict",
+    "claim": "Regarding notice period, the stated value is 60 days.",
+    "premise": "The notice period is 30 days.",
+    "probs": {
+      "entail": 0.1645,
+      "neutral": 0.2009,
+      "contradict": 0.6346
+    },
+    "correct": true
+  },
+  {
+    "template": "T1",
+    "category": "number",
+    "gold": "contradict",
+    "pred": "contradict",
+    "claim": "The security deposit is INR 10000.",
+    "premise": "The security deposit is INR 50000.",
+    "probs": {
+      "entail": 0.1645,
+      "neutral": 0.2009,
+      "contradict": 0.6346
+    },
+    "correct": true
+  },
+  {
+    "template": "T2",
+    "category": "number",
+    "gold": "contradict",
+    "pred": "contradict",
+    "claim": "security deposit: INR 10000.",
+    "premise": "The security deposit is INR 50000.",
+    "probs": {
+      "entail": 0.1645,
+      "neutral": 0.2009,
+      "contradict": 0.6346
+    },
+    "correct": true
+  },
+  {
+    "template": "T3",
+    "category": "number",
+    "gold": "contradict",
+    "pred": "contradict",
+    "claim": "Regarding security deposit, the stated value is INR 10000.",
+    "premise": "The security deposit is INR 50000.",
+    "probs": {
+      "entail": 0.1645,
+      "neutral": 0.2009,
+      "contradict": 0.6346
+    },
+    "correct": true
+  },
+  {
+    "template": "T1",
+    "category": "number",
+    "gold": "contradict",
+    "pred": "contradict",
+    "claim": "The rent is INR 40000.",
+    "premise": "The rent is INR 25000.",
+    "probs": {
+      "entail": 0.1645,
+      "neutral": 0.2009,
+      "contradict": 0.6346
+    },
+    "correct": true
+  },
+  {
+    "template": "T2",
+    "category": "number",
+    "gold": "contradict",
+    "pred": "contradict",
+    "claim": "rent: INR 40000.",
+    "premise": "The rent is INR 25000.",
+    "probs": {
+      "entail": 0.1645,
+      "neutral": 0.2009,
+      "contradict": 0.6346
+    },
+    "correct": true
+  },
+  {
+    "template": "T3",
+    "category": "number",
+    "gold": "contradict",
+    "pred": "neutral",
+    "claim": "Regarding rent, the stated value is INR 40000.",
+    "premise": "The rent is INR 25000.",
+    "probs": {
+      "entail": 0.3098,
+      "neutral": 0.4323,
+      "contradict": 0.2579
+    },
+    "correct": false
+  },
+  {
+    "template": "T1",
+    "category": "number",
+    "gold": "contradict",
+    "pred": "contradict",
+    "claim": "The notice period is 30 days.",
+    "premise": "Version 2 sets the notice period at 45 days.",
+    "probs": {
+      "entail": 0.1645,
+      "neutral": 0.2009,
+      "contradict": 0.6346
+    },
+    "correct": true
+  },
+  {
+    "template": "T2",
+    "category": "number",
+    "gold": "contradict",
+    "pred": "contradict",
+    "claim": "notice period: 30 days.",
+    "premise": "Version 2 sets the notice period at 45 days.",
+    "probs": {
+      "entail": 0.1645,
+      "neutral": 0.2009,
+      "contradict": 0.6346
+    },
+    "correct": true
+  },
+  {
+    "template": "T3",
+    "category": "number",
+    "gold": "contradict",
+    "pred": "contradict",
+    "claim": "Regarding notice period, the stated value is 30 days.",
+    "premise": "Version 2 sets the notice period at 45 days.",
+    "probs": {
+      "entail": 0.1645,
+      "neutral": 0.2009,
+      "contradict": 0.6346
+    },
+    "correct": true
+  },
+  {
+    "template": "T1",
+    "category": "number",
+    "gold": "contradict",
+    "pred": "contradict",
+    "claim": "The dose is 10 mg.",
+    "premise": "The dose is 40 mg.",
+    "probs": {
+      "entail": 0.1645,
+      "neutral": 0.2009,
+      "contradict": 0.6346
+    },
+    "correct": true
+  },
+  {
+    "template": "T2",
+    "category": "number",
+    "gold": "contradict",
+    "pred": "contradict",
+    "claim": "dose: 10 mg.",
+    "premise": "The dose is 40 mg.",
+    "probs": {
+      "entail": 0.1645,
+      "neutral": 0.2009,
+      "contradict": 0.6346
+    },
+    "correct": true
+  },
+  {
+    "template": "T3",
+    "category": "number",
+    "gold": "contradict",
+    "pred": "neutral",
+    "claim": "Regarding dose, the stated value is 10 mg.",
+    "premise": "The dose is 40 mg.",
+    "probs": {
+      "entail": 0.3098,
+      "neutral": 0.4323,
+      "contradict": 0.2579
+    },
+    "correct": false
+  },
+  {
+    "template": "T1",
+    "category": "number",
+    "gold": "contradict",
+    "pred": "contradict",
+    "claim": "The interest is 12 percent.",
+    "premise": "The bond interest is 7 percent.",
+    "probs": {
+      "entail": 0.1645,
+      "neutral": 0.2009,
+      "contradict": 0.6346
+    },
+    "correct": true
+  },
+  {
+    "template": "T2",
+    "category": "number",
+    "gold": "contradict",
+    "pred": "contradict",
+    "claim": "interest: 12 percent.",
+    "premise": "The bond interest is 7 percent.",
+    "probs": {
+      "entail": 0.1645,
+      "neutral": 0.2009,
+      "contradict": 0.6346
+    },
+    "correct": true
+  },
+  {
+    "template": "T3",
+    "category": "number",
+    "gold": "contradict",
+    "pred": "neutral",
+    "claim": "Regarding interest, the stated value is 12 percent.",
+    "premise": "The bond interest is 7 percent.",
+    "probs": {
+      "entail": 0.3098,
+      "neutral": 0.4323,
+      "contradict": 0.2579
+    },
+    "correct": false
+  },
+  {
+    "template": "T1",
+    "category": "negation",
+    "gold": "contradict",
+    "pred": "contradict",
+    "claim": "The permission is the tenant shall sublet the premises.",
+    "premise": "The tenant shall not sublet the premises.",
+    "probs": {
+      "entail": 0.1645,
+      "neutral": 0.2009,
+      "contradict": 0.6346
+    },
+    "correct": true
+  },
+  {
+    "template": "T2",
+    "category": "negation",
+    "gold": "contradict",
+    "pred": "contradict",
+    "claim": "permission: the tenant shall sublet the premises.",
+    "premise": "The tenant shall not sublet the premises.",
+    "probs": {
+      "entail": 0.1645,
+      "neutral": 0.2009,
+      "contradict": 0.6346
+    },
+    "correct": true
+  },
+  {
+    "template": "T3",
+    "category": "negation",
+    "gold": "contradict",
+    "pred": "contradict",
+    "claim": "Regarding permission, the stated value is the tenant shall sublet the premises.",
+    "premise": "The tenant shall not sublet the premises.",
+    "probs": {
+      "entail": 0.1645,
+      "neutral": 0.2009,
+      "contradict": 0.6346
+    },
+    "correct": true
+  },
+  {
+    "template": "T1",
+    "category": "negation",
+    "gold": "contradict",
+    "pred": "contradict",
+    "claim": "The renewal is the licence shall renew automatically.",
+    "premise": "The licence shall not renew automatically.",
+    "probs": {
+      "entail": 0.1645,
+      "neutral": 0.2009,
+      "contradict": 0.6346
+    },
+    "correct": true
+  },
+  {
+    "template": "T2",
+    "category": "negation",
+    "gold": "contradict",
+    "pred": "contradict",
+    "claim": "renewal: the licence shall renew automatically.",
+    "premise": "The licence shall not renew automatically.",
+    "probs": {
+      "entail": 0.1645,
+      "neutral": 0.2009,
+      "contradict": 0.6346
+    },
+    "correct": true
+  },
+  {
+    "template": "T3",
+    "category": "negation",
+    "gold": "contradict",
+    "pred": "contradict",
+    "claim": "Regarding renewal, the stated value is the licence shall renew automatically.",
+    "premise": "The licence shall not renew automatically.",
+    "probs": {
+      "entail": 0.1645,
+      "neutral": 0.2009,
+      "contradict": 0.6346
+    },
+    "correct": true
+  },
+  {
+    "template": "T1",
+    "category": "negation",
+    "gold": "contradict",
+    "pred": "contradict",
+    "claim": "The dogs is the tenant must keep a dog.",
+    "premise": "The tenant must not keep a dog.",
+    "probs": {
+      "entail": 0.1645,
+      "neutral": 0.2009,
+      "contradict": 0.6346
+    },
+    "correct": true
+  },
+  {
+    "template": "T2",
+    "category": "negation",
+    "gold": "contradict",
+    "pred": "contradict",
+    "claim": "dogs: the tenant must keep a dog.",
+    "premise": "The tenant must not keep a dog.",
+    "probs": {
+      "entail": 0.1645,
+      "neutral": 0.2009,
+      "contradict": 0.6346
+    },
+    "correct": true
+  },
+  {
+    "template": "T3",
+    "category": "negation",
+    "gold": "contradict",
+    "pred": "contradict",
+    "claim": "Regarding dogs, the stated value is the tenant must keep a dog.",
+    "premise": "The tenant must not keep a dog.",
+    "probs": {
+      "entail": 0.1645,
+      "neutral": 0.2009,
+      "contradict": 0.6346
+    },
+    "correct": true
+  },
+  {
+    "template": "T1",
+    "category": "negation",
+    "gold": "contradict",
+    "pred": "contradict",
+    "claim": "The entry is entry is allowed after dusk.",
+    "premise": "Entry is not allowed after dusk.",
+    "probs": {
+      "entail": 0.1645,
+      "neutral": 0.2009,
+      "contradict": 0.6346
+    },
+    "correct": true
+  },
+  {
+    "template": "T2",
+    "category": "negation",
+    "gold": "contradict",
+    "pred": "contradict",
+    "claim": "entry: entry is allowed after dusk.",
+    "premise": "Entry is not allowed after dusk.",
+    "probs": {
+      "entail": 0.1645,
+      "neutral": 0.2009,
+      "contradict": 0.6346
+    },
+    "correct": true
+  },
+  {
+    "template": "T3",
+    "category": "negation",
+    "gold": "contradict",
+    "pred": "contradict",
+    "claim": "Regarding entry, the stated value is entry is allowed after dusk.",
+    "premise": "Entry is not allowed after dusk.",
+    "probs": {
+      "entail": 0.1645,
+      "neutral": 0.2009,
+      "contradict": 0.6346
+    },
+    "correct": true
+  },
+  {
+    "template": "T1",
+    "category": "neutral",
+    "gold": "neutral",
+    "pred": "neutral",
+    "claim": "The deposit is INR 50000.",
+    "premise": "The garden has roses.",
+    "probs": {
+      "entail": 0.2049,
+      "neutral": 0.557,
+      "contradict": 0.2381
+    },
+    "correct": true
+  },
+  {
+    "template": "T2",
+    "category": "neutral",
+    "gold": "neutral",
+    "pred": "neutral",
+    "claim": "deposit: INR 50000.",
+    "premise": "The garden has roses.",
+    "probs": {
+      "entail": 0.2049,
+      "neutral": 0.557,
+      "contradict": 0.2381
+    },
+    "correct": true
+  },
+  {
+    "template": "T3",
+    "category": "neutral",
+    "gold": "neutral",
+    "pred": "neutral",
+    "claim": "Regarding deposit, the stated value is INR 50000.",
+    "premise": "The garden has roses.",
+    "probs": {
+      "entail": 0.2049,
+      "neutral": 0.557,
+      "contradict": 0.2381
+    },
+    "correct": true
+  },
+  {
+    "template": "T1",
+    "category": "neutral",
+    "gold": "neutral",
+    "pred": "neutral",
+    "claim": "The notice period is 30 days.",
+    "premise": "Schedule A lists four chairs.",
+    "probs": {
+      "entail": 0.2049,
+      "neutral": 0.557,
+      "contradict": 0.2381
+    },
+    "correct": true
+  },
+  {
+    "template": "T2",
+    "category": "neutral",
+    "gold": "neutral",
+    "pred": "neutral",
+    "claim": "notice period: 30 days.",
+    "premise": "Schedule A lists four chairs.",
+    "probs": {
+      "entail": 0.2049,
+      "neutral": 0.557,
+      "contradict": 0.2381
+    },
+    "correct": true
+  },
+  {
+    "template": "T3",
+    "category": "neutral",
+    "gold": "neutral",
+    "pred": "neutral",
+    "claim": "Regarding notice period, the stated value is 30 days.",
+    "premise": "Schedule A lists four chairs.",
+    "probs": {
+      "entail": 0.2049,
+      "neutral": 0.557,
+      "contradict": 0.2381
+    },
+    "correct": true
+  },
+  {
+    "template": "T1",
+    "category": "neutral",
+    "gold": "neutral",
+    "pred": "neutral",
+    "claim": "The lessee is Ravi Sharma.",
+    "premise": "Park Street market opens at dawn.",
+    "probs": {
+      "entail": 0.2049,
+      "neutral": 0.557,
+      "contradict": 0.2381
+    },
+    "correct": true
+  },
+  {
+    "template": "T2",
+    "category": "neutral",
+    "gold": "neutral",
+    "pred": "neutral",
+    "claim": "lessee: Ravi Sharma.",
+    "premise": "Park Street market opens at dawn.",
+    "probs": {
+      "entail": 0.2049,
+      "neutral": 0.557,
+      "contradict": 0.2381
+    },
+    "correct": true
+  },
+  {
+    "template": "T3",
+    "category": "neutral",
+    "gold": "neutral",
+    "pred": "neutral",
+    "claim": "Regarding lessee, the stated value is Ravi Sharma.",
+    "premise": "Park Street market opens at dawn.",
+    "probs": {
+      "entail": 0.2049,
+      "neutral": 0.557,
+      "contradict": 0.2381
+    },
+    "correct": true
+  },
+  {
+    "template": "T1",
+    "category": "neutral",
+    "gold": "neutral",
+    "pred": "neutral",
+    "claim": "The bond interest is 7 percent.",
+    "premise": "The recipe uses salt.",
+    "probs": {
+      "entail": 0.2049,
+      "neutral": 0.557,
+      "contradict": 0.2381
+    },
+    "correct": true
+  },
+  {
+    "template": "T2",
+    "category": "neutral",
+    "gold": "neutral",
+    "pred": "neutral",
+    "claim": "bond interest: 7 percent.",
+    "premise": "The recipe uses salt.",
+    "probs": {
+      "entail": 0.2049,
+      "neutral": 0.557,
+      "contradict": 0.2381
+    },
+    "correct": true
+  },
+  {
+    "template": "T3",
+    "category": "neutral",
+    "gold": "neutral",
+    "pred": "neutral",
+    "claim": "Regarding bond interest, the stated value is 7 percent.",
+    "premise": "The recipe uses salt.",
+    "probs": {
+      "entail": 0.2049,
+      "neutral": 0.557,
+      "contradict": 0.2381
+    },
+    "correct": true
+  },
+  {
+    "template": "T1",
+    "category": "neutral",
+    "gold": "neutral",
+    "pred": "neutral",
+    "claim": "The quorum code is 41827.",
+    "premise": "Meera Iyer signed the page.",
+    "probs": {
+      "entail": 0.2049,
+      "neutral": 0.557,
+      "contradict": 0.2381
+    },
+    "correct": true
+  },
+  {
+    "template": "T2",
+    "category": "neutral",
+    "gold": "neutral",
+    "pred": "neutral",
+    "claim": "quorum code: 41827.",
+    "premise": "Meera Iyer signed the page.",
+    "probs": {
+      "entail": 0.2049,
+      "neutral": 0.557,
+      "contradict": 0.2381
+    },
+    "correct": true
+  },
+  {
+    "template": "T3",
+    "category": "neutral",
+    "gold": "neutral",
+    "pred": "neutral",
+    "claim": "Regarding quorum code, the stated value is 41827.",
+    "premise": "Meera Iyer signed the page.",
+    "probs": {
+      "entail": 0.2049,
+      "neutral": 0.557,
+      "contradict": 0.2381
+    },
+    "correct": true
+  },
+  {
+    "template": "T1",
+    "category": "neutral",
+    "gold": "neutral",
+    "pred": "neutral",
+    "claim": "The sprint length is 9 days.",
+    "premise": "The parking slot is included.",
+    "probs": {
+      "entail": 0.2049,
+      "neutral": 0.557,
+      "contradict": 0.2381
+    },
+    "correct": true
+  },
+  {
+    "template": "T2",
+    "category": "neutral",
+    "gold": "neutral",
+    "pred": "neutral",
+    "claim": "sprint length: 9 days.",
+    "premise": "The parking slot is included.",
+    "probs": {
+      "entail": 0.2049,
+      "neutral": 0.557,
+      "contradict": 0.2381
+    },
+    "correct": true
+  },
+  {
+    "template": "T3",
+    "category": "neutral",
+    "gold": "neutral",
+    "pred": "neutral",
+    "claim": "Regarding sprint length, the stated value is 9 days.",
+    "premise": "The parking slot is included.",
+    "probs": {
+      "entail": 0.2049,
+      "neutral": 0.557,
+      "contradict": 0.2381
+    },
+    "correct": true
+  },
+  {
+    "template": "T1",
+    "category": "exception",
+    "gold": "neutral",
+    "pred": "entail",
+    "claim": "The subletting is the tenant may sublet.",
+    "premise": "The tenant may sublet except where the landlord refuses.",
+    "probs": {
+      "entail": 0.6175,
+      "neutral": 0.2056,
+      "contradict": 0.1769
+    },
+    "correct": false
+  },
+  {
+    "template": "T2",
+    "category": "exception",
+    "gold": "neutral",
+    "pred": "entail",
+    "claim": "subletting: the tenant may sublet.",
+    "premise": "The tenant may sublet except where the landlord refuses.",
+    "probs": {
+      "entail": 0.6175,
+      "neutral": 0.2056,
+      "contradict": 0.1769
+    },
+    "correct": false
+  },
+  {
+    "template": "T3",
+    "category": "exception",
+    "gold": "neutral",
+    "pred": "entail",
+    "claim": "Regarding subletting, the stated value is the tenant may sublet.",
+    "premise": "The tenant may sublet except where the landlord refuses.",
+    "probs": {
+      "entail": 0.3964,
+      "neutral": 0.3436,
+      "contradict": 0.2601
+    },
+    "correct": false
+  },
+  {
+    "template": "T1",
+    "category": "exception",
+    "gold": "neutral",
+    "pred": "entail",
+    "claim": "The waiver is fees are waived.",
+    "premise": "Fees are waived unless the invoice is late.",
+    "probs": {
+      "entail": 0.4323,
+      "neutral": 0.3098,
+      "contradict": 0.2579
+    },
+    "correct": false
+  },
+  {
+    "template": "T2",
+    "category": "exception",
+    "gold": "neutral",
+    "pred": "entail",
+    "claim": "waiver: fees are waived.",
+    "premise": "Fees are waived unless the invoice is late.",
+    "probs": {
+      "entail": 0.4323,
+      "neutral": 0.3098,
+      "contradict": 0.2579
+    },
+    "correct": false
+  },
+  {
+    "template": "T3",
+    "category": "exception",
+    "gold": "neutral",
+    "pred": "neutral",
+    "claim": "Regarding waiver, the stated value is fees are waived.",
+    "premise": "Fees are waived unless the invoice is late.",
+    "probs": {
+      "entail": 0.3098,
+      "neutral": 0.4323,
+      "contradict": 0.2579
+    },
+    "correct": true
+  },
+  {
+    "template": "T1",
+    "category": "exception",
+    "gold": "neutral",
+    "pred": "entail",
+    "claim": "The continuation is the licence continues.",
+    "premise": "The licence continues provided that the fee is paid.",
+    "probs": {
+      "entail": 0.4323,
+      "neutral": 0.3098,
+      "contradict": 0.2579
+    },
+    "correct": false
+  },
+  {
+    "template": "T2",
+    "category": "exception",
+    "gold": "neutral",
+    "pred": "entail",
+    "claim": "continuation: the licence continues.",
+    "premise": "The licence continues provided that the fee is paid.",
+    "probs": {
+      "entail": 0.4323,
+      "neutral": 0.3098,
+      "contradict": 0.2579
+    },
+    "correct": false
+  },
+  {
+    "template": "T3",
+    "category": "exception",
+    "gold": "neutral",
+    "pred": "neutral",
+    "claim": "Regarding continuation, the stated value is the licence continues.",
+    "premise": "The licence continues provided that the fee is paid.",
+    "probs": {
+      "entail": 0.3098,
+      "neutral": 0.4323,
+      "contradict": 0.2579
+    },
+    "correct": true
+  },
+  {
+    "template": "T1",
+    "category": "exception",
+    "gold": "neutral",
+    "pred": "entail",
+    "claim": "The visitors is visitors are allowed.",
+    "premise": "Visitors are allowed only on weekdays.",
+    "probs": {
+      "entail": 0.6175,
+      "neutral": 0.2056,
+      "contradict": 0.1769
+    },
+    "correct": false
+  },
+  {
+    "template": "T2",
+    "category": "exception",
+    "gold": "neutral",
+    "pred": "entail",
+    "claim": "visitors: visitors are allowed.",
+    "premise": "Visitors are allowed only on weekdays.",
+    "probs": {
+      "entail": 0.6175,
+      "neutral": 0.2056,
+      "contradict": 0.1769
+    },
+    "correct": false
+  },
+  {
+    "template": "T3",
+    "category": "exception",
+    "gold": "neutral",
+    "pred": "entail",
+    "claim": "Regarding visitors, the stated value is visitors are allowed.",
+    "premise": "Visitors are allowed only on weekdays.",
+    "probs": {
+      "entail": 0.3697,
+      "neutral": 0.3697,
+      "contradict": 0.2605
+    },
+    "correct": false
+  },
+  {
+    "template": "T1",
+    "category": "exception",
+    "gold": "neutral",
+    "pred": "entail",
+    "claim": "The cure period is 10 days.",
+    "premise": "The cure period is 10 days except during a lockout.",
+    "probs": {
+      "entail": 0.6175,
+      "neutral": 0.2056,
+      "contradict": 0.1769
+    },
+    "correct": false
+  },
+  {
+    "template": "T2",
+    "category": "exception",
+    "gold": "neutral",
+    "pred": "entail",
+    "claim": "cure period: 10 days.",
+    "premise": "The cure period is 10 days except during a lockout.",
+    "probs": {
+      "entail": 0.6175,
+      "neutral": 0.2056,
+      "contradict": 0.1769
+    },
+    "correct": false
+  },
+  {
+    "template": "T3",
+    "category": "exception",
+    "gold": "neutral",
+    "pred": "entail",
+    "claim": "Regarding cure period, the stated value is 10 days.",
+    "premise": "The cure period is 10 days except during a lockout.",
+    "probs": {
+      "entail": 0.3964,
+      "neutral": 0.3436,
+      "contradict": 0.2601
+    },
+    "correct": false
+  },
+  {
+    "template": "T1",
+    "category": "exception",
+    "gold": "neutral",
+    "pred": "entail",
+    "claim": "The payment is payment is due on Monday.",
+    "premise": "Payment is due on Monday unless that day is a holiday.",
+    "probs": {
+      "entail": 0.6175,
+      "neutral": 0.2056,
+      "contradict": 0.1769
+    },
+    "correct": false
+  },
+  {
+    "template": "T2",
+    "category": "exception",
+    "gold": "neutral",
+    "pred": "entail",
+    "claim": "payment: payment is due on Monday.",
+    "premise": "Payment is due on Monday unless that day is a holiday.",
+    "probs": {
+      "entail": 0.6175,
+      "neutral": 0.2056,
+      "contradict": 0.1769
+    },
+    "correct": false
+  },
+  {
+    "template": "T3",
+    "category": "exception",
+    "gold": "neutral",
+    "pred": "entail",
+    "claim": "Regarding payment, the stated value is payment is due on Monday.",
+    "premise": "Payment is due on Monday unless that day is a holiday.",
+    "probs": {
+      "entail": 0.3964,
+      "neutral": 0.3436,
+      "contradict": 0.2601
+    },
+    "correct": false
+  }
+]

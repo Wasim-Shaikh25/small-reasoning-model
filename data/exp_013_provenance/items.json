@@ -1,0 +1,96 @@
+{
+  "h1": [
+    {
+      "matched_context": true,
+      "matched_background": false,
+      "abstained": false,
+      "span": "9 days",
+      "answer": "9 days"
+    },
+    {
+      "matched_context": true,
+      "matched_background": false,
+      "abstained": false,
+      "span": "Lyon",
+      "answer": "Lyon"
+    },
+    {
+      "matched_context": true,
+      "matched_background": false,
+      "abstained": false,
+      "span": "98 C",
+      "answer": "98 C"
+    },
+    {
+      "matched_context": true,
+      "matched_background": false,
+      "abstained": false,
+      "span": "6",
+      "answer": "6"
+    },
+    {
+      "matched_context": true,
+      "matched_background": false,
+      "abstained": false,
+      "span": "9 days",
+      "answer": "9 days"
+    },
+    {
+      "matched_context": true,
+      "matched_background": false,
+      "abstained": false,
+      "span": "This page calls Lyon the capital.",
+      "answer": "This page calls Lyon the capital."
+    },
+    {
+      "matched_context": true,
+      "matched_background": false,
+      "abstained": false,
+      "span": "The sheet prints 98 C as the boiling point.",
+      "answer": "The sheet prints 98 C as the boiling point."
+    },
+    {
+      "matched_context": true,
+      "matched_background": false,
+      "abstained": false,
+      "span": "6",
+      "answer": "6"
+    }
+  ],
+  "h2_with": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+  ],
+  "h2_without": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+  ],
+  "tags": [
+    {
+      "statement": "The notice period is 30 days.",
+      "tag": "evidence",
+      "kept": true,
+      "reason": "quoted_span"
+    },
+    {
+      "statement": "The end date is 31 January 2024.",
+      "tag": "inference",
+      "kept": true,
+      "reason": "stated_step"
+    },
+    {
+      "statement": "The capital is Paris.",
+      "tag": "background",
+      "kept": false,
+      "reason": "not established in the provided material"
+    }
+  ]
+}

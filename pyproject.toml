@@ -1,0 +1,15 @@
+[project]
+name = "evidence-grounded-poc"
+version = "0.2.0"
+description = "Evidence-grounded reasoning proof of concept. No generative language model."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+  "numpy>=1.26",
+  "scikit-learn>=1.4",
+  "rapidfuzz>=3.6",
+  "dateparser>=1.2",
+]
+
+[tool.setuptools.packages.find]
+include = ["lab*"]
