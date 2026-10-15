@@ -42,7 +42,7 @@
     "navigate_semantic has no handling for a level with only 1 child (no margin computable); test a tree shape that exercises that gap before any production use.",
     "Sweep min_margin across more off-topic and near-miss asks before picking a production value; 0.03 here is a first measured choice, not a tuned one."
   ],
-  "elapsed_sec": 40.02,
-  "peak_rss_mb": 549.19,
+  "elapsed_sec": 65.3864,
+  "peak_rss_mb": 535.48,
   "models_used": "bge-small-en-v1.5 (BAAI), the same real checkpoint loaded since EXP-030, used for retrieval scoring only -- no generative model anywhere in this exploration."
 }

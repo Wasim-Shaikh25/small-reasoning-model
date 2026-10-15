@@ -21893,7 +21893,7 @@ Elapsed seconds: 3.7714. Peak RSS MB: 293.77.
 }
 ```
 
-Elapsed seconds: 8.1773. Peak RSS MB: 386.81.
+Elapsed seconds: 79.2153. Peak RSS MB: 503.51.
 - Scale-down: 8 cases across 3 regimes, not a benchmark of the brain's ceiling -- a targeted test that the single entry point reproduces every prior exploration's answer without per-case wiring.
 - Conclusion: One function handles a plain lookup, a rule-application question, and a multi-signal integrated scenario without the caller choosing a path. The difference between regimes shows up only in the trace -- which internal signal checks fired -- never in which function was called or how it was called. A lookup question fires none of the extra signals and falls back to the same single-slot extractor lab.common.engine already uses; the integrated cases fire three signals at once and chain their results. This is the unification the prior three explorations (EXP-057/058/059) proved piece by piece, now proved as one entry point rather than three scripts a person chooses between.
 
@@ -22283,7 +22283,7 @@ Elapsed seconds: 76.1722. Peak RSS MB: 147.25.
 }
 ```
 
-Elapsed seconds: 0.0266. Peak RSS MB: 128.61.
+Elapsed seconds: 0.1747. Peak RSS MB: 128.36.
 - Scale-down: 3 chapters, up to 450 leaves, one needle -- not a real 1000-page document or multiple simultaneous needles. Two levels of hierarchy (chapter, section); a real book might want a third (chapter -> section -> paragraph -> sentence).
 - Conclusion: Hierarchical navigation -- scoring each level's children against the ask and descending only into the best match, the same hybrid retriever EXP-004/015/029/040/058/060 already measured, never a language model -- correctly reaches the chapter and section containing a distinctive needle at every size tested, from 27 to 450 leaves, without ever scoring the full leaf set directly: by the final level, the candidate pool it searches is only the handful of leaves in the one resolved section, not the whole tree. This is the mechanism that lets the system work on a 1000-page document without Gemma (or anything else) ever holding more than one small section's worth of content at a time -- navigation cost grows with tree depth, not with total document size. An abstention floor is now in place, and getting it right took a real measured correction, not a guess: a fixed magnitude floor (0.05) correctly caught the off-topic negative control but then wrongly rejected the genuine needle at larger sizes too, because a true match's own dense score shrinks as its chapter's summary grows (0.64 -> 0.017 -> 0.0056 across the three sizes here) -- a magnitude tuned on the small case does not survive scale. A near-zero floor (strictly positive, not how large) does survive it, because true noise is exactly zero, not small, while a diluted-but-genuine signal never quite reaches zero. The gap lab.common.brain's flat disambiguation step has (no abstention threshold there yet either) is still open and is the natural next place to carry this same fix.
 
@@ -22325,7 +22325,7 @@ Elapsed seconds: 0.0266. Peak RSS MB: 128.61.
 }
 ```
 
-Elapsed seconds: 0.0065. Peak RSS MB: 139.5.
+Elapsed seconds: 0.0616. Peak RSS MB: 139.87.
 - Scale-down: 2 cases, 2-level hierarchy, 9 passages -- a wiring proof, not a scale test (EXP-065 already measured scale up to 450 leaves for the navigation mechanism alone).
 - Conclusion: The unification EXP-060 proved for flat documents carries over to hierarchical ones without any change at the call site: the same function, given passages tagged with a 'hierarchy' dict instead of a flat 'group' string, navigates the structure (lab.common.nested_index, EXP-065's near-zero abstention floor included) and then runs the identical downstream signals (identity, arithmetic, rule application) EXP-058 already measured. A caller never needs to know or declare whether the document it's handing brain.reason is flat or structured -- the passages' own tags decide, the same 'input decides how much of the machinery runs' principle EXP-060 established for the simpler signals now extends to document structure itself.
 
@@ -22368,9 +22368,83 @@ Elapsed seconds: 0.0065. Peak RSS MB: 139.5.
 }
 ```
 
-Elapsed seconds: 40.02. Peak RSS MB: 549.19.
+Elapsed seconds: 65.3864. Peak RSS MB: 535.48.
 - Scale-down: One tree size (72 leaves), one needle, one paraphrase pair -- a head-to-head proof, not a scale sweep (EXP-065 already measured TF-IDF scale separately).
 - Conclusion: The paraphrase case is exactly where lexical and semantic retrieval diverge as expected: lexical/TF-IDF wrong_answer, semantic/bge correct on an ask sharing almost no exact wording with the needle. Margin-based abstention on real embeddings holds up on the off-topic negative control (semantic/bge outcome: correct_abstain), confirming the predicted fix for the floor's known failure mode on embeddings (unrelated text scores ~0.1-0.3 cosine, never near zero, so the near-zero floor used for TF-IDF would never fire on embeddings) -- a relative top1-vs-runner-up gap generalizes across both scoring methods where an absolute floor does not. This measured result supports combining both signals rather than replacing TF-IDF outright: lexical retrieval still resolved the exact-wording case correctly and is cheaper, while semantic retrieval is what's load-bearing specifically for paraphrase/synonym asks -- the two are complementary, not substitutes, matching the recommendation made before this was built.
+
+## EXP-068 Closing EXP-067's three named gaps: flat abstention, single-child navigation, and margin calibration
+
+- Status: `closed`
+- Models used: bge-small-en-v1.5 for all semantic scoring (retrieval only, no generation); TF-IDF/BM25 (lab.common.index) for the lexical signal and the single-child fallback floor.
+- Goal: Fix and re-measure, not just patch, the three concrete gaps named right after EXP-067: lab.common.brain's flat disambiguation branch had no abstention at all; lab.common.semantic_index.navigate_semantic could not handle a level with only one candidate; and MIN_SEMANTIC_MARGIN=0.03 was a single first measurement, not a validated constant.
+- Method: Part A: brain.reason run on EXP-058/060's integrated fixture (2 regression cases) plus a new off-topic case and a new flat-document paraphrase case, through the new dual lexical+semantic signal logic. Part B: navigate_semantic run on a single-level, single-child tree, with a genuine ask and an off-topic ask, to exercise the new dense-floor fallback. Part C: margin sweep across 3 independently-worded tree fixtures (72 leaves each), each with an exact-wording ask, a paraphrase ask, and 3 off-topic asks, collecting the top1-vs-runner-up margin at every level visited (ignoring abstention, for measurement purposes) to check whether MIN_SEMANTIC_MARGIN actually separates genuine matches from real noise.
+- Referenced files:
+- `lab/exp_068_abstention_fixes/run.py`
+- `lab/common/brain.py`
+- `lab/common/semantic_index.py`
+- `lab/common/nested_index.py`
+- `lab/common/index.py`
+- `lab/common/harness.py`
+- `data/exp_058_integrated_scenario/results.json`
+- `data/exp_060_unified_brain/results.json`
+- `data/exp_067_semantic_navigation/results.json`
+- `data/exp_068_abstention_fixes/results.json`
+- Results: Part A (flat disambiguation, brain.py): 3/4 end-to-end correct -- the two EXP-060 regression cases hold and the off-topic ask now abstains instead of guessing. The new paraphrase case is a mixed result worth stating precisely rather than rounding off: disambiguation itself resolved the right group ('A', correct), but the overall case still came back 'inconclusive' -- the failure is downstream of the fix just made, in brain.py's _wants_identity/_wants_total keyword checks, which don't recognize this paraphrase's intent wording ('take-home pay', 'extra payout') the way they recognize 'name'/'address'/'total' literally, so it falls through to the single-slot lookup extractor and finds no single-span answer. Part B (single-child fallback, navigate_semantic): genuine ask proceeded, off-topic ask correctly abstained (reason: only one section candidate and it scored at the dense-similarity floor (dense 0.0000 < 1e-09) -- no margin was computable to check instead). Part C (margin sweep, 3 fixtures x (1 exact + 1 paraphrase + 3 off-topic) asks, 2 levels each): genuine-match margins range down to 0.0031, noise margins range up to 0.0631; the two populations are NOT cleanly separable. The current MIN_SEMANTIC_MARGIN=0.03 is NOT safely inside the measured gap.
+```json
+{
+  "part_a_flat_disambiguation": {
+    "n": 4,
+    "correct": 3,
+    "cases": [
+      {
+        "id": "F01_contractor_regression",
+        "decision": "supported",
+        "resolved_group": "B",
+        "disambiguation_correct": true,
+        "correct": true
+      },
+      {
+        "id": "F02_sales_manager_regression",
+        "decision": "supported",
+        "resolved_group": "A",
+        "disambiguation_correct": true,
+        "correct": true
+      },
+      {
+        "id": "F03_off_topic_new",
+        "decision": "inconclusive",
+        "resolved_group": null,
+        "disambiguation_correct": true,
+        "correct": true
+      },
+      {
+        "id": "F04_paraphrase_new",
+        "decision": "inconclusive",
+        "resolved_group": "A",
+        "disambiguation_correct": true,
+        "correct": false
+      }
+    ]
+  },
+  "part_b_single_child_fallback": {
+    "genuine_ask_correctly_proceeded": true,
+    "off_topic_correctly_abstained": true,
+    "both_correct": true
+  },
+  "part_c_margin_sweep": {
+    "min_genuine_margin": 0.0031,
+    "max_noise_margin": 0.0631,
+    "separable": false,
+    "current_min_semantic_margin": 0.03,
+    "current_value_in_safe_zone": false,
+    "recommended_margin_if_separable": null
+  }
+}
+```
+
+Elapsed seconds: 108.2199. Peak RSS MB: 562.21.
+- Scale-down: 3 margin-sweep fixtures, 1 single-child case, 4 flat-disambiguation cases -- enough to validate the mechanism and get a first real measurement of separability, not an exhaustive calibration.
+- Conclusion: All three gaps named after EXP-067 were addressed and re-measured rather than assumed fixed, and one new, more important finding came out of that re-measurement than the three fixes themselves. Flat disambiguation now abstains correctly on the off-topic case and still answers both EXP-060 regression cases, using the identical dual-signal (lexical floor + semantic margin, independent checks that must agree) design EXP-067 validated for hierarchical navigation -- the same mechanism now covers both branches of lab.common.brain. The disambiguation fix itself worked even on the paraphrase case (it resolved the correct group); what still fails downstream of it is a *separate*, pre-existing issue this exploration exposed rather than caused: brain.py's _wants_identity and _wants_total signal detectors are themselves literal keyword checks ('name' + 'address', a fixed list of total-cue words), so a paraphrased ask can pass disambiguation correctly and still get no answer because the intent-detection step never recognized what kind of question it was. That's a fourth, newly-identified gap, not one of the three this exploration set out to fix. The single-candidate gap in navigate_semantic is closed by falling back to the TF-IDF dense floor specifically where a margin can't be computed, reusing lab.common.nested_index's already-measured constant rather than inventing a new number. the margin sweep found the two populations are NOT cleanly separable (min genuine 0.0031 <= max noise 0.0631) -- meaning no single fixed threshold can be fully trusted across different vocabularies, a real limitation to flag rather than paper over with a confident-sounding constant.
 
 ## Follow-up todos
 

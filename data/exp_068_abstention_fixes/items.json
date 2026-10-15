@@ -1,0 +1,335 @@
+{
+  "flat_disambiguation": [
+    {
+      "id": "F01_contractor_regression",
+      "note": "Regression: EXP-060's I01, must still pass with the new dual-signal logic.",
+      "ask": "A contractor filed a reimbursement claim in April. Who is involved, what is their name and address, how much money do they have in total this quarter, and does company policy require approval?",
+      "decision": "supported",
+      "text": "Priya Nair, Residency Road [B1]. total 40,000 [B3, B4]. policy applies: the payment requires finance head approval [POLICY].",
+      "disambiguate_trace": {
+        "step": "disambiguate",
+        "lexical_group": "B",
+        "lexical_dense": 0.5875,
+        "lexical_abstain": false,
+        "semantic_group": "B",
+        "semantic_margin": 0.0028,
+        "semantic_abstain": true
+      },
+      "resolved_group": "B",
+      "disambiguation_correct": true,
+      "correct": true
+    },
+    {
+      "id": "F02_sales_manager_regression",
+      "note": "Regression: EXP-060's I02, must still pass with the new dual-signal logic.",
+      "ask": "A sales manager received a performance bonus in February. Who is involved, what is their name and address, how much money do they have in total, and does company policy require approval?",
+      "decision": "supported",
+      "text": "Ravi Sharma, MG Road [A1]. total 45,000 [A3, A4]. policy does not apply (role mismatch with 'a contractor') [POLICY].",
+      "disambiguate_trace": {
+        "step": "disambiguate",
+        "lexical_group": "A",
+        "lexical_dense": 0.6856,
+        "lexical_abstain": false,
+        "semantic_group": "A",
+        "semantic_margin": 0.0194,
+        "semantic_abstain": true
+      },
+      "resolved_group": "A",
+      "disambiguation_correct": true,
+      "correct": true
+    },
+    {
+      "id": "F03_off_topic_new",
+      "note": "New: previously had zero abstention here, would have confidently guessed group A or B.",
+      "ask": "What is the weather forecast for tomorrow?",
+      "decision": "inconclusive",
+      "text": "Insufficient evidence.",
+      "disambiguate_trace": {
+        "step": "disambiguate",
+        "lexical_group": "B",
+        "lexical_dense": 0.0,
+        "lexical_abstain": true,
+        "semantic_group": "B",
+        "semantic_margin": 0.0002,
+        "semantic_abstain": true
+      },
+      "resolved_group": null,
+      "disambiguation_correct": true,
+      "correct": true
+    },
+    {
+      "id": "F04_paraphrase_new",
+      "note": "New: paraphrases 'performance bonus in February' / 'salary' without reusing those exact words -- tests whether the semantic signal resolves it the way lexical alone might not.",
+      "ask": "Which employee's take-home pay increased with an extra payout last quarter's second month, and where do they live?",
+      "decision": "inconclusive",
+      "text": "Insufficient evidence.",
+      "disambiguate_trace": {
+        "step": "disambiguate",
+        "lexical_group": "A",
+        "lexical_dense": 0.5098,
+        "lexical_abstain": false,
+        "semantic_group": "A",
+        "semantic_margin": 0.0047,
+        "semantic_abstain": true
+      },
+      "resolved_group": "A",
+      "disambiguation_correct": true,
+      "correct": false
+    }
+  ],
+  "single_child_fallback": {
+    "genuine_ask_abstained": false,
+    "genuine_ask_path": [
+      {
+        "level": "section",
+        "chosen": "Facilities",
+        "chosen_id": "Facilities",
+        "score": null,
+        "margin": null,
+        "candidates_considered": 1,
+        "fallback": "single_candidate_dense_floor"
+      }
+    ],
+    "off_topic_abstained": true,
+    "off_topic_abstain_reason": "only one section candidate and it scored at the dense-similarity floor (dense 0.0000 < 1e-09) -- no margin was computable to check instead"
+  },
+  "margin_sweep": {
+    "per_fixture": [
+      {
+        "fixture": "governance_agm",
+        "exact_ask_margins": [
+          {
+            "level": "chapter",
+            "margin": 0.1666,
+            "top_score": 0.6908
+          },
+          {
+            "level": "section",
+            "margin": 0.1693,
+            "top_score": 0.7783
+          }
+        ],
+        "paraphrase_ask_margins": [
+          {
+            "level": "chapter",
+            "margin": 0.1126,
+            "top_score": 0.6359
+          },
+          {
+            "level": "section",
+            "margin": 0.0403,
+            "top_score": 0.6501
+          }
+        ],
+        "off_topic_margins": {
+          "What is the weather forecast for tomorrow?": [
+            {
+              "level": "chapter",
+              "margin": 0.0146,
+              "top_score": 0.4755
+            },
+            {
+              "level": "section",
+              "margin": 0.0207,
+              "top_score": 0.4772
+            }
+          ],
+          "What's the best recipe for banana bread?": [
+            {
+              "level": "chapter",
+              "margin": 0.0029,
+              "top_score": 0.3853
+            },
+            {
+              "level": "section",
+              "margin": 0.0018,
+              "top_score": 0.3779
+            }
+          ],
+          "How do I train for a marathon?": [
+            {
+              "level": "chapter",
+              "margin": 0.0484,
+              "top_score": 0.4751
+            },
+            {
+              "level": "section",
+              "margin": 0.0011,
+              "top_score": 0.4959
+            }
+          ]
+        }
+      },
+      {
+        "fixture": "finance_quorum",
+        "exact_ask_margins": [
+          {
+            "level": "chapter",
+            "margin": 0.0031,
+            "top_score": 0.537
+          },
+          {
+            "level": "section",
+            "margin": 0.0114,
+            "top_score": 0.527
+          }
+        ],
+        "paraphrase_ask_margins": [
+          {
+            "level": "chapter",
+            "margin": 0.0489,
+            "top_score": 0.5921
+          },
+          {
+            "level": "section",
+            "margin": 0.09,
+            "top_score": 0.6709
+          }
+        ],
+        "off_topic_margins": {
+          "What is the weather forecast for tomorrow?": [
+            {
+              "level": "chapter",
+              "margin": 0.0146,
+              "top_score": 0.4755
+            },
+            {
+              "level": "section",
+              "margin": 0.0207,
+              "top_score": 0.4772
+            }
+          ],
+          "What's the best recipe for banana bread?": [
+            {
+              "level": "chapter",
+              "margin": 0.0214,
+              "top_score": 0.3853
+            },
+            {
+              "level": "section",
+              "margin": 0.0018,
+              "top_score": 0.3779
+            }
+          ],
+          "How do I train for a marathon?": [
+            {
+              "level": "chapter",
+              "margin": 0.0631,
+              "top_score": 0.4751
+            },
+            {
+              "level": "section",
+              "margin": 0.0011,
+              "top_score": 0.4959
+            }
+          ]
+        }
+      },
+      {
+        "fixture": "it_security",
+        "exact_ask_margins": [
+          {
+            "level": "chapter",
+            "margin": 0.1988,
+            "top_score": 0.6905
+          },
+          {
+            "level": "section",
+            "margin": 0.1352,
+            "top_score": 0.7601
+          }
+        ],
+        "paraphrase_ask_margins": [
+          {
+            "level": "chapter",
+            "margin": 0.1085,
+            "top_score": 0.6155
+          },
+          {
+            "level": "section",
+            "margin": 0.0558,
+            "top_score": 0.6384
+          }
+        ],
+        "off_topic_margins": {
+          "What is the weather forecast for tomorrow?": [
+            {
+              "level": "chapter",
+              "margin": 0.0275,
+              "top_score": 0.4407
+            },
+            {
+              "level": "section",
+              "margin": 0.013,
+              "top_score": 0.4338
+            }
+          ],
+          "What's the best recipe for banana bread?": [
+            {
+              "level": "chapter",
+              "margin": 0.0007,
+              "top_score": 0.351
+            },
+            {
+              "level": "section",
+              "margin": 0.0048,
+              "top_score": 0.3592
+            }
+          ],
+          "How do I train for a marathon?": [
+            {
+              "level": "chapter",
+              "margin": 0.0433,
+              "top_score": 0.4422
+            },
+            {
+              "level": "section",
+              "margin": 0.0049,
+              "top_score": 0.4524
+            }
+          ]
+        }
+      }
+    ],
+    "genuine_margins": [
+      0.0031,
+      0.0114,
+      0.0403,
+      0.0489,
+      0.0558,
+      0.09,
+      0.1085,
+      0.1126,
+      0.1352,
+      0.1666,
+      0.1693,
+      0.1988
+    ],
+    "noise_margins": [
+      0.0007,
+      0.0011,
+      0.0011,
+      0.0018,
+      0.0018,
+      0.0029,
+      0.0048,
+      0.0049,
+      0.013,
+      0.0146,
+      0.0146,
+      0.0207,
+      0.0207,
+      0.0214,
+      0.0275,
+      0.0433,
+      0.0484,
+      0.0631
+    ],
+    "min_genuine_margin": 0.0031,
+    "max_noise_margin": 0.0631,
+    "separable": false,
+    "current_min_semantic_margin": 0.03,
+    "current_value_in_safe_zone": false,
+    "recommended_margin_if_separable": null
+  }
+}

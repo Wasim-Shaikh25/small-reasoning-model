@@ -21,6 +21,9 @@ ahead of time.
 
 Every tool this calls is a primitive already built and separately measured:
   - lab.common.index.Index: hybrid retrieval, EXP-004/015/029/040/058.
+  - lab.common.semantic_index.SemanticIndex: real bge embeddings, EXP-067,
+    used alongside Index (not instead of it) for flat disambiguation --
+    lexical and semantic are independent signals that must agree.
   - lab.common.nested_index: hierarchical navigation over a structured
     document, EXP-065, used when passages carry a "hierarchy" tag instead
     of (or in addition to) a flat "group" tag.
@@ -43,9 +46,10 @@ from lab.common.ask import analyze
 from lab.common.calc import sum_amounts
 from lab.common.entities import AMOUNT_RE, detect_primary, parse_address
 from lab.common.index import Index
-from lab.common.nested_index import build_nested_index, navigate
+from lab.common.nested_index import MIN_DENSE_SCORE, build_nested_index, navigate
 from lab.common.qa import answer_with_agreement
 from lab.common.rules import apply_rule, apply_threshold_rule, extract_fact_triple, parse_conditional_rule, parse_threshold_rule
+from lab.common.semantic_index import MIN_SEMANTIC_MARGIN, SemanticIndex
 from lab.common.textutil import normalize
 from lab.common.verify import quote_check
 
@@ -122,16 +126,52 @@ def reason(ask: str, passages: list[dict]) -> dict:
         # compete to be the resolved "story" just because it shares a word
         # with the ask (a policy mentioning "contractor" is not itself a
         # contractor's story).
+        #
+        # Two independent signals, neither trusted alone (EXP-067): lexical
+        # (TF-IDF) catches exact wording and abstains via MIN_DENSE_SCORE --
+        # a strictly-positive floor, since disjoint vocabulary dot-products to
+        # exactly 0.0 regardless of document count. Semantic (bge) catches
+        # paraphrase/synonym asks TF-IDF can't, and abstains via
+        # MIN_SEMANTIC_MARGIN -- a top1-vs-runner-up gap, since embeddings
+        # never score unrelated text near zero the way TF-IDF does, so a
+        # floor can't work for them. If only one signal is confident, its
+        # pick is used (the other simply had nothing to go on). If both are
+        # confident but name different groups, that's a real conflict, not a
+        # case either signal is equipped to resolve alone -- abstain rather
+        # than pick a winner arbitrarily.
         story_passages = [p for p in passages if p.get("group")]
-        index = Index(story_passages)
-        hits = index.search(ask, top_k=1)
-        if not hits:
+        lexical_hits = Index(story_passages).search(ask, top_k=2)
+        semantic_hits = SemanticIndex(story_passages).search(ask, top_k=2)
+        if not lexical_hits or not semantic_hits:
             return _finish(ask, trace, "inconclusive", ABSTAIN_TEXT, citations, reason="no passage matched the ask")
-        matched = hits[0]["passage"]
+
+        lexical_abstain = lexical_hits[0]["dense"] < MIN_DENSE_SCORE
+        semantic_margin = semantic_hits[0]["score"] - semantic_hits[1]["score"] if len(semantic_hits) > 1 else semantic_hits[0]["score"]
+        semantic_abstain = semantic_margin < MIN_SEMANTIC_MARGIN
+        lexical_group = lexical_hits[0]["passage"].get("group")
+        semantic_group = semantic_hits[0]["passage"].get("group")
+
+        trace.append(
+            {
+                "step": "disambiguate",
+                "lexical_group": lexical_group,
+                "lexical_dense": round(lexical_hits[0]["dense"], 4),
+                "lexical_abstain": lexical_abstain,
+                "semantic_group": semantic_group,
+                "semantic_margin": round(semantic_margin, 4),
+                "semantic_abstain": semantic_abstain,
+            }
+        )
+
+        if lexical_abstain and semantic_abstain:
+            return _finish(ask, trace, "inconclusive", ABSTAIN_TEXT, citations, reason="neither lexical nor semantic retrieval found a confident match")
+        if not lexical_abstain and not semantic_abstain and lexical_group != semantic_group:
+            return _finish(ask, trace, "inconclusive", ABSTAIN_TEXT, citations, reason=f"lexical and semantic retrieval disagree on which story matches ({lexical_group!r} vs {semantic_group!r})")
+
+        matched = semantic_hits[0]["passage"] if lexical_abstain else lexical_hits[0]["passage"]
         resolved_group = matched.get("group")
         citations.add(matched["id"])
         scoped = [p for p in passages if p.get("group") == resolved_group]
-        trace.append({"step": "disambiguate", "resolved_group": resolved_group, "matched_passage": matched["id"], "score": round(hits[0]["score"], 4)})
 
     facts: dict = {}
     answer_parts: list[str] = []

@@ -21,7 +21,16 @@ from __future__ import annotations
 
 import numpy as np
 
+from lab.common.index import Index
+from lab.common.nested_index import MIN_DENSE_SCORE
 from lab.common.real_encoders import bge_embed
+
+# First measured value (EXP-067): separated a genuine paraphrase match
+# (margin 0.0403) from an off-topic non-match (margin 0.0146) on one fixture.
+# That gap is narrow enough that this is a starting point, not a validated
+# constant -- see EXP-068's sweep across multiple fixtures before trusting it
+# further than this.
+MIN_SEMANTIC_MARGIN = 0.03
 
 
 class SemanticIndex:
@@ -43,25 +52,51 @@ class SemanticIndex:
         return ranked[:top_k]
 
 
-def navigate_semantic(ask: str, root, min_margin: float = 0.03) -> dict:
+def navigate_semantic(ask: str, root, min_margin: float = MIN_SEMANTIC_MARGIN) -> dict:
     """Same shape and descent logic as lab.common.nested_index.navigate, but
     scored by bge cosine similarity and abstaining on a small top1-vs-runner-up
-    margin instead of an absolute floor. Needs at least 2 children at a level
-    to compute a margin; with exactly 1 child there is no ambiguity to resolve
-    (nothing to disambiguate against), so it proceeds unconditionally -- a
-    known gap if a single-child level is itself the wrong branch, not
-    exercised by this module's fixtures.
+    margin instead of an absolute floor.
+
+    Margin needs at least 2 children to mean anything; with exactly 1 child
+    there is no runner-up to compare against, so a margin can't be computed
+    at all. Rather than proceeding unconditionally (the original gap), this
+    falls back to the one check that doesn't need a second candidate: the
+    same TF-IDF dense-score floor lab.common.nested_index uses (MIN_DENSE_SCORE),
+    scored on this single child against the ask. That floor's own logic
+    (disjoint vocabulary dot-products to exactly 0.0) holds regardless of how
+    many candidates there are, which is exactly why it can plug the gap the
+    margin check leaves open here -- it just can't catch a paraphrase the way
+    the margin check can, which is why it's the fallback and not the primary
+    mechanism when a real choice exists.
     """
     trace = []
     node = root
     while not node.is_leaf:
         candidates = [{"id": child.node_id, "text": child.summary_text} for child in node.children]
         child_level = node.children[0].level
+
+        if len(candidates) == 1:
+            dense = Index(candidates).search(ask, top_k=1)[0]["dense"]
+            if dense < MIN_DENSE_SCORE:
+                return {
+                    "path": trace,
+                    "leaf": None,
+                    "leaf_passages": [],
+                    "abstain_reason": (
+                        f"only one {child_level} candidate and it scored at the dense-similarity floor "
+                        f"(dense {dense:.4f} < {MIN_DENSE_SCORE}) -- no margin was computable to check instead"
+                    ),
+                }
+            chosen = node.children[0]
+            trace.append({"level": chosen.level, "chosen": chosen.title, "chosen_id": chosen.node_id, "score": None, "margin": None, "candidates_considered": 1, "fallback": "single_candidate_dense_floor"})
+            node = chosen
+            continue
+
         index = SemanticIndex(candidates)
         hits = index.search(ask, top_k=2)
         if not hits:
             return {"path": trace, "leaf": None, "leaf_passages": [], "abstain_reason": f"no {child_level} candidates to score"}
-        margin = hits[0]["score"] - hits[1]["score"] if len(hits) > 1 else hits[0]["score"]
+        margin = hits[0]["score"] - hits[1]["score"]
         if margin < min_margin:
             return {
                 "path": trace,

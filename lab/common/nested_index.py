@@ -25,6 +25,13 @@ from dataclasses import dataclass, field
 
 from lab.common.index import Index
 
+# A genuine TF-IDF match always has a strictly positive dense score (shared
+# non-stopword vocabulary, however small a fraction); true noise is exactly
+# 0.0 (disjoint sparse vectors dot-product to exactly zero). Exposed as a
+# named constant so lab.common.brain's flat disambiguation can reuse the
+# identical, already-measured floor instead of redefining its own copy.
+MIN_DENSE_SCORE = 1e-9
+
 
 @dataclass
 class NestedNode:
@@ -86,7 +93,7 @@ def _fill_summaries(node: NestedNode) -> None:
     node.summary_text = " ".join(f"{child.title} {child.summary_text}" for child in node.children)
 
 
-def navigate(ask: str, root: NestedNode, top_k: int = 1, min_dense_score: float = 1e-9) -> dict:
+def navigate(ask: str, root: NestedNode, top_k: int = 1, min_dense_score: float = MIN_DENSE_SCORE) -> dict:
     """Descend the tree one level at a time, scoring each level's children
     against the ask with the hybrid retriever, until a leaf is reached.
 
