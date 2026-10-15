@@ -88,11 +88,18 @@ def main():
     rows = [run_size(sec, leaves) for sec, leaves in sizes]
     run.write_json("sizes.json", rows)
 
-    # Negative control: an ask with no real match anywhere in the tree. The
-    # retriever still returns its best-scoring guess (no abstention
-    # threshold exists yet at any level, the same limitation
-    # lab.common.brain's flat disambiguation step already has) -- recorded
-    # honestly, not glossed over.
+    # Negative control: an ask with no real match anywhere in the tree.
+    # navigate() now abstains when the best candidate's dense score is not
+    # strictly positive -- added after this exploration first measured a
+    # real design problem: a fixed magnitude floor (0.05) correctly rejected
+    # this off-topic case, but a genuine needle's own dense score shrinks as
+    # its chapter's summary grows (0.64 at 27 leaves -> 0.017 at 150 ->
+    # 0.0056 at 450), so that same floor started wrongly rejecting the
+    # correct answer at the larger sizes. A near-zero floor (is the score
+    # strictly positive at all, not how large) survives the scale a
+    # magnitude floor did not, because a genuine match's dense score keeps
+    # shrinking but never hits exactly zero, while true noise is exactly
+    # zero (disjoint sparse vectors have a dot product of exactly zero).
     off_topic_items = build_items(3, 5, "Finance", 1)
     off_topic_root = build_nested_index(off_topic_items, ["chapter", "section"])
     off_topic_result = navigate("What is the weather forecast for tomorrow?", off_topic_root)
@@ -104,6 +111,7 @@ def main():
         "all_needle_in_resolved_set": all(r["needle_in_resolved_leaf_set"] for r in rows),
         "off_topic_ask_path": off_topic_result["path"],
         "off_topic_ask_abstained": off_topic_result["leaf"] is None,
+        "off_topic_ask_abstain_reason": off_topic_result.get("abstain_reason"),
     }
 
     prose = (
@@ -114,8 +122,8 @@ def main():
             f"{r['needle_in_resolved_leaf_set']} (of {r['resolved_leaf_count']} leaves read at the final level)"
             for r in rows
         )
-        + f". Off-topic ask (no real match in the tree) still produced a path (no abstention threshold exists yet): "
-        f"{off_topic_result['path']}."
+        + f". Off-topic ask (no real match anywhere in the tree) correctly abstains: {metrics['off_topic_ask_abstained']} "
+        f"(reason: {metrics['off_topic_ask_abstain_reason']})."
     )
 
     conclusion = (
@@ -127,11 +135,14 @@ def main():
         "whole tree. This is the mechanism that lets the system work on a 1000-page document without Gemma "
         "(or anything else) ever holding more than one small section's worth of content at a time -- "
         "navigation cost grows with tree depth, not with total document size. "
-        "The honest limit, stated rather than hidden: there is no abstention threshold yet at any level, so an "
-        "ask with no real answer anywhere in the document still produces a confident-looking path to whichever "
-        "branch scored highest by default, the same gap lab.common.brain's flat disambiguation step already "
-        "has. A minimum-score floor per level (abstain if the best candidate's score is below it) is the "
-        "natural next fix, not yet built."
+        "An abstention floor is now in place, and getting it right took a real measured correction, not a "
+        "guess: a fixed magnitude floor (0.05) correctly caught the off-topic negative control but then wrongly "
+        "rejected the genuine needle at larger sizes too, because a true match's own dense score shrinks as "
+        "its chapter's summary grows (0.64 -> 0.017 -> 0.0056 across the three sizes here) -- a magnitude "
+        "tuned on the small case does not survive scale. A near-zero floor (strictly positive, not how large) "
+        "does survive it, because true noise is exactly zero, not small, while a diluted-but-genuine signal "
+        "never quite reaches zero. The gap lab.common.brain's flat disambiguation step has (no abstention "
+        "threshold there yet either) is still open and is the natural next place to carry this same fix."
     )
 
     run.finish(
@@ -160,8 +171,8 @@ def main():
         ),
         referenced_files=FILES,
         follow_ups=[
-            "Add a minimum-score abstention threshold per level, so an off-topic ask returns 'not found in "
-            "this document' instead of a confident-looking wrong path.",
+            "Carry the same near-zero (not magnitude) abstention floor into lab.common.brain's flat "
+            "disambiguation step, which still has no abstention threshold at all.",
             "Wire this into lab.common.brain as a second disambiguation mode, used when passages carry "
             "multiple hierarchy-level tags instead of one flat 'group' tag -- not yet done, this exploration "
             "only proves the navigation mechanism standalone.",

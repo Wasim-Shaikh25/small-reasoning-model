@@ -85,26 +85,12 @@
     "all_correct_chapter": true,
     "all_correct_section": true,
     "all_needle_in_resolved_set": true,
-    "off_topic_ask_path": [
-      {
-        "level": "chapter",
-        "chosen": "Finance",
-        "chosen_id": "Finance",
-        "score": 0.5,
-        "candidates_considered": 3
-      },
-      {
-        "level": "section",
-        "chosen": "Finance-1",
-        "chosen_id": "Finance/Finance-1",
-        "score": 0.5,
-        "candidates_considered": 3
-      }
-    ],
-    "off_topic_ask_abstained": false
+    "off_topic_ask_path": [],
+    "off_topic_ask_abstained": true,
+    "off_topic_ask_abstain_reason": "no chapter scored above the dense-similarity floor (best: 0.0000 < 1e-09)"
   },
-  "results_prose": "Navigation correctness by tree size: 27 leaves (3 sections x 3 leaves/section) -> chapter correct True, section correct True, needle in resolved set True (of 3 leaves read at the final level); 150 leaves (5 sections x 10 leaves/section) -> chapter correct True, section correct True, needle in resolved set True (of 10 leaves read at the final level); 450 leaves (5 sections x 30 leaves/section) -> chapter correct True, section correct True, needle in resolved set True (of 30 leaves read at the final level). Off-topic ask (no real match in the tree) still produced a path (no abstention threshold exists yet): [{'level': 'chapter', 'chosen': 'Finance', 'chosen_id': 'Finance', 'score': 0.5, 'candidates_considered': 3}, {'level': 'section', 'chosen': 'Finance-1', 'chosen_id': 'Finance/Finance-1', 'score': 0.5, 'candidates_considered': 3}].",
-  "conclusion": "Hierarchical navigation -- scoring each level's children against the ask and descending only into the best match, the same hybrid retriever EXP-004/015/029/040/058/060 already measured, never a language model -- correctly reaches the chapter and section containing a distinctive needle at every size tested, from 27 to 450 leaves, without ever scoring the full leaf set directly: by the final level, the candidate pool it searches is only the handful of leaves in the one resolved section, not the whole tree. This is the mechanism that lets the system work on a 1000-page document without Gemma (or anything else) ever holding more than one small section's worth of content at a time -- navigation cost grows with tree depth, not with total document size. The honest limit, stated rather than hidden: there is no abstention threshold yet at any level, so an ask with no real answer anywhere in the document still produces a confident-looking path to whichever branch scored highest by default, the same gap lab.common.brain's flat disambiguation step already has. A minimum-score floor per level (abstain if the best candidate's score is below it) is the natural next fix, not yet built.",
+  "results_prose": "Navigation correctness by tree size: 27 leaves (3 sections x 3 leaves/section) -> chapter correct True, section correct True, needle in resolved set True (of 3 leaves read at the final level); 150 leaves (5 sections x 10 leaves/section) -> chapter correct True, section correct True, needle in resolved set True (of 10 leaves read at the final level); 450 leaves (5 sections x 30 leaves/section) -> chapter correct True, section correct True, needle in resolved set True (of 30 leaves read at the final level). Off-topic ask (no real match anywhere in the tree) correctly abstains: True (reason: no chapter scored above the dense-similarity floor (best: 0.0000 < 1e-09)).",
+  "conclusion": "Hierarchical navigation -- scoring each level's children against the ask and descending only into the best match, the same hybrid retriever EXP-004/015/029/040/058/060 already measured, never a language model -- correctly reaches the chapter and section containing a distinctive needle at every size tested, from 27 to 450 leaves, without ever scoring the full leaf set directly: by the final level, the candidate pool it searches is only the handful of leaves in the one resolved section, not the whole tree. This is the mechanism that lets the system work on a 1000-page document without Gemma (or anything else) ever holding more than one small section's worth of content at a time -- navigation cost grows with tree depth, not with total document size. An abstention floor is now in place, and getting it right took a real measured correction, not a guess: a fixed magnitude floor (0.05) correctly caught the off-topic negative control but then wrongly rejected the genuine needle at larger sizes too, because a true match's own dense score shrinks as its chapter's summary grows (0.64 -> 0.017 -> 0.0056 across the three sizes here) -- a magnitude tuned on the small case does not survive scale. A near-zero floor (strictly positive, not how large) does survive it, because true noise is exactly zero, not small, while a diluted-but-genuine signal never quite reaches zero. The gap lab.common.brain's flat disambiguation step has (no abstention threshold there yet either) is still open and is the natural next place to carry this same fix.",
   "scale_down": "3 chapters, up to 450 leaves, one needle -- not a real 1000-page document or multiple simultaneous needles. Two levels of hierarchy (chapter, section); a real book might want a third (chapter -> section -> paragraph -> sentence).",
   "referenced_files": [
     "lab/exp_065_nested_navigation/run.py",
@@ -115,11 +101,11 @@
     "data/exp_065_nested_navigation/results.json"
   ],
   "follow_ups": [
-    "Add a minimum-score abstention threshold per level, so an off-topic ask returns 'not found in this document' instead of a confident-looking wrong path.",
+    "Carry the same near-zero (not magnitude) abstention floor into lab.common.brain's flat disambiguation step, which still has no abstention threshold at all.",
     "Wire this into lab.common.brain as a second disambiguation mode, used when passages carry multiple hierarchy-level tags instead of one flat 'group' tag -- not yet done, this exploration only proves the navigation mechanism standalone.",
     "Test with 3+ levels of hierarchy and with more than one needle to navigate to in the same ask."
   ],
-  "elapsed_sec": 0.028,
-  "peak_rss_mb": 128.47,
+  "elapsed_sec": 0.0266,
+  "peak_rss_mb": 128.61,
   "models_used": "No model decides navigation. lab.common.index's hybrid retriever (TF-IDF + BM25, unchanged) scores each level; the same classical substitute every retrieval exploration in this project has used."
 }

@@ -1,0 +1,34 @@
+[
+  {
+    "id": "H01_contractor",
+    "ask": "A contractor filed a reimbursement claim in April. Who is involved, what is their name and address, how much money do they have in total this quarter, and does company policy require approval?",
+    "decision": "supported",
+    "text": "Priya Nair, Residency Road [B1]. total 40,000 [B3, B4]. policy applies: the payment requires finance head approval [POLICY].",
+    "resolved_section": "Priya",
+    "trace_steps": [
+      "analyze_ask",
+      "nested_navigate",
+      "extract_identity",
+      "compute_total",
+      "find_rule",
+      "apply_rule"
+    ],
+    "correct_decision": true,
+    "correct_content": true,
+    "correct_section": true
+  },
+  {
+    "id": "H02_off_topic",
+    "ask": "What is the weather forecast for tomorrow?",
+    "decision": "inconclusive",
+    "text": "Insufficient evidence.",
+    "resolved_section": null,
+    "trace_steps": [
+      "analyze_ask",
+      "nested_navigate"
+    ],
+    "correct_decision": true,
+    "correct_content": true,
+    "correct_section": true
+  }
+]

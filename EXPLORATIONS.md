@@ -21684,7 +21684,7 @@ Elapsed seconds: 252.4715. Peak RSS MB: 653.29.
 }
 ```
 
-Elapsed seconds: 5.6702. Peak RSS MB: 292.88.
+Elapsed seconds: 3.595. Peak RSS MB: 294.78.
 - Scale-down: One rule sentence shape ('If <subject>, <verb phrase>, <consequence>.') and single-clause facts with no qualifier. A rule with an exception ('...unless committed in self-defense') is not parsed here -- the same qualifier gap EXP-006/EXP-026 already named for the lexical NLI judge. Multiple candidate rules or facts in the same passage set are not disambiguated; the first of each is used.
 - Conclusion: A general rule given in context can be applied to a specific fact given in context, and the result cited back to both, without a generative model and without training anything new -- a dependency parser's verb extraction plus one lemma comparison is enough for this shape of case. The system correctly abstains rather than answers when the fact doesn't match the rule's verb or when no rule sentence is present at all, instead of defaulting to a guess.
 
@@ -21740,7 +21740,7 @@ Elapsed seconds: 5.6702. Peak RSS MB: 292.88.
 }
 ```
 
-Elapsed seconds: 0.0216. Peak RSS MB: 139.74.
+Elapsed seconds: 0.0067. Peak RSS MB: 141.09.
 - Scale-down: Two stories, one policy, one role-class check. Real documents would have more distractors, multiple candidate policies, and roles stated less explicitly than 'is a contractor for Zenith Corp.' -- this is a scaled-down integration test of the chain, not a benchmark of its ceiling.
 - Conclusion: Disambiguating between two multi-sentence stories by a cue in the ask (not a name), extracting a name and address, summing money mentioned across separate sentences, and applying a company policy threshold rule all chain correctly end to end, each step citable to its own source passage. The second case is the one worth dwelling on: Ravi Sharma's total (INR 45,000) is well over the policy's INR 30,000 threshold, and a rule engine that only checked the number would have incorrectly fired approval on him. Checking that his own story actually describes him with the policy's subject role ('a contractor') -- and finding it doesn't, he's a sales manager -- is what keeps the decision correct. A rule matching a number is not the same as a rule applying to the right person.
 
@@ -21778,7 +21778,7 @@ Elapsed seconds: 0.0216. Peak RSS MB: 139.74.
 }
 ```
 
-Elapsed seconds: 4.9969. Peak RSS MB: 292.8.
+Elapsed seconds: 3.7714. Peak RSS MB: 293.77.
 - Scale-down: Six domains, 11 hand-written cases, single-clause rules and facts only -- not a benchmark of how many domains or how complex a rule this can handle, a targeted test of whether the existing mechanism needed domain-specific code to extend, which it did not.
 - Conclusion: The objection this exploration tests directly -- that a 'rule engine' which secretly needs a new rule per question isn't a rule engine at all -- does not hold for the two rule shapes built so far. The verb-trigger matcher works by extracting a sentence's main verb via spaCy's dependency parser and comparing lemmas; that mechanism has no idea whether the verb is 'murder', 'contain', 'run', or 'have' -- it would work on a verb this project has never seen written down anywhere, because the verb comes from the parser's general training, not from a lookup table this project wrote. The threshold matcher works by extracting a number near 'exceeds' and comparing it with the same calc.compare_numbers function EXP-007/014 already used for dates and amounts; it has no idea whether the number is rupees, degrees, or kilometers per hour. This is category A from the research pasted in review (a rule-based expert system: explicit rules and facts, a deterministic reasoning engine) with the narrow end of category B (a neural parser for natural-language understanding feeding a symbolic match step) -- one engine, run on different rulebooks, not a new engine per rulebook. What would genuinely need new code is a *third rule shape* this project hasn't built yet (a rule with an exception clause, a rule comparing two extracted facts to each other rather than to a fixed threshold) -- and that is a real, acknowledged limit, not a hidden one.
 
@@ -21893,7 +21893,7 @@ Elapsed seconds: 4.9969. Peak RSS MB: 292.8.
 }
 ```
 
-Elapsed seconds: 4.8751. Peak RSS MB: 385.39.
+Elapsed seconds: 8.1773. Peak RSS MB: 386.81.
 - Scale-down: 8 cases across 3 regimes, not a benchmark of the brain's ceiling -- a targeted test that the single entry point reproduces every prior exploration's answer without per-case wiring.
 - Conclusion: One function handles a plain lookup, a rule-application question, and a multi-signal integrated scenario without the caller choosing a path. The difference between regimes shows up only in the trace -- which internal signal checks fired -- never in which function was called or how it was called. A lookup question fires none of the extra signals and falls back to the same single-slot extractor lab.common.engine already uses; the integrated cases fire three signals at once and chain their results. This is the unification the prior three explorations (EXP-057/058/059) proved piece by piece, now proved as one entry point rather than three scripts a person chooses between.
 
@@ -22194,7 +22194,7 @@ Elapsed seconds: 76.1722. Peak RSS MB: 147.25.
 - `lab/common/harness.py`
 - `data/exp_015_paged_memory/results.json`
 - `data/exp_065_nested_navigation/results.json`
-- Results: Navigation correctness by tree size: 27 leaves (3 sections x 3 leaves/section) -> chapter correct True, section correct True, needle in resolved set True (of 3 leaves read at the final level); 150 leaves (5 sections x 10 leaves/section) -> chapter correct True, section correct True, needle in resolved set True (of 10 leaves read at the final level); 450 leaves (5 sections x 30 leaves/section) -> chapter correct True, section correct True, needle in resolved set True (of 30 leaves read at the final level). Off-topic ask (no real match in the tree) still produced a path (no abstention threshold exists yet): [{'level': 'chapter', 'chosen': 'Finance', 'chosen_id': 'Finance', 'score': 0.5, 'candidates_considered': 3}, {'level': 'section', 'chosen': 'Finance-1', 'chosen_id': 'Finance/Finance-1', 'score': 0.5, 'candidates_considered': 3}].
+- Results: Navigation correctness by tree size: 27 leaves (3 sections x 3 leaves/section) -> chapter correct True, section correct True, needle in resolved set True (of 3 leaves read at the final level); 150 leaves (5 sections x 10 leaves/section) -> chapter correct True, section correct True, needle in resolved set True (of 10 leaves read at the final level); 450 leaves (5 sections x 30 leaves/section) -> chapter correct True, section correct True, needle in resolved set True (of 30 leaves read at the final level). Off-topic ask (no real match anywhere in the tree) correctly abstains: True (reason: no chapter scored above the dense-similarity floor (best: 0.0000 < 1e-09)).
 ```json
 {
   "sizes": [
@@ -22277,29 +22277,57 @@ Elapsed seconds: 76.1722. Peak RSS MB: 147.25.
   "all_correct_chapter": true,
   "all_correct_section": true,
   "all_needle_in_resolved_set": true,
-  "off_topic_ask_path": [
-    {
-      "level": "chapter",
-      "chosen": "Finance",
-      "chosen_id": "Finance",
-      "score": 0.5,
-      "candidates_considered": 3
-    },
-    {
-      "level": "section",
-      "chosen": "Finance-1",
-      "chosen_id": "Finance/Finance-1",
-      "score": 0.5,
-      "candidates_considered": 3
-    }
-  ],
-  "off_topic_ask_abstained": false
+  "off_topic_ask_path": [],
+  "off_topic_ask_abstained": true,
+  "off_topic_ask_abstain_reason": "no chapter scored above the dense-similarity floor (best: 0.0000 < 1e-09)"
 }
 ```
 
-Elapsed seconds: 0.028. Peak RSS MB: 128.47.
+Elapsed seconds: 0.0266. Peak RSS MB: 128.61.
 - Scale-down: 3 chapters, up to 450 leaves, one needle -- not a real 1000-page document or multiple simultaneous needles. Two levels of hierarchy (chapter, section); a real book might want a third (chapter -> section -> paragraph -> sentence).
-- Conclusion: Hierarchical navigation -- scoring each level's children against the ask and descending only into the best match, the same hybrid retriever EXP-004/015/029/040/058/060 already measured, never a language model -- correctly reaches the chapter and section containing a distinctive needle at every size tested, from 27 to 450 leaves, without ever scoring the full leaf set directly: by the final level, the candidate pool it searches is only the handful of leaves in the one resolved section, not the whole tree. This is the mechanism that lets the system work on a 1000-page document without Gemma (or anything else) ever holding more than one small section's worth of content at a time -- navigation cost grows with tree depth, not with total document size. The honest limit, stated rather than hidden: there is no abstention threshold yet at any level, so an ask with no real answer anywhere in the document still produces a confident-looking path to whichever branch scored highest by default, the same gap lab.common.brain's flat disambiguation step already has. A minimum-score floor per level (abstain if the best candidate's score is below it) is the natural next fix, not yet built.
+- Conclusion: Hierarchical navigation -- scoring each level's children against the ask and descending only into the best match, the same hybrid retriever EXP-004/015/029/040/058/060 already measured, never a language model -- correctly reaches the chapter and section containing a distinctive needle at every size tested, from 27 to 450 leaves, without ever scoring the full leaf set directly: by the final level, the candidate pool it searches is only the handful of leaves in the one resolved section, not the whole tree. This is the mechanism that lets the system work on a 1000-page document without Gemma (or anything else) ever holding more than one small section's worth of content at a time -- navigation cost grows with tree depth, not with total document size. An abstention floor is now in place, and getting it right took a real measured correction, not a guess: a fixed magnitude floor (0.05) correctly caught the off-topic negative control but then wrongly rejected the genuine needle at larger sizes too, because a true match's own dense score shrinks as its chapter's summary grows (0.64 -> 0.017 -> 0.0056 across the three sizes here) -- a magnitude tuned on the small case does not survive scale. A near-zero floor (strictly positive, not how large) does survive it, because true noise is exactly zero, not small, while a diluted-but-genuine signal never quite reaches zero. The gap lab.common.brain's flat disambiguation step has (no abstention threshold there yet either) is still open and is the natural next place to carry this same fix.
+
+## EXP-066 The unified brain navigates a hierarchical document
+
+- Status: `closed`
+- Models used: No generative model. Every step is a previously-measured classical/deterministic primitive; this exploration only chains them through the existing single entry point.
+- Goal: Prove lab.common.brain.reason handles a hierarchically-structured document (chapter/section tags) through the same entry point and call shape EXP-060 proved for flat documents, chaining nested navigation (EXP-065) into the identity/arithmetic/rule-application signals EXP-058 already measured.
+- Method: Two cases through brain.reason(ask, passages), passages tagged with a 'hierarchy' dict ({'chapter':..., 'section':...}) instead of EXP-058/060's flat 'group' string. Case 1 restates EXP-058's contractor scenario with 2-level hierarchy tags instead of flat ones. Case 2 is an off-topic ask with no real match in the document, testing that EXP-065's near-zero abstention floor correctly propagates through brain.reason rather than producing a confident wrong answer.
+- Referenced files:
+- `lab/exp_066_brain_nested_navigation/run.py`
+- `lab/common/brain.py`
+- `lab/common/nested_index.py`
+- `lab/common/index.py`
+- `lab/common/harness.py`
+- `data/exp_058_integrated_scenario/results.json`
+- `data/exp_060_unified_brain/results.json`
+- `data/exp_065_nested_navigation/results.json`
+- `data/exp_066_brain_nested_navigation/results.json`
+- Results: On 2 cases through the identical brain.reason(ask, passages) call EXP-060 used for flat documents, 2 are fully correct. The contractor case resolves to section 'Priya' via nested navigation, then runs identity extraction, arithmetic, and policy rule application exactly as EXP-058 measured on a flat-tagged version of the same scenario: 'Priya Nair, Residency Road [B1]. total 40,000 [B3, B4]. policy applies: the payment requires finance head approval [POLICY].'. The off-topic case correctly abstains rather than guessing a section: decision 'inconclusive'.
+```json
+{
+  "n": 2,
+  "accuracy": 1.0,
+  "cases": [
+    {
+      "id": "H01_contractor",
+      "decision": "supported",
+      "resolved_section": "Priya",
+      "correct": true
+    },
+    {
+      "id": "H02_off_topic",
+      "decision": "inconclusive",
+      "resolved_section": null,
+      "correct": true
+    }
+  ]
+}
+```
+
+Elapsed seconds: 0.0065. Peak RSS MB: 139.5.
+- Scale-down: 2 cases, 2-level hierarchy, 9 passages -- a wiring proof, not a scale test (EXP-065 already measured scale up to 450 leaves for the navigation mechanism alone).
+- Conclusion: The unification EXP-060 proved for flat documents carries over to hierarchical ones without any change at the call site: the same function, given passages tagged with a 'hierarchy' dict instead of a flat 'group' string, navigates the structure (lab.common.nested_index, EXP-065's near-zero abstention floor included) and then runs the identical downstream signals (identity, arithmetic, rule application) EXP-058 already measured. A caller never needs to know or declare whether the document it's handing brain.reason is flat or structured -- the passages' own tags decide, the same 'input decides how much of the machinery runs' principle EXP-060 established for the simpler signals now extends to document structure itself.
 
 ## Follow-up todos
 

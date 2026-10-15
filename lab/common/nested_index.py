@@ -86,7 +86,7 @@ def _fill_summaries(node: NestedNode) -> None:
     node.summary_text = " ".join(f"{child.title} {child.summary_text}" for child in node.children)
 
 
-def navigate(ask: str, root: NestedNode, top_k: int = 1) -> dict:
+def navigate(ask: str, root: NestedNode, top_k: int = 1, min_dense_score: float = 1e-9) -> dict:
     """Descend the tree one level at a time, scoring each level's children
     against the ask with the hybrid retriever, until a leaf is reached.
 
@@ -94,17 +94,45 @@ def navigate(ask: str, root: NestedNode, top_k: int = 1) -> dict:
     `path` is the full node-by-node trace -- every level's candidates and
     which one was chosen -- so the navigation is auditable even though it
     never involves a language model. Abstains (leaf=None) if a level's
-    children can't be scored at all (e.g. an empty branch), rather than
-    guessing a path.
+    children can't be scored at all (e.g. an empty branch), or if the best
+    candidate's *raw* dense (TF-IDF cosine) score is not strictly positive.
+
+    Why a near-zero floor and not a magnitude-based one: a fixed absolute
+    floor (0.05, even 0.01) does not survive scale -- as a chapter's summary
+    grows (more leaves concatenated into it), a genuine needle's distinctive
+    vocabulary becomes a shrinking fraction of the text, and the correct
+    candidate's dense score shrinks with it (measured 0.64 -> 0.017 -> 0.0056
+    across EXP-065's three sizes for the identical needle). A magnitude floor
+    tuned on the small case wrongly rejects the correct answer at the larger
+    ones. What does not shrink with scale is the *separation*: a genuine
+    match, however diluted, always has a strictly positive dense score
+    (TF-IDF cosine over any shared non-stopword vocabulary, however small a
+    fraction of the summary), while a truly unrelated ask gives an exact
+    mathematical 0.0 for every candidate -- disjoint sparse vectors have a
+    dot product of exactly zero, not a small positive number. Why dense and
+    not the blended `score`: the blended score is min-max normalized per
+    level, so the single best candidate is stretched toward 1.0 even when
+    nothing actually matches -- confirmed directly (EXP-065's off-topic ask
+    scored 0.5 that way). The raw sparse (BM25) leg is also unreliable here
+    because index.tokenize has no stopword filter, so "what"/"is"/"the"
+    alone produce a nonzero BM25 score on pure noise.
     """
     trace = []
     node = root
     while not node.is_leaf:
         candidates = [{"id": child.node_id, "text": child.summary_text} for child in node.children]
+        child_level = node.children[0].level
         index = Index(candidates)
         hits = index.search(ask, top_k=top_k)
         if not hits:
-            return {"path": trace, "leaf": None, "leaf_passages": [], "abstain_reason": f"no candidates scored at level {node.level}"}
+            return {"path": trace, "leaf": None, "leaf_passages": [], "abstain_reason": f"no {child_level} candidates to score"}
+        if hits[0]["dense"] < min_dense_score:
+            return {
+                "path": trace,
+                "leaf": None,
+                "leaf_passages": [],
+                "abstain_reason": f"no {child_level} scored above the dense-similarity floor (best: {hits[0]['dense']:.4f} < {min_dense_score})",
+            }
         best_id = hits[0]["passage"]["id"]
         chosen = next(child for child in node.children if child.node_id == best_id)
         trace.append(

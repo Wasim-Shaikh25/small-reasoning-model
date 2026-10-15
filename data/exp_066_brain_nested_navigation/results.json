@@ -1,0 +1,46 @@
+{
+  "id": "EXP-066",
+  "title": "The unified brain navigates a hierarchical document",
+  "status": "closed",
+  "goal": "Prove lab.common.brain.reason handles a hierarchically-structured document (chapter/section tags) through the same entry point and call shape EXP-060 proved for flat documents, chaining nested navigation (EXP-065) into the identity/arithmetic/rule-application signals EXP-058 already measured.",
+  "method": "Two cases through brain.reason(ask, passages), passages tagged with a 'hierarchy' dict ({'chapter':..., 'section':...}) instead of EXP-058/060's flat 'group' string. Case 1 restates EXP-058's contractor scenario with 2-level hierarchy tags instead of flat ones. Case 2 is an off-topic ask with no real match in the document, testing that EXP-065's near-zero abstention floor correctly propagates through brain.reason rather than producing a confident wrong answer.",
+  "metrics": {
+    "n": 2,
+    "accuracy": 1.0,
+    "cases": [
+      {
+        "id": "H01_contractor",
+        "decision": "supported",
+        "resolved_section": "Priya",
+        "correct": true
+      },
+      {
+        "id": "H02_off_topic",
+        "decision": "inconclusive",
+        "resolved_section": null,
+        "correct": true
+      }
+    ]
+  },
+  "results_prose": "On 2 cases through the identical brain.reason(ask, passages) call EXP-060 used for flat documents, 2 are fully correct. The contractor case resolves to section 'Priya' via nested navigation, then runs identity extraction, arithmetic, and policy rule application exactly as EXP-058 measured on a flat-tagged version of the same scenario: 'Priya Nair, Residency Road [B1]. total 40,000 [B3, B4]. policy applies: the payment requires finance head approval [POLICY].'. The off-topic case correctly abstains rather than guessing a section: decision 'inconclusive'.",
+  "conclusion": "The unification EXP-060 proved for flat documents carries over to hierarchical ones without any change at the call site: the same function, given passages tagged with a 'hierarchy' dict instead of a flat 'group' string, navigates the structure (lab.common.nested_index, EXP-065's near-zero abstention floor included) and then runs the identical downstream signals (identity, arithmetic, rule application) EXP-058 already measured. A caller never needs to know or declare whether the document it's handing brain.reason is flat or structured -- the passages' own tags decide, the same 'input decides how much of the machinery runs' principle EXP-060 established for the simpler signals now extends to document structure itself.",
+  "scale_down": "2 cases, 2-level hierarchy, 9 passages -- a wiring proof, not a scale test (EXP-065 already measured scale up to 450 leaves for the navigation mechanism alone).",
+  "referenced_files": [
+    "lab/exp_066_brain_nested_navigation/run.py",
+    "lab/common/brain.py",
+    "lab/common/nested_index.py",
+    "lab/common/index.py",
+    "lab/common/harness.py",
+    "data/exp_058_integrated_scenario/results.json",
+    "data/exp_060_unified_brain/results.json",
+    "data/exp_065_nested_navigation/results.json",
+    "data/exp_066_brain_nested_navigation/results.json"
+  ],
+  "follow_ups": [
+    "Extend lab.common.brain's flat ('group') disambiguation branch with the same near-zero abstention floor nested navigation now has, so a flat off-topic ask also abstains instead of guessing (EXP-065's follow-up, not yet carried to the flat path).",
+    "Test a 3-level hierarchy (chapter/section/paragraph) through brain.reason, not just the 2-level case here."
+  ],
+  "elapsed_sec": 0.0065,
+  "peak_rss_mb": 139.5,
+  "models_used": "No generative model. Every step is a previously-measured classical/deterministic primitive; this exploration only chains them through the existing single entry point."
+}

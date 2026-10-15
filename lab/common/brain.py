@@ -10,16 +10,20 @@ The key design choice, directly answering the objection that this would
 otherwise just be a classifier picking between separate pipelines: `reason()`
 does not classify the ask into one exclusive type and branch. It runs a fixed
 sequence of independent, domain-agnostic *signal checks* -- is there more than
-one candidate story here? does the ask want an identity? a total? is there a
-rule anywhere in context? -- and only the tools whose signal fires actually
-run. A plain lookup question fires none of the extra signals and falls back
-to the same lab.common.qa extractor lab.common.engine already uses. A
-question like EXP-058's fires three of them at once and chains their results.
-Same function, same code path, every time; the input decides how much of it
-is used, not a label chosen for the input ahead of time.
+one candidate story here (flat, or nested across a hierarchy)? does the ask
+want an identity? a total? is there a rule anywhere in context? -- and only
+the tools whose signal fires actually run. A plain lookup question fires none
+of the extra signals and falls back to the same lab.common.qa extractor
+lab.common.engine already uses. A question like EXP-058's fires three of them
+at once and chains their results. Same function, same code path, every time;
+the input decides how much of it is used, not a label chosen for the input
+ahead of time.
 
 Every tool this calls is a primitive already built and separately measured:
   - lab.common.index.Index: hybrid retrieval, EXP-004/015/029/040/058.
+  - lab.common.nested_index: hierarchical navigation over a structured
+    document, EXP-065, used when passages carry a "hierarchy" tag instead
+    of (or in addition to) a flat "group" tag.
   - lab.common.entities: name/address extraction, EXP-009.
   - lab.common.calc: arithmetic, EXP-007/014.
   - lab.common.rules: verb-trigger and threshold rule application,
@@ -39,6 +43,7 @@ from lab.common.ask import analyze
 from lab.common.calc import sum_amounts
 from lab.common.entities import AMOUNT_RE, detect_primary, parse_address
 from lab.common.index import Index
+from lab.common.nested_index import build_nested_index, navigate
 from lab.common.qa import answer_with_agreement
 from lab.common.rules import apply_rule, apply_threshold_rule, extract_fact_triple, parse_conditional_rule, parse_threshold_rule
 from lab.common.textutil import normalize
@@ -93,7 +98,24 @@ def reason(ask: str, passages: list[dict]) -> dict:
     citations: set[str] = set()
     scoped = passages
 
-    if len(groups) > 1:
+    hierarchical = [p for p in passages if p.get("hierarchy")]
+    if hierarchical:
+        # A structured document (chapter/section/... tags) navigates level by
+        # level (lab.common.nested_index, EXP-065) instead of the flat
+        # single-level search below. A passage with no "hierarchy" tag (a
+        # global policy, say) is excluded from the tree the same way an
+        # ungrouped passage is excluded from the flat story search -- it is
+        # not itself a candidate "section", it is background text _find_rule
+        # still scans separately over the full passage list.
+        level_keys = list(hierarchical[0]["hierarchy"].keys())
+        items = [{**p, **p["hierarchy"]} for p in hierarchical]
+        root = build_nested_index(items, level_keys)
+        nav = navigate(ask, root)
+        trace.append({"step": "nested_navigate", "path": nav["path"], "abstain_reason": nav.get("abstain_reason")})
+        if nav["leaf"] is None:
+            return _finish(ask, trace, "inconclusive", ABSTAIN_TEXT, citations, reason=nav.get("abstain_reason", "navigation failed"))
+        scoped = nav["leaf_passages"]
+    elif len(groups) > 1:
         # Only passages tagged with a story group are candidates for "which
         # story is this ask about" -- an ungrouped passage is background
         # rule/policy text, a different category entirely, and must not
