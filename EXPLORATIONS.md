@@ -22135,7 +22135,7 @@ Elapsed seconds: 64.0395. Peak RSS MB: 146.49.
 - `FORBIDDEN.md`
 - `data/exp_063_gemma3_rewriter/results.json`
 - `data/exp_064_constrained_decoding/results.json`
-- Results: Post-hoc splice (EXP-063's method, rerun here for a same-run comparison): 0.8462 fidelity pass rate. Decoding-level constraint (this exploration's method, citation and non-emptiness enforced by the JSON schema, not repaired after the fact): 1.0. Fail reasons under the constrained method: {}.
+- Results: Post-hoc splice (EXP-063's method, rerun here for a same-run comparison): 0.8462 fidelity pass rate. Decoding-level constraint (this exploration's method, citation and non-emptiness enforced by the JSON schema, not repaired after the fact): 1.0. Fail reasons under the constrained method: {}. On a 4-fact leaf (the harder, original EXP-048 difficulty level, not what this schema was designed for): failed, reasons ['numbers', 'nli'].
 ```json
 {
   "model": "gemma3:270m",
@@ -22167,14 +22167,19 @@ Elapsed seconds: 64.0395. Peak RSS MB: 146.49.
     "fidelity_pass_rate": 1.0,
     "fail_reason_counts": {}
   },
+  "decoding_constrained_4fact_leaf_passed": false,
+  "decoding_constrained_4fact_leaf_fail_reasons": [
+    "numbers",
+    "nli"
+  ],
   "exp_063_splice_baseline_pass_rate": 0.8462,
   "flan_t5_small_pass_rate": 0.3846
 }
 ```
 
-Elapsed seconds: 91.5318. Peak RSS MB: 146.36.
+Elapsed seconds: 76.1722. Peak RSS MB: 147.25.
 - Scale-down: Same 13 findings as EXP-054/056/062/063, single leaf size, one schema design, not a sweep over constraint strategies.
-- Conclusion: Real decoding-level constraints, reached through Ollama's JSON-schema structured-output support rather than the blocked transformers constrained-beam-search path or an untrusted remote-code package, improve on the post-hoc splice: 1.0 versus 0.8462. The citation can no longer be dropped by construction, and an empty rewrite is no longer decodable at all -- both are now grammar-level impossibilities, not failures caught and patched afterward. Remaining failures are free-text content problems (e.g. a dropped number) that a JSON-schema constraint on a single enum field cannot reach -- the fidelity gate is still required for those, and still does its job.
+- Conclusion: Real decoding-level constraints, reached through Ollama's JSON-schema structured-output support rather than the blocked transformers constrained-beam-search path or an untrusted remote-code package, improve on the post-hoc splice: 1.0 versus 0.8462. The citation can no longer be dropped by construction, and an empty rewrite is no longer decodable at all -- both are now grammar-level impossibilities, not failures caught and patched afterward. Remaining failures are free-text content problems (e.g. a dropped number) that a JSON-schema constraint on a single enum field cannot reach -- the fidelity gate is still required for those, and still does its job. This constraint does not generalize to the harder problem it was never designed for: on a 4-fact leaf (EXP-048's original difficulty level), the schema still forces all 4 citation ids to appear, but the free-text 'rewritten_sentence' field still collapses to one fact while listing citations for facts it never actually restated -- arguably worse than silence, since the citations now falsely imply support for content that isn't there. The fidelity gate still catches this (numbers/nli fail, falls back correctly), but it confirms that decomposing to one fact per leaf is not a crutch for flan-t5-small specifically -- it is load-bearing for any small model's reliability at this task, and no decoding-level trick found so far substitutes for it.
 
 ## Follow-up todos
 

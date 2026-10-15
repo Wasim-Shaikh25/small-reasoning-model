@@ -83,7 +83,7 @@
       "leaf_id": "L0012",
       "used_generative": true,
       "fallback_reason": null,
-      "generated_text": "Entry is permitted only between 09:00 and 18:00."
+      "generated_text": "The entry is permitted only between 09:00 and 18:00."
     }
   ],
   "decoding_constrained": [
@@ -165,5 +165,15 @@
       "fallback_reason": null,
       "generated_text": "Entry is permitted only between 09:00 and 18:00. [CITE-PG004]"
     }
-  ]
+  ],
+  "decoding_constrained_4fact_leaf": {
+    "leaf_id": "L_multi",
+    "findings_in_leaf": 4,
+    "used_generative": false,
+    "fallback_reason": [
+      "numbers",
+      "nli"
+    ],
+    "generated_text": "The notice period is 30 days. [CITE-CL000] [CITE-CL001] [CITE-CL002] [CITE-CL003]"
+  }
 }
