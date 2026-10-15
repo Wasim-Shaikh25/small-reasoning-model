@@ -32,6 +32,14 @@ from lab.common.real_encoders import bge_embed
 # further than this.
 MIN_SEMANTIC_MARGIN = 0.03
 
+# Absolute floor used only where no second candidate exists to take a
+# margin against (navigate_dual's single-candidate level). Separates a
+# genuine match (0.64-0.74 across every sample measured, EXP-070) from an
+# off-topic one (0.34, EXP-068) on a small sample -- not swept across
+# fixtures the way MIN_SEMANTIC_MARGIN was, so treat it the same way: a
+# first measured value, not a validated constant.
+SEMANTIC_SINGLE_FLOOR = 0.5
+
 
 class SemanticIndex:
     def __init__(self, passages: list[dict]):
@@ -116,6 +124,122 @@ def navigate_semantic(ask: str, root, min_margin: float = MIN_SEMANTIC_MARGIN) -
                 "chosen_id": chosen.node_id,
                 "score": round(hits[0]["score"], 4),
                 "margin": round(margin, 4),
+                "candidates_considered": len(candidates),
+            }
+        )
+        node = chosen
+    return {"path": trace, "leaf": node, "leaf_passages": node.leaf_passages}
+
+
+def navigate_dual(ask: str, root, min_dense_score: float = MIN_DENSE_SCORE, min_margin: float = MIN_SEMANTIC_MARGIN) -> dict:
+    """Hierarchical navigation using lexical and semantic as two independent
+    signals that must agree, instead of either one alone.
+
+    Until this function existed, lab.common.brain's hierarchical branch used
+    lab.common.nested_index.navigate -- lexical (TF-IDF) only, so it could
+    navigate exact-wording asks but had no way to catch a paraphrased one
+    (the same gap EXP-067 measured and fixed for flat disambiguation, never
+    carried over to the hierarchical path). navigate_semantic (above) then
+    added the opposite gap: semantic (bge) only, and EXP-068's margin sweep
+    found its margin alone isn't reliably separable from noise across
+    fixtures. This combines both the way lab.common.brain's flat branch
+    already does (EXP-067/069): lexical abstains via the near-zero dense
+    floor (disjoint TF-IDF vectors are exactly 0.0, regardless of scale);
+    semantic abstains via the top1-vs-runner-up margin (catches paraphrase,
+    where lexical can't); if only one signal is confident its pick is used,
+    if both are confident but disagree that's a real conflict and the level
+    abstains rather than guessing, and if both abstain there's nothing to
+    recover. A single-candidate level has no margin to compute at all, so it
+    checks both the lexical dense floor and an absolute semantic floor
+    (SEMANTIC_SINGLE_FLOOR) and proceeds if either clears -- not the dense
+    floor alone the way navigate_semantic's single-child fallback does;
+    lexical-only there let a correctly-resolved parent level get vetoed one
+    level down by a check with no semantic signal (EXP-070).
+    """
+    trace = []
+    node = root
+    while not node.is_leaf:
+        candidates = [{"id": child.node_id, "text": child.summary_text} for child in node.children]
+        child_level = node.children[0].level
+
+        if len(candidates) == 1:
+            # No margin is computable with one candidate, so this can't use
+            # the same two checks as the multi-candidate branch below. Using
+            # the lexical floor alone (the original design) meant a parent
+            # level could resolve a heavy paraphrase correctly via the
+            # semantic signal, only for that correct answer to be vetoed one
+            # level down by a check with no semantic signal at all --
+            # measured directly in EXP-070 (chapter correctly resolved via a
+            # 0.094 semantic margin, then the single-section level beneath
+            # it rejected the same ask because its lexical dense score was
+            # exactly 0.0). SEMANTIC_SINGLE_FLOOR is a rough absolute
+            # semantic floor, not a margin -- separates a genuine match
+            # (0.64-0.74 in every sample measured so far) from an off-topic
+            # one (0.34) on a small sample, same unvalidated-beyond-this-
+            # sample caveat MIN_SEMANTIC_MARGIN carries. Proceeds if either
+            # signal clears its own floor.
+            dense = Index(candidates).search(ask, top_k=1)[0]["dense"]
+            semantic_score = SemanticIndex(candidates).search(ask, top_k=1)[0]["score"]
+            if dense < min_dense_score and semantic_score < SEMANTIC_SINGLE_FLOOR:
+                return {
+                    "path": trace,
+                    "leaf": None,
+                    "leaf_passages": [],
+                    "abstain_reason": (
+                        f"only one {child_level} candidate and neither signal cleared its floor "
+                        f"(dense {dense:.4f} < {min_dense_score}, semantic {semantic_score:.4f} < {SEMANTIC_SINGLE_FLOOR}) "
+                        "-- no margin was computable to check instead"
+                    ),
+                }
+            chosen = node.children[0]
+            trace.append(
+                {
+                    "level": chosen.level,
+                    "chosen": chosen.title,
+                    "chosen_id": chosen.node_id,
+                    "dense": round(dense, 4),
+                    "semantic_score": round(semantic_score, 4),
+                    "candidates_considered": 1,
+                    "fallback": "single_candidate_dense_or_semantic_floor",
+                }
+            )
+            node = chosen
+            continue
+
+        lexical_hits = Index(candidates).search(ask, top_k=2)
+        semantic_hits = SemanticIndex(candidates).search(ask, top_k=2)
+        lexical_abstain = lexical_hits[0]["dense"] < min_dense_score
+        semantic_margin = semantic_hits[0]["score"] - semantic_hits[1]["score"]
+        semantic_abstain = semantic_margin < min_margin
+        lexical_top_id = lexical_hits[0]["passage"]["id"]
+        semantic_top_id = semantic_hits[0]["passage"]["id"]
+
+        if lexical_abstain and semantic_abstain:
+            return {
+                "path": trace,
+                "leaf": None,
+                "leaf_passages": [],
+                "abstain_reason": f"neither lexical nor semantic retrieval found a confident {child_level} (lexical dense {lexical_hits[0]['dense']:.4f}, semantic margin {semantic_margin:.4f})",
+            }
+        if not lexical_abstain and not semantic_abstain and lexical_top_id != semantic_top_id:
+            return {
+                "path": trace,
+                "leaf": None,
+                "leaf_passages": [],
+                "abstain_reason": f"lexical and semantic retrieval disagree on which {child_level} matches ({lexical_top_id!r} vs {semantic_top_id!r})",
+            }
+
+        best_id = semantic_top_id if lexical_abstain else lexical_top_id
+        chosen = next(child for child in node.children if child.node_id == best_id)
+        trace.append(
+            {
+                "level": chosen.level,
+                "chosen": chosen.title,
+                "chosen_id": chosen.node_id,
+                "lexical_dense": round(lexical_hits[0]["dense"], 4),
+                "lexical_abstain": lexical_abstain,
+                "semantic_margin": round(semantic_margin, 4),
+                "semantic_abstain": semantic_abstain,
                 "candidates_considered": len(candidates),
             }
         )

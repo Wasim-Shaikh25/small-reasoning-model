@@ -283,7 +283,7 @@
       "Viking"
     ],
     "answerable": true,
-    "pred_span": "itself borrowed from Old Low Franconian Nortmann \"Northman\" or directly from Old Norse NorÃ°maÃ°r, Latinized variously as Nortmannus, Normannus, or Nordmannus (recorded in Medieval Latin, 9th century) to mean \"Norseman, Viking\"",
+    "pred_span": "itself borrowed from Old Low Franconian Nortmann \"Northman\" or directly from Old Norse Norðmaðr, Latinized variously as Nortmannus, Normannus, or Nordmannus (recorded in Medieval Latin, 9th century) to mean \"Norseman, Viking\"",
     "passage_id": "A",
     "correct_abstain": false,
     "false_answer": false,
@@ -315,7 +315,7 @@
     "question": "What name comes from the English words Normans/Normanz?",
     "gold_alternatives": [],
     "answerable": false,
-    "pred_span": "itself borrowed from Old Low Franconian Nortmann \"Northman\" or directly from Old Norse NorÃ°maÃ°r, Latinized variously as Nortmannus, Normannus, or Nordmannus (recorded in Medieval Latin, 9th century) to mean \"Norseman, Viking\"",
+    "pred_span": "itself borrowed from Old Low Franconian Nortmann \"Northman\" or directly from Old Norse Norðmaðr, Latinized variously as Nortmannus, Normannus, or Nordmannus (recorded in Medieval Latin, 9th century) to mean \"Norseman, Viking\"",
     "passage_id": "A",
     "correct_abstain": false,
     "false_answer": true,
@@ -489,7 +489,7 @@
     "question": "What Viking groups were conquered by Rollo?",
     "gold_alternatives": [],
     "answerable": false,
-    "pred_span": "Rollo's contingents who raided and ultimately settled Normandy and parts of the Atlantic coast included Danes, Norwegians, Norseâ€“Gaels, Orkney Vikings, possibly Swedes, and Anglo-Danes from the English Danelaw under Norse control.",
+    "pred_span": "Rollo's contingents who raided and ultimately settled Normandy and parts of the Atlantic coast included Danes, Norwegians, Norse–Gaels, Orkney Vikings, possibly Swedes, and Anglo-Danes from the English Danelaw under Norse control.",
     "passage_id": "A",
     "correct_abstain": true,
     "false_answer": false,
@@ -1050,7 +1050,7 @@
       "30,000"
     ],
     "answerable": true,
-    "pred_span": "1081",
+    "pred_span": "30,000 men",
     "passage_id": "A",
     "correct_abstain": false,
     "false_answer": false,
@@ -1242,7 +1242,7 @@
       "Dyrrachium"
     ],
     "answerable": true,
-    "pred_span": "Some time later, Dyrrachiumâ€”one of the most important naval bases of the Adriaticâ€”fell again to Byzantine hands.",
+    "pred_span": "Some time later, Dyrrachium—one of the most important naval bases of the Adriatic—fell again to Byzantine hands.",
     "passage_id": "A",
     "correct_abstain": false,
     "false_answer": false,
@@ -1260,7 +1260,7 @@
       "the Adriatic"
     ],
     "answerable": true,
-    "pred_span": "Some time later, Dyrrachiumâ€”one of the most important naval bases of the Adriaticâ€”fell again to Byzantine hands.",
+    "pred_span": "Some time later, Dyrrachium—one of the most important naval bases of the Adriatic—fell again to Byzantine hands.",
     "passage_id": "A",
     "correct_abstain": false,
     "false_answer": false,
@@ -1305,7 +1305,7 @@
     "question": "What naval base fell to the Normans?",
     "gold_alternatives": [],
     "answerable": false,
-    "pred_span": "Some time later, Dyrrachiumâ€”one of the most important naval bases of the Adriaticâ€”fell again to Byzantine hands.",
+    "pred_span": "Some time later, Dyrrachium—one of the most important naval bases of the Adriatic—fell again to Byzantine hands.",
     "passage_id": "A",
     "correct_abstain": true,
     "false_answer": false,
@@ -1468,7 +1468,7 @@
     "title": "Normans",
     "question": "Who did Edward make archbishop of Canterbury?",
     "gold_alternatives": [
-      "Robert of JumiÃ¨ges"
+      "Robert of Jumièges"
     ],
     "answerable": true,
     "pred_span": null,
@@ -2308,14 +2308,14 @@
       "380 years"
     ],
     "answerable": true,
-    "pred_span": "380",
+    "pred_span": "380 years",
     "passage_id": "A",
     "correct_abstain": false,
     "false_answer": false,
     "missed_answer": true,
     "exact_match": false,
     "span_valid": false,
-    "any_reference_match": false
+    "any_reference_match": true
   },
   {
     "id": "5ad401f2604f3c001a3ffd41",
@@ -2626,7 +2626,7 @@
     "title": "Normans",
     "question": "Who bought the rights?",
     "gold_alternatives": [
-      "Enrique PÃ©rez de GuzmÃ¡n"
+      "Enrique Pérez de Guzmán"
     ],
     "answerable": true,
     "pred_span": null,
@@ -3222,7 +3222,7 @@
   {
     "id": "56de51c64396321400ee27f8",
     "title": "Normans",
-    "question": "Who were the two abbots at FÃ©camp Abbey?",
+    "question": "Who were the two abbots at Fécamp Abbey?",
     "gold_alternatives": [
       "William of Volpiano and John of Ravenna"
     ],
@@ -3961,14 +3961,14 @@
       "2000"
     ],
     "answerable": true,
-    "pred_span": "2000",
+    "pred_span": "15 largest",
     "passage_id": "A",
     "correct_abstain": false,
     "false_answer": false,
     "missed_answer": true,
     "exact_match": false,
     "span_valid": false,
-    "any_reference_match": true
+    "any_reference_match": false
   },
   {
     "id": "56e17e6ee3433e1400422f80",
@@ -4012,7 +4012,7 @@
     "question": "How many miles does the traveling salesman problem seek to classify a route between the 15 smallest cities in Germany?",
     "gold_alternatives": [],
     "answerable": false,
-    "pred_span": "2000",
+    "pred_span": "15 largest",
     "passage_id": "A",
     "correct_abstain": true,
     "false_answer": false,
@@ -4418,7 +4418,7 @@
       "formal language"
     ],
     "answerable": true,
-    "pred_span": "then the set of all connected graphsâ€”of course, to obtain a precise definition of this language, one has to decide how graphs are encoded as binary strings",
+    "pred_span": "then the set of all connected graphs—of course, to obtain a precise definition of this language, one has to decide how graphs are encoded as binary strings",
     "passage_id": "A",
     "correct_abstain": false,
     "false_answer": false,
@@ -4435,7 +4435,7 @@
       "how graphs are encoded as binary strings"
     ],
     "answerable": true,
-    "pred_span": "then the set of all connected graphsâ€”of course, to obtain a precise definition of this language, one has to decide how graphs are encoded as binary strings",
+    "pred_span": "then the set of all connected graphs—of course, to obtain a precise definition of this language, one has to decide how graphs are encoded as binary strings",
     "passage_id": "A",
     "correct_abstain": false,
     "false_answer": false,
@@ -4465,7 +4465,7 @@
     "question": "What is the term for the set of all unconnected graphs related to this decision problem?",
     "gold_alternatives": [],
     "answerable": false,
-    "pred_span": "then the set of all connected graphsâ€”of course, to obtain a precise definition of this language, one has to decide how graphs are encoded as binary strings",
+    "pred_span": "then the set of all connected graphs—of course, to obtain a precise definition of this language, one has to decide how graphs are encoded as binary strings",
     "passage_id": "A",
     "correct_abstain": true,
     "false_answer": false,
@@ -4480,7 +4480,7 @@
     "question": "What encoding decision needs to be made in order to determine an inaccurate definition of the formal language? ",
     "gold_alternatives": [],
     "answerable": false,
-    "pred_span": "then the set of all connected graphsâ€”of course, to obtain a precise definition of this language, one has to decide how graphs are encoded as binary strings",
+    "pred_span": "then the set of all connected graphs—of course, to obtain a precise definition of this language, one has to decide how graphs are encoded as binary strings",
     "passage_id": "A",
     "correct_abstain": true,
     "false_answer": false,
@@ -4495,7 +4495,7 @@
     "question": "How does one obtain an indefinite definition of this language?",
     "gold_alternatives": [],
     "answerable": false,
-    "pred_span": "then the set of all connected graphsâ€”of course, to obtain a precise definition of this language, one has to decide how graphs are encoded as binary strings",
+    "pred_span": "then the set of all connected graphs—of course, to obtain a precise definition of this language, one has to decide how graphs are encoded as binary strings",
     "passage_id": "A",
     "correct_abstain": true,
     "false_answer": false,
@@ -4693,7 +4693,7 @@
     "question": "If two integers are multiplied and output a value, what is this expression set called?",
     "gold_alternatives": [
       "set of triples",
-      "the set of triples (a, b, c) such that the relation a Ã— b = c holds",
+      "the set of triples (a, b, c) such that the relation a × b = c holds",
       "triple"
     ],
     "answerable": true,

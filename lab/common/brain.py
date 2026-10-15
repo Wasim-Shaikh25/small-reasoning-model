@@ -34,12 +34,13 @@ Every tool this calls is a primitive already built and separately measured:
   - lab.common.index.Index: hybrid retrieval, EXP-004/015/029/040/058.
   - lab.common.intent_signals: domain-agnostic identity/total detection,
     EXP-069 (bge exemplar similarity, not literal keywords).
-  - lab.common.semantic_index.SemanticIndex: real bge embeddings, EXP-067,
-    used alongside Index (not instead of it) for flat disambiguation --
-    lexical and semantic are independent signals that must agree.
-  - lab.common.nested_index: hierarchical navigation over a structured
-    document, EXP-065, used when passages carry a "hierarchy" tag instead
-    of (or in addition to) a flat "group" tag.
+  - lab.common.semantic_index.SemanticIndex / navigate_dual: real bge
+    embeddings, EXP-067/070, used alongside Index (not instead of it) for
+    both flat disambiguation and hierarchical navigation -- lexical and
+    semantic are independent signals that must agree in both branches.
+  - lab.common.nested_index.build_nested_index: builds the tree a
+    structured document (a "hierarchy" tag) navigates level by level,
+    EXP-065; navigate_dual (above) does the actual level-by-level descent.
   - lab.common.entities: name/address extraction, EXP-009.
   - lab.common.calc: arithmetic, EXP-007/014.
   - lab.common.rules: verb-trigger and threshold rule application,
@@ -60,10 +61,10 @@ from lab.common.calc import sum_amounts
 from lab.common.entities import AMOUNT_RE, detect_primary, parse_address
 from lab.common.index import Index
 from lab.common.intent_signals import wants_identity, wants_total
-from lab.common.nested_index import MIN_DENSE_SCORE, build_nested_index, navigate
+from lab.common.nested_index import MIN_DENSE_SCORE, build_nested_index
 from lab.common.qa import answer_with_agreement
 from lab.common.rules import apply_rule, apply_threshold_rule, extract_fact_triple, parse_conditional_rule, parse_threshold_rule
-from lab.common.semantic_index import MIN_SEMANTIC_MARGIN, SemanticIndex
+from lab.common.semantic_index import MIN_SEMANTIC_MARGIN, SemanticIndex, navigate_dual
 from lab.common.textutil import normalize
 from lab.common.verify import quote_check
 
@@ -111,10 +112,17 @@ def reason(ask: str, passages: list[dict]) -> dict:
         # ungrouped passage is excluded from the flat story search -- it is
         # not itself a candidate "section", it is background text _find_rule
         # still scans separately over the full passage list.
+        #
+        # navigate_dual (lab.common.semantic_index), not nested_index's
+        # plain lexical-only navigate: this branch used to have no semantic
+        # signal at all, so a paraphrased ask had no way through it -- the
+        # same gap EXP-067 fixed for flat disambiguation, finally carried
+        # over here too. Same lexical-floor + semantic-margin, independent
+        # signals that must agree, as the flat branch below.
         level_keys = list(hierarchical[0]["hierarchy"].keys())
         items = [{**p, **p["hierarchy"]} for p in hierarchical]
         root = build_nested_index(items, level_keys)
-        nav = navigate(ask, root)
+        nav = navigate_dual(ask, root)
         trace.append({"step": "nested_navigate", "path": nav["path"], "abstain_reason": nav.get("abstain_reason")})
         if nav["leaf"] is None:
             return _finish(ask, trace, "inconclusive", ABSTAIN_TEXT, citations, reason=nav.get("abstain_reason", "navigation failed"))

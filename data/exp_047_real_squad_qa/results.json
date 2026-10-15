@@ -48,7 +48,7 @@
     "If huggingface.co access is ever granted, rerun this exact subset with deepset/deberta-v3-base-squad2 (EXP-030) for a true model-vs-model comparison on identical real data.",
     "Add the 3-10 passage distractor count Experiment B specifies, once more real passages per question are sourced."
   ],
-  "elapsed_sec": 0.2452,
-  "peak_rss_mb": 37.57,
+  "elapsed_sec": 0.2864,
+  "peak_rss_mb": 39.39,
   "models_used": "No model, classical or neural, is loaded by this exploration beyond lab/common/qa.py's existing lexical extractors (unchanged from EXP-005). This is a real-data rerun: the SQuAD2 dev set is real and unmodified; the method is EXP-005's own. deepset/deberta-v3-base-squad2, the blueprint's named checkpoint for this role, remains unloaded because huggingface.co is blocked in this sandbox."
 }

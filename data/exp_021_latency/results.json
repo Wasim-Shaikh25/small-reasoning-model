@@ -6,18 +6,18 @@
   "method": "Each stage is warmed up once and then timed over repeated calls. Peak RSS is the process high-water mark: getrusage on POSIX, psutil's peak working-set size on Windows (see lab/common/harness.peak_rss_mb).",
   "metrics": {
     "mean_seconds": {
-      "ask_analyze_sec": 6.2e-05,
-      "chunk_sec": 0.002032,
-      "search_sec": 0.002671,
-      "qa_sec": 0.001272,
-      "nli_sec": 4.9e-05,
-      "e2e_sec": 0.029816
+      "ask_analyze_sec": 0.000535,
+      "chunk_sec": 0.003811,
+      "search_sec": 0.008541,
+      "qa_sec": 0.003097,
+      "nli_sec": 0.000169,
+      "e2e_sec": 0.039917
     },
-    "peak_rss_mb": 126.12,
+    "peak_rss_mb": 128.08,
     "cpu_note": "Measured on this process. RSS is peak resident set for the whole run, not a per-model load.",
     "models_loaded": []
   },
-  "results_prose": "Mean stage times in seconds: ask_analyze_sec 6.2e-05, chunk_sec 0.002032, search_sec 0.002671, qa_sec 0.001272, nli_sec 4.9e-05, e2e_sec 0.029816. Peak RSS 126.12 MB. No neural checkpoint was loaded.",
+  "results_prose": "Mean stage times in seconds: ask_analyze_sec 0.000535, chunk_sec 0.003811, search_sec 0.008541, qa_sec 0.003097, nli_sec 0.000169, e2e_sec 0.039917. Peak RSS 128.08 MB. No neural checkpoint was loaded.",
   "conclusion": "These times are for the lexical substitutes. They are not the latency of DeBERTa, GLiNER, or FLAN-T5, which are not loaded.",
   "scale_down": "Forty short passages. Quantized ONNX and CTranslate2 runtimes from the architecture are not used.",
   "referenced_files": [
@@ -36,6 +36,6 @@
     "data/exp_021_latency/results.json"
   ],
   "follow_ups": [],
-  "elapsed_sec": 0.288,
-  "peak_rss_mb": 126.12
+  "elapsed_sec": 0.6119,
+  "peak_rss_mb": 128.08
 }

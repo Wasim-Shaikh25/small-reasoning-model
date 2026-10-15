@@ -38,26 +38,42 @@ DATE_RE = re.compile(
     r"August|September|October|November|December)\s+\d{4})\b",
     re.I,
 )
+#  A closed, finite set of English function words (pronouns, articles,
+#  prepositions, conjunctions, short auxiliaries/modals) -- not a growing
+#  domain-vocabulary list like "lessee"/"lessor" was. Needed because a short
+#  lowercase word right after a number ("1081 he", found against real SQuAD
+#  text, EXP-070) is otherwise indistinguishable from a real short lowercase
+#  unit ("7 grams") by the capitalization/length heuristic alone. The same
+#  category of list sklearn's own stop_words="english" already uses
+#  elsewhere in this repo (lab.common.index), not a per-domain word list.
+_AMOUNT_UNIT_STOPWORDS = (
+    r"(?:he|she|it|we|us|you|they|is|was|are|am|be|to|of|in|on|at|by|or|and"
+    r"|the|a|an|as|if|so|do|did|has|had|can|may|not|no|nor|but|yet|for|up|out|off)"
+)
+
 AMOUNT_RE = re.compile(
     # Currency-prefixed ("INR 30000"), percent ("90%"/"90 percent"), or a
-    # number followed by a short (<=4 letter) alphabetic unit suffix --
-    # "30 days", "300mg", "250 MPa", "90kg" -- covering whatever unit a
-    # domain uses instead of enumerating specific units (which would just
-    # be domain-specific hardcoding one level down). The length cap is a
-    # structural heuristic, not a unit whitelist: units are typically short
-    # abbreviations, while a number followed by an ordinary English word
-    # ("30 employees") is usually longer and is deliberately left alone so
-    # it isn't misread as a quantity.
+    # number followed by a generic unit suffix -- "30 days", "7 grams",
+    # "300mg", "250 MPa" -- covering whatever unit a domain uses instead of
+    # enumerating specific units (which would just be domain-specific
+    # hardcoding one level down).
     #
-    # The trailing negative lookahead (not followed by whitespace+capital)
-    # guards a real false positive EXP-069 measured: "7 Hill Crest Avenue"
-    # otherwise reads as the quantity "7" with unit "Hill", because a short
-    # capitalized street-name word (Hill, Park, Lake, Road -- all <=4
-    # letters) looks exactly like a unit abbreviation by length alone. A
-    # genuine unit is followed by punctuation or a lowercase word; a house
-    # number's street name is followed by more of the proper noun (another
-    # capitalized word) -- that's the structural difference this leans on,
-    # not a street-word denylist.
+    # The real signal distinguishing a unit from a house-number's street
+    # name (EXP-069's follow-up fix, after a first attempt that capped unit
+    # length at 4 letters broke "7 grams" -- "grams" is 5 letters, a real
+    # unit, not a street name): capitalization, not length. A unit word is
+    # either plain lowercase ("grams", "minutes", however long) or a short
+    # abbreviation that isn't single-capital-then-lowercase ("MPa", "PSI",
+    # "C"); a street name is exactly that shape ("Hill", "Road", "Lake") --
+    # one capital letter followed by lowercase letters, and nothing else.
+    # The leading negative lookahead rejects that one shape; the length cap
+    # (<=7) and trailing lookahead (not followed by another capitalized
+    # word) catch the remaining case, an all-lowercase or all-caps token
+    # that still isn't really a unit ("30 employees", "14 MG Road"). The
+    # function-word lookahead (_AMOUNT_UNIT_STOPWORDS) catches the case
+    # neither capitalization nor length rules out: an ordinary short
+    # lowercase function word ("1081 he") that happens to immediately
+    # follow a number in real prose.
     #
     # Word-based currency codes (INR/USD/Rs) keep a leading \b since they're
     # word characters. Symbol currencies ($/€/£) get their own branch with
@@ -66,10 +82,15 @@ AMOUNT_RE = re.compile(
     # match at all. A latent bug, not one introduced here: every amount in
     # every fixture before EXP-069 used a word-prefixed currency (INR/USD),
     # so this never fired until a fixture finally used a bare "$" symbol.
+    # The two capitalization lookaheads must stay case-sensitive regardless
+    # of the compile-time re.I flag (needed for the lowercase currency codes
+    # and "percent") -- (?-i: ...) scopes that locally; without it, re.I
+    # makes [A-Z]/[a-z] both match any case and the whole distinction this
+    # comment describes silently stops doing anything.
     r"\b(?:INR|USD|Rs\.?)\s?\d[\d,]*(?:\.\d+)?\b"
     r"|[$€£]\s?\d[\d,]*(?:\.\d+)?\b"
     r"|\b\d[\d,]*(?:\.\d+)?\s?(?:percent|%)\b"
-    r"|\b\d[\d,]*(?:\.\d+)?\s?[A-Za-z]{1,4}\b(?!\s+[A-Z])",
+    r"|\b\d[\d,]*(?:\.\d+)?\s?(?!" + _AMOUNT_UNIT_STOPWORDS + r"\b)(?-i:(?![A-Z][a-z]+\b))[A-Za-z]{1,7}\b(?-i:(?!\s+[A-Z]))",
     re.I,
 )
 STREET_RE = re.compile(
@@ -95,6 +116,14 @@ def _add(found: list[dict], text: str, match: re.Match, label: str, conf: float,
     start = match.start() + match.group(0).find(span)
     if label == "person":
         words = span.split()
+        # If the capitalized run continues past this match ("New Delhi High
+        # |Court|"), FULL_PERSON's word cap is truncating a longer
+        # institution/place name, not catching a short one -- trimming a
+        # leading sentence-initial word in that case produces a confident
+        # wrong span ("Delhi High") no denylist entry anticipates, rather
+        # than widening the match. Reject the candidate outright instead.
+        if re.match(r"\s+[A-Z]", text[match.end():]):
+            return
         if len(words) >= 3:
             before = text[:match.start()]
             sentence_initial = not before.strip() or re.search(r"[.?!]\s*$", before)

@@ -1,0 +1,65 @@
+{
+  "id": "EXP-070",
+  "title": "Wiring navigate_dual into brain.py's hierarchical branch",
+  "status": "closed",
+  "goal": "Replace lab.common.brain's hierarchical-branch call to lab.common.nested_index's lexical-only navigate with lab.common.semantic_index.navigate_dual (lexical floor + semantic margin), and measure the before/after difference directly on a paraphrased ask the lexical-only navigator was never able to catch.",
+  "method": "EXP-066's exact fixture (2-level chapter/section hierarchy, Employees/Ravi and Contractors/Priya). 5 cases: 2 exact-wording regressions, 2 new paraphrased asks (avoiding 'contractor'/'sales manager'/'total'/'name'/'address' entirely), 1 off-topic negative control. Each case run through brain.reason (now using navigate_dual) and, as a direct counterfactual, through the old lexical-only lab.common.nested_index.navigate standalone on the same tree and ask, to measure what would have happened before this wiring.",
+  "metrics": {
+    "n": 5,
+    "dual_signal_accuracy": 1.0,
+    "lexical_only_accuracy": 0.6,
+    "cases": [
+      {
+        "id": "H01_contractor_exact",
+        "dual_signal_correct": true,
+        "lexical_only_correct": true,
+        "lexical_only_resolved_chapter": "Contractors"
+      },
+      {
+        "id": "H02_employee_exact",
+        "dual_signal_correct": true,
+        "lexical_only_correct": true,
+        "lexical_only_resolved_chapter": "Employees"
+      },
+      {
+        "id": "H03_contractor_paraphrase",
+        "dual_signal_correct": true,
+        "lexical_only_correct": false,
+        "lexical_only_resolved_chapter": null
+      },
+      {
+        "id": "H04_employee_paraphrase",
+        "dual_signal_correct": true,
+        "lexical_only_correct": false,
+        "lexical_only_resolved_chapter": null
+      },
+      {
+        "id": "H05_off_topic",
+        "dual_signal_correct": true,
+        "lexical_only_correct": true,
+        "lexical_only_resolved_chapter": null
+      }
+    ]
+  },
+  "results_prose": "Through brain.reason (now wired to navigate_dual): 5/5 correct. Through the counterfactual standalone lexical-only navigator (what brain.py's hierarchical branch used before this exploration): 3/5 correct. H03_contractor_paraphrase: dual=True, lexical-only=False (lexical-only resolved chapter None); H04_employee_paraphrase: dual=True, lexical-only=False (lexical-only resolved chapter None).",
+  "conclusion": "lab.common.brain's hierarchical branch now uses the same lexical+semantic dual-signal design (lab.common.semantic_index.navigate_dual) the flat branch already had, closing the gap this exploration was built to close. The paraphrase cases are exactly where the two diverge, as predicted: the dual-signal navigator resolves both correctly while the lexical-only navigator it replaces does not -- direct, measured evidence this wiring is load-bearing, not cosmetic. The two regression cases (exact wording) and the off-topic negative control hold under both navigators, confirming this is additive -- the new signal only helps on asks where lexical alone was already weak, it does not regress the cases lexical alone already handled.",
+  "scale_down": "1 fixture, 2 chapters, 5 cases -- a wiring/before-after proof, not a scale test (EXP-065 already measured the lexical mechanism's scale, EXP-067 the semantic mechanism's paraphrase case).",
+  "referenced_files": [
+    "lab/exp_070_hierarchical_dual_signal/run.py",
+    "lab/common/brain.py",
+    "lab/common/semantic_index.py",
+    "lab/common/nested_index.py",
+    "lab/common/harness.py",
+    "data/exp_066_brain_nested_navigation/results.json",
+    "data/exp_067_semantic_navigation/results.json",
+    "data/exp_070_hierarchical_dual_signal/results.json"
+  ],
+  "follow_ups": [
+    "EXP-068's margin sweep found MIN_SEMANTIC_MARGIN isn't cleanly separable across fixtures -- navigate_dual inherits that same calibration risk for its semantic half, mitigated but not removed by requiring lexical agreement too. Worth rerunning EXP-068's sweep against navigate_dual specifically, not just navigate_semantic standalone.",
+    "Only tested 2-level hierarchy; a 3+ level tree would exercise the dual-signal check at more levels in sequence, not yet tried.",
+    "SEMANTIC_SINGLE_FLOOR=0.5 (the fix for the single-candidate gap found here) is a first measured value from a handful of samples, the same unvalidated-constant caveat MIN_SEMANTIC_MARGIN carries -- it has not had its own EXP-068-style sweep across independent fixtures."
+  ],
+  "elapsed_sec": 15.4621,
+  "peak_rss_mb": 506.09,
+  "models_used": "bge-small-en-v1.5 for the semantic signal (retrieval only); TF-IDF/BM25 for the lexical signal. No generative model."
+}

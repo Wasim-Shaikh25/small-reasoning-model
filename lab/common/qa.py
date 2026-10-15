@@ -19,10 +19,32 @@ PERSON_RE = re.compile(
     r"|\b[A-Z][a-z]+\s+[A-Z][a-z]+\b"
     r"|\b[A-Z]\.\s*[A-Z][a-z]+\b"
 )
+# Sibling copy of lab.common.entities._AMOUNT_UNIT_STOPWORDS -- not
+# imported from there to avoid a circular import (entities.py already
+# imports from this module). A closed, finite set of English function
+# words, not a growing domain-vocabulary list.
+_AMOUNT_UNIT_STOPWORDS = (
+    r"(?:he|she|it|we|us|you|they|is|was|are|am|be|to|of|in|on|at|by|or|and"
+    r"|the|a|an|as|if|so|do|did|has|had|can|may|not|no|nor|but|yet|for|up|out|off)"
+)
+
 AMOUNT_RE = re.compile(
-    r"\b(?:INR|USD|Rs\.?|\$|€|£)\s?\d[\d,]*(?:\.\d+)?\b"
-    r"|\b\d[\d,]*(?:\.\d+)?\s?(?:days|day|months|percent|%|grams|gram|minutes|minute|seconds|second|mg|tablets|times)\b"
-    r"|\b\d+(?:\.\d+)?\s*C\b",
+    # Same bugs lab.common.entities.AMOUNT_RE had until EXP-069/070, fixed
+    # the same way here: (1) a literal \b right before a symbol currency
+    # ($/€/£) can never match -- \b needs a word/non-word transition, and a
+    # symbol preceded by whitespace is non-word on both sides -- so symbol
+    # currencies get their own branch with no leading \b. (2) the old
+    # enumerated unit list (days/months/grams/mg/tablets/...) was ad hoc
+    # per-scenario accretion; replaced with a capitalization-based
+    # distinction (unit vs. street-name word) plus a function-word
+    # exclusion (an ordinary short word like "he" can otherwise look like a
+    # unit right after a number) -- see lab.common.entities.AMOUNT_RE for
+    # the full rationale, identical here. (?-i: ...) keeps the two
+    # capitalization lookaheads case-sensitive despite the outer re.I.
+    r"\b(?:INR|USD|Rs\.?)\s?\d[\d,]*(?:\.\d+)?\b"
+    r"|[$€£]\s?\d[\d,]*(?:\.\d+)?\b"
+    r"|\b\d[\d,]*(?:\.\d+)?\s?(?:percent|%)\b"
+    r"|\b\d[\d,]*(?:\.\d+)?\s?(?!" + _AMOUNT_UNIT_STOPWORDS + r"\b)(?-i:(?![A-Z][a-z]+\b))[A-Za-z]{1,7}\b(?-i:(?!\s+[A-Z]))",
     re.I,
 )
 
