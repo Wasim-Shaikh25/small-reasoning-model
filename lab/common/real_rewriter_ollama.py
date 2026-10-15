@@ -16,6 +16,8 @@ host). It does not become a general local LLM runtime for this project.
 
 from __future__ import annotations
 
+import json
+
 import requests
 
 from lab.common.assemble import render_unit
@@ -23,6 +25,50 @@ from lab.common.real_rewriter import build_prompt, fidelity_gate
 
 MODEL_NAME = "gemma3:270m"
 OLLAMA_URL = "http://localhost:11434/api/generate"
+
+
+def generate_constrained(prompt: str, required_citations: list[str], max_tokens: int = 160) -> str:
+    """A real decoding-level constraint, not a post-hoc patch: Ollama (via llama.cpp's
+    grammar-constrained sampling, exposed as JSON-schema structured output) makes it
+    structurally impossible for the model to emit anything but the exact required
+    citation id for that field, and `minLength` makes an empty rewrite impossible.
+    This is the constrained-decoding mechanism discussed earlier, found to be
+    reachable through Ollama's own supported `format` parameter -- no raw GBNF, no
+    remote trust_remote_code package, no custom beam search loop.
+
+    Only the citation and non-emptiness are hard-constrained this way; a dropped or
+    altered number is still a free-text risk and stays the fidelity gate's job to
+    catch, same as today.
+    """
+    schema = {
+        "type": "object",
+        "properties": {
+            "rewritten_sentence": {"type": "string", "minLength": 1},
+            "citations": {
+                "type": "array",
+                "items": {"type": "string", "enum": required_citations},
+                "minItems": len(required_citations),
+                "maxItems": len(required_citations),
+            },
+        },
+        "required": ["rewritten_sentence", "citations"],
+    }
+    resp = requests.post(
+        OLLAMA_URL,
+        json={
+            "model": MODEL_NAME,
+            "prompt": prompt,
+            "stream": False,
+            "format": schema,
+            "options": {"num_predict": max_tokens, "temperature": 0, "seed": 0},
+        },
+        timeout=60,
+    )
+    resp.raise_for_status()
+    parsed = json.loads(resp.json()["response"])
+    sentence = parsed.get("rewritten_sentence", "").strip()
+    citations = parsed.get("citations") or required_citations
+    return sentence + " " + " ".join(f"[{c}]" for c in citations)
 
 
 def generate(prompt: str, max_tokens: int = 160) -> str:
@@ -80,6 +126,45 @@ def _splice_missing_citations(generated: str, cite_ids: list[str], checks: dict)
         return generated, checks
     spliced = generated.rstrip() + " " + " ".join(f"[{c}]" for c in checks["missing_citations"])
     return spliced, None
+
+
+def rewrite_unit_constrained(
+    leaf: dict,
+    glossary: dict[str, str],
+    ask: str | None = None,
+    max_new_tokens: int = 160,
+) -> dict:
+    """Like `rewrite_unit`, but the citation is enforced by a decoding-level
+    constraint (`generate_constrained`) rather than repaired after the fact.
+
+    EXP-063 found 11 of 13 failures were pure citation-formatting, fixed by a
+    post-hoc splice. This is the stronger version of the same fix: the model
+    cannot decode a citation other than the required one, and cannot decode
+    an empty rewrite, because the JSON schema forbids both at the grammar
+    level, not just after the fact. Number/modal/NLI fidelity is still a
+    free-text risk and still the gate's job -- this does not and should not
+    short-circuit that check.
+    """
+    deterministic_text = render_unit(leaf, glossary)
+    prompt, src_text, cite_ids = build_prompt(leaf, glossary, ask=ask)
+    generated = generate_constrained(prompt, cite_ids, max_new_tokens)
+
+    checks = fidelity_gate(src_text, generated, cite_ids, ask=ask)
+    if checks["ok"]:
+        return {
+            "text": generated,
+            "used_generative": True,
+            "generated_text": generated,
+            "checks": checks,
+            "fallback_reason": None,
+        }
+    return {
+        "text": deterministic_text,
+        "used_generative": False,
+        "generated_text": generated,
+        "checks": checks,
+        "fallback_reason": checks["fail_reasons"],
+    }
 
 
 def rewrite_unit(

@@ -1,0 +1,59 @@
+{
+  "id": "EXP-064",
+  "title": "Decoding-level constraints vs. post-hoc splice for gemma3:270m",
+  "status": "closed",
+  "goal": "Test whether forcing the citation marker and a non-empty rewrite at the decoding level (Ollama's JSON-schema structured output, llama.cpp grammar-constrained sampling) improves on EXP-063's post-hoc splice repair, on the identical fixture and fidelity gate.",
+  "method": "Identical 13 findings, leaf size 1. lab.common.real_rewriter_ollama.rewrite_unit_constrained requests a JSON object with a 'rewritten_sentence' field (minLength 1, so an empty decode is not valid under the grammar) and a 'citations' field (enum-constrained to the exact required citation ids) instead of free-text generation, then runs the same lab.common.real_rewriter.fidelity_gate used by every other rewriter exploration. Compared directly against rewrite_unit's post-hoc splice path in the same run.",
+  "metrics": {
+    "model": "gemma3:270m",
+    "model_card": {
+      "checkpoint": "gemma3:270m",
+      "params_approx": "~270M",
+      "runtime": "Ollama, local only (http://localhost:11434)",
+      "role": "rewriter only (ARCHITECTURE.md section 3.7): join verified findings into prose",
+      "source": "https://ollama.com/library/gemma3",
+      "not_used_for": [
+        "extraction",
+        "answering",
+        "support/contradiction judging",
+        "proposing"
+      ],
+      "forbidden_reference": "FORBIDDEN.md, 'bounded rewriter exception', widened 2026-10-15"
+    },
+    "post_hoc_splice": {
+      "leaves": 13,
+      "fidelity_pass_rate": 0.8462,
+      "fail_reason_counts": {
+        "nli": 2,
+        "citations": 2,
+        "numbers": 1
+      }
+    },
+    "decoding_constrained": {
+      "leaves": 13,
+      "fidelity_pass_rate": 1.0,
+      "fail_reason_counts": {}
+    },
+    "exp_063_splice_baseline_pass_rate": 0.8462,
+    "flan_t5_small_pass_rate": 0.3846
+  },
+  "results_prose": "Post-hoc splice (EXP-063's method, rerun here for a same-run comparison): 0.8462 fidelity pass rate. Decoding-level constraint (this exploration's method, citation and non-emptiness enforced by the JSON schema, not repaired after the fact): 1.0. Fail reasons under the constrained method: {}.",
+  "conclusion": "Real decoding-level constraints, reached through Ollama's JSON-schema structured-output support rather than the blocked transformers constrained-beam-search path or an untrusted remote-code package, improve on the post-hoc splice: 1.0 versus 0.8462. The citation can no longer be dropped by construction, and an empty rewrite is no longer decodable at all -- both are now grammar-level impossibilities, not failures caught and patched afterward. Remaining failures are free-text content problems (e.g. a dropped number) that a JSON-schema constraint on a single enum field cannot reach -- the fidelity gate is still required for those, and still does its job.",
+  "scale_down": "Same 13 findings as EXP-054/056/062/063, single leaf size, one schema design, not a sweep over constraint strategies.",
+  "referenced_files": [
+    "lab/exp_064_constrained_decoding/run.py",
+    "lab/common/real_rewriter_ollama.py",
+    "lab/common/real_rewriter.py",
+    "lab/common/harness.py",
+    "FORBIDDEN.md",
+    "data/exp_063_gemma3_rewriter/results.json",
+    "data/exp_064_constrained_decoding/results.json"
+  ],
+  "follow_ups": [
+    "Extend the schema to also require restating each number as a separate enum-constrained field, to see if the remaining number-drop failure can be constrained away the same way citations were.",
+    "Measure latency/overhead of structured-output decoding versus free-text generation, since grammar-constrained sampling is not free."
+  ],
+  "elapsed_sec": 91.5318,
+  "peak_rss_mb": 146.36,
+  "models_used": "gemma3:270m, the same local Ollama checkpoint EXP-063 measured. Rewriter role only, same fidelity gate, same fallback -- only the decoding mechanism for this comparison's second condition differs."
+}

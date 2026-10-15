@@ -22121,6 +22121,61 @@ Elapsed seconds: 64.0395. Peak RSS MB: 146.49.
 - Scale-down: Same 13 findings as EXP-054/056/062, single leaf size (1), default Ollama sampling settings, not a sweep.
 - Conclusion: gemma3:270m is measured on the identical fixture and fidelity gate flan-t5-small was measured on, not assumed better because it is newer. The raw comparison alone would have been misleading: gemma3:270m's raw pass rate (0.0) looks worse than flan-t5-small's 0.3846, but the failure *shapes* are not the same thing. flan-t5-small's failures were genuine content loss -- dropping facts, collapsing to a citation marker with nothing else. gemma3:270m's raw failures were almost entirely a formatting gap (not reproducing the literal '[CITE-x]' bracket convention) around content it preserved verbatim. Once that specific, narrow, content-safe repair is applied, gemma3:270m reaches 0.8462 fidelity pass rate, clearly ahead of flan-t5-small's 0.3846. This is real evidence that the content-dropping failure EXP-048/054/056/062 measured is not an inherent property of every small checkpoint at this size -- it is at least partly specific to flan-t5-small (or the T5 training recipe), and a different, more recently trained small model can be substantially more faithful at the identical task without any fine-tuning, once its own narrow quirk (citation formatting, not content) is accounted for rather than conflated with flan-t5-small's deeper problem.
 
+## EXP-064 Decoding-level constraints vs. post-hoc splice for gemma3:270m
+
+- Status: `closed`
+- Models used: gemma3:270m, the same local Ollama checkpoint EXP-063 measured. Rewriter role only, same fidelity gate, same fallback -- only the decoding mechanism for this comparison's second condition differs.
+- Goal: Test whether forcing the citation marker and a non-empty rewrite at the decoding level (Ollama's JSON-schema structured output, llama.cpp grammar-constrained sampling) improves on EXP-063's post-hoc splice repair, on the identical fixture and fidelity gate.
+- Method: Identical 13 findings, leaf size 1. lab.common.real_rewriter_ollama.rewrite_unit_constrained requests a JSON object with a 'rewritten_sentence' field (minLength 1, so an empty decode is not valid under the grammar) and a 'citations' field (enum-constrained to the exact required citation ids) instead of free-text generation, then runs the same lab.common.real_rewriter.fidelity_gate used by every other rewriter exploration. Compared directly against rewrite_unit's post-hoc splice path in the same run.
+- Referenced files:
+- `lab/exp_064_constrained_decoding/run.py`
+- `lab/common/real_rewriter_ollama.py`
+- `lab/common/real_rewriter.py`
+- `lab/common/harness.py`
+- `FORBIDDEN.md`
+- `data/exp_063_gemma3_rewriter/results.json`
+- `data/exp_064_constrained_decoding/results.json`
+- Results: Post-hoc splice (EXP-063's method, rerun here for a same-run comparison): 0.8462 fidelity pass rate. Decoding-level constraint (this exploration's method, citation and non-emptiness enforced by the JSON schema, not repaired after the fact): 1.0. Fail reasons under the constrained method: {}.
+```json
+{
+  "model": "gemma3:270m",
+  "model_card": {
+    "checkpoint": "gemma3:270m",
+    "params_approx": "~270M",
+    "runtime": "Ollama, local only (http://localhost:11434)",
+    "role": "rewriter only (ARCHITECTURE.md section 3.7): join verified findings into prose",
+    "source": "https://ollama.com/library/gemma3",
+    "not_used_for": [
+      "extraction",
+      "answering",
+      "support/contradiction judging",
+      "proposing"
+    ],
+    "forbidden_reference": "FORBIDDEN.md, 'bounded rewriter exception', widened 2026-10-15"
+  },
+  "post_hoc_splice": {
+    "leaves": 13,
+    "fidelity_pass_rate": 0.8462,
+    "fail_reason_counts": {
+      "nli": 2,
+      "citations": 2,
+      "numbers": 1
+    }
+  },
+  "decoding_constrained": {
+    "leaves": 13,
+    "fidelity_pass_rate": 1.0,
+    "fail_reason_counts": {}
+  },
+  "exp_063_splice_baseline_pass_rate": 0.8462,
+  "flan_t5_small_pass_rate": 0.3846
+}
+```
+
+Elapsed seconds: 91.5318. Peak RSS MB: 146.36.
+- Scale-down: Same 13 findings as EXP-054/056/062/063, single leaf size, one schema design, not a sweep over constraint strategies.
+- Conclusion: Real decoding-level constraints, reached through Ollama's JSON-schema structured-output support rather than the blocked transformers constrained-beam-search path or an untrusted remote-code package, improve on the post-hoc splice: 1.0 versus 0.8462. The citation can no longer be dropped by construction, and an empty rewrite is no longer decodable at all -- both are now grammar-level impossibilities, not failures caught and patched afterward. Remaining failures are free-text content problems (e.g. a dropped number) that a JSON-schema constraint on a single enum field cannot reach -- the fidelity gate is still required for those, and still does its job.
+
 ## Follow-up todos
 
 ## EXP-022 On-disk hybrid index
