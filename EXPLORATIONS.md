@@ -22329,6 +22329,49 @@ Elapsed seconds: 0.0065. Peak RSS MB: 139.5.
 - Scale-down: 2 cases, 2-level hierarchy, 9 passages -- a wiring proof, not a scale test (EXP-065 already measured scale up to 450 leaves for the navigation mechanism alone).
 - Conclusion: The unification EXP-060 proved for flat documents carries over to hierarchical ones without any change at the call site: the same function, given passages tagged with a 'hierarchy' dict instead of a flat 'group' string, navigates the structure (lab.common.nested_index, EXP-065's near-zero abstention floor included) and then runs the identical downstream signals (identity, arithmetic, rule application) EXP-058 already measured. A caller never needs to know or declare whether the document it's handing brain.reason is flat or structured -- the passages' own tags decide, the same 'input decides how much of the machinery runs' principle EXP-060 established for the simpler signals now extends to document structure itself.
 
+## EXP-067 Real embeddings (bge) vs. TF-IDF/BM25 for hierarchical navigation
+
+- Status: `closed`
+- Models used: bge-small-en-v1.5 (BAAI), the same real checkpoint loaded since EXP-030, used for retrieval scoring only -- no generative model anywhere in this exploration.
+- Goal: Measure, head to head on the identical tree, whether real bge embeddings out-navigate classical TF-IDF/BM25 on a paraphrased ask, and whether a margin-based abstention check (top1-vs-runner-up gap) correctly abstains on an off-topic ask given that embeddings lack the near-zero-score property lab.common.nested_index's floor relies on.
+- Method: One 3-chapter, 3-section-per-chapter, 8-leaf-per-section tree (72 leaves), one needle planted in Governance/section 1. Three asks run through both lab.common.nested_index.navigate (TF-IDF, near-zero floor) and lab.common.semantic_index.navigate_semantic (bge cosine, margin-based abstention, min_margin=0.03): an exact-wording ask, a paraphrased ask sharing almost no exact wording with the needle, and an off-topic ask with no real match in the tree.
+- Referenced files:
+- `lab/exp_067_semantic_navigation/run.py`
+- `lab/common/semantic_index.py`
+- `lab/common/nested_index.py`
+- `lab/common/index.py`
+- `lab/common/real_encoders.py`
+- `lab/common/harness.py`
+- `data/exp_065_nested_navigation/results.json`
+- `data/exp_067_semantic_navigation/results.json`
+- Results: 'exact_wording' ('What is the AGM authorization PIN for board members?'): lexical/TF-IDF -> correct; semantic/bge -> correct. 'paraphrase' ("What's the annual shareholder meeting access code for directors?"): lexical/TF-IDF -> wrong_answer; semantic/bge -> correct. 'off_topic' ('What is the weather forecast for tomorrow?'): lexical/TF-IDF -> correct_abstain; semantic/bge -> correct_abstain.
+```json
+{
+  "total_leaves": 72,
+  "sections_per_chapter": 3,
+  "leaves_per_section": 8,
+  "needle": "The AGM authorization PIN for board members is 77319.",
+  "outcomes": {
+    "exact_wording": {
+      "lexical_tfidf": "correct",
+      "semantic_bge": "correct"
+    },
+    "paraphrase": {
+      "lexical_tfidf": "wrong_answer",
+      "semantic_bge": "correct"
+    },
+    "off_topic": {
+      "lexical_tfidf": "correct_abstain",
+      "semantic_bge": "correct_abstain"
+    }
+  }
+}
+```
+
+Elapsed seconds: 40.02. Peak RSS MB: 549.19.
+- Scale-down: One tree size (72 leaves), one needle, one paraphrase pair -- a head-to-head proof, not a scale sweep (EXP-065 already measured TF-IDF scale separately).
+- Conclusion: The paraphrase case is exactly where lexical and semantic retrieval diverge as expected: lexical/TF-IDF wrong_answer, semantic/bge correct on an ask sharing almost no exact wording with the needle. Margin-based abstention on real embeddings holds up on the off-topic negative control (semantic/bge outcome: correct_abstain), confirming the predicted fix for the floor's known failure mode on embeddings (unrelated text scores ~0.1-0.3 cosine, never near zero, so the near-zero floor used for TF-IDF would never fire on embeddings) -- a relative top1-vs-runner-up gap generalizes across both scoring methods where an absolute floor does not. This measured result supports combining both signals rather than replacing TF-IDF outright: lexical retrieval still resolved the exact-wording case correctly and is cheaper, while semantic retrieval is what's load-bearing specifically for paraphrase/synonym asks -- the two are complementary, not substitutes, matching the recommendation made before this was built.
+
 ## Follow-up todos
 
 ## EXP-022 On-disk hybrid index

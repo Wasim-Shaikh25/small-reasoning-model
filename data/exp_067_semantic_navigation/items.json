@@ -1,0 +1,132 @@
+[
+  {
+    "ask_id": "exact_wording",
+    "ask": "What is the AGM authorization PIN for board members?",
+    "note": "High lexical overlap with the needle -- both methods are expected to succeed.",
+    "expect_match": true,
+    "lexical_tfidf": {
+      "abstained": false,
+      "abstain_reason": null,
+      "path": [
+        {
+          "level": "chapter",
+          "chosen": "Governance",
+          "chosen_id": "Governance",
+          "score": 1.0,
+          "candidates_considered": 3
+        },
+        {
+          "level": "section",
+          "chosen": "Governance-1",
+          "chosen_id": "Governance/Governance-1",
+          "score": 1.0,
+          "candidates_considered": 3
+        }
+      ],
+      "correct_chapter": true,
+      "correct_section": true,
+      "needle_in_resolved_set": true
+    },
+    "semantic_bge": {
+      "abstained": false,
+      "abstain_reason": null,
+      "path": [
+        {
+          "level": "chapter",
+          "chosen": "Governance",
+          "chosen_id": "Governance",
+          "score": 0.6908,
+          "margin": 0.1666,
+          "candidates_considered": 3
+        },
+        {
+          "level": "section",
+          "chosen": "Governance-1",
+          "chosen_id": "Governance/Governance-1",
+          "score": 0.7783,
+          "margin": 0.1693,
+          "candidates_considered": 3
+        }
+      ],
+      "correct_chapter": true,
+      "correct_section": true,
+      "needle_in_resolved_set": true
+    }
+  },
+  {
+    "ask_id": "paraphrase",
+    "ask": "What's the annual shareholder meeting access code for directors?",
+    "note": "Same meaning as the needle (AGM=annual meeting, authorization PIN=access code, board members=directors), almost no shared exact wording -- the case real embeddings exist to handle and TF-IDF/BM25 is expected to struggle with.",
+    "expect_match": true,
+    "lexical_tfidf": {
+      "abstained": false,
+      "abstain_reason": null,
+      "path": [
+        {
+          "level": "chapter",
+          "chosen": "Governance",
+          "chosen_id": "Governance",
+          "score": 1.0,
+          "candidates_considered": 3
+        },
+        {
+          "level": "section",
+          "chosen": "Governance-0",
+          "chosen_id": "Governance/Governance-0",
+          "score": 0.5,
+          "candidates_considered": 3
+        }
+      ],
+      "correct_chapter": true,
+      "correct_section": false,
+      "needle_in_resolved_set": false
+    },
+    "semantic_bge": {
+      "abstained": false,
+      "abstain_reason": null,
+      "path": [
+        {
+          "level": "chapter",
+          "chosen": "Governance",
+          "chosen_id": "Governance",
+          "score": 0.6359,
+          "margin": 0.1126,
+          "candidates_considered": 3
+        },
+        {
+          "level": "section",
+          "chosen": "Governance-1",
+          "chosen_id": "Governance/Governance-1",
+          "score": 0.6501,
+          "margin": 0.0403,
+          "candidates_considered": 3
+        }
+      ],
+      "correct_chapter": true,
+      "correct_section": true,
+      "needle_in_resolved_set": true
+    }
+  },
+  {
+    "ask_id": "off_topic",
+    "ask": "What is the weather forecast for tomorrow?",
+    "note": "No real match anywhere in the tree -- tests abstention, not retrieval.",
+    "expect_match": false,
+    "lexical_tfidf": {
+      "abstained": true,
+      "abstain_reason": "no chapter scored above the dense-similarity floor (best: 0.0000 < 1e-09)",
+      "path": [],
+      "correct_chapter": false,
+      "correct_section": false,
+      "needle_in_resolved_set": false
+    },
+    "semantic_bge": {
+      "abstained": true,
+      "abstain_reason": "no chapter clearly separated from the runner-up (margin 0.0146 < 0.03, top score 0.4755)",
+      "path": [],
+      "correct_chapter": false,
+      "correct_section": false,
+      "needle_in_resolved_set": false
+    }
+  }
+]
