@@ -118,6 +118,33 @@ def fidelity_gate(src_text: str, out_text: str, cite_ids: list[str], ask: str | 
     }
 
 
+def _generate(tok, mdl, prompt: str, max_new_tokens: int) -> str:
+    import torch
+
+    with torch.no_grad():
+        inputs = tok(prompt, return_tensors="pt", truncation=True, max_length=512)
+        out_ids = mdl.generate(**inputs, max_new_tokens=max_new_tokens, num_beams=4)
+    return tok.decode(out_ids[0], skip_special_tokens=True).strip()
+
+
+def _missing_feedback(checks: dict) -> str | None:
+    """Name exactly what the previous attempt dropped, for the retry prompt.
+
+    This is a control mechanism, not a hope: instead of asking the model to
+    try harder in general, it is told precisely which tokens its own last
+    output was missing. If that is enough to fix it, the model could hold
+    the fact all along and simply was not told clearly enough what it
+    missed -- a different finding than "it structurally cannot."
+    """
+    missing = []
+    if checks["numbers"]["numbers_dropped"]:
+        missing.extend(checks["numbers"]["numbers_dropped"])
+    missing.extend(checks["missing_citations"])
+    if not missing:
+        return None
+    return f"Your previous attempt was missing: {', '.join(missing)}. Rewrite again and include all of them."
+
+
 def rewrite_unit(
     leaf: dict,
     glossary: dict[str, str],
@@ -125,38 +152,49 @@ def rewrite_unit(
     model=None,
     max_new_tokens: int = 160,
     ask: str | None = None,
+    max_retries: int = 0,
 ) -> dict:
     """Generative counterpart to `assemble.render_unit`. Same input shape, fidelity-gated.
 
-    Returns {"text", "used_generative", "generated_text", "checks", "fallback_reason"}.
-    `text` is the generated prose when it passes the gate, otherwise the unchanged
-    deterministic output -- never a partial accept of a failing rewrite. `ask`,
-    when supplied, is also checked for relevance (see `fidelity_gate`).
+    Returns {"text", "used_generative", "generated_text", "checks", "fallback_reason",
+    "attempts"}. `text` is the generated prose when it passes the gate, otherwise the
+    unchanged deterministic output -- never a partial accept of a failing rewrite.
+    `ask`, when supplied, is also checked for relevance (see `fidelity_gate`).
+
+    `max_retries` (default 0, so existing callers are unaffected): on a failed
+    attempt, instead of falling back immediately, tell the model exactly what
+    its own output dropped (`_missing_feedback`) and regenerate, up to this
+    many additional attempts, before falling back to the deterministic text.
     """
     deterministic_text = render_unit(leaf, glossary)
     prompt, src_text, cite_ids = build_prompt(leaf, glossary, ask=ask)
     tok, mdl = (tokenizer, model) if tokenizer is not None and model is not None else load()
 
-    import torch
+    attempts = []
+    current_prompt = prompt
+    for attempt_num in range(max_retries + 1):
+        generated = _generate(tok, mdl, current_prompt, max_new_tokens)
+        checks = fidelity_gate(src_text, generated, cite_ids, ask=ask)
+        attempts.append({"attempt": attempt_num, "prompt": current_prompt, "generated": generated, "ok": checks["ok"], "fail_reasons": checks["fail_reasons"]})
+        if checks["ok"]:
+            return {
+                "text": generated,
+                "used_generative": True,
+                "generated_text": generated,
+                "checks": checks,
+                "fallback_reason": None,
+                "attempts": attempts,
+            }
+        feedback = _missing_feedback(checks)
+        if feedback is None or attempt_num == max_retries:
+            break
+        current_prompt = f"{prompt}\n\n{feedback}"
 
-    with torch.no_grad():
-        inputs = tok(prompt, return_tensors="pt", truncation=True, max_length=512)
-        out_ids = mdl.generate(**inputs, max_new_tokens=max_new_tokens, num_beams=4)
-    generated = tok.decode(out_ids[0], skip_special_tokens=True).strip()
-
-    checks = fidelity_gate(src_text, generated, cite_ids, ask=ask)
-    if checks["ok"]:
-        return {
-            "text": generated,
-            "used_generative": True,
-            "generated_text": generated,
-            "checks": checks,
-            "fallback_reason": None,
-        }
     return {
         "text": deterministic_text,
         "used_generative": False,
-        "generated_text": generated,
+        "generated_text": attempts[-1]["generated"],
         "checks": checks,
         "fallback_reason": checks["fail_reasons"],
+        "attempts": attempts,
     }

@@ -9,8 +9,8 @@
     "by_leaf_size": {
       "1": {
         "leaves": 13,
-        "fidelity_pass_rate": 0.3846,
-        "fallback_rate": 0.6154
+        "fidelity_pass_rate": 0.3077,
+        "fallback_rate": 0.6923
       },
       "2": {
         "leaves": 7,
@@ -25,12 +25,12 @@
     },
     "exp_048_leaf_size_4_fidelity_pass_rate": 0.0,
     "leaf_size_1_residual_failure_mode": {
-      "failures": 8,
+      "failures": 9,
       "dropped_statement_kept_only_citation": 8
     }
   },
-  "results_prose": "Fidelity pass rate by leaf size on the identical 13 findings EXP-048 used: 1 finding(s)/leaf -> 0.3846, 2 finding(s)/leaf -> 0.0, 4 finding(s)/leaf -> 0.0.",
-  "conclusion": "google/flan-t5-small is measured at leaf sizes 1, 2, and 4 findings per rewrite call, isolating leaf size as the only variable changed from EXP-048. Narrowing the task to one finding per call raises the fidelity pass rate from 0.0 to 0.3846, supporting this project's governing hypothesis that a small model's failure mode is being asked to hold too much at once, not a general inability to rewrite a single verified statement. But decomposition alone does not fully fix it here: 8 of 13 single-finding leaves still fail, and 8 of those fail in a different, more extreme way than EXP-048's -- instead of picking one fact out of several and dropping the rest, the model sometimes drops the statement's content entirely and echoes only the citation marker (for example generating '[CITE-CL000]' with no text). Decomposition shrinks the failure, it does not remove the need for the fidelity gate -- the gate stays the load-bearing safeguard at every leaf size measured.",
+  "results_prose": "Fidelity pass rate by leaf size on the identical 13 findings EXP-048 used: 1 finding(s)/leaf -> 0.3077, 2 finding(s)/leaf -> 0.0, 4 finding(s)/leaf -> 0.0.",
+  "conclusion": "google/flan-t5-small is measured at leaf sizes 1, 2, and 4 findings per rewrite call, isolating leaf size as the only variable changed from EXP-048. Narrowing the task to one finding per call raises the fidelity pass rate from 0.0 to 0.3077, supporting this project's governing hypothesis that a small model's failure mode is being asked to hold too much at once, not a general inability to rewrite a single verified statement. But decomposition alone does not fully fix it here: 9 of 13 single-finding leaves still fail, and 8 of those fail in a different, more extreme way than EXP-048's -- instead of picking one fact out of several and dropping the rest, the model sometimes drops the statement's content entirely and echoes only the citation marker (for example generating '[CITE-CL000]' with no text). Decomposition shrinks the failure, it does not remove the need for the fidelity gate -- the gate stays the load-bearing safeguard at every leaf size measured.",
   "scale_down": "Same 13 findings as EXP-048, not a larger fixture; three leaf sizes, not a full sweep.",
   "referenced_files": [
     "lab/exp_054_rewriter_leaf_size/run.py",
@@ -44,7 +44,7 @@
     "If this closes the gap, wire the leaf size down for the bounded rewriter in lab/common/assemble.assemble() (currently hardcoded to 4 in build_outline) and re-run EXP-048 at the new size as the real default.",
     "If it does not close the gap, try a more directive single-fact prompt before concluding the checkpoint cannot do this role at this size."
   ],
-  "elapsed_sec": 22.6742,
-  "peak_rss_mb": 682.51,
+  "elapsed_sec": 84.3512,
+  "peak_rss_mb": 683.16,
   "models_used": "google/flan-t5-small, the same local checkpoint EXP-048 measured. Rewriter role only, fidelity-gated, identical to EXP-048's contract."
 }

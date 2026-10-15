@@ -1,0 +1,146 @@
+[
+  {
+    "leaf_id": "L0000",
+    "used_generative": false,
+    "attempts_made": 3,
+    "fixed_by_retry": false,
+    "attempt_outcomes": [
+      false,
+      false,
+      false
+    ],
+    "final_generated": "Your previous attempt was missing: CITE-CL000."
+  },
+  {
+    "leaf_id": "L0001",
+    "used_generative": false,
+    "attempts_made": 3,
+    "fixed_by_retry": false,
+    "attempt_outcomes": [
+      false,
+      false,
+      false
+    ],
+    "final_generated": "Your previous attempt was missing: 50000, CITE-CL001."
+  },
+  {
+    "leaf_id": "L0002",
+    "used_generative": true,
+    "attempts_made": 1,
+    "fixed_by_retry": false,
+    "attempt_outcomes": [
+      true
+    ],
+    "final_generated": "Ravi Sharma is the Lessee. [CITE-CL002]"
+  },
+  {
+    "leaf_id": "L0003",
+    "used_generative": false,
+    "attempts_made": 2,
+    "fixed_by_retry": false,
+    "attempt_outcomes": [
+      false,
+      false
+    ],
+    "final_generated": "The lease was signed on 5 January 2024. [CITE-CL003] Your previous attempt was missing: 2024, 5."
+  },
+  {
+    "leaf_id": "L0004",
+    "used_generative": false,
+    "attempts_made": 1,
+    "fixed_by_retry": false,
+    "attempt_outcomes": [
+      false
+    ],
+    "final_generated": "[CITE-CL004]"
+  },
+  {
+    "leaf_id": "L0005",
+    "used_generative": false,
+    "attempts_made": 3,
+    "fixed_by_retry": false,
+    "attempt_outcomes": [
+      false,
+      false,
+      false
+    ],
+    "final_generated": "Your previous attempt was missing: CITE-CL005."
+  },
+  {
+    "leaf_id": "L0006",
+    "used_generative": false,
+    "attempts_made": 3,
+    "fixed_by_retry": false,
+    "attempt_outcomes": [
+      false,
+      false,
+      false
+    ],
+    "final_generated": "[CITE-CL006] Your previous attempt was missing: CITE-CL006."
+  },
+  {
+    "leaf_id": "L0007",
+    "used_generative": true,
+    "attempts_made": 1,
+    "fixed_by_retry": false,
+    "attempt_outcomes": [
+      true
+    ],
+    "final_generated": "ABC Pvt Ltd is the Lessor. [CITE-CL007]"
+  },
+  {
+    "leaf_id": "L0008",
+    "used_generative": true,
+    "attempts_made": 1,
+    "fixed_by_retry": false,
+    "attempt_outcomes": [
+      true
+    ],
+    "final_generated": "The tenant shall pay INR 25000 on the 1st of each month and shall not withhold rent. [CITE-PG000]"
+  },
+  {
+    "leaf_id": "L0009",
+    "used_generative": false,
+    "attempts_made": 3,
+    "fixed_by_retry": false,
+    "attempt_outcomes": [
+      false,
+      false,
+      false
+    ],
+    "final_generated": "Your previous attempt was missing: CITE-PG001."
+  },
+  {
+    "leaf_id": "L0010",
+    "used_generative": true,
+    "attempts_made": 1,
+    "fixed_by_retry": false,
+    "attempt_outcomes": [
+      true
+    ],
+    "final_generated": "Meera Iyer signed on 5 January 2024 in the presence of the witness. [CITE-PG002]"
+  },
+  {
+    "leaf_id": "L0011",
+    "used_generative": true,
+    "attempts_made": 2,
+    "fixed_by_retry": true,
+    "attempt_outcomes": [
+      false,
+      true
+    ],
+    "final_generated": "The deposit of INR 50000 is held until 14 days after the handover. [CITE-PG003]"
+  },
+  {
+    "leaf_id": "L0012",
+    "used_generative": false,
+    "attempts_made": 3,
+    "fixed_by_retry": false,
+    "attempt_outcomes": [
+      false,
+      false,
+      false
+    ],
+    "final_generated": "Your previous attempt was missing: CITE-PG004."
+  }
+]

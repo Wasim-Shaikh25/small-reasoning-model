@@ -21491,7 +21491,7 @@ Elapsed seconds: 0.2452. Peak RSS MB: 37.57.
 }
 ```
 
-Elapsed seconds: 27.9342. Peak RSS MB: 673.46.
+Elapsed seconds: 73.4004. Peak RSS MB: 654.04.
 - Scale-down: 13 findings across 4 leaves, not a full document. The same small fixture EXP-017 used, chosen so fidelity numbers are directly comparable, not a large or adversarial rewriting benchmark. No CTranslate2 int8 conversion (ARCHITECTURE.md section 8/14, EXP-045) -- plain transformers inference only, as the handoff asked for first.
 - Conclusion: The bounded rewriter exception is implemented and measured, not assumed: google/flan-t5-small is loaded locally (no API call), used only to rewrite findings this run already treats as verified, and every output goes through the same fidelity checks EXP-017 validated on the deterministic path before this run accepts it. The gate caught and discarded 4 of 4 rewrites (1.0 fallback rate), for the reasons counted above. Inspecting the generated text (not stored in results.json, re-run with a debug print to reproduce) shows a consistent failure mode, not hallucination: on every leaf flan-t5-small collapsed the 4 verified statements down to a near-copy of just one of them, silently dropping the other three findings' numbers, names, and citation markers instead of inventing new ones. That is exactly the failure the fidelity gate (entity_number_check plus citation survival) is built to catch, and it caught it every time -- a failing rewrite was replaced, never partially accepted. At this prompt and this checkpoint size, the gate's job is less about guarding against invention and more about guarding against silent omission. Extraction and verification are unaffected: this checkpoint never touched the QA extractor or the NLI judge, only text that those components had already verified.
 
@@ -22018,6 +22018,40 @@ Elapsed seconds: 4.8751. Peak RSS MB: 385.39.
 Elapsed seconds: 118.4022. Peak RSS MB: 725.19.
 - Scale-down: 10 hand-written cases across 4 domains, not a paraphrase benchmark -- a targeted test of one specific, named brittleness.
 - Conclusion: Exact-lemma matching is exactly as brittle on messy phrasing as the objection predicted: 0.0 accuracy on paraphrased facts that share no verb with their rule, because 'took her life' and 'murdered' are different lemmas even though they describe the same act. Semantic matching recovers all of that gap (1.0 accuracy), using the real DeBERTa-v3 MNLI checkpoint to check whether the specific fact entails the rule's general condition, rather than requiring the same word. This is not a free upgrade: near-miss accuracy drops from 1.0 to 0.5 -- a related-but-insufficient fact (injuring someone in an accident, cooking in a shared kitchen) is exactly where a model that generalizes by meaning risks over-matching where exact lemma comparison, by being too strict, accidentally got it right for the wrong reason. Both numbers are reported, not just the one that favors the fix.
+
+## EXP-062 Retry with explicit missing-content feedback vs. EXP-054's no-retry baseline
+
+- Status: `closed`
+- Models used: google/flan-t5-small, the same local checkpoint EXP-048/054/056 measured. The retry loop is new control flow around the same checkpoint and the same fidelity gate, not a different model or a change to the gate's own criteria.
+- Goal: Test whether telling flan-t5-small exactly what its previous attempt dropped, then letting it retry up to 2 more times, closes the citation-only-collapse gap EXP-054 measured at leaf size 1 -- a cheap, dependency-free control mechanism to test before investing in harder fixes (constrained decoding, fine-tuning).
+- Method: Identical 13 findings and leaf size 1 as EXP-054/056. lab.common.real_rewriter.rewrite_unit's new max_retries parameter: on a failed fidelity check, build feedback naming exactly which numbers/citations were dropped (lab.common.real_rewriter._missing_feedback) and append it to the original prompt, regenerate, up to 2 additional attempts, before falling back to the deterministic text -- the same fallback behavior as every other closed rewriter exploration.
+- Referenced files:
+- `lab/exp_062_retry_with_feedback/run.py`
+- `lab/common/real_rewriter.py`
+- `lab/common/assemble.py`
+- `lab/common/harness.py`
+- `data/exp_054_rewriter_leaf_size/results.json`
+- `data/exp_056_ask_relevance_gate/results.json`
+- `data/exp_062_retry_with_feedback/results.json`
+- Results: With up to 2 retries and explicit 'you dropped X' feedback, fidelity pass rate is 0.3846 (EXP-054's no-retry baseline on the identical fixture: 0.3846). Retries fixed 1 of the leaves that failed on the first attempt. Total generate() calls: 27 across 13 leaves (2.08/leaf), versus 1/leaf with no retry. 8 leaves still fail even after every retry.
+```json
+{
+  "model": "google/flan-t5-small",
+  "max_retries": 2,
+  "leaves": 13,
+  "fidelity_pass_rate_with_retry": 0.3846,
+  "fixed_by_retry_count": 1,
+  "total_generate_calls": 27,
+  "calls_per_leaf_avg": 2.08,
+  "still_failing_after_all_retries": 8,
+  "exp_054_baseline_no_retry_pass_rate": 0.3846,
+  "exp_054_baseline_citation_only_collapses": 8
+}
+```
+
+Elapsed seconds: 169.4348. Peak RSS MB: 659.65.
+- Scale-down: Same 13 findings as EXP-054/056, 2 retries, not a sweep over retry count or feedback phrasing.
+- Conclusion: Explicit 'you dropped X, include it' feedback does not meaningfully close the gap EXP-054 measured. This is evidence the failure is more structural than a missing nudge: telling the model exactly what it dropped and asking it to retry does not reliably make it include that content. This supports the research report's recommendation over a prompt-level fix -- the next lever to pull is training-data-level (fine-tuning on fusion-shaped data with guaranteed content coverage), not further prompt engineering. The retry loop costs 2.08x the inference calls of the no-retry path for whatever gain it provides -- a real cost to weigh against the alternative of just running the deterministic fallback immediately, which is free.
 
 ## Follow-up todos
 
