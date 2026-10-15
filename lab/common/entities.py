@@ -19,7 +19,13 @@ from lab.common.textutil import content_tokens, find_span, normalize, sentences
 TITLE_PERSON = re.compile(
     r"\b(?:Mr|Mrs|Ms|Dr|Shri|Smt)\.?\s+[A-Z][a-z]+(?:\s+[A-Z][a-z]+)?\b"
 )
-FULL_PERSON = re.compile(r"\b[A-Z][a-z]{1,20}\s+[A-Z][a-z]{1,20}\b")
+# Captures 2 OR 3 consecutive title-case words (greedy): a 3-word run is
+# common when a sentence-initial common noun ("Claimant Lakshmi Iyer...")
+# happens to be capitalized only because it starts the sentence, not
+# because it's part of the name. _add() trims that leading word off when
+# the match is sentence-initial -- a generic English-capitalization rule,
+# not a list of role words to recognize.
+FULL_PERSON = re.compile(r"\b[A-Z][a-z]{1,20}(?:\s+[A-Z][a-z]{1,20}){1,2}\b")
 INITIAL_PERSON = re.compile(r"\b[A-Z]\.\s?[A-Z][a-z]+\b")
 ORG_RE = re.compile(
     r"\b[A-Z][A-Za-z0-9&]*(?:\s+[A-Z][A-Za-z0-9&]*){0,4}\s+"
@@ -33,7 +39,37 @@ DATE_RE = re.compile(
     re.I,
 )
 AMOUNT_RE = re.compile(
-    r"\b(?:INR|USD|Rs\.?|\$|€|£)\s?\d[\d,]*(?:\.\d+)?\b|\b\d[\d,]*(?:\.\d+)?\s?(?:days|percent|%)\b",
+    # Currency-prefixed ("INR 30000"), percent ("90%"/"90 percent"), or a
+    # number followed by a short (<=4 letter) alphabetic unit suffix --
+    # "30 days", "300mg", "250 MPa", "90kg" -- covering whatever unit a
+    # domain uses instead of enumerating specific units (which would just
+    # be domain-specific hardcoding one level down). The length cap is a
+    # structural heuristic, not a unit whitelist: units are typically short
+    # abbreviations, while a number followed by an ordinary English word
+    # ("30 employees") is usually longer and is deliberately left alone so
+    # it isn't misread as a quantity.
+    #
+    # The trailing negative lookahead (not followed by whitespace+capital)
+    # guards a real false positive EXP-069 measured: "7 Hill Crest Avenue"
+    # otherwise reads as the quantity "7" with unit "Hill", because a short
+    # capitalized street-name word (Hill, Park, Lake, Road -- all <=4
+    # letters) looks exactly like a unit abbreviation by length alone. A
+    # genuine unit is followed by punctuation or a lowercase word; a house
+    # number's street name is followed by more of the proper noun (another
+    # capitalized word) -- that's the structural difference this leans on,
+    # not a street-word denylist.
+    #
+    # Word-based currency codes (INR/USD/Rs) keep a leading \b since they're
+    # word characters. Symbol currencies ($/€/£) get their own branch with
+    # no leading \b -- \b needs a word/non-word transition, and a symbol
+    # preceded by a space is non-word on both sides, so "\b\$" can never
+    # match at all. A latent bug, not one introduced here: every amount in
+    # every fixture before EXP-069 used a word-prefixed currency (INR/USD),
+    # so this never fired until a fixture finally used a bare "$" symbol.
+    r"\b(?:INR|USD|Rs\.?)\s?\d[\d,]*(?:\.\d+)?\b"
+    r"|[$€£]\s?\d[\d,]*(?:\.\d+)?\b"
+    r"|\b\d[\d,]*(?:\.\d+)?\s?(?:percent|%)\b"
+    r"|\b\d[\d,]*(?:\.\d+)?\s?[A-Za-z]{1,4}\b(?!\s+[A-Z])",
     re.I,
 )
 STREET_RE = re.compile(
@@ -58,6 +94,13 @@ def _add(found: list[dict], text: str, match: re.Match, label: str, conf: float,
     span = match.group(0).strip(" ,;")
     start = match.start() + match.group(0).find(span)
     if label == "person":
+        words = span.split()
+        if len(words) >= 3:
+            before = text[:match.start()]
+            sentence_initial = not before.strip() or re.search(r"[.?!]\s*$", before)
+            if sentence_initial:
+                start += len(words[0]) + 1
+                span = " ".join(words[1:])
         if span in NOT_PERSON:
             return
         pieces = {p.lower().strip(".") for p in span.split()}

@@ -1,0 +1,88 @@
+{
+  "id": "EXP-069",
+  "title": "Removing literal domain hardcoding from brain.py/ask.py, proven on medical/insurance/engineering domains",
+  "status": "closed",
+  "goal": "Remove the literal keyword hardcoding found after EXP-068 (ask.py's 'lessee'/'lessor' cues, brain.py's TOTAL_CUES word list and name+address substring check) and replace it with a domain-agnostic semantic signal, then prove generalization on domains (medical, insurance, engineering) this project has never used before -- not just re-pass the lease/contract fixtures every other exploration happens to use.",
+  "method": "Part A: lab.common.intent_signals' bge exemplar similarity measured against a labeled 4-domain set (10 positive, 10 negative asks per signal, including lease/contract for continuity and medical/insurance/engineering/logistics for genuine novelty), checking whether a single threshold separates true positives from true negatives. Part B: three new fixtures (medical dosage review, insurance claims, engineering stress inspection), each with 2 flat groups, a threshold policy rule, and a paraphrased ask carefully avoiding every old cue word, run end to end through the unmodified lab.common.brain.reason(ask, passages) call, plus an off-topic negative control per domain.",
+  "metrics": {
+    "calibration": {
+      "identity": {
+        "min_positive_score": 0.6528,
+        "max_negative_score": 0.5414,
+        "separable": true,
+        "recommended_tau_if_separable": 0.5971
+      },
+      "total": {
+        "min_positive_score": 0.6405,
+        "max_negative_score": 0.5763,
+        "separable": true,
+        "recommended_tau_if_separable": 0.6084
+      },
+      "current_identity_tau": 0.5971,
+      "current_total_tau": 0.6084
+    },
+    "domain_cases": {
+      "n": 3,
+      "correct": 3,
+      "cases": [
+        {
+          "domain": "medical",
+          "decision": "supported",
+          "correct_content": true,
+          "correct_total": true,
+          "correct_rule": true,
+          "correct_off_topic_abstain": true,
+          "all_correct": true
+        },
+        {
+          "domain": "insurance",
+          "decision": "supported",
+          "correct_content": true,
+          "correct_total": true,
+          "correct_rule": true,
+          "correct_off_topic_abstain": true,
+          "all_correct": true
+        },
+        {
+          "domain": "engineering",
+          "decision": "supported",
+          "correct_content": true,
+          "correct_total": true,
+          "correct_rule": true,
+          "correct_off_topic_abstain": true,
+          "all_correct": true
+        }
+      ]
+    },
+    "lessee_lessor_removed_from": [
+      "lab/common/ask.py ENTITY_CUES",
+      "lab/common/ask.py decompose()"
+    ],
+    "literal_keyword_checks_removed_from": [
+      "lab/common/brain.py TOTAL_CUES",
+      "lab/common/brain.py _wants_identity (name+address substring check)"
+    ]
+  },
+  "results_prose": "Part A calibration: identity signal separates its 4-domain positive/negative set cleanly (min positive 0.6528, max negative 0.5414); total signal cleanly separates its set (min positive 0.6405, max negative 0.5763). Part B: 3/3 brand-new cross-domain cases fully correct end to end through lab.common.brain.reason (disambiguation + identity + total + threshold rule + off-topic abstention), none of them lease/contract-flavored and none containing any word any prior hardcoded list (lessee/lessor, name/address, total/sum/altogether) would have matched.",
+  "conclusion": "The literal domain/keyword hardcoding found after EXP-068 -- ask.py's lessee/lessor cues, brain.py's TOTAL_CUES and name+address substring check -- is removed and replaced with lab.common.intent_signals' bge exemplar similarity, which describes question FORM (who/where, how-much/total) rather than any subject vocabulary. Calibration across four domains (including two never used anywhere else in this repo) found real separation for both signals, so the current thresholds rest on a measured gap rather than one lucky guess. All three brand-new domains (medical, insurance, engineering) -- invented for this exploration specifically so nothing in them could match a pre-existing hardcoded word -- pass end to end through the unchanged lab.common.brain.reason entry point: same disambiguation, same identity extraction, same arithmetic, same rule application already proven on lease/contract fixtures, now proven on content the pipeline has genuinely never seen before.",
+  "scale_down": "3 new domains, 1 fixture each, 10+10 calibration asks per signal -- enough to demonstrate removal and generalization, not an exhaustive domain sweep.",
+  "referenced_files": [
+    "lab/exp_069_domain_agnostic_signals/run.py",
+    "lab/common/intent_signals.py",
+    "lab/common/brain.py",
+    "lab/common/ask.py",
+    "lab/common/entities.py",
+    "lab/common/harness.py",
+    "data/exp_068_abstention_fixes/results.json",
+    "data/exp_069_domain_agnostic_signals/results.json"
+  ],
+  "follow_ups": [
+    "qa.py has its own separate AMOUNT_RE with the identical \\b\\$ bug just fixed in entities.AMOUNT_RE here (a word boundary immediately before a symbol currency can never match) -- not exercised by brain.reason's main path, but the same latent bug, worth the same fix if that module's path is used again.",
+    "qa.py has its own separate AMOUNT_RE with an enumerated unit list (days/months/percent/grams/mg/tablets/...) -- the same kind of ad hoc per-scenario unit accretion this exploration just removed from entities.AMOUNT_RE. Not exercised by brain.reason's identity/total/rule path (only its lookup_fallback branch could reach it), but it's the same category of issue and should be generalized the same way if that fallback path matters.",
+    "ask.py still has COMPARE_CUES/CHRON_CUES/REWRITE_CUES/REASON_CUES keyword lists for classify_task -- none contained domain-specific words like lessee/lessor, and brain.py's identity/total signals no longer depend on task_type at all, so they were out of scope here, but they're still literal-keyword classifiers.",
+    "entities.py's regex patterns (STREET_RE's Road/Street/Avenue suffixes, NOT_PERSON's India-specific place names) assume Indian address conventions -- a structural/geographic assumption, not a subject-domain one, but still not universal; untested on addresses formatted differently."
+  ],
+  "elapsed_sec": 136.097,
+  "peak_rss_mb": 412.47,
+  "models_used": "bge-small-en-v1.5 for intent-signal scoring (retrieval only, no generation); all other steps are the same classical/deterministic primitives already measured elsewhere in this repo."
+}

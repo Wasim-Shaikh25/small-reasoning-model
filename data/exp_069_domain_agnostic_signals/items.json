@@ -1,0 +1,236 @@
+{
+  "calibration": {
+    "identity": {
+      "signal": "identity",
+      "positives": [
+        {
+          "domain": "lease/contract",
+          "ask": "Which employee's take-home pay increased with an extra payout last quarter's second month, and where do they live?",
+          "score": 0.7553
+        },
+        {
+          "domain": "medical",
+          "ask": "Which patient's dosage was increased last month, and where do they reside?",
+          "score": 0.7782
+        },
+        {
+          "domain": "insurance",
+          "ask": "Who filed the claim that was updated in November, and where can they be reached?",
+          "score": 0.6836
+        },
+        {
+          "domain": "engineering",
+          "ask": "Which engineer submitted the inspection report, and where is their site based?",
+          "score": 0.7158
+        },
+        {
+          "domain": "logistics",
+          "ask": "Identify the vendor responsible for the delayed shipment and state where their business operates.",
+          "score": 0.6528
+        }
+      ],
+      "negatives": [
+        {
+          "domain": "lease/contract",
+          "ask": "What is the total amount billed this quarter?",
+          "score": 0.5308
+        },
+        {
+          "domain": "medical",
+          "ask": "Does hospital policy require physician review for this dosage?",
+          "score": 0.5223
+        },
+        {
+          "domain": "insurance",
+          "ask": "What is the weather forecast for tomorrow?",
+          "score": 0.5414
+        },
+        {
+          "domain": "engineering",
+          "ask": "Does the component need to be replaced?",
+          "score": 0.5075
+        },
+        {
+          "domain": "generic",
+          "ask": "How do I train for a marathon?",
+          "score": 0.472
+        }
+      ],
+      "min_positive_score": 0.6528,
+      "max_negative_score": 0.5414,
+      "separable": true,
+      "recommended_tau_if_separable": 0.5971
+    },
+    "total": {
+      "signal": "total",
+      "positives": [
+        {
+          "domain": "lease/contract",
+          "ask": "How much money do they have in total this quarter?",
+          "score": 0.8205
+        },
+        {
+          "domain": "medical",
+          "ask": "What is the cumulative dosage administered to the patient this month?",
+          "score": 0.6405
+        },
+        {
+          "domain": "insurance",
+          "ask": "Add up every claim amount filed by the claimant this year.",
+          "score": 0.7034
+        },
+        {
+          "domain": "engineering",
+          "ask": "What do all of the component's stress readings amount to?",
+          "score": 0.6446
+        },
+        {
+          "domain": "logistics",
+          "ask": "What is the combined cost of every delayed shipment?",
+          "score": 0.7115
+        }
+      ],
+      "negatives": [
+        {
+          "domain": "lease/contract",
+          "ask": "Who is the Lessee?",
+          "score": 0.4794
+        },
+        {
+          "domain": "medical",
+          "ask": "Which patient received the dosage increase, and where do they reside?",
+          "score": 0.5763
+        },
+        {
+          "domain": "insurance",
+          "ask": "What is the weather forecast for tomorrow?",
+          "score": 0.5128
+        },
+        {
+          "domain": "engineering",
+          "ask": "Who inspected the component?",
+          "score": 0.5434
+        },
+        {
+          "domain": "generic",
+          "ask": "What's the best recipe for banana bread?",
+          "score": 0.4666
+        }
+      ],
+      "min_positive_score": 0.6405,
+      "max_negative_score": 0.5763,
+      "separable": true,
+      "recommended_tau_if_separable": 0.6084
+    }
+  },
+  "domain_cases": [
+    {
+      "domain": "medical",
+      "ask": "A patient's dosage was increased with an extra dose in April. Who is this patient, and where do they live? Add up every dose they've received this quarter, and does hospital policy require physician review?",
+      "decision": "supported",
+      "text": "Meera Nair, Hill Crest Avenue [P2a]. total 550 [P2c, P2d]. policy applies: physician review is required [M_POLICY].",
+      "identity_signal": {
+        "step": "intent_signal",
+        "signal": "identity",
+        "fires": true,
+        "score": 0.7553,
+        "tau": 0.5971
+      },
+      "total_signal": {
+        "step": "intent_signal",
+        "signal": "total",
+        "fires": true,
+        "score": 0.6707,
+        "tau": 0.6084
+      },
+      "facts": {
+        "name": "Meera Nair",
+        "address": {
+          "house_number": "7",
+          "road": "Hill Crest Avenue",
+          "city": "Bengaluru",
+          "postcode": "560002"
+        },
+        "total": 550.0
+      },
+      "off_topic_decision": "inconclusive",
+      "correct_content": true,
+      "correct_total": true,
+      "correct_rule": true,
+      "correct_off_topic_abstain": true,
+      "all_correct": true
+    },
+    {
+      "domain": "insurance",
+      "ask": "A claimant filed an additional claim in November. Who is this claimant, and where can they be reached? What do all of their claims this year amount to, and does insurance policy require underwriter approval?",
+      "decision": "supported",
+      "text": "Lakshmi Iyer [C2a]. total 11,000 [C2c, C2d]. policy applies: underwriter approval is required [I_POLICY].",
+      "identity_signal": {
+        "step": "intent_signal",
+        "signal": "identity",
+        "fires": true,
+        "score": 0.7683,
+        "tau": 0.5971
+      },
+      "total_signal": {
+        "step": "intent_signal",
+        "signal": "total",
+        "fires": true,
+        "score": 0.7151,
+        "tau": 0.6084
+      },
+      "facts": {
+        "name": "Lakshmi Iyer",
+        "address": {
+          "house_number": "18",
+          "road": null,
+          "city": null,
+          "postcode": "682001"
+        },
+        "total": 11000.0
+      },
+      "off_topic_decision": "inconclusive",
+      "correct_content": true,
+      "correct_total": true,
+      "correct_rule": true,
+      "correct_off_topic_abstain": true,
+      "all_correct": true
+    },
+    {
+      "domain": "engineering",
+      "ask": "An engineer recorded an additional stress reading on a component last week. Who is this engineer, and where is their site based? What do all of the component's stress readings amount to, and does engineering policy require the part to be replaced?",
+      "decision": "supported",
+      "text": "Fatima Khan, Industrial Estate Road [E2a]. total 260 [E2c, E2d]. policy applies: the part must be replaced [E_POLICY].",
+      "identity_signal": {
+        "step": "intent_signal",
+        "signal": "identity",
+        "fires": true,
+        "score": 0.7223,
+        "tau": 0.5971
+      },
+      "total_signal": {
+        "step": "intent_signal",
+        "signal": "total",
+        "fires": true,
+        "score": 0.644,
+        "tau": 0.6084
+      },
+      "facts": {
+        "name": "Fatima Khan",
+        "address": {
+          "house_number": "4",
+          "road": "Industrial Estate Road",
+          "city": "Fatima Khan",
+          "postcode": null
+        },
+        "total": 260.0
+      },
+      "off_topic_decision": "inconclusive",
+      "correct_content": true,
+      "correct_total": true,
+      "correct_rule": true,
+      "correct_off_topic_abstain": true,
+      "all_correct": true
+    }
+  ]
+}

@@ -61,8 +61,8 @@
       "id": "F04_paraphrase_new",
       "note": "New: paraphrases 'performance bonus in February' / 'salary' without reusing those exact words -- tests whether the semantic signal resolves it the way lexical alone might not.",
       "ask": "Which employee's take-home pay increased with an extra payout last quarter's second month, and where do they live?",
-      "decision": "inconclusive",
-      "text": "Insufficient evidence.",
+      "decision": "supported",
+      "text": "Ravi Sharma, MG Road [A1].",
       "disambiguate_trace": {
         "step": "disambiguate",
         "lexical_group": "A",
@@ -74,7 +74,7 @@
       },
       "resolved_group": "A",
       "disambiguation_correct": true,
-      "correct": false
+      "correct": true
     }
   ],
   "single_child_fallback": {

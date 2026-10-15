@@ -6,6 +6,8 @@
     "text": "30 days [A]",
     "trace_steps": [
       "analyze_ask",
+      "intent_signal",
+      "intent_signal",
       "lookup_fallback"
     ],
     "correct_decision": true,
@@ -18,6 +20,8 @@
     "text": "INR 50000 [A]",
     "trace_steps": [
       "analyze_ask",
+      "intent_signal",
+      "intent_signal",
       "lookup_fallback"
     ],
     "correct_decision": true,
@@ -30,6 +34,8 @@
     "text": "a refund issued after 14 days [A]",
     "trace_steps": [
       "analyze_ask",
+      "intent_signal",
+      "intent_signal",
       "lookup_fallback"
     ],
     "correct_decision": true,
@@ -42,7 +48,9 @@
     "text": "Ravi Sharma [A].",
     "trace_steps": [
       "analyze_ask",
-      "extract_identity"
+      "intent_signal",
+      "extract_identity",
+      "intent_signal"
     ],
     "correct_decision": true,
     "correct_content": true
@@ -54,6 +62,8 @@
     "text": "Insufficient evidence.",
     "trace_steps": [
       "analyze_ask",
+      "intent_signal",
+      "intent_signal",
       "lookup_fallback"
     ],
     "correct_decision": true,
@@ -66,6 +76,8 @@
     "text": "Arjun murdered Neha. [FACT1] matches the rule's trigger (murder): If someone murders a person, it is a punishable crime. [RULE1] Therefore, it is a punishable crime..",
     "trace_steps": [
       "analyze_ask",
+      "intent_signal",
+      "intent_signal",
       "find_rule",
       "apply_rule"
     ],
@@ -80,7 +92,9 @@
     "trace_steps": [
       "analyze_ask",
       "disambiguate",
+      "intent_signal",
       "extract_identity",
+      "intent_signal",
       "compute_total",
       "find_rule",
       "apply_rule"
@@ -96,7 +110,9 @@
     "trace_steps": [
       "analyze_ask",
       "disambiguate",
+      "intent_signal",
       "extract_identity",
+      "intent_signal",
       "compute_total",
       "find_rule",
       "apply_rule"

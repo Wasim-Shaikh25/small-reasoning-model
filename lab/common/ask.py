@@ -23,8 +23,8 @@ CHRON_CUES = (
     "which came first", "order of",
 )
 ENTITY_CUES = (
-    "who is", "who was", "who are", "address of", "lessee", "lessor",
-    "the parties", "which party", "whose address",
+    "who is", "who was", "who are", "address of", "the parties",
+    "which party", "whose address",
 )
 REASON_CUES = (
     "why ", "why?", "what happens if", "unless", "provided that", "is it permitted",
@@ -108,10 +108,6 @@ def decompose(ask: str, task_type: str) -> list[str]:
         subs.append(f"What is {_clean_part(parts[1])}?")
         subs.append("How do these values differ?")
     elif task_type == "entity":
-        if "lessee" in low:
-            subs.append("Who is the Lessee?")
-        if "lessor" in low:
-            subs.append("Who is the Lessor?")
         if "address" in low:
             subs.append("What is the address?")
         if "who" in low and not subs:

@@ -19,8 +19,21 @@ at once and chains their results. Same function, same code path, every time;
 the input decides how much of it is used, not a label chosen for the input
 ahead of time.
 
+Identity/total detection used to be two literal keyword checks (a fixed
+TOTAL_CUES word list; "name" + "address" as literal substrings) plus a
+dependency on lab.common.ask's task_type classifier, which itself used to
+hardcode "lessee"/"lessor" -- real lease-contract vocabulary -- into what was
+supposed to be a domain-agnostic signal. Found when a paraphrased ask passed
+disambiguation correctly but got no answer anyway (EXP-068), and replaced
+(EXP-069) with lab.common.intent_signals: semantic exemplar matching (bge),
+calibrated and tested against medical, insurance, and engineering asks, not
+just the lease/contract wording every other fixture in this repo happens to
+use.
+
 Every tool this calls is a primitive already built and separately measured:
   - lab.common.index.Index: hybrid retrieval, EXP-004/015/029/040/058.
+  - lab.common.intent_signals: domain-agnostic identity/total detection,
+    EXP-069 (bge exemplar similarity, not literal keywords).
   - lab.common.semantic_index.SemanticIndex: real bge embeddings, EXP-067,
     used alongside Index (not instead of it) for flat disambiguation --
     lexical and semantic are independent signals that must agree.
@@ -46,6 +59,7 @@ from lab.common.ask import analyze
 from lab.common.calc import sum_amounts
 from lab.common.entities import AMOUNT_RE, detect_primary, parse_address
 from lab.common.index import Index
+from lab.common.intent_signals import wants_identity, wants_total
 from lab.common.nested_index import MIN_DENSE_SCORE, build_nested_index, navigate
 from lab.common.qa import answer_with_agreement
 from lab.common.rules import apply_rule, apply_threshold_rule, extract_fact_triple, parse_conditional_rule, parse_threshold_rule
@@ -54,20 +68,6 @@ from lab.common.textutil import normalize
 from lab.common.verify import quote_check
 
 ABSTAIN_TEXT = "Insufficient evidence."
-
-TOTAL_CUES = ("total", "how much", "sum", "altogether", "combined", "in all")
-
-
-def _wants_total(ask: str) -> bool:
-    low = ask.lower()
-    return any(cue in low for cue in TOTAL_CUES)
-
-
-def _wants_identity(ask: str, task_type: str) -> bool:
-    if task_type == "entity":
-        return True
-    low = ask.lower()
-    return "name" in low and "address" in low
 
 
 def _find_rule(passages: list[dict]):
@@ -176,10 +176,21 @@ def reason(ask: str, passages: list[dict]) -> dict:
     facts: dict = {}
     answer_parts: list[str] = []
 
-    if _wants_identity(ask, plan["task_type"]):
+    identity_signal = wants_identity(ask)
+    trace.append({"step": "intent_signal", "signal": "identity", **identity_signal})
+    if identity_signal["fires"]:
         full_text = " ".join(p["text"] for p in scoped)
         mentions = detect_primary(full_text)
-        person = next((m for m in mentions if m["label"] == "person"), None)
+        # Prefer a person mention that is unique to this resolved scope over
+        # one that also appears outside it (e.g. a doctor's name repeated
+        # across every patient's own passages) -- a set-difference check
+        # over which passages mention whom, not a role word list, so it
+        # stays domain-agnostic. Falls back to the first mention (the
+        # original behavior) when no mention is scope-unique, so documents
+        # with only one person per group are unaffected.
+        other_text = " ".join(p["text"] for p in passages if p not in scoped)
+        person = next((m for m in mentions if m["label"] == "person" and m["text"] not in other_text), None)
+        person = person or next((m for m in mentions if m["label"] == "person"), None)
         address = parse_address(full_text)
         name_cite = next((p["id"] for p in scoped if person and person["text"] in p["text"]), None)
         facts["name"] = person["text"] if person else None
@@ -191,7 +202,9 @@ def reason(ask: str, passages: list[dict]) -> dict:
             road = address.get("road")
             answer_parts.append(f"{facts['name']}" + (f", {road}" if road else "") + (f" [{name_cite}]" if name_cite else ""))
 
-    if _wants_total(ask):
+    total_signal = wants_total(ask)
+    trace.append({"step": "intent_signal", "signal": "total", **total_signal})
+    if total_signal["fires"]:
         spans, sources = [], []
         for p in scoped:
             for found in AMOUNT_RE.findall(p["text"]):

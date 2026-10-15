@@ -8,7 +8,9 @@
     "trace_steps": [
       "analyze_ask",
       "nested_navigate",
+      "intent_signal",
       "extract_identity",
+      "intent_signal",
       "compute_total",
       "find_rule",
       "apply_rule"

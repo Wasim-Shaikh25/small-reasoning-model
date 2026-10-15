@@ -352,19 +352,30 @@ def main():
     )
 
     conclusion = (
-        "All three gaps named after EXP-067 were addressed and re-measured rather than assumed fixed, and "
-        "one new, more important finding came out of that re-measurement than the three fixes themselves. "
+        "All three gaps named after EXP-067 were addressed and re-measured rather than assumed fixed. "
         "Flat disambiguation now abstains correctly on the off-topic case and still answers both EXP-060 "
         "regression cases, using the identical dual-signal (lexical floor + semantic margin, independent "
         "checks that must agree) design EXP-067 validated for hierarchical navigation -- the same mechanism "
-        "now covers both branches of lab.common.brain. The disambiguation fix itself worked even on the "
-        "paraphrase case (it resolved the correct group); what still fails downstream of it is a *separate*, "
-        "pre-existing issue this exploration exposed rather than caused: brain.py's _wants_identity and "
-        "_wants_total signal detectors are themselves literal keyword checks ('name' + 'address', a fixed "
-        "list of total-cue words), so a paraphrased ask can pass disambiguation correctly and still get no "
-        "answer because the intent-detection step never recognized what kind of question it was. That's a "
-        "fourth, newly-identified gap, not one of the three this exploration set out to fix. "
-        "The single-candidate gap in navigate_semantic is closed by falling back to the TF-IDF dense floor "
+        "now covers both branches of lab.common.brain. "
+        + (
+            "The disambiguation fix worked on the paraphrase case from the first run (it resolved the correct "
+            "group); what failed downstream of it at the time this exploration was first run was a *separate* "
+            "issue this exploration exposed rather than caused: brain.py's _wants_identity and _wants_total "
+            "were literal keyword checks ('name' + 'address', a fixed list of total-cue words), so a "
+            "paraphrased ask could pass disambiguation correctly and still get no answer. That gap was closed "
+            "in EXP-069 (semantic intent signals, replacing the literal keyword checks) -- this file reflects "
+            "a rerun after that fix, which is why the paraphrase case now passes end to end rather than "
+            "failing downstream the way it did when this exploration was first written."
+            if paraphrase_row["correct"]
+            else "The disambiguation fix itself worked on the paraphrase case (it resolved the correct group); "
+            "what still fails downstream of it is a *separate*, pre-existing issue this exploration exposed "
+            "rather than caused: brain.py's _wants_identity and _wants_total signal detectors are themselves "
+            "literal keyword checks ('name' + 'address', a fixed list of total-cue words), so a paraphrased "
+            "ask can pass disambiguation correctly and still get no answer because the intent-detection step "
+            "never recognized what kind of question it was. That's a fourth, newly-identified gap, not one of "
+            "the three this exploration set out to fix."
+        )
+        + " The single-candidate gap in navigate_semantic is closed by falling back to the TF-IDF dense floor "
         "specifically where a margin can't be computed, reusing lab.common.nested_index's already-measured "
         "constant rather than inventing a new number. "
         + (
@@ -379,7 +390,7 @@ def main():
             )
             if sweep["separable"]
             else (
-                f"the margin sweep found the two populations are NOT cleanly separable (min genuine "
+                f"The margin sweep found the two populations are NOT cleanly separable (min genuine "
                 f"{sweep['min_genuine_margin']} <= max noise {sweep['max_noise_margin']}) -- meaning no single "
                 f"fixed threshold can be fully trusted across different vocabularies, a real limitation to "
                 f"flag rather than paper over with a confident-sounding constant."
@@ -411,11 +422,11 @@ def main():
         scale_down="3 margin-sweep fixtures, 1 single-child case, 4 flat-disambiguation cases -- enough to validate the mechanism and get a first real measurement of separability, not an exhaustive calibration.",
         referenced_files=FILES,
         follow_ups=[
-            "New, higher-priority than the three this exploration closed: brain.py's _wants_identity/_wants_total "
-            "are literal keyword checks ('name'+'address', a fixed total-cue word list) -- a paraphrased ask can "
-            "pass disambiguation correctly (proven working here) and still fail because intent detection itself "
-            "doesn't recognize it. The same lexical+semantic dual-signal fix just applied to disambiguation is "
-            "the natural pattern to apply here too, not a keyword-list expansion.",
+            "RESOLVED in EXP-069: brain.py's _wants_identity/_wants_total were literal keyword checks "
+            "('name'+'address', a fixed total-cue word list) -- a paraphrased ask could pass disambiguation "
+            "correctly (proven working here) and still fail because intent detection itself didn't recognize "
+            "it. Replaced with lab.common.intent_signals (bge exemplar similarity), tested cross-domain. This "
+            "file was rerun after that fix, which is why the paraphrase case passes end to end now.",
             "The margin sweep found genuine-match and noise margins are NOT cleanly separable by any single "
             "global threshold across 3 fixtures and 2 levels (min genuine 0.0031 <= max noise 0.0631) -- "
             "MIN_SEMANTIC_MARGIN=0.03 is not a safe fixed constant. This is why brain.py's disambiguation never "

@@ -47,8 +47,11 @@ THRESHOLD_RULE_RE = re.compile(
     # degrees", "3 days") -- the same two shapes textutil.NUM_RE/qa.AMOUNT_RE
     # already both handle elsewhere in this repo. A rule shouldn't need a
     # new regex every time the quantity's unit happens to sit on the other
-    # side of the number.
-    r"(?P<threshold>[a-z]*\s*[\d,]+(?:\.\d+)?\s*[a-z%]*)\s*,\s*(?P<consequence>.+?)\.?\s*$",
+    # side of the number. The prefix class also includes the common currency
+    # symbols ($/€/£), found missing (EXP-069) when a threshold phrased as
+    # "exceeds $10000" failed to parse at all -- only letter prefixes like
+    # "INR" were accounted for.
+    r"(?P<threshold>[a-z$€£]*\s*[\d,]+(?:\.\d+)?\s*[a-z%]*)\s*,\s*(?P<consequence>.+?)\.?\s*$",
     re.I,
 )
 

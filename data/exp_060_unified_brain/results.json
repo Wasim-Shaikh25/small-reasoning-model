@@ -14,6 +14,7 @@
         "trace_steps_used": [
           "analyze_ask",
           "extract_identity",
+          "intent_signal",
           "lookup_fallback"
         ]
       },
@@ -23,7 +24,8 @@
         "trace_steps_used": [
           "analyze_ask",
           "apply_rule",
-          "find_rule"
+          "find_rule",
+          "intent_signal"
         ]
       },
       "integrated": {
@@ -35,7 +37,8 @@
           "compute_total",
           "disambiguate",
           "extract_identity",
-          "find_rule"
+          "find_rule",
+          "intent_signal"
         ]
       }
     },
@@ -91,7 +94,7 @@
       }
     ]
   },
-  "results_prose": "On 8 cases spanning three regimes (plain lookup, rule application, integrated disambiguation+arithmetic+policy), all through the identical lab.common.brain.reason(ask, passages) call, 8 are correct (accuracy 1.0). The trace shows which internal steps fired per regime: lookup cases use ['analyze_ask', 'extract_identity', 'lookup_fallback'], the rule case uses ['analyze_ask', 'apply_rule', 'find_rule'], the integrated cases use ['analyze_ask', 'apply_rule', 'compute_total', 'disambiguate', 'extract_identity', 'find_rule'] -- different internal steps, same external call.",
+  "results_prose": "On 8 cases spanning three regimes (plain lookup, rule application, integrated disambiguation+arithmetic+policy), all through the identical lab.common.brain.reason(ask, passages) call, 8 are correct (accuracy 1.0). The trace shows which internal steps fired per regime: lookup cases use ['analyze_ask', 'extract_identity', 'intent_signal', 'lookup_fallback'], the rule case uses ['analyze_ask', 'apply_rule', 'find_rule', 'intent_signal'], the integrated cases use ['analyze_ask', 'apply_rule', 'compute_total', 'disambiguate', 'extract_identity', 'find_rule', 'intent_signal'] -- different internal steps, same external call.",
   "conclusion": "One function handles a plain lookup, a rule-application question, and a multi-signal integrated scenario without the caller choosing a path. The difference between regimes shows up only in the trace -- which internal signal checks fired -- never in which function was called or how it was called. A lookup question fires none of the extra signals and falls back to the same single-slot extractor lab.common.engine already uses; the integrated cases fire three signals at once and chain their results. This is the unification the prior three explorations (EXP-057/058/059) proved piece by piece, now proved as one entry point rather than three scripts a person chooses between.",
   "scale_down": "8 cases across 3 regimes, not a benchmark of the brain's ceiling -- a targeted test that the single entry point reproduces every prior exploration's answer without per-case wiring.",
   "referenced_files": [
@@ -113,7 +116,7 @@
     "Wire lab.common.brain.reason as the entry point lab.common.engine.run_task's callers would use, so the controller's own round/budget loop (EXP-001) and this brain's signal-chaining converge into one thing instead of two.",
     "Add long-form dispatch (lab.common.assemble) as a fifth signal -- 'does the ask want a document, not a short answer' -- so EXP-018/042/048/054/055/056's page-wise path is reachable from the same entry point too."
   ],
-  "elapsed_sec": 79.2153,
-  "peak_rss_mb": 503.51,
+  "elapsed_sec": 55.576,
+  "peak_rss_mb": 588.08,
   "models_used": "No generative model. Every step is a previously-measured classical/deterministic primitive; this module's only new code is the control flow that chains them."
 }

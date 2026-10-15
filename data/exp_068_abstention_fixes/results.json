@@ -7,7 +7,7 @@
   "metrics": {
     "part_a_flat_disambiguation": {
       "n": 4,
-      "correct": 3,
+      "correct": 4,
       "cases": [
         {
           "id": "F01_contractor_regression",
@@ -32,10 +32,10 @@
         },
         {
           "id": "F04_paraphrase_new",
-          "decision": "inconclusive",
+          "decision": "supported",
           "resolved_group": "A",
           "disambiguation_correct": true,
-          "correct": false
+          "correct": true
         }
       ]
     },
@@ -53,8 +53,8 @@
       "recommended_margin_if_separable": null
     }
   },
-  "results_prose": "Part A (flat disambiguation, brain.py): 3/4 end-to-end correct -- the two EXP-060 regression cases hold and the off-topic ask now abstains instead of guessing. The new paraphrase case is a mixed result worth stating precisely rather than rounding off: disambiguation itself resolved the right group ('A', correct), but the overall case still came back 'inconclusive' -- the failure is downstream of the fix just made, in brain.py's _wants_identity/_wants_total keyword checks, which don't recognize this paraphrase's intent wording ('take-home pay', 'extra payout') the way they recognize 'name'/'address'/'total' literally, so it falls through to the single-slot lookup extractor and finds no single-span answer. Part B (single-child fallback, navigate_semantic): genuine ask proceeded, off-topic ask correctly abstained (reason: only one section candidate and it scored at the dense-similarity floor (dense 0.0000 < 1e-09) -- no margin was computable to check instead). Part C (margin sweep, 3 fixtures x (1 exact + 1 paraphrase + 3 off-topic) asks, 2 levels each): genuine-match margins range down to 0.0031, noise margins range up to 0.0631; the two populations are NOT cleanly separable. The current MIN_SEMANTIC_MARGIN=0.03 is NOT safely inside the measured gap.",
-  "conclusion": "All three gaps named after EXP-067 were addressed and re-measured rather than assumed fixed, and one new, more important finding came out of that re-measurement than the three fixes themselves. Flat disambiguation now abstains correctly on the off-topic case and still answers both EXP-060 regression cases, using the identical dual-signal (lexical floor + semantic margin, independent checks that must agree) design EXP-067 validated for hierarchical navigation -- the same mechanism now covers both branches of lab.common.brain. The disambiguation fix itself worked even on the paraphrase case (it resolved the correct group); what still fails downstream of it is a *separate*, pre-existing issue this exploration exposed rather than caused: brain.py's _wants_identity and _wants_total signal detectors are themselves literal keyword checks ('name' + 'address', a fixed list of total-cue words), so a paraphrased ask can pass disambiguation correctly and still get no answer because the intent-detection step never recognized what kind of question it was. That's a fourth, newly-identified gap, not one of the three this exploration set out to fix. The single-candidate gap in navigate_semantic is closed by falling back to the TF-IDF dense floor specifically where a margin can't be computed, reusing lab.common.nested_index's already-measured constant rather than inventing a new number. the margin sweep found the two populations are NOT cleanly separable (min genuine 0.0031 <= max noise 0.0631) -- meaning no single fixed threshold can be fully trusted across different vocabularies, a real limitation to flag rather than paper over with a confident-sounding constant.",
+  "results_prose": "Part A (flat disambiguation, brain.py): 4/4 end-to-end correct -- the two EXP-060 regression cases hold and the off-topic ask now abstains instead of guessing. The new paraphrase case is correct end-to-end: disambiguation resolved the right group and the downstream extraction found the right answer. Part B (single-child fallback, navigate_semantic): genuine ask proceeded, off-topic ask correctly abstained (reason: only one section candidate and it scored at the dense-similarity floor (dense 0.0000 < 1e-09) -- no margin was computable to check instead). Part C (margin sweep, 3 fixtures x (1 exact + 1 paraphrase + 3 off-topic) asks, 2 levels each): genuine-match margins range down to 0.0031, noise margins range up to 0.0631; the two populations are NOT cleanly separable. The current MIN_SEMANTIC_MARGIN=0.03 is NOT safely inside the measured gap.",
+  "conclusion": "All three gaps named after EXP-067 were addressed and re-measured rather than assumed fixed. Flat disambiguation now abstains correctly on the off-topic case and still answers both EXP-060 regression cases, using the identical dual-signal (lexical floor + semantic margin, independent checks that must agree) design EXP-067 validated for hierarchical navigation -- the same mechanism now covers both branches of lab.common.brain. The disambiguation fix worked on the paraphrase case from the first run (it resolved the correct group); what failed downstream of it at the time this exploration was first run was a *separate* issue this exploration exposed rather than caused: brain.py's _wants_identity and _wants_total were literal keyword checks ('name' + 'address', a fixed list of total-cue words), so a paraphrased ask could pass disambiguation correctly and still get no answer. That gap was closed in EXP-069 (semantic intent signals, replacing the literal keyword checks) -- this file reflects a rerun after that fix, which is why the paraphrase case now passes end to end rather than failing downstream the way it did when this exploration was first written. The single-candidate gap in navigate_semantic is closed by falling back to the TF-IDF dense floor specifically where a margin can't be computed, reusing lab.common.nested_index's already-measured constant rather than inventing a new number. The margin sweep found the two populations are NOT cleanly separable (min genuine 0.0031 <= max noise 0.0631) -- meaning no single fixed threshold can be fully trusted across different vocabularies, a real limitation to flag rather than paper over with a confident-sounding constant.",
   "scale_down": "3 margin-sweep fixtures, 1 single-child case, 4 flat-disambiguation cases -- enough to validate the mechanism and get a first real measurement of separability, not an exhaustive calibration.",
   "referenced_files": [
     "lab/exp_068_abstention_fixes/run.py",
@@ -69,12 +69,12 @@
     "data/exp_068_abstention_fixes/results.json"
   ],
   "follow_ups": [
-    "New, higher-priority than the three this exploration closed: brain.py's _wants_identity/_wants_total are literal keyword checks ('name'+'address', a fixed total-cue word list) -- a paraphrased ask can pass disambiguation correctly (proven working here) and still fail because intent detection itself doesn't recognize it. The same lexical+semantic dual-signal fix just applied to disambiguation is the natural pattern to apply here too, not a keyword-list expansion.",
+    "RESOLVED in EXP-069: brain.py's _wants_identity/_wants_total were literal keyword checks ('name'+'address', a fixed total-cue word list) -- a paraphrased ask could pass disambiguation correctly (proven working here) and still fail because intent detection itself didn't recognize it. Replaced with lab.common.intent_signals (bge exemplar similarity), tested cross-domain. This file was rerun after that fix, which is why the paraphrase case passes end to end now.",
     "The margin sweep found genuine-match and noise margins are NOT cleanly separable by any single global threshold across 3 fixtures and 2 levels (min genuine 0.0031 <= max noise 0.0631) -- MIN_SEMANTIC_MARGIN=0.03 is not a safe fixed constant. This is why brain.py's disambiguation never trusts the semantic margin alone -- it only acts when lexical also abstains or agrees -- but navigate_semantic's hierarchical path still uses the margin as its only signal at each level and inherits this same risk. Needs either a per-level/relative recalibration or a second corroborating signal there too, not a bigger single constant.",
     "If MIN_SEMANTIC_MARGIN is adjusted, rerun EXP-066/067 to confirm nothing regresses.",
     "The single-child fallback still can't catch a paraphrased ask the way the margin check can -- only exercised against an exact/off-topic pair here, not a paraphrase against a lone candidate."
   ],
-  "elapsed_sec": 108.2199,
-  "peak_rss_mb": 562.21,
+  "elapsed_sec": 179.1385,
+  "peak_rss_mb": 459.58,
   "models_used": "bge-small-en-v1.5 for all semantic scoring (retrieval only, no generation); TF-IDF/BM25 (lab.common.index) for the lexical signal and the single-child fallback floor."
 }
