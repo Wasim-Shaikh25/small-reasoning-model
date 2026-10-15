@@ -1,0 +1,77 @@
+[
+  {
+    "total_leaves": 27,
+    "sections_per_chapter": 3,
+    "leaves_per_section": 3,
+    "path": [
+      {
+        "level": "chapter",
+        "chosen": "Finance",
+        "chosen_id": "Finance",
+        "score": 1.0,
+        "candidates_considered": 3
+      },
+      {
+        "level": "section",
+        "chosen": "Finance-1",
+        "chosen_id": "Finance/Finance-1",
+        "score": 1.0,
+        "candidates_considered": 3
+      }
+    ],
+    "correct_chapter": true,
+    "correct_section": true,
+    "needle_in_resolved_leaf_set": true,
+    "resolved_leaf_count": 3
+  },
+  {
+    "total_leaves": 150,
+    "sections_per_chapter": 5,
+    "leaves_per_section": 10,
+    "path": [
+      {
+        "level": "chapter",
+        "chosen": "Finance",
+        "chosen_id": "Finance",
+        "score": 1.0,
+        "candidates_considered": 3
+      },
+      {
+        "level": "section",
+        "chosen": "Finance-2",
+        "chosen_id": "Finance/Finance-2",
+        "score": 1.0,
+        "candidates_considered": 5
+      }
+    ],
+    "correct_chapter": true,
+    "correct_section": true,
+    "needle_in_resolved_leaf_set": true,
+    "resolved_leaf_count": 10
+  },
+  {
+    "total_leaves": 450,
+    "sections_per_chapter": 5,
+    "leaves_per_section": 30,
+    "path": [
+      {
+        "level": "chapter",
+        "chosen": "Finance",
+        "chosen_id": "Finance",
+        "score": 1.0,
+        "candidates_considered": 3
+      },
+      {
+        "level": "section",
+        "chosen": "Finance-2",
+        "chosen_id": "Finance/Finance-2",
+        "score": 1.0,
+        "candidates_considered": 5
+      }
+    ],
+    "correct_chapter": true,
+    "correct_section": true,
+    "needle_in_resolved_leaf_set": true,
+    "resolved_leaf_count": 30
+  }
+]

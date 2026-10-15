@@ -22181,6 +22181,126 @@ Elapsed seconds: 76.1722. Peak RSS MB: 147.25.
 - Scale-down: Same 13 findings as EXP-054/056/062/063, single leaf size, one schema design, not a sweep over constraint strategies.
 - Conclusion: Real decoding-level constraints, reached through Ollama's JSON-schema structured-output support rather than the blocked transformers constrained-beam-search path or an untrusted remote-code package, improve on the post-hoc splice: 1.0 versus 0.8462. The citation can no longer be dropped by construction, and an empty rewrite is no longer decodable at all -- both are now grammar-level impossibilities, not failures caught and patched afterward. Remaining failures are free-text content problems (e.g. a dropped number) that a JSON-schema constraint on a single enum field cannot reach -- the fidelity gate is still required for those, and still does its job. This constraint does not generalize to the harder problem it was never designed for: on a 4-fact leaf (EXP-048's original difficulty level), the schema still forces all 4 citation ids to appear, but the free-text 'rewritten_sentence' field still collapses to one fact while listing citations for facts it never actually restated -- arguably worse than silence, since the citations now falsely imply support for content that isn't there. The fidelity gate still catches this (numbers/nli fail, falls back correctly), but it confirms that decomposing to one fact per leaf is not a crutch for flan-t5-small specifically -- it is load-bearing for any small model's reliability at this task, and no decoding-level trick found so far substitutes for it.
 
+## EXP-065 Nested (hierarchical) navigation over a structured document
+
+- Status: `closed`
+- Models used: No model decides navigation. lab.common.index's hybrid retriever (TF-IDF + BM25, unchanged) scores each level; the same classical substitute every retrieval exploration in this project has used.
+- Goal: Build and measure multi-level navigation (chapter -> section -> leaf) over a synthetic structured document, so the system can search a 1000-page document level by level instead of flattening it, and confirm the navigation decision stays with the embeddings/retrieval layer, never the generative rewriter.
+- Method: lab.common.nested_index.build_nested_index groups flat records into a tree by chapter then section. lab.common.nested_index.navigate descends one level at a time, using lab.common.index.Index (the same hybrid retriever already measured) to score only that level's children against the ask, producing an explicit path trace. Tested at 3 tree sizes (27/150/450 leaves) with a single distinctive needle planted in one section of the Finance chapter, plus one off-topic ask as a negative control.
+- Referenced files:
+- `lab/exp_065_nested_navigation/run.py`
+- `lab/common/nested_index.py`
+- `lab/common/index.py`
+- `lab/common/harness.py`
+- `data/exp_015_paged_memory/results.json`
+- `data/exp_065_nested_navigation/results.json`
+- Results: Navigation correctness by tree size: 27 leaves (3 sections x 3 leaves/section) -> chapter correct True, section correct True, needle in resolved set True (of 3 leaves read at the final level); 150 leaves (5 sections x 10 leaves/section) -> chapter correct True, section correct True, needle in resolved set True (of 10 leaves read at the final level); 450 leaves (5 sections x 30 leaves/section) -> chapter correct True, section correct True, needle in resolved set True (of 30 leaves read at the final level). Off-topic ask (no real match in the tree) still produced a path (no abstention threshold exists yet): [{'level': 'chapter', 'chosen': 'Finance', 'chosen_id': 'Finance', 'score': 0.5, 'candidates_considered': 3}, {'level': 'section', 'chosen': 'Finance-1', 'chosen_id': 'Finance/Finance-1', 'score': 0.5, 'candidates_considered': 3}].
+```json
+{
+  "sizes": [
+    {
+      "total_leaves": 27,
+      "sections_per_chapter": 3,
+      "leaves_per_section": 3,
+      "path": [
+        {
+          "level": "chapter",
+          "chosen": "Finance",
+          "chosen_id": "Finance",
+          "score": 1.0,
+          "candidates_considered": 3
+        },
+        {
+          "level": "section",
+          "chosen": "Finance-1",
+          "chosen_id": "Finance/Finance-1",
+          "score": 1.0,
+          "candidates_considered": 3
+        }
+      ],
+      "correct_chapter": true,
+      "correct_section": true,
+      "needle_in_resolved_leaf_set": true,
+      "resolved_leaf_count": 3
+    },
+    {
+      "total_leaves": 150,
+      "sections_per_chapter": 5,
+      "leaves_per_section": 10,
+      "path": [
+        {
+          "level": "chapter",
+          "chosen": "Finance",
+          "chosen_id": "Finance",
+          "score": 1.0,
+          "candidates_considered": 3
+        },
+        {
+          "level": "section",
+          "chosen": "Finance-2",
+          "chosen_id": "Finance/Finance-2",
+          "score": 1.0,
+          "candidates_considered": 5
+        }
+      ],
+      "correct_chapter": true,
+      "correct_section": true,
+      "needle_in_resolved_leaf_set": true,
+      "resolved_leaf_count": 10
+    },
+    {
+      "total_leaves": 450,
+      "sections_per_chapter": 5,
+      "leaves_per_section": 30,
+      "path": [
+        {
+          "level": "chapter",
+          "chosen": "Finance",
+          "chosen_id": "Finance",
+          "score": 1.0,
+          "candidates_considered": 3
+        },
+        {
+          "level": "section",
+          "chosen": "Finance-2",
+          "chosen_id": "Finance/Finance-2",
+          "score": 1.0,
+          "candidates_considered": 5
+        }
+      ],
+      "correct_chapter": true,
+      "correct_section": true,
+      "needle_in_resolved_leaf_set": true,
+      "resolved_leaf_count": 30
+    }
+  ],
+  "all_correct_chapter": true,
+  "all_correct_section": true,
+  "all_needle_in_resolved_set": true,
+  "off_topic_ask_path": [
+    {
+      "level": "chapter",
+      "chosen": "Finance",
+      "chosen_id": "Finance",
+      "score": 0.5,
+      "candidates_considered": 3
+    },
+    {
+      "level": "section",
+      "chosen": "Finance-1",
+      "chosen_id": "Finance/Finance-1",
+      "score": 0.5,
+      "candidates_considered": 3
+    }
+  ],
+  "off_topic_ask_abstained": false
+}
+```
+
+Elapsed seconds: 0.028. Peak RSS MB: 128.47.
+- Scale-down: 3 chapters, up to 450 leaves, one needle -- not a real 1000-page document or multiple simultaneous needles. Two levels of hierarchy (chapter, section); a real book might want a third (chapter -> section -> paragraph -> sentence).
+- Conclusion: Hierarchical navigation -- scoring each level's children against the ask and descending only into the best match, the same hybrid retriever EXP-004/015/029/040/058/060 already measured, never a language model -- correctly reaches the chapter and section containing a distinctive needle at every size tested, from 27 to 450 leaves, without ever scoring the full leaf set directly: by the final level, the candidate pool it searches is only the handful of leaves in the one resolved section, not the whole tree. This is the mechanism that lets the system work on a 1000-page document without Gemma (or anything else) ever holding more than one small section's worth of content at a time -- navigation cost grows with tree depth, not with total document size. The honest limit, stated rather than hidden: there is no abstention threshold yet at any level, so an ask with no real answer anywhere in the document still produces a confident-looking path to whichever branch scored highest by default, the same gap lab.common.brain's flat disambiguation step already has. A minimum-score floor per level (abstain if the best candidate's score is below it) is the natural next fix, not yet built.
+
 ## Follow-up todos
 
 ## EXP-022 On-disk hybrid index
