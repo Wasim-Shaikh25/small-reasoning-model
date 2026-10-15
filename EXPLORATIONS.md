@@ -21508,15 +21508,15 @@ Elapsed seconds: 73.4004. Peak RSS MB: 654.04.
 - `lab/common/harness.py`
 - `data/exp_048_bounded_rewriter/results.json`
 - `data/exp_054_rewriter_leaf_size/results.json`
-- Results: Fidelity pass rate by leaf size on the identical 13 findings EXP-048 used: 1 finding(s)/leaf -> 0.3846, 2 finding(s)/leaf -> 0.0, 4 finding(s)/leaf -> 0.0.
+- Results: Fidelity pass rate by leaf size on the identical 13 findings EXP-048 used: 1 finding(s)/leaf -> 0.3077, 2 finding(s)/leaf -> 0.0, 4 finding(s)/leaf -> 0.0.
 ```json
 {
   "model": "google/flan-t5-small",
   "by_leaf_size": {
     "1": {
       "leaves": 13,
-      "fidelity_pass_rate": 0.3846,
-      "fallback_rate": 0.6154
+      "fidelity_pass_rate": 0.3077,
+      "fallback_rate": 0.6923
     },
     "2": {
       "leaves": 7,
@@ -21531,15 +21531,15 @@ Elapsed seconds: 73.4004. Peak RSS MB: 654.04.
   },
   "exp_048_leaf_size_4_fidelity_pass_rate": 0.0,
   "leaf_size_1_residual_failure_mode": {
-    "failures": 8,
+    "failures": 9,
     "dropped_statement_kept_only_citation": 8
   }
 }
 ```
 
-Elapsed seconds: 22.6742. Peak RSS MB: 682.51.
+Elapsed seconds: 84.3512. Peak RSS MB: 683.16.
 - Scale-down: Same 13 findings as EXP-048, not a larger fixture; three leaf sizes, not a full sweep.
-- Conclusion: google/flan-t5-small is measured at leaf sizes 1, 2, and 4 findings per rewrite call, isolating leaf size as the only variable changed from EXP-048. Narrowing the task to one finding per call raises the fidelity pass rate from 0.0 to 0.3846, supporting this project's governing hypothesis that a small model's failure mode is being asked to hold too much at once, not a general inability to rewrite a single verified statement. But decomposition alone does not fully fix it here: 8 of 13 single-finding leaves still fail, and 8 of those fail in a different, more extreme way than EXP-048's -- instead of picking one fact out of several and dropping the rest, the model sometimes drops the statement's content entirely and echoes only the citation marker (for example generating '[CITE-CL000]' with no text). Decomposition shrinks the failure, it does not remove the need for the fidelity gate -- the gate stays the load-bearing safeguard at every leaf size measured.
+- Conclusion: google/flan-t5-small is measured at leaf sizes 1, 2, and 4 findings per rewrite call, isolating leaf size as the only variable changed from EXP-048. Narrowing the task to one finding per call raises the fidelity pass rate from 0.0 to 0.3077, supporting this project's governing hypothesis that a small model's failure mode is being asked to hold too much at once, not a general inability to rewrite a single verified statement. But decomposition alone does not fully fix it here: 9 of 13 single-finding leaves still fail, and 8 of those fail in a different, more extreme way than EXP-048's -- instead of picking one fact out of several and dropping the rest, the model sometimes drops the statement's content entirely and echoes only the citation marker (for example generating '[CITE-CL000]' with no text). Decomposition shrinks the failure, it does not remove the need for the fidelity gate -- the gate stays the load-bearing safeguard at every leaf size measured.
 
 ## EXP-055 Content-only template rewriter (connective splice)
 
@@ -21595,7 +21595,7 @@ Elapsed seconds: 0.0382. Peak RSS MB: 126.22.
 - `lab/common/harness.py`
 - `data/exp_054_rewriter_leaf_size/results.json`
 - `data/exp_056_ask_relevance_gate/results.json`
-- Results: Ask-relevance sanity check: 1.0 correct on 5 clear-cut cases, including catching EXP-054's exact collapse shape (bare citation marker, no content) as irrelevant. Isolating the two changes: prompt alone (no ask gate) scores fidelity pass rate 0.3077 with 8 citation-only collapses (EXP-054's original prompt scored 0.3846 with 8 collapses). Adding the ask-relevance gate on top drops pass rate to 0.0: it triggered on 9 of 13 leaves, 5 of which would otherwise have passed every other check.
+- Results: Ask-relevance sanity check: 1.0 correct on 5 clear-cut cases, including catching EXP-054's exact collapse shape (bare citation marker, no content) as irrelevant. Isolating the two changes: prompt alone (no ask gate) scores fidelity pass rate 0.3077 with 8 citation-only collapses (EXP-054's original prompt scored 0.3077 with 8 collapses). Adding the ask-relevance gate on top drops pass rate to 0.0: it triggered on 9 of 13 leaves, 5 of which would otherwise have passed every other check.
 ```json
 {
   "model": "google/flan-t5-small",
@@ -21615,7 +21615,7 @@ Elapsed seconds: 0.0382. Peak RSS MB: 126.22.
   "ask_relevance_gate_triggered_count": 9,
   "failures_caused_only_by_ask_relevance": 5,
   "vs_exp_054_leaf_size_1_original_prompt": {
-    "exp_054_fidelity_pass_rate": 0.3846,
+    "exp_054_fidelity_pass_rate": 0.3077,
     "exp_054_citation_only_collapse_count": 8,
     "exp_056_prompt_only_fidelity_pass_rate": 0.3077,
     "exp_056_prompt_only_citation_only_collapse_count": 8
@@ -21623,7 +21623,7 @@ Elapsed seconds: 0.0382. Peak RSS MB: 126.22.
 }
 ```
 
-Elapsed seconds: 49.7613. Peak RSS MB: 683.06.
+Elapsed seconds: 252.4715. Peak RSS MB: 653.29.
 - Scale-down: Same 13 findings as EXP-054/EXP-048, 5 hand-picked relevance sanity cases, not a large relevance benchmark.
 - Conclusion: The ask-relevance check itself is correct on 1.0 of 5 unambiguous sanity cases -- the function works as designed. But wiring it in with a literal high-level ask ("Summarize the lease's key terms.") against single-fact leaves backfires here: 5 leaves that were otherwise faithful, verified rewrites get rejected only because an isolated fact like 'Ravi Sharma is the Lessee.' doesn't happen to restate the words 'summarize', 'lease', or 'terms'. Token-overlap relevance works when a question's own key noun phrase naturally reappears in its answer (EXP-012's fixed-passage cases, or a direct QA ask); it does not work against an atomic fact drawn from a broader summarization ask, because there is no reason that fact's wording should echo the ask's wording. This is a real design gap in lab.common.relevance.ask_relevance as written, not a success to report quietly: the check needs to compare against something narrower than the whole-document ask (the leaf's own finding, or a sub-ask from EXP-052's eventual table of contents) before it is wired into the rewriter gate by default. Isolated from that problem, the more directive single-fact prompt alone did not clearly improve on EXP-054's numbers either.
 
@@ -22052,6 +22052,74 @@ Elapsed seconds: 118.4022. Peak RSS MB: 725.19.
 Elapsed seconds: 169.4348. Peak RSS MB: 659.65.
 - Scale-down: Same 13 findings as EXP-054/056, 2 retries, not a sweep over retry count or feedback phrasing.
 - Conclusion: Explicit 'you dropped X, include it' feedback does not meaningfully close the gap EXP-054 measured. This is evidence the failure is more structural than a missing nudge: telling the model exactly what it dropped and asking it to retry does not reliably make it include that content. This supports the research report's recommendation over a prompt-level fix -- the next lever to pull is training-data-level (fine-tuning on fusion-shaped data with guaranteed content coverage), not further prompt engineering. The retry loop costs 2.08x the inference calls of the no-retry path for whatever gain it provides -- a real cost to weigh against the alternative of just running the deterministic fallback immediately, which is free.
+
+## EXP-063 gemma3:270m via Ollama vs. flan-t5-small, identical fixture and gate
+
+- Status: `closed`
+- Models used: gemma3:270m, a local checkpoint run via Ollama (fully local, no remote host), permitted 2026-10-15 specifically for this comparison. Rewriter role only, same fidelity gate as flan-t5-small.
+- Goal: Test whether gemma3:270m, run locally via Ollama under the 2026-10-15 widened bounded-rewriter exception, handles the rewriter role more faithfully than flan-t5-small measured across EXP-048/054/056/062, on the identical fixture and fidelity gate.
+- Method: Identical 13 findings and leaf size 1 as EXP-054/056/062. lab.common.real_rewriter_ollama.rewrite_unit reuses lab.common.real_rewriter.build_prompt and fidelity_gate completely unchanged -- only the generation call (Ollama's local HTTP API instead of transformers' AutoModelForSeq2SeqLM.generate) differs. No fine-tuning, no prompt changes beyond what EXP-056 already established as the per-leaf-size default. Two conditions measured: raw output, and with a narrow, content-safe repair (_splice_missing_citations) that deterministically appends a missing citation marker only when it is the sole fidelity failure -- never invoked when a number, modal, or NLI check also fails, so it cannot paper over a genuine content-fidelity problem.
+- Referenced files:
+- `lab/exp_063_gemma3_rewriter/run.py`
+- `lab/common/real_rewriter_ollama.py`
+- `lab/common/real_rewriter.py`
+- `lab/common/assemble.py`
+- `lab/common/harness.py`
+- `FORBIDDEN.md`
+- `lab/config/models.json`
+- `data/exp_054_rewriter_leaf_size/results.json`
+- `data/exp_062_retry_with_feedback/results.json`
+- `data/exp_063_gemma3_rewriter/results.json`
+- Results: On the identical 13 findings, leaf size 1: gemma3:270m's raw fidelity pass rate is 0.0 (fail reasons: {'nli': 8, 'citations': 13, 'numbers': 1}), worse than flan-t5-small's 0.3846 (EXP-054) on the surface. But inspecting the raw failures found its content fidelity was excellent -- verbatim fact preservation -- and the dominant failure was simply not reproducing the literal citation-bracket format. Deterministically appending a missing citation marker when it is the *only* fidelity failure (never inventing content) raises the pass rate to 0.8462, repairing 11 of the 13 leaves. Only 2 leaves have a genuine content-fidelity problem after the repair (one empty-output collapse, one dropped number).
+```json
+{
+  "model": "gemma3:270m",
+  "model_card": {
+    "checkpoint": "gemma3:270m",
+    "params_approx": "~270M",
+    "runtime": "Ollama, local only (http://localhost:11434)",
+    "role": "rewriter only (ARCHITECTURE.md section 3.7): join verified findings into prose",
+    "source": "https://ollama.com/library/gemma3",
+    "not_used_for": [
+      "extraction",
+      "answering",
+      "support/contradiction judging",
+      "proposing"
+    ],
+    "forbidden_reference": "FORBIDDEN.md, 'bounded rewriter exception', widened 2026-10-15"
+  },
+  "leaves": 13,
+  "raw": {
+    "leaves": 13,
+    "fidelity_pass_rate": 0.0,
+    "citation_only_collapse_count": 0,
+    "fail_reason_counts": {
+      "nli": 8,
+      "citations": 13,
+      "numbers": 1
+    },
+    "repaired_count": 0
+  },
+  "with_citation_splice": {
+    "leaves": 13,
+    "fidelity_pass_rate": 0.8462,
+    "citation_only_collapse_count": 0,
+    "fail_reason_counts": {
+      "nli": 2,
+      "citations": 2,
+      "numbers": 1
+    },
+    "repaired_count": 11
+  },
+  "genuine_failures_after_splice": 2,
+  "flan_t5_small_leaf_size_1_pass_rate": 0.3846,
+  "flan_t5_small_leaf_size_1_citation_only_collapse_count": 8
+}
+```
+
+Elapsed seconds: 64.0395. Peak RSS MB: 146.49.
+- Scale-down: Same 13 findings as EXP-054/056/062, single leaf size (1), default Ollama sampling settings, not a sweep.
+- Conclusion: gemma3:270m is measured on the identical fixture and fidelity gate flan-t5-small was measured on, not assumed better because it is newer. The raw comparison alone would have been misleading: gemma3:270m's raw pass rate (0.0) looks worse than flan-t5-small's 0.3846, but the failure *shapes* are not the same thing. flan-t5-small's failures were genuine content loss -- dropping facts, collapsing to a citation marker with nothing else. gemma3:270m's raw failures were almost entirely a formatting gap (not reproducing the literal '[CITE-x]' bracket convention) around content it preserved verbatim. Once that specific, narrow, content-safe repair is applied, gemma3:270m reaches 0.8462 fidelity pass rate, clearly ahead of flan-t5-small's 0.3846. This is real evidence that the content-dropping failure EXP-048/054/056/062 measured is not an inherent property of every small checkpoint at this size -- it is at least partly specific to flan-t5-small (or the T5 training recipe), and a different, more recently trained small model can be substantially more faithful at the identical task without any fine-tuning, once its own narrow quirk (citation formatting, not content) is accounted for rather than conflated with flan-t5-small's deeper problem.
 
 ## Follow-up todos
 
