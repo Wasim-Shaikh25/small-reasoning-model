@@ -1,0 +1,499 @@
+[
+  {
+    "leaf_id": "SYN9029283",
+    "used_generative": true,
+    "fallback_reason": null,
+    "text": "Devon Clarke submitted the component at 730 hours. [CITE-645403]"
+  },
+  {
+    "leaf_id": "SYN7648989",
+    "used_generative": true,
+    "fallback_reason": null,
+    "text": "Elena Petrova confirmed the batch was within 747 percent of the limit. [CITE-638600]"
+  },
+  {
+    "leaf_id": "SYN2108819",
+    "used_generative": true,
+    "fallback_reason": null,
+    "text": "Fatima Khan is the Landlord. [CITE-924374]"
+  },
+  {
+    "leaf_id": "SYN2088319",
+    "used_generative": true,
+    "fallback_reason": null,
+    "text": "{\n    \"rewritten_sentence\": \"On review, Aiko Tanaka found the device's value at 310 points. [CITE-892887]} 892887 was found at 310 points. 892887 was found at 310 points. 892887 was found at 310 points. 892887 was found at 310 points. 892887 was found at 310 points. 892887 was found at 310 points. 892887 was found at 310 points. "
+  },
+  {
+    "leaf_id": "SYN8143339",
+    "used_generative": true,
+    "fallback_reason": null,
+    "text": "The security deposit is INR 83829. [CITE-005808]"
+  },
+  {
+    "leaf_id": "SYN6190397",
+    "used_generative": true,
+    "fallback_reason": null,
+    "text": "Marcus Webb confirmed the sample was within 370 hours of the limit. [CITE-306397]"
+  },
+  {
+    "leaf_id": "SYN7048733",
+    "used_generative": true,
+    "fallback_reason": null,
+    "text": "The lease was signed on 25 July 2020. [CITE-323202]"
+  },
+  {
+    "leaf_id": "SYN5961665",
+    "used_generative": true,
+    "fallback_reason": null,
+    "text": "The component assigned to Samuel Owusu reached 814 days. [CITE-146271] [CITE-146271]"
+  },
+  {
+    "leaf_id": "SYN8582748",
+    "used_generative": true,
+    "fallback_reason": null,
+    "text": "Ingrid Olsen confirmed the account was within 102 meters of the limit. [CITE-448717]"
+  },
+  {
+    "leaf_id": "SYN0163307",
+    "used_generative": true,
+    "fallback_reason": null,
+    "text": "The device assigned to Samuel Owusu reached 195 MPa. [CITE-240295]"
+  },
+  {
+    "leaf_id": "SYN1853686",
+    "used_generative": true,
+    "fallback_reason": null,
+    "text": "Fatima Khan noted that the component must not exceed 136 days. [CITE-844843]"
+  },
+  {
+    "leaf_id": "SYN6672004",
+    "used_generative": true,
+    "fallback_reason": null,
+    "text": "The lease was signed on 8 June 2021. [CITE-476834]"
+  },
+  {
+    "leaf_id": "SYN3317322",
+    "used_generative": true,
+    "fallback_reason": null,
+    "text": "Elena Petrova is the Guarantor. [CITE-640622]"
+  },
+  {
+    "leaf_id": "SYN4084648",
+    "used_generative": true,
+    "fallback_reason": null,
+    "text": "{\n    \"rewritten_sentence\": \"The rent is INR 2060. [CITE-616578]</div>} 616578 2060 2060 2060 2060 2060 2060 2060 2060 2060 2060 2060 2060 2060 2060 2060 2060} 2060 2060 2060 2060 2060 2060 2060"
+  },
+  {
+    "leaf_id": "SYN0834752",
+    "used_generative": true,
+    "fallback_reason": null,
+    "text": "Fatima Khan confirmed the account was within 531 MPa of the limit. [CITE-417352]"
+  },
+  {
+    "leaf_id": "SYN8504643",
+    "used_generative": true,
+    "fallback_reason": null,
+    "text": "The component assigned to Ingrid Olsen reached 877 liters. [CITE-859123]"
+  },
+  {
+    "leaf_id": "SYN2161287",
+    "used_generative": false,
+    "fallback_reason": [
+      "nli",
+      "citations"
+    ],
+    "text": "Synthetic\nJorge Alvarez measured the sample at 417 points. [CITE-977152]"
+  },
+  {
+    "leaf_id": "SYN7367856",
+    "used_generative": true,
+    "fallback_reason": null,
+    "text": "Marcus Webb confirmed the component was within 914 meters of the limit. [CITE-607969]"
+  },
+  {
+    "leaf_id": "SYN5361028",
+    "used_generative": true,
+    "fallback_reason": null,
+    "text": "Ingrid Olsen noted that the sample must not exceed 550 kg. [CITE-484932]"
+  },
+  {
+    "leaf_id": "SYN8315636",
+    "used_generative": true,
+    "fallback_reason": null,
+    "text": "Priya Nair noted that the component must not exceed 728 days. [CITE-934672]"
+  },
+  {
+    "leaf_id": "SYN3794320",
+    "used_generative": false,
+    "fallback_reason": [
+      "numbers",
+      "nli"
+    ],
+    "text": "Synthetic\nOn review, Priya Nair found the account's value at 21 meters. [CITE-789609]"
+  },
+  {
+    "leaf_id": "SYN4577304",
+    "used_generative": true,
+    "fallback_reason": null,
+    "text": "On review, Devon Clarke found the component's value at 662 percent. [CITE-613624] [CITE-613624]"
+  },
+  {
+    "leaf_id": "SYN5981432",
+    "used_generative": true,
+    "fallback_reason": null,
+    "text": "The Guarantor shall not assign this agreement unless the Lessee consents. [CITE-023589]"
+  },
+  {
+    "leaf_id": "SYN7080661",
+    "used_generative": true,
+    "fallback_reason": null,
+    "text": "The lease was signed on 13 April 2023. [CITE-237959]"
+  },
+  {
+    "leaf_id": "SYN7636629",
+    "used_generative": true,
+    "fallback_reason": null,
+    "text": "Devon Clarke noted that the account must not exceed 903 meters. [CITE-452804]"
+  },
+  {
+    "leaf_id": "SYN6729311",
+    "used_generative": true,
+    "fallback_reason": null,
+    "text": "The Lessor shall not alter the fixtures unless the Tenant consents. [CITE-863310]"
+  },
+  {
+    "leaf_id": "SYN7909312",
+    "used_generative": true,
+    "fallback_reason": null,
+    "text": "The notice period is 58 days. [CITE-756051]"
+  },
+  {
+    "leaf_id": "SYN9727038",
+    "used_generative": true,
+    "fallback_reason": null,
+    "text": "Devon Clarke confirmed the shipment was within 99 points of the limit. [CITE-624611]"
+  },
+  {
+    "leaf_id": "SYN3507145",
+    "used_generative": true,
+    "fallback_reason": null,
+    "text": "The lease was signed on 8 December 2023. [CITE-774503]"
+  },
+  {
+    "leaf_id": "SYN8335404",
+    "used_generative": true,
+    "fallback_reason": null,
+    "text": "Jorge Alvarez is the Guarantor. [CITE-693279]"
+  },
+  {
+    "leaf_id": "SYN0517079",
+    "used_generative": true,
+    "fallback_reason": null,
+    "text": "The cure period is 56 days. [CITE-290939]"
+  },
+  {
+    "leaf_id": "SYN0963304",
+    "used_generative": true,
+    "fallback_reason": null,
+    "text": "The Guarantor shall not remove the fittings unless the Landlord consents. [CITE-000955]"
+  },
+  {
+    "leaf_id": "SYN8545133",
+    "used_generative": true,
+    "fallback_reason": null,
+    "text": "Marcus Webb is the Tenant. [CITE-907218]"
+  },
+  {
+    "leaf_id": "SYN8623243",
+    "used_generative": true,
+    "fallback_reason": null,
+    "text": "The Landlord shall not alter the fixtures unless the Tenant consents. [CITE-236849]"
+  },
+  {
+    "leaf_id": "SYN3780059",
+    "used_generative": true,
+    "fallback_reason": null,
+    "text": "The lease was signed on 15 November 2024. [CITE-592174]"
+  },
+  {
+    "leaf_id": "SYN7962534",
+    "used_generative": true,
+    "fallback_reason": null,
+    "text": "The lease was signed on 11 September 2024. [CITE-355289]"
+  },
+  {
+    "leaf_id": "SYN7531202",
+    "used_generative": true,
+    "fallback_reason": null,
+    "text": "The Tenant shall not alter the fixtures unless the Lessor consents. [CITE-889632]"
+  },
+  {
+    "leaf_id": "SYN7311125",
+    "used_generative": true,
+    "fallback_reason": null,
+    "text": "The Guarantor shall not alter the fixtures unless the Lessee consents. [CITE-715289]"
+  },
+  {
+    "leaf_id": "SYN5541503",
+    "used_generative": true,
+    "fallback_reason": null,
+    "text": "Marcus Webb logged the batch at 193 percent. [CITE-567345]"
+  },
+  {
+    "leaf_id": "SYN2485294",
+    "used_generative": true,
+    "fallback_reason": null,
+    "text": "Alex Chen noted that the shipment must not exceed 909 points. [CITE-789006]"
+  },
+  {
+    "leaf_id": "SYN3860121",
+    "used_generative": true,
+    "fallback_reason": null,
+    "text": "The lease was signed on 15 July 2020. [CITE-420173]"
+  },
+  {
+    "leaf_id": "SYN6908902",
+    "used_generative": true,
+    "fallback_reason": null,
+    "text": "Ingrid Olsen is the Guarantor. [CITE-794636]"
+  },
+  {
+    "leaf_id": "SYN1443413",
+    "used_generative": true,
+    "fallback_reason": null,
+    "text": "The lease was signed on 25 October 2022. [CITE-974103]"
+  },
+  {
+    "leaf_id": "SYN7047848",
+    "used_generative": true,
+    "fallback_reason": null,
+    "text": "The lease was signed on 5 December 2024. [CITE-010968]"
+  },
+  {
+    "leaf_id": "SYN6973419",
+    "used_generative": true,
+    "fallback_reason": null,
+    "text": "Aiko Tanaka reported the device at 950 meters. [CITE-091605]"
+  },
+  {
+    "leaf_id": "SYN9034873",
+    "used_generative": false,
+    "fallback_reason": [
+      "nli"
+    ],
+    "text": "Synthetic\nThe rent is INR 98406. [CITE-385247]"
+  },
+  {
+    "leaf_id": "SYN7093037",
+    "used_generative": true,
+    "fallback_reason": null,
+    "text": "Fatima Khan noted that the sample must not exceed 180 liters. [CITE-968954]"
+  },
+  {
+    "leaf_id": "SYN7624971",
+    "used_generative": true,
+    "fallback_reason": null,
+    "text": "Ingrid Olsen confirmed the ticket was within 607 percent of the limit. [CITE-629626]"
+  },
+  {
+    "leaf_id": "SYN8243176",
+    "used_generative": false,
+    "fallback_reason": [
+      "numbers",
+      "nli",
+      "citations"
+    ],
+    "text": "Synthetic\nThe batch assigned to Priya Nair reached 152 percent. [CITE-736698]"
+  },
+  {
+    "leaf_id": "SYN9838100",
+    "used_generative": true,
+    "fallback_reason": null,
+    "text": "On review, Alex Chen found the batch's value at 280 kg. [CITE-765631] [CITE-765631]"
+  },
+  {
+    "leaf_id": "SYN4547690",
+    "used_generative": true,
+    "fallback_reason": null,
+    "text": "The lease was signed on 13 May 2022. [CITE-376299]"
+  },
+  {
+    "leaf_id": "SYN5674713",
+    "used_generative": false,
+    "fallback_reason": [
+      "numbers",
+      "nli"
+    ],
+    "text": "Synthetic\nThe batch assigned to Priya Nair reached 281 days. [CITE-739768]"
+  },
+  {
+    "leaf_id": "SYN2841218",
+    "used_generative": true,
+    "fallback_reason": null,
+    "text": "Ingrid Olsen noted that the device must not exceed 760 kg. [CITE-329275]"
+  },
+  {
+    "leaf_id": "SYN5671793",
+    "used_generative": true,
+    "fallback_reason": null,
+    "text": "The Landlord shall not alter the fixtures unless the Tenant consents. [CITE-661673]"
+  },
+  {
+    "leaf_id": "SYN2353863",
+    "used_generative": true,
+    "fallback_reason": null,
+    "text": "Marcus Webb noted that the module must not exceed 178 percent. [CITE-329727]"
+  },
+  {
+    "leaf_id": "SYN5826411",
+    "used_generative": true,
+    "fallback_reason": null,
+    "text": "The Tenant shall not alter the fixtures unless the Lessee consents. [CITE-977524]"
+  },
+  {
+    "leaf_id": "SYN4387723",
+    "used_generative": true,
+    "fallback_reason": null,
+    "text": "The module assigned to Samuel Owusu reached 799 meters. [CITE-161482] [CITE-161482]"
+  },
+  {
+    "leaf_id": "SYN5590505",
+    "used_generative": false,
+    "fallback_reason": [
+      "nli"
+    ],
+    "text": "Synthetic\nOn review, Priya Nair found the component's value at 895 meters. [CITE-036181]"
+  },
+  {
+    "leaf_id": "SYN4953160",
+    "used_generative": true,
+    "fallback_reason": null,
+    "text": "Jorge Alvarez confirmed the sample was within 536 percent of the limit. [CITE-166921]"
+  },
+  {
+    "leaf_id": "SYN5920598",
+    "used_generative": true,
+    "fallback_reason": null,
+    "text": "The lease was signed on 26 August 2022. [CITE-418582]"
+  },
+  {
+    "leaf_id": "SYN4536815",
+    "used_generative": true,
+    "fallback_reason": null,
+    "text": "The lease was signed on 4 February 2023. [CITE-069606]"
+  },
+  {
+    "leaf_id": "SYN9138232",
+    "used_generative": true,
+    "fallback_reason": null,
+    "text": "Fatima Khan confirmed the account was within 705 kg of the limit. [CITE-331138]"
+  },
+  {
+    "leaf_id": "SYN7519559",
+    "used_generative": true,
+    "fallback_reason": null,
+    "text": "The Lessor shall not sublet the premises unless the Lessee consents. [CITE-216822]"
+  },
+  {
+    "leaf_id": "SYN0032230",
+    "used_generative": true,
+    "fallback_reason": null,
+    "text": "Devon Clarke is the Lessee. [CITE-816696]"
+  },
+  {
+    "leaf_id": "SYN7007127",
+    "used_generative": true,
+    "fallback_reason": null,
+    "text": "The rent is INR 78664. [CITE-078790] [CITE-078790]"
+  },
+  {
+    "leaf_id": "SYN1476401",
+    "used_generative": true,
+    "fallback_reason": null,
+    "text": "The account assigned to Devon Clarke reached 495 MPa. [CITE-286592]"
+  },
+  {
+    "leaf_id": "SYN9888529",
+    "used_generative": true,
+    "fallback_reason": null,
+    "text": "On review, Devon Clarke found the component's value at 938 days. [CITE-144023] [CITE-144023]"
+  },
+  {
+    "leaf_id": "SYN5472385",
+    "used_generative": true,
+    "fallback_reason": null,
+    "text": "Ingrid Olsen logged the shipment at 148 days. [CITE-800440]"
+  },
+  {
+    "leaf_id": "SYN7599022",
+    "used_generative": true,
+    "fallback_reason": null,
+    "text": "The lease was signed on 17 February 2024. [CITE-168863]"
+  },
+  {
+    "leaf_id": "SYN2694126",
+    "used_generative": true,
+    "fallback_reason": null,
+    "text": "The grace period is 10 days. [CITE-645806]"
+  },
+  {
+    "leaf_id": "SYN0976327",
+    "used_generative": true,
+    "fallback_reason": null,
+    "text": "{\n    \"rewritten_sentence\": \"On review, Jorge Alvarez found the ticket's value at 675 days. [CITE-322140]} 322140} 675 days 322140} 675 days 322140} 675 days 322140} 675 days 322140} 675 days 322140} 675 days 322140} 675 days 322140} 675 days 322140} 675"
+  },
+  {
+    "leaf_id": "SYN5214998",
+    "used_generative": true,
+    "fallback_reason": null,
+    "text": "Aiko Tanaka confirmed the ticket was within 867 points of the limit. [CITE-427733]"
+  },
+  {
+    "leaf_id": "SYN1264154",
+    "used_generative": true,
+    "fallback_reason": null,
+    "text": "The security deposit is INR 77929. [CITE-506218]"
+  },
+  {
+    "leaf_id": "SYN7548210",
+    "used_generative": true,
+    "fallback_reason": null,
+    "text": "Jorge Alvarez submitted the sample at 446 kg. [CITE-076082]"
+  },
+  {
+    "leaf_id": "SYN4636874",
+    "used_generative": true,
+    "fallback_reason": null,
+    "text": "Fatima Khan is the Guarantor. [CITE-536609]"
+  },
+  {
+    "leaf_id": "SYN8820382",
+    "used_generative": true,
+    "fallback_reason": null,
+    "text": "Jorge Alvarez noted that the module must not exceed 236 MPa. [CITE-313403]"
+  },
+  {
+    "leaf_id": "SYN6992781",
+    "used_generative": true,
+    "fallback_reason": null,
+    "text": "The renewal term is 12 days. [CITE-763194]"
+  },
+  {
+    "leaf_id": "SYN1569181",
+    "used_generative": true,
+    "fallback_reason": null,
+    "text": "The sample assigned to Jorge Alvarez reached 681 kg. [CITE-227694]"
+  },
+  {
+    "leaf_id": "SYN7977340",
+    "used_generative": true,
+    "fallback_reason": null,
+    "text": "The Lessor shall not remove the fittings unless the Lessor consents. [CITE-093780]"
+  },
+  {
+    "leaf_id": "SYN4153552",
+    "used_generative": true,
+    "fallback_reason": null,
+    "text": "The lease was signed on February 25, 2025. [CITE-318651]"
+  }
+]

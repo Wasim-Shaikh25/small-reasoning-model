@@ -58,7 +58,7 @@
     "Extend the schema to also require restating each number as a separate enum-constrained field, to see if the remaining number-drop failure can be constrained away the same way citations were.",
     "Measure latency/overhead of structured-output decoding versus free-text generation, since grammar-constrained sampling is not free."
   ],
-  "elapsed_sec": 76.1722,
-  "peak_rss_mb": 147.25,
+  "elapsed_sec": 106.2533,
+  "peak_rss_mb": 147.0,
   "models_used": "gemma3:270m, the same local Ollama checkpoint EXP-063 measured. Rewriter role only, same fidelity gate, same fallback -- only the decoding mechanism for this comparison's second condition differs."
 }

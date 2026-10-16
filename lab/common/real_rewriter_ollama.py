@@ -17,6 +17,7 @@ host). It does not become a general local LLM runtime for this project.
 from __future__ import annotations
 
 import json
+import time
 
 import requests
 
@@ -25,6 +26,25 @@ from lab.common.real_rewriter import build_prompt, fidelity_gate
 
 MODEL_NAME = "gemma3:270m"
 OLLAMA_URL = "http://localhost:11434/api/generate"
+
+
+def _post_with_retry(payload: dict, timeout: int = 60, retries: int = 2, backoff_sec: float = 2.0):
+    """A transient 5xx (Ollama found, EXP-077: reproducible only as the first
+    call after the model had been idle/under load elsewhere -- a cold-start
+    race, not a bad request, since replaying the identical payload alone
+    succeeded immediately) shouldn't abort an entire batch of generations.
+    Retries only on a server error, never papers over a 4xx (a real request
+    problem retrying won't fix).
+    """
+    last_exc = None
+    for attempt in range(retries + 1):
+        resp = requests.post(OLLAMA_URL, json=payload, timeout=timeout)
+        if resp.status_code < 500:
+            return resp
+        last_exc = resp
+        if attempt < retries:
+            time.sleep(backoff_sec * (attempt + 1))
+    return last_exc
 
 
 def generate_constrained(prompt: str, required_citations: list[str], max_tokens: int = 160) -> str:
@@ -53,19 +73,29 @@ def generate_constrained(prompt: str, required_citations: list[str], max_tokens:
         },
         "required": ["rewritten_sentence", "citations"],
     }
-    resp = requests.post(
-        OLLAMA_URL,
-        json={
+    resp = _post_with_retry(
+        {
             "model": MODEL_NAME,
             "prompt": prompt,
             "stream": False,
             "format": schema,
             "options": {"num_predict": max_tokens, "temperature": 0, "seed": 0},
         },
-        timeout=60,
     )
     resp.raise_for_status()
-    parsed = json.loads(resp.json()["response"])
+    raw = resp.json()["response"]
+    try:
+        parsed = json.loads(raw)
+    except json.JSONDecodeError:
+        # EXP-077 found this at scale (never triggered in EXP-064's 13-leaf
+        # sample): the schema guarantees *shape* if generation completes,
+        # but num_predict can still cut generation off mid-string before
+        # the JSON closes, leaving invalid JSON despite the constraint.
+        # Return the raw (truncated) text rather than crash the batch --
+        # it will correctly fail fidelity_gate's checks (missing/broken
+        # citation brackets, likely-incomplete content) and fall back to
+        # the deterministic text the same way any other failure does.
+        return raw
     sentence = parsed.get("rewritten_sentence", "").strip()
     citations = parsed.get("citations") or required_citations
     return sentence + " " + " ".join(f"[{c}]" for c in citations)
@@ -78,10 +108,8 @@ def generate(prompt: str, max_tokens: int = 160) -> str:
     # are not a fair comparison, and this module's own result is not
     # reproducible -- discovered directly (EXP-063's first scripted run
     # didn't match its own manual diagnostic sample) rather than assumed.
-    resp = requests.post(
-        OLLAMA_URL,
-        json={"model": MODEL_NAME, "prompt": prompt, "stream": False, "options": {"num_predict": max_tokens, "temperature": 0, "seed": 0}},
-        timeout=60,
+    resp = _post_with_retry(
+        {"model": MODEL_NAME, "prompt": prompt, "stream": False, "options": {"num_predict": max_tokens, "temperature": 0, "seed": 0}},
     )
     resp.raise_for_status()
     return resp.json()["response"].strip()

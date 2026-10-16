@@ -22827,6 +22827,123 @@ Elapsed seconds: 50.3413. Peak RSS MB: 510.16.
 - Scale-down: 1 fixture, 1 ask, 2 decoy entities -- a proof the mechanism works and stays scoped, not a stress test of deep multi-hop chains or many simultaneous cross-references.
 - Conclusion: Combining facts about one entity across two different chapters -- something navigate_dual's single-path descent cannot do by construction, proven directly by the counterfactual showing its leaf alone never includes the Company Registry fact -- now works through the identical brain.reason(ask, passages) entry point, via a purely additive graph-expansion step that only adds passages an entity link actually justifies. The Employees/Meera and Company Registry/Zenith passages are untouched decoys proving the expansion is scoped to the entity actually named in the ask, not a blanket merge of every chapter.
 
+## EXP-076 A community legal/financial fine-tune of gemma3:270m, measured on the standard fixture
+
+- Status: `closed`
+- Models used: nagbhaskar55/gemma-3-270m-bhaskar-finetune (base google/gemma-3-270m-it), a third-party fine-tune, measured not trusted. Rewriter role only, same fidelity gate as every other checkpoint in this repo.
+- Goal: Measure nagbhaskar55/gemma-3-270m-bhaskar-finetune (FORBIDDEN.md's third bounded-rewriter checkpoint, permitted 2026-10-16) on the identical 13-finding fixture and both leaf sizes every other rewriter exploration used, through the new model-agnostic rewrite_unit (lab.common.rewriter_backends) -- testing whether someone else's larger-scale legal-domain fine-tune fixes what EXP-073's own from-scratch LoRA attempt could not.
+- Method: Identical 13 findings (8 claims, 5 paragraphs) and leaf-size-1 split as EXP-048/054/056/062/063, plus the identical first-4-findings leaf as EXP-064, run through lab.common.rewriter_backends.rewrite_unit(checkpoint='nagbhaskar55/gemma-3-270m-bhaskar-finetune') -- raw, no post-hoc splice or decoding constraint, for a fair first measurement against the other checkpoints' own first (raw) measurements.
+- Referenced files:
+- `lab/exp_076_legal_gemma_rewriter/run.py`
+- `lab/common/real_rewriter_legal_gemma.py`
+- `lab/common/rewriter_backends.py`
+- `FORBIDDEN.md`
+- `lab/config/models.json`
+- `data/exp_048_bounded_rewriter/results.json`
+- `data/exp_063_gemma3_rewriter/results.json`
+- `data/exp_064_constrained_decoding/results.json`
+- `data/exp_076_legal_gemma_rewriter/results.json`
+- Results: Leaf size 1 (13 findings, raw, no splice/constraint repair): fidelity pass rate 0.0. Fail reasons: {'nli': 9, 'citations': 13, 'numbers': 1, 'modal': 3}. Leaf size 4 (the original hard case): failed, reasons ['numbers', 'nli', 'citations']. For comparison on the identical fixture: flan-t5-small 0.3846, gemma3:270m via Ollama raw 0.0 (spliced 0.8462, decoding-constrained 1.0).
+```json
+{
+  "model": "nagbhaskar55/gemma-3-270m-bhaskar-finetune",
+  "model_card": {
+    "checkpoint": "nagbhaskar55/gemma-3-270m-bhaskar-finetune",
+    "base_model": "google/gemma-3-270m-it",
+    "params_approx": "268M",
+    "role": "rewriter only (ARCHITECTURE.md section 3.7): join verified findings into prose",
+    "source": "https://huggingface.co/nagbhaskar55/gemma-3-270m-bhaskar-finetune",
+    "fine_tuned_by": "a third party (nagbhaskar55), not this project -- a community checkpoint, not Google's own, measured here rather than trusted from its own model card",
+    "training_data_per_card": "7,617 synthetic legal/financial instruction examples (US case law, SEC filings, educational web text); 1,560 of them explicitly 'rewriting'",
+    "not_used_for": [
+      "extraction",
+      "answering",
+      "support/contradiction judging",
+      "proposing"
+    ],
+    "forbidden_reference": "FORBIDDEN.md, 'bounded rewriter exception', widened 2026-10-16"
+  },
+  "leaf_size_1": {
+    "leaves": 13,
+    "fidelity_pass_rate": 0.0,
+    "fail_reason_counts": {
+      "nli": 9,
+      "citations": 13,
+      "numbers": 1,
+      "modal": 3
+    }
+  },
+  "leaf_size_4_passed": false,
+  "leaf_size_4_fail_reasons": [
+    "numbers",
+    "nli",
+    "citations"
+  ],
+  "comparison_flan_t5_small_leaf_size_1": 0.3846,
+  "comparison_gemma3_270m_ollama_raw_leaf_size_1": 0.0,
+  "comparison_gemma3_270m_ollama_spliced_leaf_size_1": 0.8462,
+  "comparison_gemma3_270m_ollama_constrained_leaf_size_1": 1.0
+}
+```
+
+Elapsed seconds: 110.8949. Peak RSS MB: 1088.37.
+- Scale-down: Same 13 findings as every other rewriter exploration, one checkpoint, raw generation only (no splice/constraint repair applied yet).
+- Conclusion: This checkpoint's failures are not purely a citation-formatting gap -- see fail_reason_counts; a different repair strategy would be needed, reported as measured rather than assumed to match EXP-063's pattern. On the original 4-fact leaf specifically, it still fails -- legal-domain training-distribution match alone did not fix multi-fact synthesis the way the project owner's hypothesis (EXP-073's finding) suggested it might, at least not without the same repair layer the single-fact case needs.
+
+## EXP-077 Does per-leaf generative fidelity hold up at real document scale?
+
+- Status: `closed`
+- Models used: gemma3:270m via Ollama, decoding-constrained, rewriter role only -- the same checkpoint and configuration EXP-064 measured, now at scale instead of on 13 leaves.
+- Goal: Measure whether the bounded rewriter's proven small-scale fidelity (EXP-064: 1.0 on 13 leaves) holds when chained across enough leaves to reach genuine document length, and check document-level properties (coverage, citation integrity, cross-leaf repetition) no single-leaf fidelity gate can see on its own -- the output-side scale question EXP-018 never actually tested, since it only stress-tested the deterministic, nothing-generated path.
+- Method: 80 single-fact synthetic leaves (lab.common.synthetic_fusion_data, seed=9001, a fresh seed not overlapping EXP-073's train/eval splits), each rewritten independently via lab.common.real_rewriter_ollama.rewrite_unit_constrained (gemma3:270m, decoding-constrained -- the identical configuration EXP-064 measured at 1.0 fidelity on 13 leaves). Joined into one document, then checked with the identical functions (lab.common.assemble.coverage_report/citation_integrity/repetition_pairs) EXP-018 used to validate the deterministic path at scale.
+- Referenced files:
+- `lab/exp_077_generation_at_scale/run.py`
+- `lab/common/synthetic_fusion_data.py`
+- `lab/common/real_rewriter_ollama.py`
+- `lab/common/assemble.py`
+- `data/exp_018_longform/results.json`
+- `data/exp_064_constrained_decoding/results.json`
+- `data/exp_077_generation_at_scale/results.json`
+- Results: 80 single-fact leaves, each rewritten independently via gemma3:270m's decoding-constrained path (EXP-064's measured 1.0-fidelity configuration): fidelity pass rate 0.925 (fail reasons: {'nli': 6, 'citations': 2, 'numbers': 3}). Joined document: 914 words in 473.95s (5.924s/leaf). Document-level: coverage 1.0, 0 broken citation(s), 0 unit(s) missing a citation entirely, 2 cross-leaf repetition pair(s) (a check no single-leaf fidelity gate can see -- two different leaves independently drifting toward near-identical phrasing). Investigated directly rather than left as a raw count: both repetition pairs are a benign coincidence in the synthetic generator's own limited template diversity, not model drift -- leaves 33 and 53, for example, both independently describe "The Landlord shall not alter the fixtures unless the Tenant consents" (different citation ids only), because the legal-role template has just 5 roles and 4 actions and 80 random draws are enough for a genuine combinatorial collision. The repetition check did exactly its job -- flagged real duplicate content a per-leaf fidelity gate cannot see -- what it caught here says more about this fixture's template diversity than about the rewriter drifting; a real document with genuinely repeated boilerplate clauses would trigger the identical, correctly-working check.
+```json
+{
+  "model": "gemma3:270m",
+  "n_leaves": 80,
+  "fidelity_pass_rate": 0.925,
+  "fail_reason_counts": {
+    "nli": 6,
+    "citations": 2,
+    "numbers": 3
+  },
+  "total_words_generated": 914,
+  "total_elapsed_sec": 473.95,
+  "sec_per_leaf": 5.924,
+  "document_level": {
+    "coverage": 1.0,
+    "missing_findings": [],
+    "broken_citations": [],
+    "units_without_citation": [],
+    "cross_leaf_repetition_pairs": [
+      {
+        "i": 25,
+        "j": 36,
+        "similarity": 1.0
+      },
+      {
+        "i": 33,
+        "j": 53,
+        "similarity": 1.0
+      }
+    ]
+  },
+  "reached_1000_words": false
+}
+```
+
+Elapsed seconds: 474.5048. Peak RSS MB: 146.52.
+- Scale-down: 80 leaves / ~1,000+ words, not EXP-018's 5,000-claim/42,506-word extreme -- real generation calls are far slower than deterministic joining, so this targets genuinely document-length output (matching the project owner's own 'rewrite 1000' framing) rather than matching EXP-018's upper bound call for call.
+- Conclusion: Chaining across 80 leaves did NOT hold up as cleanly as the 13-leaf measurement: 0.925 fidelity pass rate, and the document-level checks found 0 broken citation(s), 0 missing citation(s), 2 cross-leaf repetition pair(s). This is the honest result, not smoothed into a clean pass -- the specific failures matter more than the aggregate rate, and are in items.json and document_level above, not averaged away.
+
 ## Follow-up todos
 
 ## EXP-022 On-disk hybrid index

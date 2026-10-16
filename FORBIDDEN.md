@@ -5,27 +5,38 @@ These are prohibited at any cost, including for a demo, a test, a fixture, or a 
 ## No generative language models, with one narrow, bounded exception
 
 Do not use an LLM or any pure generative language model of any size, **except**
-a small local FLAN-T5/T5 checkpoint (project owner's call, 2026-10-14), or a
+a small local FLAN-T5/T5 checkpoint (project owner's call, 2026-10-14), a
 small local Gemma 3 checkpoint run via Ollama (project owner's call,
 2026-10-15, to test whether a different small checkpoint handles the
 rewriter role more faithfully than flan-t5-small measured in EXP-048/054/056/062),
-used **only** as the rewriter in section 3.7 of the blueprint: joining and
+or, as of 2026-10-16, a community checkpoint already fine-tuned by someone
+else on legal/financial data,
+[`nagbhaskar55/gemma-3-270m-bhaskar-finetune`](https://huggingface.co/nagbhaskar55/gemma-3-270m-bhaskar-finetune)
+(base `google/gemma-3-270m-it`, 268M params, ungated, Gemma Terms of Use
+carried downstream) -- added specifically to test the project owner's
+question of whether training-distribution style match (not just more
+epochs or a higher LoRA rank, EXP-073's own finding) is what was missing,
+using someone else's already-completed, larger-scale fine-tune rather than
+retraining ourselves. This is a downloaded checkpoint, not a hosted API:
+weights are fetched once from HuggingFace and run entirely locally
+afterward, same as every other checkpoint in this exception. Used **only**
+as the rewriter in section 3.7 of the blueprint: joining and
 grammar-correcting sentences that another, non-generative component has
 already extracted and verified. The exception does not reopen anything else,
-and does not make Ollama or any other local runtime available for any other
-use.
+and does not make Ollama, HuggingFace downloads, or any other local runtime
+available for any other use.
 
 - No pretrained or hosted LLM for any role except the bounded rewriter below.
 - No GPT-style generative model.
 - No API call to OpenAI, Anthropic, Google, Cohere, Mistral, Groq, Together, Hugging Face inference, or any similar endpoint. The bounded rewriter is a local checkpoint, never an API call. Ollama, when used, must run fully local (no `ollama run` against a remote host, no cloud-hosted Ollama); the one-time model pull is the only network access it makes.
-- No local generative runtime beyond the bounded rewriter: llama.cpp, vLLM, CTranslate2 generation, or any GPT-2 / Llama / Mistral checkpoint are still fully forbidden. Ollama is allowed **only** to run the one named small Gemma 3 checkpoint below, **only** in the rewriter role — not as a general local LLM runtime, not for any other checkpoint.
+- No local generative runtime beyond the bounded rewriter: llama.cpp, vLLM, CTranslate2 generation, or any GPT-2 / Llama / Mistral checkpoint are still fully forbidden. Ollama is allowed **only** to run the one named small Gemma 3 checkpoint below, **only** in the rewriter role — not as a general local LLM runtime, not for any other checkpoint. `nagbhaskar55/gemma-3-270m-bhaskar-finetune` runs via `transformers` (like `flan-t5-small`), not Ollama -- it does not widen what Ollama may run.
 - Do not ask another agent or chat product to generate the answer text that this system would attribute to evidence.
 
 ### The bounded rewriter exception, in full
 
 This exception exists so verified findings can be joined into flowing prose instead of a bulleted list of cited sentences (`ARCHITECTURE.md` sections 3.7 and 3.10), while every other hard constraint in section 1 of `ARCHITECTURE.md` still holds. All of the following must be true, or the exception does not apply and the deterministic fallback (`lab/common/assemble.py`, unchanged) is used instead:
 
-- **Small checkpoint only.** `flan-t5-small` (or a comparably small T5 checkpoint, roughly under 300M parameters), **or**, as of 2026-10-15, `gemma3:270m` run locally via Ollama (also roughly under 300M parameters, same size ceiling, same role). Not `flan-t5-base`, not `flan-t5-large`, not a larger Gemma 3 variant, not any other non-T5/non-Gemma-3-270m generative model, without a separate, explicit decision recorded here. The two checkpoints are measured side by side on the same fidelity gate and fixtures (EXP-048/054/056/062 for FLAN-T5-small; see the matching Gemma 3 exploration once it exists) -- this entry does not declare a winner, it records that both are permitted to be tried.
+- **Small checkpoint only.** `flan-t5-small` (or a comparably small T5 checkpoint, roughly under 300M parameters); `gemma3:270m` run locally via Ollama (also roughly under 300M parameters, same size ceiling, same role); or, as of 2026-10-16, `nagbhaskar55/gemma-3-270m-bhaskar-finetune` (268M params, same ceiling, downloaded once from HuggingFace and run locally via transformers). Not `flan-t5-base`, not `flan-t5-large`, not a larger Gemma 3 variant, not any other checkpoint, without a separate, explicit decision recorded here. All three are measured on the identical fidelity gate and fixtures (EXP-048/054/056/062 for FLAN-T5-small; EXP-063/064 for gemma3:270m; EXP-076 for the legal-tuned checkpoint) -- this entry does not declare a winner, it records that all three are permitted to be tried.
 - **Rewriter role only, never proposer, extractor, or judge.** It receives a batch of already-verified `(statement, citation)` findings and a style instruction, and returns prose covering only those findings. It is never given raw retrieved passages to search, never asked to answer a question, decide a fact, or judge support/contradiction. Extraction stays on the lexical QA extractor (and, when reachable, a real non-generative extractive QA encoder); verification stays on the NLI judge (and, when reachable, a real NLI encoder). A generative model never grades its own output.
 - **Fidelity-gated.** Every rewrite is checked before use: every number, date, name, and amount in the input must appear in the output; `not/no/shall/may/must/unless/except/only/provided` must not change; input and output must entail each other both ways; every citation marker must survive. On any failure, the rewrite is discarded and the deterministic verbatim-findings text (`lab/common/assemble.py`'s current behavior) is returned instead. This is `ARCHITECTURE.md` section 3.7's fidelity validator, not a new invention.
 - **No new facts, ever.** If a rewrite introduces a name, number, date, or claim absent from its input findings, that is a fidelity failure, not a style choice, and is rejected.
