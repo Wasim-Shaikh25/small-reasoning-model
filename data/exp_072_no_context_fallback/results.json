@@ -1,0 +1,59 @@
+{
+  "id": "EXP-072",
+  "title": "The no-context fallback, and the boundary that keeps it from swallowing real abstention",
+  "status": "closed",
+  "goal": "Prove lab.common.open_domain's no-context fallback (FORBIDDEN.md, 2026-10-16) answers correctly and visibly-disclaimed when passages is genuinely empty, and -- the more important check -- that a real retrieval miss (passages given, none relevant) is completely unaffected and still abstains the original way.",
+  "method": "3 genuinely-no-context asks through brain.reason(ask, []), checked for decision=='ungrounded', the fixed disclaimer prefix, and no fabricated citation marker. 1 retrieval-miss case (passages given, ask about something not in them) checked against the unchanged pre-existing abstain behavior. 1 genuine evidence-grounded case as a regression check on the existing path.",
+  "metrics": {
+    "no_context": {
+      "n": 3,
+      "correct": 3,
+      "cases": [
+        {
+          "ask": "What is the capital of France?",
+          "decision": "ungrounded",
+          "text": "[Not grounded in any provided evidence -- general knowledge only.] The capital of France is Paris.",
+          "has_disclaimer": true,
+          "has_fabricated_citation": false,
+          "correct": true
+        },
+        {
+          "ask": "What is the boiling point of water in Celsius?",
+          "decision": "ungrounded",
+          "text": "[Not grounded in any provided evidence -- general knowledge only.] The boiling point of water is 100°C.",
+          "has_disclaimer": true,
+          "has_fabricated_citation": false,
+          "correct": true
+        },
+        {
+          "ask": "Who wrote the play Romeo and Juliet?",
+          "decision": "ungrounded",
+          "text": "[Not grounded in any provided evidence -- general knowledge only.] The play Romeo and Juliet was written by William Shakespeare.",
+          "has_disclaimer": true,
+          "has_fabricated_citation": false,
+          "correct": true
+        }
+      ]
+    },
+    "retrieval_miss_still_abstains": true,
+    "genuine_case_unaffected": true
+  },
+  "results_prose": "No-context fallback: 3/3 asks correctly answered with decision='ungrounded', the fixed disclaimer, and no fabricated citation marker. The boundary check: a real retrieval miss (passages given, none relevant) still correctly abstains (decision='inconclusive'). The existing evidence-grounded path is unaffected (decision='supported', text='30 days [B1]').",
+  "conclusion": "The no-context fallback works and, critically, stays exactly where FORBIDDEN.md's exception draws the line: a genuinely empty passages list gets an explicitly disclaimed, ungrounded answer, while a real retrieval miss -- passages were given, just none of them relevant -- still abstains exactly as it did before this branch existed. The two cases are structurally distinguished (checked before any retrieval runs, not by a confidence score), so there is no way for a struggling retrieval to slide into the ungrounded path and dodge abstention.",
+  "scale_down": "3 no-context asks, 1 retrieval-miss case, 1 genuine case -- enough to prove the mechanism and its boundary, not a broad open-domain QA benchmark.",
+  "referenced_files": [
+    "lab/exp_072_no_context_fallback/run.py",
+    "lab/common/open_domain.py",
+    "lab/common/brain.py",
+    "lab/common/prompt_contract.py",
+    "FORBIDDEN.md",
+    "data/exp_072_no_context_fallback/results.json"
+  ],
+  "follow_ups": [
+    "Only gemma3:270m via Ollama tested for this role; flan-t5-small (also permitted by the exception) not yet measured here.",
+    "The citation-marker rejection has only been exercised when the model happens not to fabricate one; a case that reliably provokes a fabricated marker (to prove the rejection actually fires) has not been constructed."
+  ],
+  "elapsed_sec": 62.5396,
+  "peak_rss_mb": 508.27,
+  "models_used": "gemma3:270m via Ollama, in the new no-context role (FORBIDDEN.md 2026-10-16) -- not the rewriter role, a third, separate, narrowly-scoped generative use."
+}

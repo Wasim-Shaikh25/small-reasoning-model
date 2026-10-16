@@ -1,0 +1,138 @@
+{
+  "ask": "Where does Ravi Sharma live, and in which city is his employer registered?",
+  "decision": "supported",
+  "text": "ABC Pvt Ltd is registered in Mumbai under company number 55021. [R1]. Ravi Sharma, MG Road [E1].",
+  "trace": [
+    {
+      "step": "analyze_ask",
+      "task_type": "lookup",
+      "subquestions": [
+        "What is Where does Ravi Sharma live,?",
+        "What is in which city is his employer registered?"
+      ]
+    },
+    {
+      "step": "nested_navigate",
+      "path": [
+        {
+          "level": "chapter",
+          "chosen": "Employees",
+          "chosen_id": "Employees",
+          "lexical_dense": 0.4002,
+          "lexical_margin": 0.1486,
+          "lexical_abstain": false,
+          "semantic_margin": 0.209,
+          "semantic_abstain": false,
+          "candidates_considered": 2
+        },
+        {
+          "level": "section",
+          "chosen": "Ravi",
+          "chosen_id": "Employees/Ravi",
+          "lexical_dense": 0.6758,
+          "lexical_margin": 0.6758,
+          "lexical_abstain": false,
+          "semantic_margin": 0.2513,
+          "semantic_abstain": false,
+          "candidates_considered": 2
+        }
+      ],
+      "abstain_reason": null
+    },
+    {
+      "step": "graph_expand",
+      "entity": "Ravi Sharma",
+      "added_passage_ids": [
+        "R1"
+      ],
+      "path": [
+        {
+          "hop": 0,
+          "entity": "Ravi Sharma",
+          "via": null
+        },
+        {
+          "hop": 1,
+          "entity": "ABC Pvt Ltd",
+          "via": "Ravi Sharma"
+        }
+      ]
+    },
+    {
+      "step": "graph_expand_lookup",
+      "entity": "Ravi Sharma",
+      "span": "ABC Pvt Ltd is registered in Mumbai under company number 55021.",
+      "passage_id": "R1"
+    },
+    {
+      "step": "intent_signal",
+      "signal": "identity",
+      "fires": true,
+      "score": 0.7248,
+      "tau": 0.5971
+    },
+    {
+      "step": "extract_identity",
+      "name": "Ravi Sharma",
+      "address_road": "MG Road"
+    },
+    {
+      "step": "intent_signal",
+      "signal": "total",
+      "fires": false,
+      "score": 0.489,
+      "tau": 0.6084
+    }
+  ],
+  "nav_step": {
+    "step": "nested_navigate",
+    "path": [
+      {
+        "level": "chapter",
+        "chosen": "Employees",
+        "chosen_id": "Employees",
+        "lexical_dense": 0.4002,
+        "lexical_margin": 0.1486,
+        "lexical_abstain": false,
+        "semantic_margin": 0.209,
+        "semantic_abstain": false,
+        "candidates_considered": 2
+      },
+      {
+        "level": "section",
+        "chosen": "Ravi",
+        "chosen_id": "Employees/Ravi",
+        "lexical_dense": 0.6758,
+        "lexical_margin": 0.6758,
+        "lexical_abstain": false,
+        "semantic_margin": 0.2513,
+        "semantic_abstain": false,
+        "candidates_considered": 2
+      }
+    ],
+    "abstain_reason": null
+  },
+  "graph_step": {
+    "step": "graph_expand",
+    "entity": "Ravi Sharma",
+    "added_passage_ids": [
+      "R1"
+    ],
+    "path": [
+      {
+        "hop": 0,
+        "entity": "Ravi Sharma",
+        "via": null
+      },
+      {
+        "hop": 1,
+        "entity": "ABC Pvt Ltd",
+        "via": "Ravi Sharma"
+      }
+    ]
+  },
+  "single_path_only_leaf_passages": [
+    "E1",
+    "E2"
+  ]
+}

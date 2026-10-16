@@ -1,0 +1,518 @@
+[
+  {
+    "fixture": "governance_agm",
+    "kind": "exact",
+    "ask": "What is the AGM authorization PIN for board members?",
+    "abstained": false,
+    "outcome": "correct",
+    "correct": true,
+    "path": [
+      {
+        "level": "chapter",
+        "chosen": "Governance",
+        "chosen_id": "Governance",
+        "lexical_dense": 0.0323,
+        "lexical_margin": 0.0323,
+        "lexical_abstain": false,
+        "semantic_margin": 0.1666,
+        "semantic_abstain": false,
+        "candidates_considered": 3
+      },
+      {
+        "level": "section",
+        "chosen": "Governance-1",
+        "chosen_id": "Governance/Governance-1",
+        "lexical_dense": 0.1428,
+        "lexical_margin": 0.1428,
+        "lexical_abstain": false,
+        "semantic_margin": 0.1693,
+        "semantic_abstain": false,
+        "candidates_considered": 3
+      }
+    ],
+    "abstain_reason": null
+  },
+  {
+    "fixture": "governance_agm",
+    "kind": "paraphrase",
+    "ask": "What's the annual shareholder meeting access code for directors?",
+    "abstained": false,
+    "outcome": "correct",
+    "correct": true,
+    "path": [
+      {
+        "level": "chapter",
+        "chosen": "Governance",
+        "chosen_id": "Governance",
+        "lexical_dense": 0.3324,
+        "lexical_margin": 0.3324,
+        "lexical_abstain": false,
+        "semantic_margin": 0.1126,
+        "semantic_abstain": false,
+        "candidates_considered": 3
+      },
+      {
+        "level": "section",
+        "chosen": "Governance-1",
+        "chosen_id": "Governance/Governance-1",
+        "lexical_dense": 0.2673,
+        "lexical_margin": 0.0,
+        "lexical_abstain": true,
+        "semantic_margin": 0.0403,
+        "semantic_abstain": false,
+        "candidates_considered": 3
+      }
+    ],
+    "abstain_reason": null
+  },
+  {
+    "fixture": "governance_agm",
+    "kind": "off_topic",
+    "ask": "What is the weather forecast for tomorrow?",
+    "abstained": true,
+    "outcome": "correct_abstain",
+    "correct": true,
+    "path": [],
+    "abstain_reason": "neither lexical nor semantic retrieval found a confident chapter (lexical dense 0.0000, margin 0.0000; semantic margin 0.0146)"
+  },
+  {
+    "fixture": "governance_agm",
+    "kind": "off_topic",
+    "ask": "What's the best recipe for banana bread?",
+    "abstained": true,
+    "outcome": "correct_abstain",
+    "correct": true,
+    "path": [],
+    "abstain_reason": "neither lexical nor semantic retrieval found a confident chapter (lexical dense 0.0000, margin 0.0000; semantic margin 0.0029)"
+  },
+  {
+    "fixture": "governance_agm",
+    "kind": "off_topic",
+    "ask": "How do I train for a marathon?",
+    "abstained": true,
+    "outcome": "correct_abstain",
+    "correct": true,
+    "path": [
+      {
+        "level": "chapter",
+        "chosen": "Safety Policy",
+        "chosen_id": "Safety Policy",
+        "lexical_dense": 0.0,
+        "lexical_margin": 0.0,
+        "lexical_abstain": true,
+        "semantic_margin": 0.0484,
+        "semantic_abstain": false,
+        "candidates_considered": 3
+      }
+    ],
+    "abstain_reason": "neither lexical nor semantic retrieval found a confident section (lexical dense 0.0000, margin 0.0000; semantic margin 0.0011)"
+  },
+  {
+    "fixture": "finance_quorum",
+    "kind": "exact",
+    "ask": "What is the violet quorum code for the annual general meeting?",
+    "abstained": false,
+    "outcome": "correct",
+    "correct": true,
+    "path": [
+      {
+        "level": "chapter",
+        "chosen": "Finance",
+        "chosen_id": "Finance",
+        "lexical_dense": 0.0363,
+        "lexical_margin": 0.0363,
+        "lexical_abstain": false,
+        "semantic_margin": 0.0031,
+        "semantic_abstain": true,
+        "candidates_considered": 3
+      },
+      {
+        "level": "section",
+        "chosen": "Finance-2",
+        "chosen_id": "Finance/Finance-2",
+        "lexical_dense": 0.1561,
+        "lexical_margin": 0.1561,
+        "lexical_abstain": false,
+        "semantic_margin": 0.2406,
+        "semantic_abstain": false,
+        "candidates_considered": 3
+      }
+    ],
+    "abstain_reason": null
+  },
+  {
+    "fixture": "finance_quorum",
+    "kind": "paraphrase",
+    "ask": "What's the special color-coded access number required at the yearly shareholders' gathering?",
+    "abstained": false,
+    "outcome": "correct",
+    "correct": true,
+    "path": [
+      {
+        "level": "chapter",
+        "chosen": "Finance",
+        "chosen_id": "Finance",
+        "lexical_dense": 0.0,
+        "lexical_margin": 0.0,
+        "lexical_abstain": true,
+        "semantic_margin": 0.0489,
+        "semantic_abstain": false,
+        "candidates_considered": 3
+      },
+      {
+        "level": "section",
+        "chosen": "Finance-2",
+        "chosen_id": "Finance/Finance-2",
+        "lexical_dense": 0.0,
+        "lexical_margin": 0.0,
+        "lexical_abstain": true,
+        "semantic_margin": 0.09,
+        "semantic_abstain": false,
+        "candidates_considered": 3
+      }
+    ],
+    "abstain_reason": null
+  },
+  {
+    "fixture": "finance_quorum",
+    "kind": "off_topic",
+    "ask": "What is the weather forecast for tomorrow?",
+    "abstained": true,
+    "outcome": "correct_abstain",
+    "correct": true,
+    "path": [],
+    "abstain_reason": "neither lexical nor semantic retrieval found a confident chapter (lexical dense 0.0000, margin 0.0000; semantic margin 0.0146)"
+  },
+  {
+    "fixture": "finance_quorum",
+    "kind": "off_topic",
+    "ask": "What's the best recipe for banana bread?",
+    "abstained": true,
+    "outcome": "correct_abstain",
+    "correct": true,
+    "path": [],
+    "abstain_reason": "neither lexical nor semantic retrieval found a confident chapter (lexical dense 0.0000, margin 0.0000; semantic margin 0.0214)"
+  },
+  {
+    "fixture": "finance_quorum",
+    "kind": "off_topic",
+    "ask": "How do I train for a marathon?",
+    "abstained": true,
+    "outcome": "correct_abstain",
+    "correct": true,
+    "path": [
+      {
+        "level": "chapter",
+        "chosen": "Safety Policy",
+        "chosen_id": "Safety Policy",
+        "lexical_dense": 0.0,
+        "lexical_margin": 0.0,
+        "lexical_abstain": true,
+        "semantic_margin": 0.0631,
+        "semantic_abstain": false,
+        "candidates_considered": 3
+      }
+    ],
+    "abstain_reason": "neither lexical nor semantic retrieval found a confident section (lexical dense 0.0000, margin 0.0000; semantic margin 0.0011)"
+  },
+  {
+    "fixture": "it_security",
+    "kind": "exact",
+    "ask": "What is the emergency override password for the server room?",
+    "abstained": false,
+    "outcome": "correct",
+    "correct": true,
+    "path": [
+      {
+        "level": "chapter",
+        "chosen": "IT Security",
+        "chosen_id": "IT Security",
+        "lexical_dense": 0.171,
+        "lexical_margin": 0.171,
+        "lexical_abstain": false,
+        "semantic_margin": 0.1988,
+        "semantic_abstain": false,
+        "candidates_considered": 3
+      },
+      {
+        "level": "section",
+        "chosen": "IT Security-0",
+        "chosen_id": "IT Security/IT Security-0",
+        "lexical_dense": 0.1994,
+        "lexical_margin": 0.1263,
+        "lexical_abstain": false,
+        "semantic_margin": 0.1352,
+        "semantic_abstain": false,
+        "candidates_considered": 3
+      }
+    ],
+    "abstain_reason": null
+  },
+  {
+    "fixture": "it_security",
+    "kind": "paraphrase",
+    "ask": "What's the backup access phrase for the data center in a crisis?",
+    "abstained": false,
+    "outcome": "correct",
+    "correct": true,
+    "path": [
+      {
+        "level": "chapter",
+        "chosen": "IT Security",
+        "chosen_id": "IT Security",
+        "lexical_dense": 0.0,
+        "lexical_margin": 0.0,
+        "lexical_abstain": true,
+        "semantic_margin": 0.1085,
+        "semantic_abstain": false,
+        "candidates_considered": 3
+      },
+      {
+        "level": "section",
+        "chosen": "IT Security-0",
+        "chosen_id": "IT Security/IT Security-0",
+        "lexical_dense": 0.0,
+        "lexical_margin": 0.0,
+        "lexical_abstain": true,
+        "semantic_margin": 0.0558,
+        "semantic_abstain": false,
+        "candidates_considered": 3
+      }
+    ],
+    "abstain_reason": null
+  },
+  {
+    "fixture": "it_security",
+    "kind": "off_topic",
+    "ask": "What is the weather forecast for tomorrow?",
+    "abstained": true,
+    "outcome": "correct_abstain",
+    "correct": true,
+    "path": [],
+    "abstain_reason": "neither lexical nor semantic retrieval found a confident chapter (lexical dense 0.0000, margin 0.0000; semantic margin 0.0275)"
+  },
+  {
+    "fixture": "it_security",
+    "kind": "off_topic",
+    "ask": "What's the best recipe for banana bread?",
+    "abstained": true,
+    "outcome": "correct_abstain",
+    "correct": true,
+    "path": [],
+    "abstain_reason": "neither lexical nor semantic retrieval found a confident chapter (lexical dense 0.0000, margin 0.0000; semantic margin 0.0007)"
+  },
+  {
+    "fixture": "it_security",
+    "kind": "off_topic",
+    "ask": "How do I train for a marathon?",
+    "abstained": true,
+    "outcome": "correct_abstain",
+    "correct": true,
+    "path": [
+      {
+        "level": "chapter",
+        "chosen": "Travel Policy",
+        "chosen_id": "Travel Policy",
+        "lexical_dense": 0.0,
+        "lexical_margin": 0.0,
+        "lexical_abstain": true,
+        "semantic_margin": 0.0433,
+        "semantic_abstain": false,
+        "candidates_considered": 3
+      }
+    ],
+    "abstain_reason": "neither lexical nor semantic retrieval found a confident section (lexical dense 0.0000, margin 0.0000; semantic margin 0.0049)"
+  },
+  {
+    "fixture": "research_lab",
+    "kind": "exact",
+    "ask": "What is the cold-storage freezer's backup unlock sequence?",
+    "abstained": false,
+    "outcome": "correct",
+    "correct": true,
+    "path": [
+      {
+        "level": "chapter",
+        "chosen": "Biosafety",
+        "chosen_id": "Biosafety",
+        "lexical_dense": 0.0346,
+        "lexical_margin": 0.0346,
+        "lexical_abstain": false,
+        "semantic_margin": 0.0361,
+        "semantic_abstain": false,
+        "candidates_considered": 3
+      },
+      {
+        "level": "section",
+        "chosen": "Biosafety-1",
+        "chosen_id": "Biosafety/Biosafety-1",
+        "lexical_dense": 0.1561,
+        "lexical_margin": 0.1561,
+        "lexical_abstain": false,
+        "semantic_margin": 0.1479,
+        "semantic_abstain": false,
+        "candidates_considered": 3
+      }
+    ],
+    "abstain_reason": null
+  },
+  {
+    "fixture": "research_lab",
+    "kind": "paraphrase",
+    "ask": "What's the emergency code to open the specimen fridge if the main lock fails?",
+    "abstained": false,
+    "outcome": "correct",
+    "correct": true,
+    "path": [
+      {
+        "level": "chapter",
+        "chosen": "Biosafety",
+        "chosen_id": "Biosafety",
+        "lexical_dense": 0.3249,
+        "lexical_margin": 0.3249,
+        "lexical_abstain": false,
+        "semantic_margin": 0.0944,
+        "semantic_abstain": false,
+        "candidates_considered": 3
+      },
+      {
+        "level": "section",
+        "chosen": "Biosafety-1",
+        "chosen_id": "Biosafety/Biosafety-1",
+        "lexical_dense": 0.2673,
+        "lexical_margin": 0.0,
+        "lexical_abstain": true,
+        "semantic_margin": 0.0753,
+        "semantic_abstain": false,
+        "candidates_considered": 3
+      }
+    ],
+    "abstain_reason": null
+  },
+  {
+    "fixture": "research_lab",
+    "kind": "off_topic",
+    "ask": "What is the weather forecast for tomorrow?",
+    "abstained": true,
+    "outcome": "correct_abstain",
+    "correct": true,
+    "path": [],
+    "abstain_reason": "neither lexical nor semantic retrieval found a confident chapter (lexical dense 0.0000, margin 0.0000; semantic margin 0.0163)"
+  },
+  {
+    "fixture": "research_lab",
+    "kind": "off_topic",
+    "ask": "What's the best recipe for banana bread?",
+    "abstained": true,
+    "outcome": "correct_abstain",
+    "correct": true,
+    "path": [],
+    "abstain_reason": "neither lexical nor semantic retrieval found a confident chapter (lexical dense 0.0000, margin 0.0000; semantic margin 0.0168)"
+  },
+  {
+    "fixture": "research_lab",
+    "kind": "off_topic",
+    "ask": "How do I train for a marathon?",
+    "abstained": true,
+    "outcome": "correct_abstain",
+    "correct": true,
+    "path": [],
+    "abstain_reason": "neither lexical nor semantic retrieval found a confident chapter (lexical dense 0.0000, margin 0.0000; semantic margin 0.0080)"
+  },
+  {
+    "fixture": "logistics_hub",
+    "kind": "exact",
+    "ask": "What is the bonded warehouse's gate release token?",
+    "abstained": false,
+    "outcome": "correct",
+    "correct": true,
+    "path": [
+      {
+        "level": "chapter",
+        "chosen": "Warehousing",
+        "chosen_id": "Warehousing",
+        "lexical_dense": 0.03,
+        "lexical_margin": 0.03,
+        "lexical_abstain": false,
+        "semantic_margin": 0.0966,
+        "semantic_abstain": false,
+        "candidates_considered": 3
+      },
+      {
+        "level": "section",
+        "chosen": "Warehousing-2",
+        "chosen_id": "Warehousing/Warehousing-2",
+        "lexical_dense": 0.1378,
+        "lexical_margin": 0.1378,
+        "lexical_abstain": false,
+        "semantic_margin": 0.1486,
+        "semantic_abstain": false,
+        "candidates_considered": 3
+      }
+    ],
+    "abstain_reason": null
+  },
+  {
+    "fixture": "logistics_hub",
+    "kind": "paraphrase",
+    "ask": "What's the entry pass needed to open the secure storage yard's gate?",
+    "abstained": false,
+    "outcome": "correct",
+    "correct": true,
+    "path": [
+      {
+        "level": "chapter",
+        "chosen": "Warehousing",
+        "chosen_id": "Warehousing",
+        "lexical_dense": 0.0134,
+        "lexical_margin": 0.0134,
+        "lexical_abstain": false,
+        "semantic_margin": 0.0396,
+        "semantic_abstain": false,
+        "candidates_considered": 3
+      },
+      {
+        "level": "section",
+        "chosen": "Warehousing-2",
+        "chosen_id": "Warehousing/Warehousing-2",
+        "lexical_dense": 0.0616,
+        "lexical_margin": 0.0616,
+        "lexical_abstain": false,
+        "semantic_margin": 0.0477,
+        "semantic_abstain": false,
+        "candidates_considered": 3
+      }
+    ],
+    "abstain_reason": null
+  },
+  {
+    "fixture": "logistics_hub",
+    "kind": "off_topic",
+    "ask": "What is the weather forecast for tomorrow?",
+    "abstained": true,
+    "outcome": "correct_abstain",
+    "correct": true,
+    "path": [],
+    "abstain_reason": "neither lexical nor semantic retrieval found a confident chapter (lexical dense 0.0000, margin 0.0000; semantic margin 0.0063)"
+  },
+  {
+    "fixture": "logistics_hub",
+    "kind": "off_topic",
+    "ask": "What's the best recipe for banana bread?",
+    "abstained": true,
+    "outcome": "correct_abstain",
+    "correct": true,
+    "path": [],
+    "abstain_reason": "neither lexical nor semantic retrieval found a confident chapter (lexical dense 0.0000, margin 0.0000; semantic margin 0.0069)"
+  },
+  {
+    "fixture": "logistics_hub",
+    "kind": "off_topic",
+    "ask": "How do I train for a marathon?",
+    "abstained": true,
+    "outcome": "correct_abstain",
+    "correct": true,
+    "path": [],
+    "abstain_reason": "neither lexical nor semantic retrieval found a confident chapter (lexical dense 0.0000, margin 0.0000; semantic margin 0.0049)"
+  }
+]

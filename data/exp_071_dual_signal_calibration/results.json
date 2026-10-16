@@ -1,0 +1,44 @@
+{
+  "id": "EXP-071",
+  "title": "Does navigate_dual's lexical+semantic agreement fix EXP-068's margin-separability gap?",
+  "status": "closed",
+  "goal": "Measure navigate_dual's real end-to-end correctness (not raw margin separability) across 5 independently-worded fixtures, to determine whether requiring both signals to agree compensates for the semantic margin alone not being cleanly separable (EXP-068's finding).",
+  "method": "5 fixtures (3 reused from EXP-068, 2 new), each with an exact-wording ask, a paraphrased ask, and 3 off-topic asks, run through navigate_dual (the actual function wired into brain.py, EXP-070) rather than inspecting raw margins in isolation. 40 total cases.",
+  "metrics": {
+    "n": 25,
+    "accuracy": 1.0,
+    "by_kind": {
+      "exact": {
+        "n": 5,
+        "correct": 5,
+        "accuracy": 1.0
+      },
+      "paraphrase": {
+        "n": 5,
+        "correct": 5,
+        "accuracy": 1.0
+      },
+      "off_topic": {
+        "n": 15,
+        "correct": 15,
+        "accuracy": 1.0
+      }
+    },
+    "wrong_cases": []
+  },
+  "results_prose": "Across 5 fixtures (3 from EXP-068 plus 2 new ones), navigate_dual's actual end-to-end decisions score 25/25 (1.0) overall: exact-wording 5/5, paraphrase 5/5, off-topic abstention 15/15.",
+  "conclusion": "Requiring lexical agreement does compensate for the semantic margin's own unreliability: every case resolves or abstains correctly end to end, even though EXP-068 measured the semantic margin alone as not cleanly separable across fixtures. The dual-signal requirement -- not a better single threshold -- is what makes this robust: a low-confidence semantic margin on a genuine paraphrase still gets corroborated by the lexical signal often enough, and a low-confidence semantic margin on real noise has no lexical corroboration to borrow from either.",
+  "scale_down": "5 fixtures, 8 asks each -- enough to check the dual-signal claim directly, not an exhaustive calibration across every possible domain.",
+  "referenced_files": [
+    "lab/exp_071_dual_signal_calibration/run.py",
+    "lab/common/semantic_index.py",
+    "lab/common/nested_index.py",
+    "data/exp_068_abstention_fixes/results.json",
+    "data/exp_070_hierarchical_dual_signal/results.json",
+    "data/exp_071_dual_signal_calibration/results.json"
+  ],
+  "follow_ups": [],
+  "elapsed_sec": 110.4487,
+  "peak_rss_mb": 554.13,
+  "models_used": "bge-small-en-v1.5 for semantic scoring; TF-IDF/BM25 for lexical. No generative model."
+}

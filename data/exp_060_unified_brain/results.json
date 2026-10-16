@@ -116,7 +116,7 @@
     "Wire lab.common.brain.reason as the entry point lab.common.engine.run_task's callers would use, so the controller's own round/budget loop (EXP-001) and this brain's signal-chaining converge into one thing instead of two.",
     "Add long-form dispatch (lab.common.assemble) as a fifth signal -- 'does the ask want a document, not a short answer' -- so EXP-018/042/048/054/055/056's page-wise path is reachable from the same entry point too."
   ],
-  "elapsed_sec": 29.9131,
-  "peak_rss_mb": 557.14,
+  "elapsed_sec": 50.7908,
+  "peak_rss_mb": 594.22,
   "models_used": "No generative model. Every step is a previously-measured classical/deterministic primitive; this module's only new code is the control flow that chains them."
 }

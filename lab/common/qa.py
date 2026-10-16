@@ -41,10 +41,14 @@ AMOUNT_RE = re.compile(
     # unit right after a number) -- see lab.common.entities.AMOUNT_RE for
     # the full rationale, identical here. (?-i: ...) keeps the two
     # capitalization lookaheads case-sensitive despite the outer re.I.
-    r"\b(?:INR|USD|Rs\.?)\s?\d[\d,]*(?:\.\d+)?\b"
-    r"|[$€£]\s?\d[\d,]*(?:\.\d+)?\b"
-    r"|\b\d[\d,]*(?:\.\d+)?\s?(?:percent|%)\b"
-    r"|\b\d[\d,]*(?:\.\d+)?\s?(?!" + _AMOUNT_UNIT_STOPWORDS + r"\b)(?-i:(?![A-Z][a-z]+\b))[A-Za-z]{1,7}\b(?-i:(?!\s+[A-Z]))",
+    # (?:\d[\d,]*\d|\d), not \d[\d,]*: a comma inside the number must be
+    # followed by another digit (a real thousands separator), never an
+    # ordinary trailing punctuation comma -- see lab.common.entities.AMOUNT_RE
+    # for the "TC-19, taken" false positive this fixes.
+    r"\b(?:INR|USD|Rs\.?)\s?(?:\d[\d,]*\d|\d)(?:\.\d+)?\b"
+    r"|[$€£]\s?(?:\d[\d,]*\d|\d)(?:\.\d+)?\b"
+    r"|\b(?:\d[\d,]*\d|\d)(?:\.\d+)?\s?(?:percent|%)\b"
+    r"|\b(?:\d[\d,]*\d|\d)(?:\.\d+)?\s?(?!" + _AMOUNT_UNIT_STOPWORDS + r"\b)(?-i:(?![A-Z][a-z]+\b))[A-Za-z]{1,7}\b(?-i:(?!\s+[A-Z]))",
     re.I,
 )
 

@@ -32,6 +32,17 @@ This exception exists so verified findings can be joined into flowing prose inst
 - **Measured, not assumed.** Any exploration using the bounded rewriter reports exactly which checkpoint ran, the fidelity pass/fail rate, and the fallback rate, the same as every other exploration in `EXPLORATIONS.md`.
 - **Reversible.** If measurement shows the fidelity failure rate is unacceptable, the exception is withdrawn and the deterministic fallback becomes the only path again.
 
+### Offline LoRA fine-tuning of the bounded rewriter (project owner's call, 2026-10-16)
+
+The rewriter exception above covers using a pretrained checkpoint as-is. Fine-tuned weights are a different artifact and need their own explicit permission, not an inference by analogy -- granted here, narrowly:
+
+- **Same checkpoint, same role, nothing else widened.** Only a LoRA adapter on top of one of the two checkpoints already named above (`flan-t5-small` or `gemma3:270m`), used only in the rewriter role, under every constraint already listed (fidelity-gated, no new facts, measured, reversible). This does not permit full fine-tuning (all weights), a larger base checkpoint, or fine-tuning for any role other than the rewriter.
+- **Training data must be synthetic and deterministically generated**, by code in this repo, never scraped or drawn from real documents -- so this can never become a backdoor for "No private or real personal data" or "No facts from background alone". The generator and its output are checked into `data/`, same as any other exploration's fixture.
+- **Offline only, before any answering, not "at inference time."** This is the distinction the "No weight updates at inference time" rule below is actually drawing: that rule forbids the system updating its own weights *while answering a question* (the kind of online "learning" that would be unverified and ungated). A LoRA adapter trained once, offline, as its own measured exploration, with a frozen base checkpoint and a before/after fidelity comparison, is not that -- it is a deliberate, reviewed, one-time change to which checkpoint gets loaded, exactly like choosing `gemma3:270m` over `flan-t5-small` already was.
+- **`gemma3:270m` on HuggingFace is gate-restricted** (manual license acceptance); this environment has no HF credentials that have accepted it, and none were obtained to work around that. `flan-t5-small` is used for this fine-tuning instead -- it is the original bounded-rewriter checkpoint, ungated, and EXP-048/054/056/062 already measured the identical multi-fact-synthesis failure on it, so it is a faithful substitute for the question being tested, not a different one. This substitution is logged here, not silent; if Gemma access is ever obtained, the same recipe should be retried there before assuming the result transfers.
+- **Measured against the same fixture the failure was found on**, not a new, easier one: EXP-048/054/062/064's 4-fact-leaf case, the one every non-fine-tuning approach tried so far (retry loops, decoding constraints) failed to fix.
+- **Reversible, same as the base exception.** If the fine-tuned adapter doesn't measurably improve the fidelity pass rate on held-out cases, it is not adopted and the unmodified checkpoint remains the only path.
+
 Encoder checkpoints named in the blueprint (DeBERTa, GLiNER, BERT-NER, bge) are still not loaded in this POC. The explorations use classical substitutes, or, where reachable, real non-generative pretrained substitutes (see `lab/common/real_models.py`), and say so either way. A later experiment may train a small head or a span tagger only on labels stored in this repository. Outside the one bounded rewriter exception above, nothing here may download or call a generative model.
 
 ## No fabricated measurements
@@ -40,11 +51,21 @@ Do not invent accuracy, latency, memory, or human ratings. If a run did not happ
 
 ## No weight updates at inference time
 
-"Learning" means retrieve missing context and read it again, or store a verified example. Do not fine-tune, adapt, or edit model weights while answering.
+"Learning" means retrieve missing context and read it again, or store a verified example. Do not fine-tune, adapt, or edit model weights while answering. This is about *when*: weight changes during the act of answering a question are forbidden, full stop, regardless of role. It does not conflict with the one narrow offline exception above (LoRA fine-tuning of the bounded rewriter, done once before any answering, as its own measured exploration with a frozen result) -- that happens entirely outside any answering loop, the same way choosing which pretrained checkpoint to load does.
 
 ## No facts from background alone
 
 A model's prior, a hardcoded trivia table, or a contributor's memory is not evidence. If the context disagrees with it, the context wins. If the context is silent, abstain or mark the term unresolved. Do not guess a definition from weights or from the background table.
+
+### Narrow exception: genuinely empty context (project owner's call, 2026-10-16)
+
+Everything above still holds the instant any context is supplied, including when retrieval ran and found nothing relevant -- that stays abstention (`ABSTAIN_TEXT`), unchanged. The one new, separate thing permitted: when `lab.common.brain.reason` is called with **no passages at all** (`passages` is empty or `None` -- not "retrieval returned nothing," a structurally different, upstream case: there was nothing to retrieve from), it may answer from the bounded checkpoint's own pretrained knowledge instead of abstaining. This is a third generative role, distinct from the rewriter exception above, and does not reuse or widen it:
+
+- **Triggers only on a literally empty passages list**, checked before retrieval runs, not when retrieval runs and comes up short. A caller cannot reach this path by feeding an ask that merely fails to match real content.
+- **The output is never attributed as evidence.** `decision` is `"ungrounded"` -- a third value, never `"supported"` -- and the returned text always carries a fixed, visible prefix stating it is not grounded in any provided evidence. Nothing downstream may treat this text as a citable finding.
+- **No fidelity gate is possible here** (there is nothing to check faithfulness against), so the one thing enforced instead: the output must not contain a citation marker (`[...]`) at all -- a bracketed citation here would be fabricated, not evidence, and is rejected outright rather than shown.
+- **Still never the proposer/extractor/judge roles.** It answers directly; it is not searching, deciding a contested fact, or judging support/contradiction between two things.
+- **Measured and reversible**, same as the rewriter exception: the exploration that adds this reports exactly which checkpoint answered and how often the no-citation check itself had to reject an output; if that rejection rate is high, the exception is withdrawn and a plain abstain becomes the only path again, same as before this existed.
 
 ## Retrieved text is data
 

@@ -59,7 +59,7 @@
     "Only tested 2-level hierarchy; a 3+ level tree would exercise the dual-signal check at more levels in sequence, not yet tried.",
     "SEMANTIC_SINGLE_FLOOR=0.5 (the fix for the single-candidate gap found here) is a first measured value from a handful of samples, the same unvalidated-constant caveat MIN_SEMANTIC_MARGIN carries -- it has not had its own EXP-068-style sweep across independent fixtures."
   ],
-  "elapsed_sec": 15.4621,
-  "peak_rss_mb": 506.09,
+  "elapsed_sec": 34.8767,
+  "peak_rss_mb": 513.15,
   "models_used": "bge-small-en-v1.5 for the semantic signal (retrieval only); TF-IDF/BM25 for the lexical signal. No generative model."
 }

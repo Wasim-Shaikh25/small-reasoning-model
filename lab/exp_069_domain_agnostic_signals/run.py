@@ -146,11 +146,11 @@ ENGINEERING_PASSAGES = [
     {"id": "E1a", "group": "E1", "text": "Engineer Arjun Mehta is based at the Pune fabrication site, 31 Industrial Estate Road."},
     {"id": "E1b", "group": "E1", "text": "Arjun Mehta inspected turbine component TC-12."},
     {"id": "E1c", "group": "E1", "text": "The first reading on TC-12 recorded a stress of 80 MPa."},
-    {"id": "E1d", "group": "E1", "text": "A follow-up reading on TC-12 recorded an additional stress of 60 MPa."},
+    {"id": "E1d", "group": "E1", "text": "A follow-up reading on TC-12, taken last month, recorded an additional stress of 60 MPa."},
     {"id": "E2a", "group": "E2", "text": "Engineer Fatima Khan is based at the Baroda fabrication site, 4 Industrial Estate Road."},
     {"id": "E2b", "group": "E2", "text": "Fatima Khan inspected turbine component TC-19."},
     {"id": "E2c", "group": "E2", "text": "The first reading on TC-19 recorded a stress of 150 MPa."},
-    {"id": "E2d", "group": "E2", "text": "A follow-up reading on TC-19 recorded an additional stress of 110 MPa."},
+    {"id": "E2d", "group": "E2", "text": "A follow-up reading on TC-19, taken last week, recorded an additional stress of 110 MPa."},
     {"id": "E_POLICY", "text": "Engineering policy: if a component's cumulative stress reading exceeds 250 MPa, the part must be replaced."},
 ]
 ENGINEERING_ASK = (

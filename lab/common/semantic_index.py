@@ -40,6 +40,42 @@ MIN_SEMANTIC_MARGIN = 0.03
 # first measured value, not a validated constant.
 SEMANTIC_SINGLE_FLOOR = 0.5
 
+# EXP-071 found a real gap in the "disagree -> always abstain" rule: lexical
+# can clear MIN_DENSE_SCORE (technically nonzero) while its top1-vs-top2 gap
+# is pure noise -- measured directly on a real failure (governance_agm's
+# paraphrase case): dense scores of 0.2673/0.2640/0.2673 across 3 sections,
+# a top1-vs-top2 margin of 0.0033, because every section's summary shares
+# the same chapter-level filler vocabulary and the ask shares none of the
+# needle's own distinguishing words. Lexical wasn't confident about *which*
+# section -- it was just nonzero everywhere -- and that spurious "agreement"
+# requirement vetoed a semantic signal that was genuinely decisive (margin
+# 0.1126). Giving lexical the same margin-based confidence check already
+# used for semantic, not just an absolute floor, fixes this: a technically
+# positive but indecisive lexical score no longer counts as "lexical is
+# confident" in the disagreement check below. First measured value, not
+# swept across many fixtures -- same caveat as MIN_SEMANTIC_MARGIN.
+MIN_LEXICAL_MARGIN = 0.01
+
+
+def dense_margin(hits: list[dict]) -> float:
+    """The real top1-vs-runner-up gap in *dense* score, not whatever gap
+    happens to exist between hits[0] and hits[1] as Index.search ranks them.
+
+    Index.search sorts by the blended hybrid score (dense and sparse
+    combined), not by dense alone -- so the hybrid-ranked runner-up is not
+    reliably the second-highest *dense* score. Comparing hits[0]["dense"]
+    to hits[1]["dense"] directly can come out negative (EXP-071 found this
+    exact bug: the hybrid-top candidate's own dense score was lower than
+    the hybrid-runner-up's), which would make MIN_LEXICAL_MARGIN's check
+    always fail regardless of whether dense itself was actually decisive.
+    `hits` must already include every real candidate (call search with
+    top_k=len(candidates), not top_k=2) for this to re-rank correctly.
+    """
+    dense_sorted = sorted((h["dense"] for h in hits), reverse=True)
+    if len(dense_sorted) < 2:
+        return dense_sorted[0] if dense_sorted else 0.0
+    return dense_sorted[0] - dense_sorted[1]
+
 
 class SemanticIndex:
     def __init__(self, passages: list[dict]):
@@ -206,9 +242,17 @@ def navigate_dual(ask: str, root, min_dense_score: float = MIN_DENSE_SCORE, min_
             node = chosen
             continue
 
-        lexical_hits = Index(candidates).search(ask, top_k=2)
+        # top_k=len(candidates): dense_margin needs every candidate's dense
+        # score to re-rank correctly, not just the top 2 by hybrid score.
+        lexical_hits = Index(candidates).search(ask, top_k=len(candidates))
         semantic_hits = SemanticIndex(candidates).search(ask, top_k=2)
-        lexical_abstain = lexical_hits[0]["dense"] < min_dense_score
+        lexical_margin = dense_margin(lexical_hits)
+        # "Confident" requires clearing the floor (there's some real match at
+        # all) AND a real margin over the runner-up (it isn't just generic
+        # vocabulary every candidate shares, EXP-071) -- a floor alone let a
+        # technically-nonzero, actually-noise lexical score veto a decisive
+        # semantic one.
+        lexical_abstain = lexical_hits[0]["dense"] < min_dense_score or lexical_margin < MIN_LEXICAL_MARGIN
         semantic_margin = semantic_hits[0]["score"] - semantic_hits[1]["score"]
         semantic_abstain = semantic_margin < min_margin
         lexical_top_id = lexical_hits[0]["passage"]["id"]
@@ -219,7 +263,7 @@ def navigate_dual(ask: str, root, min_dense_score: float = MIN_DENSE_SCORE, min_
                 "path": trace,
                 "leaf": None,
                 "leaf_passages": [],
-                "abstain_reason": f"neither lexical nor semantic retrieval found a confident {child_level} (lexical dense {lexical_hits[0]['dense']:.4f}, semantic margin {semantic_margin:.4f})",
+                "abstain_reason": f"neither lexical nor semantic retrieval found a confident {child_level} (lexical dense {lexical_hits[0]['dense']:.4f}, margin {lexical_margin:.4f}; semantic margin {semantic_margin:.4f})",
             }
         if not lexical_abstain and not semantic_abstain and lexical_top_id != semantic_top_id:
             return {
@@ -237,6 +281,7 @@ def navigate_dual(ask: str, root, min_dense_score: float = MIN_DENSE_SCORE, min_
                 "chosen": chosen.title,
                 "chosen_id": chosen.node_id,
                 "lexical_dense": round(lexical_hits[0]["dense"], 4),
+                "lexical_margin": round(lexical_margin, 4),
                 "lexical_abstain": lexical_abstain,
                 "semantic_margin": round(semantic_margin, 4),
                 "semantic_abstain": semantic_abstain,

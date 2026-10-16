@@ -87,10 +87,18 @@ AMOUNT_RE = re.compile(
     # and "percent") -- (?-i: ...) scopes that locally; without it, re.I
     # makes [A-Z]/[a-z] both match any case and the whole distinction this
     # comment describes silently stops doing anything.
-    r"\b(?:INR|USD|Rs\.?)\s?\d[\d,]*(?:\.\d+)?\b"
-    r"|[$€£]\s?\d[\d,]*(?:\.\d+)?\b"
-    r"|\b\d[\d,]*(?:\.\d+)?\s?(?:percent|%)\b"
-    r"|\b\d[\d,]*(?:\.\d+)?\s?(?!" + _AMOUNT_UNIT_STOPWORDS + r"\b)(?-i:(?![A-Z][a-z]+\b))[A-Za-z]{1,7}\b(?-i:(?!\s+[A-Z]))",
+    #
+    # The number pattern (?:\d[\d,]*\d|\d) -- not \d[\d,]* -- requires any
+    # comma inside the number to be followed by another digit, so it only
+    # absorbs a real thousands separator ("25,000") and never an ordinary
+    # trailing punctuation comma. Found missing (EXP-069/070) when
+    # "TC-19, taken" matched as the amount "19" (unit "taken") -- \d[\d,]*
+    # happily consumed the comma after a component ID with nothing on the
+    # other side needing to be a digit at all.
+    r"\b(?:INR|USD|Rs\.?)\s?(?:\d[\d,]*\d|\d)(?:\.\d+)?\b"
+    r"|[$€£]\s?(?:\d[\d,]*\d|\d)(?:\.\d+)?\b"
+    r"|\b(?:\d[\d,]*\d|\d)(?:\.\d+)?\s?(?:percent|%)\b"
+    r"|\b(?:\d[\d,]*\d|\d)(?:\.\d+)?\s?(?!" + _AMOUNT_UNIT_STOPWORDS + r"\b)(?-i:(?![A-Z][a-z]+\b))[A-Za-z]{1,7}\b(?-i:(?!\s+[A-Z]))",
     re.I,
 )
 STREET_RE = re.compile(

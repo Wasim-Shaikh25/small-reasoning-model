@@ -19,6 +19,15 @@ at once and chains their results. Same function, same code path, every time;
 the input decides how much of it is used, not a label chosen for the input
 ahead of time.
 
+One case sits outside that signal-chain entirely and is checked first: zero
+passages at all (FORBIDDEN.md's narrow exception, 2026-10-16). That is not
+"no signal fired" -- it is "there was nothing to check a signal against" --
+so it never reaches the evidence-grounded path below, and it never returns
+`decision == "supported"`, only the new `"ungrounded"` value, with a fixed
+visible disclaimer. lab.common.open_domain, not this module, does the
+actual answering; this function only enforces exactly when that path is
+reachable.
+
 Identity/total detection used to be two literal keyword checks (a fixed
 TOTAL_CUES word list; "name" + "address" as literal substrings) plus a
 dependency on lab.common.ask's task_type classifier, which itself used to
@@ -41,6 +50,9 @@ Every tool this calls is a primitive already built and separately measured:
   - lab.common.nested_index.build_nested_index: builds the tree a
     structured document (a "hierarchy" tag) navigates level by level,
     EXP-065; navigate_dual (above) does the actual level-by-level descent.
+  - lab.common.graph_index: entity co-occurrence graph, EXP-075, for
+    combining facts about one named entity across groups/chapters the
+    single-path flat/hierarchical resolution above can't reach by design.
   - lab.common.entities: name/address extraction, EXP-009.
   - lab.common.calc: arithmetic, EXP-007/014.
   - lab.common.rules: verb-trigger and threshold rule application,
@@ -59,12 +71,13 @@ from __future__ import annotations
 from lab.common.ask import analyze
 from lab.common.calc import sum_amounts
 from lab.common.entities import AMOUNT_RE, detect_primary, parse_address
+from lab.common.graph_index import build_entity_graph, expand_from_entity
 from lab.common.index import Index
 from lab.common.intent_signals import wants_identity, wants_total
 from lab.common.nested_index import MIN_DENSE_SCORE, build_nested_index
 from lab.common.qa import answer_with_agreement
 from lab.common.rules import apply_rule, apply_threshold_rule, extract_fact_triple, parse_conditional_rule, parse_threshold_rule
-from lab.common.semantic_index import MIN_SEMANTIC_MARGIN, SemanticIndex, navigate_dual
+from lab.common.semantic_index import MIN_LEXICAL_MARGIN, MIN_SEMANTIC_MARGIN, SemanticIndex, navigate_dual
 from lab.common.textutil import normalize
 from lab.common.verify import quote_check
 
@@ -94,8 +107,50 @@ def _role_matches(rule: dict, passages: list[dict]) -> bool:
     return role_noun in full_text
 
 
+def _group_margin(hits: list[dict], score_key: str) -> float:
+    """The real top-group-vs-runner-up-group gap, not whatever gap exists
+    between the top 2 individual *passages*.
+
+    Flat disambiguation's candidates are passages, but the actual decision
+    is which GROUP the ask is about, and a group can have several
+    passages. If the top 2 passages by score both happen to belong to the
+    same (correct) group -- expected, even desirable, since that group's
+    passages should score similarly -- comparing hits[0] against hits[1]
+    directly measures within-group noise, not the real separation from a
+    competing group, and can come out tiny or zero even when that group
+    decisively beats every other one (EXP-069 found this exact case: two
+    E2 passages tied for the top dense score, margin computed as 0.0,
+    even though E2 clearly outscored E1 overall). Takes each group's best
+    score, then the gap between the best group and the runner-up group.
+    `hits` must include every passage (top_k=len(story_passages)) for this
+    to see every group's best score, not just the top couple of passages.
+    """
+    best_by_group: dict = {}
+    for hit in hits:
+        group = hit["passage"].get("group")
+        value = hit[score_key]
+        if group not in best_by_group or value > best_by_group[group]:
+            best_by_group[group] = value
+    scores = sorted(best_by_group.values(), reverse=True)
+    if len(scores) < 2:
+        return scores[0] if scores else 0.0
+    return scores[0] - scores[1]
+
+
 def reason(ask: str, passages: list[dict]) -> dict:
     trace = []
+    if not passages:
+        # FORBIDDEN.md's narrow exception, recorded 2026-10-16: literally no
+        # passages at all (not "retrieval found nothing" -- that is a
+        # different, later case, and still abstains the existing way). The
+        # checked-but-empty case never reaches this branch; it is checked
+        # before anything else runs, precisely so it can never be reached by
+        # feeding an ask that merely fails to match real content.
+        from lab.common.open_domain import answer_from_general_knowledge
+
+        result = answer_from_general_knowledge(ask)
+        trace.append({"step": "no_context_fallback", "fallback_reason": result["fallback_reason"]})
+        return _finish(ask, trace, result["decision"], result["text"], set())
     plan = analyze(ask)
     trace.append({"step": "analyze_ask", "task_type": plan["task_type"], "subquestions": plan["subquestions"]})
 
@@ -148,13 +203,25 @@ def reason(ask: str, passages: list[dict]) -> dict:
         # case either signal is equipped to resolve alone -- abstain rather
         # than pick a winner arbitrarily.
         story_passages = [p for p in passages if p.get("group")]
-        lexical_hits = Index(story_passages).search(ask, top_k=2)
-        semantic_hits = SemanticIndex(story_passages).search(ask, top_k=2)
+        # top_k=len(...) for both signals: the margin checks below need
+        # every passage's score, in every group, to find each group's best
+        # score -- not just the top couple of passages overall, which can
+        # all belong to one group (EXP-069's regression -- see
+        # _group_margin's docstring).
+        lexical_hits = Index(story_passages).search(ask, top_k=len(story_passages))
+        semantic_hits = SemanticIndex(story_passages).search(ask, top_k=len(story_passages))
         if not lexical_hits or not semantic_hits:
             return _finish(ask, trace, "inconclusive", ABSTAIN_TEXT, citations, reason="no passage matched the ask")
 
-        lexical_abstain = lexical_hits[0]["dense"] < MIN_DENSE_SCORE
-        semantic_margin = semantic_hits[0]["score"] - semantic_hits[1]["score"] if len(semantic_hits) > 1 else semantic_hits[0]["score"]
+        # lexical_abstain also requires a real margin over the runner-up
+        # *group*, not just clearing the floor (EXP-071) and not just the
+        # gap between the top 2 individual passages (EXP-069: those can
+        # both be the correct group's own passages, understating how
+        # decisive that group really is). _group_margin takes each group's
+        # best score first, then compares group to group.
+        lexical_margin = _group_margin(lexical_hits, "dense")
+        lexical_abstain = lexical_hits[0]["dense"] < MIN_DENSE_SCORE or lexical_margin < MIN_LEXICAL_MARGIN
+        semantic_margin = _group_margin(semantic_hits, "score")
         semantic_abstain = semantic_margin < MIN_SEMANTIC_MARGIN
         lexical_group = lexical_hits[0]["passage"].get("group")
         semantic_group = semantic_hits[0]["passage"].get("group")
@@ -164,6 +231,7 @@ def reason(ask: str, passages: list[dict]) -> dict:
                 "step": "disambiguate",
                 "lexical_group": lexical_group,
                 "lexical_dense": round(lexical_hits[0]["dense"], 4),
+                "lexical_margin": round(lexical_margin, 4),
                 "lexical_abstain": lexical_abstain,
                 "semantic_group": semantic_group,
                 "semantic_margin": round(semantic_margin, 4),
@@ -181,8 +249,59 @@ def reason(ask: str, passages: list[dict]) -> dict:
         citations.add(matched["id"])
         scoped = [p for p in passages if p.get("group") == resolved_group]
 
+    # Cross-reference expansion (lab.common.graph_index, EXP-075): the one
+    # gap neither the flat nor the hierarchical path above can close by
+    # design -- each commits to one group/leaf and returns only its
+    # passages, so a fact about the same named entity living in a
+    # *different* group/chapter (e.g. the company a resolved person works
+    # for, documented in its own separate section) is never reachable.
+    # Purely additive and classical: if the ask names a person/org that
+    # the entity graph also finds connected to passages outside the
+    # already-resolved scope, those are unioned in, never removed from or
+    # substituted for what was already resolved. Does nothing when no
+    # named entity is in the ask, or when expansion finds nothing new --
+    # the existing single-path resolution above is still what does the
+    # real work for every ask that doesn't need this.
     facts: dict = {}
     answer_parts: list[str] = []
+
+    ask_entities = [m["text"] for m in detect_primary(ask) if m["label"] in ("person", "organization")]
+    if ask_entities:
+        graph = build_entity_graph(passages)
+        passages_by_id = {p["id"]: p for p in passages}
+        scoped_ids = {p["id"] for p in scoped}
+        for entity_text in ask_entities:
+            expansion = expand_from_entity(entity_text, graph, passages_by_id, max_hops=2)
+            new_passages = [p for p in expansion["passages"] if p["id"] not in scoped_ids]
+            if new_passages:
+                scoped = scoped + new_passages
+                scoped_ids.update(p["id"] for p in new_passages)
+                trace.append({"step": "graph_expand", "entity": entity_text, "added_passage_ids": [p["id"] for p in new_passages], "path": expansion["path"]})
+                # Surfacing, not just widening: a fact in a newly-added
+                # passage otherwise sits in scope but never reaches the
+                # answer unless another signal (identity/total/rule)
+                # happens to also cover it -- measured directly in EXP-075,
+                # where the registry fact was correctly added to scope but
+                # silently dropped from the answer text until this lookup
+                # was added. Same extractor and same quote_check the final
+                # lookup_fallback below uses, just run against only the
+                # newly-added passages so it answers the specific
+                # cross-referenced sub-question, not the whole ask again.
+                # tau is deliberately lower than the main lookup_fallback's
+                # 0.34: that threshold guards against pulling a span from an
+                # irrelevant passage among many candidates, a risk that
+                # doesn't apply here -- new_passages already passed the
+                # entity-graph relevance check, so a weaker lexical overlap
+                # with the full compound ask (measured directly, EXP-075:
+                # score 0.1442, well under 0.34) doesn't mean the content is
+                # off-topic, just that the ask's other half (about a
+                # different fact) dilutes the match.
+                cross_ref = answer_with_agreement(ask, new_passages, tau=0.1)
+                cross_ref_text = next((p["text"] for p in new_passages if p["id"] == cross_ref.get("passage_id")), "")
+                if cross_ref["span"] and quote_check(cross_ref["span"], cross_ref_text):
+                    answer_parts.append(f"{cross_ref['span']} [{cross_ref['passage_id']}]")
+                    citations.add(cross_ref["passage_id"])
+                    trace.append({"step": "graph_expand_lookup", "entity": entity_text, "span": cross_ref["span"], "passage_id": cross_ref.get("passage_id")})
 
     identity_signal = wants_identity(ask)
     trace.append({"step": "intent_signal", "signal": "identity", **identity_signal})

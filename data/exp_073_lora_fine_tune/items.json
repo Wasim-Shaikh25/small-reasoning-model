@@ -1,0 +1,271 @@
+{
+  "base_original_4fact": {
+    "leaf_id": "L_ORIG_4FACT",
+    "generated": "[CITE-CL003]",
+    "ok": false,
+    "fail_reasons": [
+      "numbers",
+      "nli",
+      "citations"
+    ]
+  },
+  "lora_original_4fact": {
+    "leaf_id": "L_ORIG_4FACT",
+    "generated": "The lease was signed on 5 January 2024. [CITE-CL002] [CITE-CL003] [CITE-CL003] [CITE-CL003] [CITE-CL003] [CITE-CL003] [CITE-CL003] [CITE-CL003] [CITE-CL003] [CITE-CL003] [CITE-CL003] [CITE-CL003] [CITE-CL003] [CITE-CL003] [CITE-CL003] [CITE-CL003] [CITE-CL003] [CITE-CL003] [CITE-CL00",
+    "ok": false,
+    "fail_reasons": [
+      "numbers",
+      "nli",
+      "citations"
+    ]
+  },
+  "base_eval": [
+    {
+      "leaf_id": "SYN8540734",
+      "generated": "The component must not exceed 596 MPa. [CITE-669485]",
+      "ok": false,
+      "fail_reasons": [
+        "numbers",
+        "nli",
+        "citations"
+      ]
+    },
+    {
+      "leaf_id": "SYN6034620",
+      "generated": "Jorge Alvarez confirmed the sample was within 25 MPa of the limit. [CITE-143337]",
+      "ok": false,
+      "fail_reasons": [
+        "numbers",
+        "modal",
+        "nli",
+        "citations"
+      ]
+    },
+    {
+      "leaf_id": "SYN3721371",
+      "generated": "[CITE-965036]",
+      "ok": false,
+      "fail_reasons": [
+        "numbers",
+        "nli",
+        "citations"
+      ]
+    },
+    {
+      "leaf_id": "SYN0985810",
+      "generated": "Elena Petrova confirmed the account was within 749 percent of the limit. [CITE-951743]",
+      "ok": false,
+      "fail_reasons": [
+        "numbers",
+        "nli",
+        "citations"
+      ]
+    },
+    {
+      "leaf_id": "SYN0032484",
+      "generated": "[CITE-852863]",
+      "ok": false,
+      "fail_reasons": [
+        "numbers",
+        "modal",
+        "nli",
+        "citations"
+      ]
+    },
+    {
+      "leaf_id": "SYN7931923",
+      "generated": "[CITE-904339]",
+      "ok": false,
+      "fail_reasons": [
+        "numbers",
+        "nli",
+        "citations"
+      ]
+    },
+    {
+      "leaf_id": "SYN4346916",
+      "generated": "The batch was within 528 liters of the limit. [CITE-916920]",
+      "ok": false,
+      "fail_reasons": [
+        "numbers",
+        "nli",
+        "citations"
+      ]
+    },
+    {
+      "leaf_id": "SYN6036929",
+      "generated": "Fatima Khan found the sample's value at 239 points. [CITE-084336]",
+      "ok": false,
+      "fail_reasons": [
+        "numbers",
+        "modal",
+        "nli",
+        "citations"
+      ]
+    },
+    {
+      "leaf_id": "SYN5196341",
+      "generated": "Alex Chen reported the sample at 108 percent. [CITE-702010]",
+      "ok": false,
+      "fail_reasons": [
+        "numbers",
+        "nli",
+        "citations"
+      ]
+    },
+    {
+      "leaf_id": "SYN0263772",
+      "generated": "[CITE-106075]",
+      "ok": false,
+      "fail_reasons": [
+        "numbers",
+        "nli",
+        "citations"
+      ]
+    },
+    {
+      "leaf_id": "SYN6627714",
+      "generated": "The shipment assigned to Samuel Owusu reached 586 liters.",
+      "ok": false,
+      "fail_reasons": [
+        "numbers",
+        "nli",
+        "citations"
+      ]
+    },
+    {
+      "leaf_id": "SYN4878023",
+      "generated": "On review, Fatima Khan found the component's value at 634 points. [CITE-045277]",
+      "ok": false,
+      "fail_reasons": [
+        "numbers",
+        "modal",
+        "nli",
+        "citations"
+      ]
+    },
+    {
+      "leaf_id": "SYN1193864",
+      "generated": "On review, Jorge Alvarez found the account's value at 496 points. [CITE-857581]",
+      "ok": false,
+      "fail_reasons": [
+        "numbers",
+        "nli",
+        "citations"
+      ]
+    },
+    {
+      "leaf_id": "SYN5517080",
+      "generated": "The module assigned to Elena Petrova reached 920 days. [CITE-792489]",
+      "ok": false,
+      "fail_reasons": [
+        "numbers",
+        "modal",
+        "nli",
+        "citations"
+      ]
+    },
+    {
+      "leaf_id": "SYN9186833",
+      "generated": "The device assigned to Elena Petrova reached 917 MPa. [CITE-982169]",
+      "ok": false,
+      "fail_reasons": [
+        "numbers",
+        "nli",
+        "citations"
+      ]
+    }
+  ],
+  "lora_eval": [
+    {
+      "leaf_id": "SYN8540734",
+      "generated": "Priya Nair approved the device at 754 hours [CITE-451589]. Devon Clarke noted that the component must not exceed 596 MPa [CITE-669485].",
+      "ok": true,
+      "fail_reasons": []
+    },
+    {
+      "leaf_id": "SYN6034620",
+      "generated": "Samuel Owusu confirmed the component was within 892 kg of the limit [CITE-340937]. Samuel Owusu noted that the module must not exceed 434 MPa [CITE-182021]. Jorge Alvarez confirmed the sample was within 25 MPa [CITE-143337].",
+      "ok": true,
+      "fail_reasons": []
+    },
+    {
+      "leaf_id": "SYN3721371",
+      "generated": "Jorge Alvarez confirmed the module was within 753 liters of the limit [CITE-367814]. Marcus Webb confirmed the batch was within 166 meters of the limit [CITE-595281]. On review, Elena Petrova found the batch's value at 286 points [CITE-761145]. Elena Petrova confirmed the batch was within 922 points [CITE-965036].",
+      "ok": true,
+      "fail_reasons": []
+    },
+    {
+      "leaf_id": "SYN0985810",
+      "generated": "The batch assigned to Devon Clarke reached 317 hours [CITE-761213]. Elena Petrova confirmed the account was within 749 percent of the limit [CITE-008830]. On review, Elena Petrova found the shipment's value at 804 liters [CITE-951743].",
+      "ok": true,
+      "fail_reasons": []
+    },
+    {
+      "leaf_id": "SYN0032484",
+      "generated": "Ingrid Olsen logged the shipment at 773 MPa [CITE-391220]. Fatima Khan noted that the component must not exceed 434 kg [CITE-268110]. Marcus Webb approved the device at 256 kg [CITE-133994]. Priya Nair recorded the component at 42 kg [CITE-852863].",
+      "ok": true,
+      "fail_reasons": []
+    },
+    {
+      "leaf_id": "SYN7931923",
+      "generated": "Alex Chen confirmed the device was within 995 kg of the limit [CITE-792369]. Marcus Webb recorded the account at 346 points [CITE-421374]. Ingrid Olsen updated the component at 924 hours [CITE-904339].",
+      "ok": true,
+      "fail_reasons": []
+    },
+    {
+      "leaf_id": "SYN4346916",
+      "generated": "Marcus Webb recorded the component at 459 MPa [CITE-150816]. Devon Clarke confirmed the batch was within 528 liters of the limit [CITE-916920].",
+      "ok": true,
+      "fail_reasons": []
+    },
+    {
+      "leaf_id": "SYN6036929",
+      "generated": "Aiko Tanaka confirmed the device was within 687 kg of the limit [CITE-077120]. Alex Chen noted that the device must not exceed 175 days [CITE-262962]. On review, Fatima Khan found the sample's value at 239 points [CITE-084336].",
+      "ok": true,
+      "fail_reasons": []
+    },
+    {
+      "leaf_id": "SYN5196341",
+      "generated": "On review, Ingrid Olsen found the device's value at 37 meters [CITE-025627]. On review, Jorge Alvarez found the shipment's value at 247 days [CITE-546031]. Alex Chen reported the sample at 108 percent [CITE-702010].",
+      "ok": true,
+      "fail_reasons": []
+    },
+    {
+      "leaf_id": "SYN0263772",
+      "generated": "On review, Fatima Khan found the module's value at 436 kg. [CITE-916819] Devon Clarke confirmed the module was within 952 MPa of the limit. [CITE-718600] Samuel Owusu approved the component at 532 days. [CITE-432279] Marcus Webb confirmed the ticket was within 316 kg of the limit. [CITE-106075]",
+      "ok": true,
+      "fail_reasons": []
+    },
+    {
+      "leaf_id": "SYN6627714",
+      "generated": "Aiko Tanaka updated the batch at 214 days [CITE-410812] Ingrid Olsen measured the ticket at 314 days [CITE-750701] The shipment assigned to Samuel Owusu reached 586 liters [CITE-485725].",
+      "ok": true,
+      "fail_reasons": []
+    },
+    {
+      "leaf_id": "SYN4878023",
+      "generated": "Priya Nair noted that the shipment must not exceed 632 liters [CITE-814965]. On review, Fatima Khan found the component's value at 634 points [CITE-045277].",
+      "ok": true,
+      "fail_reasons": []
+    },
+    {
+      "leaf_id": "SYN1193864",
+      "generated": "On review, Jorge Alvarez found the account's value at 496 points. [CITE-614361] On review, Samuel Owusu found the module's value at 238 MPa. [CITE-763154] On review, Devon Clarke found the module's value at 713 days. [CITE-857581]",
+      "ok": true,
+      "fail_reasons": []
+    },
+    {
+      "leaf_id": "SYN5517080",
+      "generated": "The module assigned to Elena Petrova reached 920 days. [CITE-567167] Alex Chen reported the account at 400 percent. [CITE-996082] Samuel Owusu noted that the account must not exceed 115 MPa. [CITE-792489]",
+      "ok": true,
+      "fail_reasons": []
+    },
+    {
+      "leaf_id": "SYN9186833",
+      "generated": "The device assigned to Elena Petrova reached 917 MPa. [CITE-266046] On review, Fatima Khan found the ticket's value at 802 MPa. [CITE-744971] On review, Samuel Owusu found the module's value at 903 MPa. [CITE-766768] On review, Elena Petrova found the batch's value at 281 meters. [CITE-982169]",
+      "ok": true,
+      "fail_reasons": []
+    }
+  ]
+}

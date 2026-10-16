@@ -1,0 +1,40 @@
+{
+  "no_context": [
+    {
+      "ask": "What is the capital of France?",
+      "decision": "ungrounded",
+      "text": "[Not grounded in any provided evidence -- general knowledge only.] The capital of France is Paris.",
+      "has_disclaimer": true,
+      "has_fabricated_citation": false,
+      "correct": true
+    },
+    {
+      "ask": "What is the boiling point of water in Celsius?",
+      "decision": "ungrounded",
+      "text": "[Not grounded in any provided evidence -- general knowledge only.] The boiling point of water is 100°C.",
+      "has_disclaimer": true,
+      "has_fabricated_citation": false,
+      "correct": true
+    },
+    {
+      "ask": "Who wrote the play Romeo and Juliet?",
+      "decision": "ungrounded",
+      "text": "[Not grounded in any provided evidence -- general knowledge only.] The play Romeo and Juliet was written by William Shakespeare.",
+      "has_disclaimer": true,
+      "has_fabricated_citation": false,
+      "correct": true
+    }
+  ],
+  "retrieval_miss": {
+    "ask": "What is the capital of France?",
+    "decision": "inconclusive",
+    "text": "Insufficient evidence.",
+    "correct": true
+  },
+  "genuine": {
+    "ask": "What is the notice period?",
+    "decision": "supported",
+    "text": "30 days [B1]",
+    "correct": true
+  }
+}

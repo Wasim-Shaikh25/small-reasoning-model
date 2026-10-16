@@ -1,0 +1,58 @@
+{
+  "id": "EXP-074",
+  "title": "Mandatory prompt contract (no text change) and the document-assembly capstone",
+  "status": "closed",
+  "goal": "Prove lab.common.real_rewriter's migration onto lab.common.prompt_contract is byte-identical to the prompt text every fidelity measurement since EXP-048 was taken against, and prove lab.common.document_writer produces a correctly structured, complete document file from lab.common.assemble's existing output.",
+  "method": "Prompt identity: rebuild the pre-contract prompt formula by hand for a 1-fact and a 2-fact leaf, compare by direct string equality against lab.common.real_rewriter.build_prompt's actual output (now routed through the contract). Document writer: assemble() 5 findings into 2 leaves, write the result to a file, check the table of contents' entry count against the real leaf count and the citation index against the citation markers lab.common.verify.citation_markers finds in the assembled body.",
+  "metrics": {
+    "prompt_contract": {
+      "n": 2,
+      "all_identical": true,
+      "rows": [
+        {
+          "leaf_id": "L1",
+          "identical": true,
+          "src_identical": true
+        },
+        {
+          "leaf_id": "L2",
+          "identical": true,
+          "src_identical": true
+        }
+      ]
+    },
+    "document_writer": {
+      "doc_result": {
+        "path": "C:\\python_project\\small-reasoning-model\\data\\exp_074_document_contract\\sample_document.md",
+        "sha256": "07e2227b29438105b013dea30bcfa10ad0053fb5b447c9bf73724da8cbcd24ce",
+        "sections": 2,
+        "word_count": 66,
+        "citations_indexed": 5
+      },
+      "leaves": 2,
+      "toc_entries_match_leaves": true,
+      "citation_index_exact": true,
+      "file_exists": true,
+      "file_contains_title": true,
+      "file_contains_toc_header": true
+    }
+  },
+  "results_prose": "Prompt contract migration: byte-identical to the pre-contract prompt text on 2 sample leaves (1-fact and 2-fact). Document writer: table of contents has 2 entries for 2 leaves (match); citation index exactly matches the markers actually present in the assembled document; file written to C:\\python_project\\small-reasoning-model\\data\\exp_074_document_contract\\sample_document.md.",
+  "conclusion": "The mandatory prompt contract (lab.common.prompt_contract) is now the one shared way every generative call site builds a prompt, and migrating the existing rewriter role onto it changed nothing about what gets sent to the model -- confirmed by direct string equality, not assumed from the refactor being 'just a wrapper'. The document-assembly capstone (lab.common.document_writer) writes one complete, correctly-structured file: a table of contents with exactly as many entries as there are leaves, and a citation index that exactly matches what the assembled body actually cites -- every structural fact still decided by Python, nothing by a model.",
+  "scale_down": "2 prompt samples, 1 document sample (5 findings, 2 leaves) -- enough to prove both contracts hold, not a broad document-formatting test.",
+  "referenced_files": [
+    "lab/exp_074_document_contract/run.py",
+    "lab/common/prompt_contract.py",
+    "lab/common/document_writer.py",
+    "lab/common/real_rewriter.py",
+    "lab/common/assemble.py",
+    "data/exp_074_document_contract/results.json"
+  ],
+  "follow_ups": [
+    "document_writer only emits Markdown; a .docx or PDF target would need its own writer behind the same assembled-dict input, not a different contract.",
+    "The no-context fallback (lab.common.open_domain, EXP-072) does not yet route its prompt through labeled=True in a measured way beyond a smoke check -- worth its own identity-style check once that path is exercised more."
+  ],
+  "elapsed_sec": 0.0283,
+  "peak_rss_mb": 127.75,
+  "models_used": "None -- both checks are pure string/file comparisons, no model loaded."
+}

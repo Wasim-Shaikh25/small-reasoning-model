@@ -15,6 +15,7 @@ from __future__ import annotations
 import re
 
 from lab.common.assemble import render_unit
+from lab.common.prompt_contract import build as build_prompt_contract
 from lab.common.relevance import ask_relevance
 from lab.common.verify import bidirectional_nli, citation_markers, entity_number_check, modality_preserved
 
@@ -74,7 +75,11 @@ def build_prompt(leaf: dict, glossary: dict[str, str], ask: str | None = None) -
     )
     if ask:
         instruction += f" This is for answering: {ask.strip()}"
-    prompt = instruction + "\n\n" + src_text
+    # lab.common.prompt_contract, labeled=False: byte-identical to the
+    # pre-contract "instruction + blank line + src_text" every fidelity
+    # measurement since EXP-048 was taken against -- the mandatory prompt
+    # format (EXP-072) wraps this call site rather than changing its text.
+    prompt = build_prompt_contract(instruction, src_text, labeled=False)
     return prompt, src_text, cite_ids
 
 
