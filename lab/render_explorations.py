@@ -578,37 +578,6 @@ TODOS = [
         "conclusion": "Todo. Depends on EXP-052's outline existing first, so there are multiple pages worth checking against each other.",
         "scale_down": "",
     },
-    {
-        "id": "EXP-055",
-        "title": "Content-only template rewriter (connective splice, no generative model)",
-        "status": "todo",
-        "goal": (
-            "Build a middle path between lab/common/assemble.render_unit's bare 'statement [citation]' join "
-            "and the bounded FLAN-T5 rewriter (EXP-048): splice verified statements into one paragraph using "
-            "only a small fixed connective vocabulary (and, in addition, separately, however) chosen by "
-            "simple rules (shared subject, number contrast, sequence), never generating a token outside that "
-            "fixed vocabulary and the statements themselves. EXP-054 measured that even a single-fact "
-            "generative rewrite can drop the given content outright (producing only the citation marker); a "
-            "connective-splice rewriter cannot do that, because it has no mechanism to omit or invent -- it "
-            "only ever rearranges and lightly joins the exact given content, per AGENT.md's 'rewrite from "
-            "the given content itself' rule."
-        ),
-        "method": "Not run.",
-        "models_used": (
-            "Deterministic code only: a small fixed connective-word table and rule-based selection (shared "
-            "subject, number contrast, sequence). No model, generative or otherwise."
-        ),
-        "referenced_files": [
-            "lab/common/assemble.py",
-            "lab/common/real_rewriter.py",
-            "data/exp_048_bounded_rewriter/results.json",
-            "data/exp_054_rewriter_leaf_size/results.json",
-            "AGENT.md",
-        ],
-        "results_prose": "Not run.",
-        "conclusion": "Todo. A candidate default rewrite mode, ahead of the generative one, once built and measured against EXP-017's fidelity checks.",
-        "scale_down": "",
-    },
 ]
 
 RERUN_TODOS = [

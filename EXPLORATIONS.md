@@ -22120,7 +22120,7 @@ Elapsed seconds: 169.4348. Peak RSS MB: 659.65.
 }
 ```
 
-Elapsed seconds: 64.0395. Peak RSS MB: 146.49.
+Elapsed seconds: 72.4595. Peak RSS MB: 147.2.
 - Scale-down: Same 13 findings as EXP-054/056/062, single leaf size (1), default Ollama sampling settings, not a sweep.
 - Conclusion: gemma3:270m is measured on the identical fixture and fidelity gate flan-t5-small was measured on, not assumed better because it is newer. The raw comparison alone would have been misleading: gemma3:270m's raw pass rate (0.0) looks worse than flan-t5-small's 0.3846, but the failure *shapes* are not the same thing. flan-t5-small's failures were genuine content loss -- dropping facts, collapsing to a citation marker with nothing else. gemma3:270m's raw failures were almost entirely a formatting gap (not reproducing the literal '[CITE-x]' bracket convention) around content it preserved verbatim. Once that specific, narrow, content-safe repair is applied, gemma3:270m reaches 0.8462 fidelity pass rate, clearly ahead of flan-t5-small's 0.3846. This is real evidence that the content-dropping failure EXP-048/054/056/062 measured is not an inherent property of every small checkpoint at this size -- it is at least partly specific to flan-t5-small (or the T5 training recipe), and a different, more recently trained small model can be substantially more faithful at the identical task without any fine-tuning, once its own narrow quirk (citation formatting, not content) is accounted for rather than conflated with flan-t5-small's deeper problem.
 
@@ -22180,7 +22180,7 @@ Elapsed seconds: 64.0395. Peak RSS MB: 146.49.
 }
 ```
 
-Elapsed seconds: 76.1722. Peak RSS MB: 147.25.
+Elapsed seconds: 106.2533. Peak RSS MB: 147.0.
 - Scale-down: Same 13 findings as EXP-054/056/062/063, single leaf size, one schema design, not a sweep over constraint strategies.
 - Conclusion: Real decoding-level constraints, reached through Ollama's JSON-schema structured-output support rather than the blocked transformers constrained-beam-search path or an untrusted remote-code package, improve on the post-hoc splice: 1.0 versus 0.8462. The citation can no longer be dropped by construction, and an empty rewrite is no longer decodable at all -- both are now grammar-level impossibilities, not failures caught and patched afterward. Remaining failures are free-text content problems (e.g. a dropped number) that a JSON-schema constraint on a single enum field cannot reach -- the fidelity gate is still required for those, and still does its job. This constraint does not generalize to the harder problem it was never designed for: on a 4-fact leaf (EXP-048's original difficulty level), the schema still forces all 4 citation ids to appear, but the free-text 'rewritten_sentence' field still collapses to one fact while listing citations for facts it never actually restated -- arguably worse than silence, since the citations now falsely imply support for content that isn't there. The fidelity gate still catches this (numbers/nli fail, falls back correctly), but it confirms that decomposing to one fact per leaf is not a crutch for flan-t5-small specifically -- it is load-bearing for any small model's reliability at this task, and no decoding-level trick found so far substitutes for it.
 
@@ -23088,24 +23088,6 @@ Elapsed seconds: 474.5048. Peak RSS MB: 146.52.
 
 - Scale-down: 
 - Conclusion: Todo. Depends on EXP-052's outline existing first, so there are multiple pages worth checking against each other.
-
-## EXP-055 Content-only template rewriter (connective splice, no generative model)
-
-- Status: `todo`
-- Models used: Deterministic code only: a small fixed connective-word table and rule-based selection (shared subject, number contrast, sequence). No model, generative or otherwise.
-- Goal: Build a middle path between lab/common/assemble.render_unit's bare 'statement [citation]' join and the bounded FLAN-T5 rewriter (EXP-048): splice verified statements into one paragraph using only a small fixed connective vocabulary (and, in addition, separately, however) chosen by simple rules (shared subject, number contrast, sequence), never generating a token outside that fixed vocabulary and the statements themselves. EXP-054 measured that even a single-fact generative rewrite can drop the given content outright (producing only the citation marker); a connective-splice rewriter cannot do that, because it has no mechanism to omit or invent -- it only ever rearranges and lightly joins the exact given content, per AGENT.md's 'rewrite from the given content itself' rule.
-- Method: Not run.
-- Referenced files:
-- `lab/common/assemble.py`
-- `lab/common/real_rewriter.py`
-- `data/exp_048_bounded_rewriter/results.json`
-- `data/exp_054_rewriter_leaf_size/results.json`
-- `AGENT.md`
-- Results: Not run.
-
-
-- Scale-down: 
-- Conclusion: Todo. A candidate default rewrite mode, ahead of the generative one, once built and measured against EXP-017's fidelity checks.
 
 ## Proposed-model reruns
 
