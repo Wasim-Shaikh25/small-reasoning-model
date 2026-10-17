@@ -1,0 +1,29 @@
+{
+  "clean": {
+    "label": "clean",
+    "document": "Ravi Sharma lives at 14 MG Road, Pune 411001. [C0] Ravi Sharma works at ABC Pvt Ltd. [C1] Ravi Sharma signed on 5 January 2024. [C2] Ravi Sharma reports to Deepak Verma. [C3]\n\nMeera Iyer\nMeera Iyer lives at 22 Lake View Road, Chennai 600028. [C4]\nMeera Iyer works at Zenith Corp. [C5]\n\nPriya Nair\nPriya Nair lives at 9 Residency Road, Bengaluru 560001. [C6]\nPriya Nair works at Globex Inc. [C7]",
+    "consistency_flags": [],
+    "coverage": 1.0,
+    "missing": [],
+    "broken_citations": [],
+    "working_memory_pages": 3
+  },
+  "conflicting": {
+    "label": "conflicting",
+    "document": "Ravi Sharma (1)\nRavi Sharma lives at 14 MG Road, Pune 411001. [C0] Ravi Sharma works at ABC Pvt Ltd. [C1] Ravi Sharma signed on 5 January 2024. [C2] Ravi Sharma reports to Deepak Verma. [C3]\n\nRavi Sharma (2)\nRavi Sharma lives at 88 New Colony Road, Nagpur 440001. [C8]\n\nMeera Iyer\nMeera Iyer lives at 22 Lake View Road, Chennai 600028. [C4]\nMeera Iyer works at Zenith Corp. [C5]\n\nPriya Nair\nPriya Nair lives at 9 Residency Road, Bengaluru 560001. [C6]\nPriya Nair works at Globex Inc. [C7]",
+    "consistency_flags": [
+      {
+        "leaf_id": "E0001",
+        "subject": "Ravi Sharma",
+        "verb_lemma": "live",
+        "new_object": "88 New Colony Road , Nagpur 440001",
+        "conflicts_with_leaf_id": "E0000",
+        "prior_object": "14 MG Road , Pune 411001"
+      }
+    ],
+    "coverage": 1.0,
+    "missing": [],
+    "broken_citations": [],
+    "working_memory_pages": 4
+  }
+}

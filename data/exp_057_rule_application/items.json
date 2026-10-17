@@ -76,7 +76,7 @@
       "raw": "Priya stole the necklace.",
       "subject": "Priya",
       "verb_lemma": "steal",
-      "object": "necklace"
+      "object": "the necklace"
     },
     "expect_decision": "supported",
     "correct": true

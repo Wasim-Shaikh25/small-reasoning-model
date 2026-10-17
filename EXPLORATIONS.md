@@ -21684,7 +21684,7 @@ Elapsed seconds: 252.4715. Peak RSS MB: 653.29.
 }
 ```
 
-Elapsed seconds: 28.6733. Peak RSS MB: 294.56.
+Elapsed seconds: 37.2436. Peak RSS MB: 290.86.
 - Scale-down: One rule sentence shape ('If <subject>, <verb phrase>, <consequence>.') and single-clause facts with no qualifier. A rule with an exception ('...unless committed in self-defense') is not parsed here -- the same qualifier gap EXP-006/EXP-026 already named for the lexical NLI judge. Multiple candidate rules or facts in the same passage set are not disambiguated; the first of each is used.
 - Conclusion: A general rule given in context can be applied to a specific fact given in context, and the result cited back to both, without a generative model and without training anything new -- a dependency parser's verb extraction plus one lemma comparison is enough for this shape of case. The system correctly abstains rather than answers when the fact doesn't match the rule's verb or when no rule sentence is present at all, instead of defaulting to a guess.
 
@@ -21740,7 +21740,7 @@ Elapsed seconds: 28.6733. Peak RSS MB: 294.56.
 }
 ```
 
-Elapsed seconds: 0.0271. Peak RSS MB: 140.64.
+Elapsed seconds: 0.0511. Peak RSS MB: 139.43.
 - Scale-down: Two stories, one policy, one role-class check. Real documents would have more distractors, multiple candidate policies, and roles stated less explicitly than 'is a contractor for Zenith Corp.' -- this is a scaled-down integration test of the chain, not a benchmark of its ceiling.
 - Conclusion: Disambiguating between two multi-sentence stories by a cue in the ask (not a name), extracting a name and address, summing money mentioned across separate sentences, and applying a company policy threshold rule all chain correctly end to end, each step citable to its own source passage. The second case is the one worth dwelling on: Ravi Sharma's total (INR 45,000) is well over the policy's INR 30,000 threshold, and a rule engine that only checked the number would have incorrectly fired approval on him. Checking that his own story actually describes him with the policy's subject role ('a contractor') -- and finding it doesn't, he's a sales manager -- is what keeps the decision correct. A rule matching a number is not the same as a rule applying to the right person.
 
@@ -21778,7 +21778,7 @@ Elapsed seconds: 0.0271. Peak RSS MB: 140.64.
 }
 ```
 
-Elapsed seconds: 13.2439. Peak RSS MB: 294.37.
+Elapsed seconds: 45.9583. Peak RSS MB: 292.96.
 - Scale-down: Six domains, 11 hand-written cases, single-clause rules and facts only -- not a benchmark of how many domains or how complex a rule this can handle, a targeted test of whether the existing mechanism needed domain-specific code to extend, which it did not.
 - Conclusion: The objection this exploration tests directly -- that a 'rule engine' which secretly needs a new rule per question isn't a rule engine at all -- does not hold for the two rule shapes built so far. The verb-trigger matcher works by extracting a sentence's main verb via spaCy's dependency parser and comparing lemmas; that mechanism has no idea whether the verb is 'murder', 'contain', 'run', or 'have' -- it would work on a verb this project has never seen written down anywhere, because the verb comes from the parser's general training, not from a lookup table this project wrote. The threshold matcher works by extracting a number near 'exceeds' and comparing it with the same calc.compare_numbers function EXP-007/014 already used for dates and amounts; it has no idea whether the number is rupees, degrees, or kilometers per hour. This is category A from the research pasted in review (a rule-based expert system: explicit rules and facts, a deterministic reasoning engine) with the narrow end of category B (a neural parser for natural-language understanding feeding a symbolic match step) -- one engine, run on different rulebooks, not a new engine per rulebook. What would genuinely need new code is a *third rule shape* this project hasn't built yet (a rule with an exception clause, a rule comparing two extracted facts to each other rather than to a fixed threshold) -- and that is a real, acknowledged limit, not a hidden one.
 
@@ -21896,7 +21896,7 @@ Elapsed seconds: 13.2439. Peak RSS MB: 294.37.
 }
 ```
 
-Elapsed seconds: 50.7908. Peak RSS MB: 594.22.
+Elapsed seconds: 171.9855. Peak RSS MB: 592.45.
 - Scale-down: 8 cases across 3 regimes, not a benchmark of the brain's ceiling -- a targeted test that the single entry point reproduces every prior exploration's answer without per-case wiring.
 - Conclusion: One function handles a plain lookup, a rule-application question, and a multi-signal integrated scenario without the caller choosing a path. The difference between regimes shows up only in the trace -- which internal signal checks fired -- never in which function was called or how it was called. A lookup question fires none of the extra signals and falls back to the same single-slot extractor lab.common.engine already uses; the integrated cases fire three signals at once and chain their results. This is the unification the prior three explorations (EXP-057/058/059) proved piece by piece, now proved as one entry point rather than three scripts a person chooses between.
 
@@ -22018,7 +22018,7 @@ Elapsed seconds: 50.7908. Peak RSS MB: 594.22.
 }
 ```
 
-Elapsed seconds: 118.4022. Peak RSS MB: 725.19.
+Elapsed seconds: 1066.2928. Peak RSS MB: 600.31.
 - Scale-down: 10 hand-written cases across 4 domains, not a paraphrase benchmark -- a targeted test of one specific, named brittleness.
 - Conclusion: Exact-lemma matching is exactly as brittle on messy phrasing as the objection predicted: 0.0 accuracy on paraphrased facts that share no verb with their rule, because 'took her life' and 'murdered' are different lemmas even though they describe the same act. Semantic matching recovers all of that gap (1.0 accuracy), using the real DeBERTa-v3 MNLI checkpoint to check whether the specific fact entails the rule's general condition, rather than requiring the same word. This is not a free upgrade: near-miss accuracy drops from 1.0 to 0.5 -- a related-but-insufficient fact (injuring someone in an accident, cooking in a shared kitchen) is exactly where a model that generalizes by meaning risks over-matching where exact lemma comparison, by being too strict, accidentally got it right for the wrong reason. Both numbers are reported, not just the one that favors the fix.
 
@@ -22943,6 +22943,51 @@ Elapsed seconds: 110.8949. Peak RSS MB: 1088.37.
 Elapsed seconds: 474.5048. Peak RSS MB: 146.52.
 - Scale-down: 80 leaves / ~1,000+ words, not EXP-018's 5,000-claim/42,506-word extreme -- real generation calls are far slower than deterministic joining, so this targets genuinely document-length output (matching the project owner's own 'rewrite 1000' framing) rather than matching EXP-018's upper bound call for call.
 - Conclusion: Chaining across 80 leaves did NOT hold up as cleanly as the 13-leaf measurement: 0.925 fidelity pass rate, and the document-level checks found 0 broken citation(s), 0 missing citation(s), 2 cross-leaf repetition pair(s). This is the honest result, not smoothed into a clean pass -- the specific failures matter more than the aggregate rate, and are in items.json and document_level above, not averaged away.
+
+## EXP-078 Long-form writing with cross-page consistency checking
+
+- Status: `closed`
+- Models used: flan-t5-small via lab.common.rewriter_backends (rewriter role only, fidelity-gated, falling back to deterministic text per leaf on any failure, exactly as EXP-048 measured) -- the pipeline is model-agnostic (EXP-076) and works with any registered checkpoint.
+- Goal: Prove lab.common.longform.write_long_document (EXP-052's ask-derived section titling, wired onto the existing deterministic outline/rewriter/document-writer pieces) produces a real multi-page document, and that lab.common.working_memory's cross-page consistency check (EXP-053) both stays silent on a genuinely consistent document and fires on a deliberately injected contradiction, naming the specific conflicting pages and values.
+- Method: Two 6-7 leaf documents from the same ask: one internally consistent, one identical except a later page restates an earlier page's fact about the same person with a different value. Both run through lab.common.longform.write_long_document end to end, checked for coverage, citation integrity, and the consistency flags lab.common.working_memory actually produced.
+- Referenced files:
+- `lab/exp_078_longform_consistency/run.py`
+- `lab/common/longform.py`
+- `lab/common/working_memory.py`
+- `lab/common/rules.py`
+- `lab/common/rewriter_backends.py`
+- `data/exp_018_longform/results.json`
+- `data/exp_077_generation_at_scale/results.json`
+- `data/exp_078_longform_consistency/results.json`
+- Results: Clean 6-leaf document: 0 consistency flag(s) (expect 0), coverage 1.0, 0 broken citation(s). Conflicting 7-leaf document (identical, plus a later page restating Ravi Sharma's address with a different value): 1 flag(s) -- the address conflict was caught: [{'leaf_id': 'E0001', 'subject': 'Ravi Sharma', 'verb_lemma': 'live', 'new_object': '88 New Colony Road , Nagpur 440001', 'conflicts_with_leaf_id': 'E0000', 'prior_object': '14 MG Road , Pune 411001'}].
+```json
+{
+  "clean_case": {
+    "consistency_flags": 0,
+    "coverage": 1.0,
+    "broken_citations": 0,
+    "correct": true
+  },
+  "conflicting_case": {
+    "consistency_flags": [
+      {
+        "leaf_id": "E0001",
+        "subject": "Ravi Sharma",
+        "verb_lemma": "live",
+        "new_object": "88 New Colony Road , Nagpur 440001",
+        "conflicts_with_leaf_id": "E0000",
+        "prior_object": "14 MG Road , Pune 411001"
+      }
+    ],
+    "flag_fired": true
+  },
+  "document_sample": "Ravi Sharma lives at 14 MG Road, Pune 411001. [C0] Ravi Sharma works at ABC Pvt Ltd. [C1] Ravi Sharma signed on 5 January 2024. [C2] Ravi Sharma reports to Deepak Verma. [C3]\n\nMeera Iyer\nMeera Iyer lives at 22 Lake View Road, Chennai 600028. [C4]\nMeera Iyer works at Zenith Corp. [C5]\n\nPriya Nair\nPriya Nair lives at 9 Residency Road, Bengaluru 560001. [C6]\nPriya Nair works at Globex Inc. [C7]"
+}
+```
+
+Elapsed seconds: 135.874. Peak RSS MB: 765.05.
+- Scale-down: 6-7 leaves, one deliberately injected conflict -- a proof the mechanism works and stays quiet when it should, not a scale test (EXP-077 already measured generative fidelity at 80 leaves; this is a different mechanism, checked separately).
+- Conclusion: Both mechanisms work as intended: a genuinely consistent multi-page document produces zero false-positive flags, and a deliberately injected later-page contradiction about the same person and the same fact (address) is caught, naming exactly which earlier page it conflicts with and what the two values were -- not just 'something is wrong somewhere'. This closes EXP-053's gap directly: a check that previously did not exist at all for long-form writing, built on lab.common.working_memory's bounded 'RAM' (subject-verb-object triples only, never full page text kept once a page is behind it).
 
 ## Follow-up todos
 

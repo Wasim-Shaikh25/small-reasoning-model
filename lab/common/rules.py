@@ -114,6 +114,21 @@ def parse_conditional_rule(text: str) -> dict | None:
     }
 
 
+def _span_text(token) -> str:
+    """The full noun phrase a token heads ("14 MG Road", not just "Road"),
+    reconstructed from its dependency subtree in sentence order -- not the
+    single head token's own text. Found needed (lab.common.working_memory,
+    EXP-053): a head-token-only object collapses "14 MG Road" and "22 Lake
+    View Road" to the identical string "Road", making two genuinely
+    different facts indistinguishable. Safe to widen here rather than add
+    a second extractor: no existing caller (lab.common.brain's apply_rule,
+    EXP-057/059/061) compares `subject`/`object` by exact value -- only
+    `verb_lemma` ever gets matched -- so a fuller, more informative span
+    changes nothing any of them actually check.
+    """
+    return " ".join(t.text for t in sorted(token.subtree, key=lambda t: t.i))
+
+
 def extract_fact_triple(text: str) -> dict | None:
     """Subject / verb lemma / object for a simple factual sentence, via dependency parse."""
     text = text.strip()
@@ -123,11 +138,26 @@ def extract_fact_triple(text: str) -> dict | None:
         return None
     subject = next((t for t in root.children if t.dep_ in ("nsubj", "nsubjpass")), None)
     obj = next((t for t in root.children if t.dep_ in ("dobj", "pobj", "attr", "dative")), None)
+    if obj is None:
+        # A prepositional-phrase object ("lives AT X", "works AT Y",
+        # "registered IN Z") is the pobj's own object, not a direct child
+        # of the root verb -- it's one level deeper, under the "prep"
+        # relation. Found missing (lab.common.working_memory, EXP-053):
+        # every address/employer-style sentence in this project's own
+        # fixtures is phrased this way, and the direct-object-only version
+        # silently returned no object for all of them. Only a fallback,
+        # checked after every direct-object shape above, so a sentence
+        # that already had a real dobj/attr/dative is completely
+        # unaffected -- this never overrides an object the old behavior
+        # already found.
+        prep = next((t for t in root.children if t.dep_ == "prep"), None)
+        if prep is not None:
+            obj = next((t for t in prep.children if t.dep_ == "pobj"), None)
     return {
         "raw": text,
-        "subject": subject.text if subject is not None else None,
+        "subject": _span_text(subject) if subject is not None else None,
         "verb_lemma": root.lemma_.lower(),
-        "object": obj.text if obj is not None else None,
+        "object": _span_text(obj) if obj is not None else None,
     }
 
 

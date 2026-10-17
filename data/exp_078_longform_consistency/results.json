@@ -1,0 +1,50 @@
+{
+  "id": "EXP-078",
+  "title": "Long-form writing with cross-page consistency checking",
+  "status": "closed",
+  "goal": "Prove lab.common.longform.write_long_document (EXP-052's ask-derived section titling, wired onto the existing deterministic outline/rewriter/document-writer pieces) produces a real multi-page document, and that lab.common.working_memory's cross-page consistency check (EXP-053) both stays silent on a genuinely consistent document and fires on a deliberately injected contradiction, naming the specific conflicting pages and values.",
+  "method": "Two 6-7 leaf documents from the same ask: one internally consistent, one identical except a later page restates an earlier page's fact about the same person with a different value. Both run through lab.common.longform.write_long_document end to end, checked for coverage, citation integrity, and the consistency flags lab.common.working_memory actually produced.",
+  "metrics": {
+    "clean_case": {
+      "consistency_flags": 0,
+      "coverage": 1.0,
+      "broken_citations": 0,
+      "correct": true
+    },
+    "conflicting_case": {
+      "consistency_flags": [
+        {
+          "leaf_id": "E0001",
+          "subject": "Ravi Sharma",
+          "verb_lemma": "live",
+          "new_object": "88 New Colony Road , Nagpur 440001",
+          "conflicts_with_leaf_id": "E0000",
+          "prior_object": "14 MG Road , Pune 411001"
+        }
+      ],
+      "flag_fired": true
+    },
+    "document_sample": "Ravi Sharma lives at 14 MG Road, Pune 411001. [C0] Ravi Sharma works at ABC Pvt Ltd. [C1] Ravi Sharma signed on 5 January 2024. [C2] Ravi Sharma reports to Deepak Verma. [C3]\n\nMeera Iyer\nMeera Iyer lives at 22 Lake View Road, Chennai 600028. [C4]\nMeera Iyer works at Zenith Corp. [C5]\n\nPriya Nair\nPriya Nair lives at 9 Residency Road, Bengaluru 560001. [C6]\nPriya Nair works at Globex Inc. [C7]"
+  },
+  "results_prose": "Clean 6-leaf document: 0 consistency flag(s) (expect 0), coverage 1.0, 0 broken citation(s). Conflicting 7-leaf document (identical, plus a later page restating Ravi Sharma's address with a different value): 1 flag(s) -- the address conflict was caught: [{'leaf_id': 'E0001', 'subject': 'Ravi Sharma', 'verb_lemma': 'live', 'new_object': '88 New Colony Road , Nagpur 440001', 'conflicts_with_leaf_id': 'E0000', 'prior_object': '14 MG Road , Pune 411001'}].",
+  "conclusion": "Both mechanisms work as intended: a genuinely consistent multi-page document produces zero false-positive flags, and a deliberately injected later-page contradiction about the same person and the same fact (address) is caught, naming exactly which earlier page it conflicts with and what the two values were -- not just 'something is wrong somewhere'. This closes EXP-053's gap directly: a check that previously did not exist at all for long-form writing, built on lab.common.working_memory's bounded 'RAM' (subject-verb-object triples only, never full page text kept once a page is behind it).",
+  "scale_down": "6-7 leaves, one deliberately injected conflict -- a proof the mechanism works and stays quiet when it should, not a scale test (EXP-077 already measured generative fidelity at 80 leaves; this is a different mechanism, checked separately).",
+  "referenced_files": [
+    "lab/exp_078_longform_consistency/run.py",
+    "lab/common/longform.py",
+    "lab/common/working_memory.py",
+    "lab/common/rules.py",
+    "lab/common/rewriter_backends.py",
+    "data/exp_018_longform/results.json",
+    "data/exp_077_generation_at_scale/results.json",
+    "data/exp_078_longform_consistency/results.json"
+  ],
+  "follow_ups": [
+    "Not yet combined with EXP-077's scale (80 leaves): this exploration uses 6-7 leaves, enough to prove both mechanisms, not enough to also re-measure generative fidelity degradation -- a combined run (EXP-077's scale, with cross-page consistency checking turned on) is a natural next step.",
+    "extract_fact_triple's prepositional-object fallback (this exploration's prerequisite fix) still misses some constructions -- a compound date ('5 January 2024') extracted as just '5' in one spot-check -- worth a dedicated pass if dates become a consistency-check target, not just addresses/employers.",
+    "Not yet wired into lab.common.brain.reason as a signal -- this module is callable standalone, not yet reachable through the same entry point every other capability in this repo goes through."
+  ],
+  "elapsed_sec": 135.874,
+  "peak_rss_mb": 765.05,
+  "models_used": "flan-t5-small via lab.common.rewriter_backends (rewriter role only, fidelity-gated, falling back to deterministic text per leaf on any failure, exactly as EXP-048 measured) -- the pipeline is model-agnostic (EXP-076) and works with any registered checkpoint."
+}
