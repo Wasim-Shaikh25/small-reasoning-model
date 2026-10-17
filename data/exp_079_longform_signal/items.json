@@ -1,0 +1,55 @@
+{
+  "document_asks": [
+    {
+      "ask": "Write a full report covering every employee, their address, and their employer.",
+      "score": 0.8835,
+      "fired": true,
+      "dispatched_to_longform": true,
+      "decision": "supported"
+    },
+    {
+      "ask": "Draft a complete document summarizing all the people in these records.",
+      "score": 0.8992,
+      "fired": true,
+      "dispatched_to_longform": true,
+      "decision": "supported"
+    },
+    {
+      "ask": "Compose a detailed write-up describing each person mentioned here.",
+      "score": 0.9225,
+      "fired": true,
+      "dispatched_to_longform": true,
+      "decision": "supported"
+    }
+  ],
+  "lookup_regression": [
+    {
+      "ask": "What is the notice period?",
+      "score": 0.5282,
+      "fired": false,
+      "decision": "supported",
+      "had_document_signal_step": true
+    },
+    {
+      "ask": "An engineer recorded an additional stress reading on a component last ",
+      "score": 0.6331,
+      "fired": false,
+      "decision": "supported",
+      "had_document_signal_step": true
+    },
+    {
+      "ask": "What is the capital of France?",
+      "score": null,
+      "fired": null,
+      "decision": "ungrounded",
+      "had_document_signal_step": false
+    },
+    {
+      "ask": "Where does Ravi Sharma live, and in which city is his employer registe",
+      "score": 0.5201,
+      "fired": false,
+      "decision": "supported",
+      "had_document_signal_step": true
+    }
+  ]
+}

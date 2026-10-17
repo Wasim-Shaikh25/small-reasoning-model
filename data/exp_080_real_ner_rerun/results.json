@@ -1,0 +1,66 @@
+{
+  "id": "EXP-080",
+  "title": "dslim/bert-base-NER, actually measured against EXP-033's rule-tagger-vs-spaCy comparison",
+  "status": "closed",
+  "goal": "Pick up EXP-033's own named follow-up: measure dslim/bert-base-NER (loaded in lab.common.real_encoders since EXP-033/034's era, never actually called for entity detection until now) on the identical gold fixture, for a real three-way comparison against the rule tagger and the spaCy substitute.",
+  "method": "The same 12 hand-labeled sentences / 19 PERSON-ORG spans EXP-033 used (imported directly from that exploration's GOLD, not re-picked), scored the identical way (text-containment hit counting, micro-averaged precision/recall/F1) against lab.common.real_ner.detect_real, the new wiring of the dslim/bert-base-NER pipeline already loaded in lab.common.real_encoders.",
+  "metrics": {
+    "n_sentences": 12,
+    "n_gold_entities": 19,
+    "rule_tagger": {
+      "precision": 0.8,
+      "recall": 0.6316,
+      "f1": 0.7059,
+      "tp": 12,
+      "fp": 3,
+      "fn": 7
+    },
+    "dslim_bert_base_ner": {
+      "precision": 0.6786,
+      "recall": 1.0,
+      "f1": 0.8085,
+      "tp": 19,
+      "fp": 9,
+      "fn": 0
+    },
+    "spacy_en_core_web_sm_exp033": {
+      "precision": 0.6957,
+      "recall": 0.8421,
+      "f1": 0.7619
+    },
+    "f1_lift_dslim_vs_rule": 0.1026,
+    "f1_lift_dslim_vs_spacy": 0.0466,
+    "real_model_card": {
+      "bge_model": "BAAI/bge-small-en-v1.5",
+      "qa_model": "deepset/deberta-v3-base-squad2",
+      "nli_model": "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli",
+      "ner_model": "dslim/bert-base-NER",
+      "gliner_named_by_blueprint": "urchade/gliner_small-v2.1",
+      "gliner_loaded": false,
+      "gliner_reason": "the `gliner` package is not installed in this environment; dslim/bert-base-NER is the real checkpoint measured for the NER role instead",
+      "huggingface_reachable": true,
+      "all_non_generative": true
+    }
+  },
+  "results_prose": "On the identical EXP-033 fixture (12 sentences, 19 gold PERSON/ORG spans): rule tagger F1 0.7059 (unchanged from EXP-008/033, measured again here as the baseline). dslim/bert-base-NER F1 0.8085 (precision 0.6786, recall 1.0) -- the first real measurement of this checkpoint anywhere in this repo. spaCy en_core_web_sm (EXP-033): F1 0.7619, for reference, not rerun here.",
+  "conclusion": "dslim/bert-base-NER, the actual blueprint-named checkpoint, outperforms both the rule tagger and the spaCy substitute EXP-033 used when HuggingFace was unreachable -- a real, direct three-way comparison, not an assumption that the originally-intended checkpoint would be better just because it's the one the blueprint named. EXP-033/034's gap is closed: the checkpoint was loaded but never actually called for this role until now.",
+  "scale_down": "Same 12-sentence fixture as EXP-033 -- not a held-out annotated corpus, chosen for a direct, controlled comparison against an already-measured result rather than a fresh, larger evaluation.",
+  "referenced_files": [
+    "lab/exp_080_real_ner_rerun/run.py",
+    "lab/common/real_ner.py",
+    "lab/common/real_encoders.py",
+    "lab/common/entities.py",
+    "lab/exp_033_real_entities/run.py",
+    "data/exp_033_real_entities/gold.json",
+    "data/exp_033_real_entities/results.json",
+    "data/exp_080_real_ner_rerun/results.json"
+  ],
+  "follow_ups": [
+    "Hand-label a larger gold sentence set (50+, matching EXP-008's own scale) for a more stable F1 estimate across all three taggers.",
+    "lab.common.real_ner.detect_real only maps PER/ORG -- dslim/bert-base-NER's LOC/MISC categories are dropped rather than mapped to this project's address/date/amount labels, which it was never trained to produce; address detection still depends entirely on the regex tagger.",
+    "Not yet wired into lab.common.brain.reason's identity-extraction step (detect_primary is still what that step calls) -- this measures the checkpoint standalone, matching EXP-033's own scope, not a live pipeline swap."
+  ],
+  "elapsed_sec": 24.1203,
+  "peak_rss_mb": 755.16,
+  "models_used": "dslim/bert-base-NER (CoNLL-2003 token classifier, non-generative), via lab.common.real_encoders.real_entities, wired through lab.common.real_ner. No generative model."
+}

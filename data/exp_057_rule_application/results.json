@@ -60,7 +60,7 @@
     "Wire this into lab/common/engine.run_task as a new task_type once the ask analyzer (lab/common/ask.py) can detect a rule-application question, so it isn't a separate standalone path.",
     "Test against passage sets with more than one candidate rule or fact to measure disambiguation, not just presence/absence."
   ],
-  "elapsed_sec": 37.2436,
-  "peak_rss_mb": 290.86,
+  "elapsed_sec": 28.1871,
+  "peak_rss_mb": 293.04,
   "models_used": "No model decides the outcome. spaCy's en_core_web_sm dependency parser (already loaded for EXP-032/033's real-model NER, lab/common/real_models.py) extracts each sentence's main verb -- a narrow syntactic sub-task, not a reasoning judgment. The rule match and the final answer are deterministic code."
 }

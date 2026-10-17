@@ -1,0 +1,88 @@
+{
+  "id": "EXP-079",
+  "title": "Long-form writing wired into brain.reason as its fifth signal",
+  "status": "closed",
+  "goal": "Prove lab.common.intent_signals.wants_document correctly dispatches document-requesting asks to lab.common.longform.write_long_document through lab.common.brain.reason, and -- the real test -- that it does not fire on any short-lookup ask already measured by an earlier exploration.",
+  "method": "3 genuine document-requesting asks, run through brain.reason, checked for the signal firing and actually dispatching to longform_write. 4 short-lookup asks drawn directly from EXP-057/069/075's own fixtures (not invented fresh for this test), including the one compound ask that scored closest to DOCUMENT_TAU during calibration, checked that the signal stays silent.",
+  "metrics": {
+    "document_asks": {
+      "n": 3,
+      "all_fired": true,
+      "rows": [
+        {
+          "ask": "Write a full report covering every employee, their address, and their employer.",
+          "score": 0.8835,
+          "fired": true,
+          "dispatched_to_longform": true,
+          "decision": "supported"
+        },
+        {
+          "ask": "Draft a complete document summarizing all the people in these records.",
+          "score": 0.8992,
+          "fired": true,
+          "dispatched_to_longform": true,
+          "decision": "supported"
+        },
+        {
+          "ask": "Compose a detailed write-up describing each person mentioned here.",
+          "score": 0.9225,
+          "fired": true,
+          "dispatched_to_longform": true,
+          "decision": "supported"
+        }
+      ]
+    },
+    "lookup_regression": {
+      "n": 4,
+      "none_fired": true,
+      "rows": [
+        {
+          "ask": "What is the notice period?",
+          "score": 0.5282,
+          "fired": false,
+          "decision": "supported",
+          "had_document_signal_step": true
+        },
+        {
+          "ask": "An engineer recorded an additional stress reading on a component last ",
+          "score": 0.6331,
+          "fired": false,
+          "decision": "supported",
+          "had_document_signal_step": true
+        },
+        {
+          "ask": "What is the capital of France?",
+          "score": null,
+          "fired": null,
+          "decision": "ungrounded",
+          "had_document_signal_step": false
+        },
+        {
+          "ask": "Where does Ravi Sharma live, and in which city is his employer registe",
+          "score": 0.5201,
+          "fired": false,
+          "decision": "supported",
+          "had_document_signal_step": true
+        }
+      ]
+    }
+  },
+  "results_prose": "3/3 document-requesting asks correctly fired the signal and dispatched to lab.common.longform (scores [0.8835, 0.8992, 0.9225]). 4/4 short-lookup asks (drawn from EXP-057/069/075, not invented fresh) correctly did NOT fire it (scores [0.5282, 0.6331, None, 0.5201]), including the one compound multi-clause ask that scored closest to the threshold during calibration.",
+  "conclusion": "The long-form signal is now reachable through the same single entry point (lab.common.brain.reason) every other capability in this repo goes through, not a standalone function -- and, more importantly, wiring it in did not disturb any existing short-answer behavior: every lookup ask already measured by an earlier exploration still resolves exactly as it did before this signal existed. EXP-052/053's named gaps are closed end to end, not just as isolated modules.",
+  "scale_down": "7 asks total -- enough to prove the wiring and its most important regression boundary, not an exhaustive sweep of every existing exploration's asks.",
+  "referenced_files": [
+    "lab/exp_079_longform_signal/run.py",
+    "lab/common/brain.py",
+    "lab/common/intent_signals.py",
+    "lab/common/longform.py",
+    "data/exp_078_longform_consistency/results.json",
+    "data/exp_079_longform_signal/results.json"
+  ],
+  "follow_ups": [
+    "DOCUMENT_TAU=0.75 is a first measured value from a small sample (EXP-069-style multi-domain calibration not yet done for this signal) -- the same caveat every other first-measured threshold in this repo carries.",
+    "Not yet tested: an ask that genuinely wants both a short answer AND implies document-length output in the same compound sentence -- which signal should win is not yet a decided, measured case."
+  ],
+  "elapsed_sec": 103.4616,
+  "peak_rss_mb": 874.65,
+  "models_used": "bge-small-en-v1.5 for the document-intent signal (retrieval-style similarity scoring only); flan-t5-small for the rewriter role inside longform (measured separately, EXP-048 onward). No new generative use."
+}

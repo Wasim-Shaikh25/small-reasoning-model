@@ -8,6 +8,7 @@
       "analyze_ask",
       "intent_signal",
       "intent_signal",
+      "intent_signal",
       "lookup_fallback"
     ],
     "correct_decision": true,
@@ -20,6 +21,7 @@
     "text": "INR 50000 [A]",
     "trace_steps": [
       "analyze_ask",
+      "intent_signal",
       "intent_signal",
       "intent_signal",
       "lookup_fallback"
@@ -36,6 +38,7 @@
       "analyze_ask",
       "intent_signal",
       "intent_signal",
+      "intent_signal",
       "lookup_fallback"
     ],
     "correct_decision": true,
@@ -48,6 +51,7 @@
     "text": "Ravi Sharma [A].",
     "trace_steps": [
       "analyze_ask",
+      "intent_signal",
       "intent_signal",
       "extract_identity",
       "intent_signal"
@@ -64,6 +68,7 @@
       "analyze_ask",
       "intent_signal",
       "intent_signal",
+      "intent_signal",
       "lookup_fallback"
     ],
     "correct_decision": true,
@@ -76,6 +81,7 @@
     "text": "Arjun murdered Neha. [FACT1] matches the rule's trigger (murder): If someone murders a person, it is a punishable crime. [RULE1] Therefore, it is a punishable crime..",
     "trace_steps": [
       "analyze_ask",
+      "intent_signal",
       "intent_signal",
       "intent_signal",
       "find_rule",
@@ -91,6 +97,7 @@
     "text": "Priya Nair, Residency Road [B1]. total 40,000 [B3, B4]. policy applies: the payment requires finance head approval [POLICY].",
     "trace_steps": [
       "analyze_ask",
+      "intent_signal",
       "disambiguate",
       "intent_signal",
       "extract_identity",
@@ -109,6 +116,7 @@
     "text": "Ravi Sharma, MG Road [A1]. total 45,000 [A3, A4]. policy does not apply (role mismatch with 'a contractor') [POLICY].",
     "trace_steps": [
       "analyze_ask",
+      "intent_signal",
       "disambiguate",
       "intent_signal",
       "extract_identity",

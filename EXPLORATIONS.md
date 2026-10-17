@@ -21684,7 +21684,7 @@ Elapsed seconds: 252.4715. Peak RSS MB: 653.29.
 }
 ```
 
-Elapsed seconds: 37.2436. Peak RSS MB: 290.86.
+Elapsed seconds: 28.1871. Peak RSS MB: 293.04.
 - Scale-down: One rule sentence shape ('If <subject>, <verb phrase>, <consequence>.') and single-clause facts with no qualifier. A rule with an exception ('...unless committed in self-defense') is not parsed here -- the same qualifier gap EXP-006/EXP-026 already named for the lexical NLI judge. Multiple candidate rules or facts in the same passage set are not disambiguated; the first of each is used.
 - Conclusion: A general rule given in context can be applied to a specific fact given in context, and the result cited back to both, without a generative model and without training anything new -- a dependency parser's verb extraction plus one lemma comparison is enough for this shape of case. The system correctly abstains rather than answers when the fact doesn't match the rule's verb or when no rule sentence is present at all, instead of defaulting to a guess.
 
@@ -21740,7 +21740,7 @@ Elapsed seconds: 37.2436. Peak RSS MB: 290.86.
 }
 ```
 
-Elapsed seconds: 0.0511. Peak RSS MB: 139.43.
+Elapsed seconds: 0.0322. Peak RSS MB: 139.55.
 - Scale-down: Two stories, one policy, one role-class check. Real documents would have more distractors, multiple candidate policies, and roles stated less explicitly than 'is a contractor for Zenith Corp.' -- this is a scaled-down integration test of the chain, not a benchmark of its ceiling.
 - Conclusion: Disambiguating between two multi-sentence stories by a cue in the ask (not a name), extracting a name and address, summing money mentioned across separate sentences, and applying a company policy threshold rule all chain correctly end to end, each step citable to its own source passage. The second case is the one worth dwelling on: Ravi Sharma's total (INR 45,000) is well over the policy's INR 30,000 threshold, and a rule engine that only checked the number would have incorrectly fired approval on him. Checking that his own story actually describes him with the policy's subject role ('a contractor') -- and finding it doesn't, he's a sales manager -- is what keeps the decision correct. A rule matching a number is not the same as a rule applying to the right person.
 
@@ -21778,7 +21778,7 @@ Elapsed seconds: 0.0511. Peak RSS MB: 139.43.
 }
 ```
 
-Elapsed seconds: 45.9583. Peak RSS MB: 292.96.
+Elapsed seconds: 23.459. Peak RSS MB: 293.0.
 - Scale-down: Six domains, 11 hand-written cases, single-clause rules and facts only -- not a benchmark of how many domains or how complex a rule this can handle, a targeted test of whether the existing mechanism needed domain-specific code to extend, which it did not.
 - Conclusion: The objection this exploration tests directly -- that a 'rule engine' which secretly needs a new rule per question isn't a rule engine at all -- does not hold for the two rule shapes built so far. The verb-trigger matcher works by extracting a sentence's main verb via spaCy's dependency parser and comparing lemmas; that mechanism has no idea whether the verb is 'murder', 'contain', 'run', or 'have' -- it would work on a verb this project has never seen written down anywhere, because the verb comes from the parser's general training, not from a lookup table this project wrote. The threshold matcher works by extracting a number near 'exceeds' and comparing it with the same calc.compare_numbers function EXP-007/014 already used for dates and amounts; it has no idea whether the number is rupees, degrees, or kilometers per hour. This is category A from the research pasted in review (a rule-based expert system: explicit rules and facts, a deterministic reasoning engine) with the narrow end of category B (a neural parser for natural-language understanding feeding a symbolic match step) -- one engine, run on different rulebooks, not a new engine per rulebook. What would genuinely need new code is a *third rule shape* this project hasn't built yet (a rule with an exception clause, a rule comparing two extracted facts to each other rather than to a fixed threshold) -- and that is a real, acknowledged limit, not a hidden one.
 
@@ -21896,7 +21896,7 @@ Elapsed seconds: 45.9583. Peak RSS MB: 292.96.
 }
 ```
 
-Elapsed seconds: 171.9855. Peak RSS MB: 592.45.
+Elapsed seconds: 60.6037. Peak RSS MB: 594.36.
 - Scale-down: 8 cases across 3 regimes, not a benchmark of the brain's ceiling -- a targeted test that the single entry point reproduces every prior exploration's answer without per-case wiring.
 - Conclusion: One function handles a plain lookup, a rule-application question, and a multi-signal integrated scenario without the caller choosing a path. The difference between regimes shows up only in the trace -- which internal signal checks fired -- never in which function was called or how it was called. A lookup question fires none of the extra signals and falls back to the same single-slot extractor lab.common.engine already uses; the integrated cases fire three signals at once and chain their results. This is the unification the prior three explorations (EXP-057/058/059) proved piece by piece, now proved as one entry point rather than three scripts a person chooses between.
 
@@ -22018,7 +22018,7 @@ Elapsed seconds: 171.9855. Peak RSS MB: 592.45.
 }
 ```
 
-Elapsed seconds: 1066.2928. Peak RSS MB: 600.31.
+Elapsed seconds: 621.5368. Peak RSS MB: 721.97.
 - Scale-down: 10 hand-written cases across 4 domains, not a paraphrase benchmark -- a targeted test of one specific, named brittleness.
 - Conclusion: Exact-lemma matching is exactly as brittle on messy phrasing as the objection predicted: 0.0 accuracy on paraphrased facts that share no verb with their rule, because 'took her life' and 'murdered' are different lemmas even though they describe the same act. Semantic matching recovers all of that gap (1.0 accuracy), using the real DeBERTa-v3 MNLI checkpoint to check whether the specific fact entails the rule's general condition, rather than requiring the same word. This is not a free upgrade: near-miss accuracy drops from 1.0 to 0.5 -- a related-but-insufficient fact (injuring someone in an accident, cooking in a shared kitchen) is exactly where a model that generalizes by meaning risks over-matching where exact lemma comparison, by being too strict, accidentally got it right for the wrong reason. Both numbers are reported, not just the one that favors the fix.
 
@@ -22286,7 +22286,7 @@ Elapsed seconds: 106.2533. Peak RSS MB: 147.0.
 }
 ```
 
-Elapsed seconds: 0.1214. Peak RSS MB: 128.7.
+Elapsed seconds: 0.125. Peak RSS MB: 127.38.
 - Scale-down: 3 chapters, up to 450 leaves, one needle -- not a real 1000-page document or multiple simultaneous needles. Two levels of hierarchy (chapter, section); a real book might want a third (chapter -> section -> paragraph -> sentence).
 - Conclusion: Hierarchical navigation -- scoring each level's children against the ask and descending only into the best match, the same hybrid retriever EXP-004/015/029/040/058/060 already measured, never a language model -- correctly reaches the chapter and section containing a distinctive needle at every size tested, from 27 to 450 leaves, without ever scoring the full leaf set directly: by the final level, the candidate pool it searches is only the handful of leaves in the one resolved section, not the whole tree. This is the mechanism that lets the system work on a 1000-page document without Gemma (or anything else) ever holding more than one small section's worth of content at a time -- navigation cost grows with tree depth, not with total document size. An abstention floor is now in place, and getting it right took a real measured correction, not a guess: a fixed magnitude floor (0.05) correctly caught the off-topic negative control but then wrongly rejected the genuine needle at larger sizes too, because a true match's own dense score shrinks as its chapter's summary grows (0.64 -> 0.017 -> 0.0056 across the three sizes here) -- a magnitude tuned on the small case does not survive scale. A near-zero floor (strictly positive, not how large) does survive it, because true noise is exactly zero, not small, while a diluted-but-genuine signal never quite reaches zero. The gap lab.common.brain's flat disambiguation step has (no abstention threshold there yet either) is still open and is the natural next place to carry this same fix.
 
@@ -22328,7 +22328,7 @@ Elapsed seconds: 0.1214. Peak RSS MB: 128.7.
 }
 ```
 
-Elapsed seconds: 46.5544. Peak RSS MB: 510.18.
+Elapsed seconds: 50.1163. Peak RSS MB: 510.38.
 - Scale-down: 2 cases, 2-level hierarchy, 9 passages -- a wiring proof, not a scale test (EXP-065 already measured scale up to 450 leaves for the navigation mechanism alone).
 - Conclusion: The unification EXP-060 proved for flat documents carries over to hierarchical ones without any change at the call site: the same function, given passages tagged with a 'hierarchy' dict instead of a flat 'group' string, navigates the structure (lab.common.nested_index, EXP-065's near-zero abstention floor included) and then runs the identical downstream signals (identity, arithmetic, rule application) EXP-058 already measured. A caller never needs to know or declare whether the document it's handing brain.reason is flat or structured -- the passages' own tags decide, the same 'input decides how much of the machinery runs' principle EXP-060 established for the simpler signals now extends to document structure itself.
 
@@ -22371,7 +22371,7 @@ Elapsed seconds: 46.5544. Peak RSS MB: 510.18.
 }
 ```
 
-Elapsed seconds: 51.4229. Peak RSS MB: 550.13.
+Elapsed seconds: 40.8532. Peak RSS MB: 548.89.
 - Scale-down: One tree size (72 leaves), one needle, one paraphrase pair -- a head-to-head proof, not a scale sweep (EXP-065 already measured TF-IDF scale separately).
 - Conclusion: The paraphrase case is exactly where lexical and semantic retrieval diverge as expected: lexical/TF-IDF wrong_answer, semantic/bge correct on an ask sharing almost no exact wording with the needle. Margin-based abstention on real embeddings holds up on the off-topic negative control (semantic/bge outcome: correct_abstain), confirming the predicted fix for the floor's known failure mode on embeddings (unrelated text scores ~0.1-0.3 cosine, never near zero, so the near-zero floor used for TF-IDF would never fire on embeddings) -- a relative top1-vs-runner-up gap generalizes across both scoring methods where an absolute floor does not. This measured result supports combining both signals rather than replacing TF-IDF outright: lexical retrieval still resolved the exact-wording case correctly and is cheaper, while semantic retrieval is what's load-bearing specifically for paraphrase/synonym asks -- the two are complementary, not substitutes, matching the recommendation made before this was built.
 
@@ -22445,7 +22445,7 @@ Elapsed seconds: 51.4229. Peak RSS MB: 550.13.
 }
 ```
 
-Elapsed seconds: 96.1699. Peak RSS MB: 431.99.
+Elapsed seconds: 69.6613. Peak RSS MB: 575.27.
 - Scale-down: 3 margin-sweep fixtures, 1 single-child case, 4 flat-disambiguation cases -- enough to validate the mechanism and get a first real measurement of separability, not an exhaustive calibration.
 - Conclusion: All three gaps named after EXP-067 were addressed and re-measured rather than assumed fixed. Flat disambiguation now abstains correctly on the off-topic case and still answers both EXP-060 regression cases, using the identical dual-signal (lexical floor + semantic margin, independent checks that must agree) design EXP-067 validated for hierarchical navigation -- the same mechanism now covers both branches of lab.common.brain. The disambiguation fix worked on the paraphrase case from the first run (it resolved the correct group); what failed downstream of it at the time this exploration was first run was a *separate* issue this exploration exposed rather than caused: brain.py's _wants_identity and _wants_total were literal keyword checks ('name' + 'address', a fixed list of total-cue words), so a paraphrased ask could pass disambiguation correctly and still get no answer. That gap was closed in EXP-069 (semantic intent signals, replacing the literal keyword checks) -- this file reflects a rerun after that fix, which is why the paraphrase case now passes end to end rather than failing downstream the way it did when this exploration was first written. The single-candidate gap in navigate_semantic is closed by falling back to the TF-IDF dense floor specifically where a margin can't be computed, reusing lab.common.nested_index's already-measured constant rather than inventing a new number. The margin sweep found the two populations are NOT cleanly separable (min genuine 0.0031 <= max noise 0.0631) -- meaning no single fixed threshold can be fully trusted across different vocabularies, a real limitation to flag rather than paper over with a confident-sounding constant.
 
@@ -22527,7 +22527,7 @@ Elapsed seconds: 96.1699. Peak RSS MB: 431.99.
 }
 ```
 
-Elapsed seconds: 73.6368. Peak RSS MB: 435.44.
+Elapsed seconds: 40.6324. Peak RSS MB: 516.6.
 - Scale-down: 3 new domains, 1 fixture each, 10+10 calibration asks per signal -- enough to demonstrate removal and generalization, not an exhaustive domain sweep.
 - Conclusion: The literal domain/keyword hardcoding found after EXP-068 -- ask.py's lessee/lessor cues, brain.py's TOTAL_CUES and name+address substring check -- is removed and replaced with lab.common.intent_signals' bge exemplar similarity, which describes question FORM (who/where, how-much/total) rather than any subject vocabulary. Calibration across four domains (including two never used anywhere else in this repo) found real separation for both signals, so the current thresholds rest on a measured gap rather than one lucky guess. All three brand-new domains (medical, insurance, engineering) -- invented for this exploration specifically so nothing in them could match a pre-existing hardcoded word -- pass end to end through the unchanged lab.common.brain.reason entry point: same disambiguation, same identity extraction, same arithmetic, same rule application already proven on lease/contract fixtures, now proven on content the pipeline has genuinely never seen before.
 
@@ -22587,7 +22587,7 @@ Elapsed seconds: 73.6368. Peak RSS MB: 435.44.
 }
 ```
 
-Elapsed seconds: 34.8767. Peak RSS MB: 513.15.
+Elapsed seconds: 35.6987. Peak RSS MB: 512.71.
 - Scale-down: 1 fixture, 2 chapters, 5 cases -- a wiring/before-after proof, not a scale test (EXP-065 already measured the lexical mechanism's scale, EXP-067 the semantic mechanism's paraphrase case).
 - Conclusion: lab.common.brain's hierarchical branch now uses the same lexical+semantic dual-signal design (lab.common.semantic_index.navigate_dual) the flat branch already had, closing the gap this exploration was built to close. The paraphrase cases are exactly where the two diverge, as predicted: the dual-signal navigator resolves both correctly while the lexical-only navigator it replaces does not -- direct, measured evidence this wiring is load-bearing, not cosmetic. The two regression cases (exact wording) and the off-topic negative control hold under both navigators, confirming this is additive -- the new signal only helps on asks where lexical alone was already weak, it does not regress the cases lexical alone already handled.
 
@@ -22630,7 +22630,7 @@ Elapsed seconds: 34.8767. Peak RSS MB: 513.15.
 }
 ```
 
-Elapsed seconds: 110.4487. Peak RSS MB: 554.13.
+Elapsed seconds: 70.2328. Peak RSS MB: 558.96.
 - Scale-down: 5 fixtures, 8 asks each -- enough to check the dual-signal claim directly, not an exhaustive calibration across every possible domain.
 - Conclusion: Requiring lexical agreement does compensate for the semantic margin's own unreliability: every case resolves or abstains correctly end to end, even though EXP-068 measured the semantic margin alone as not cleanly separable across fixtures. The dual-signal requirement -- not a better single threshold -- is what makes this robust: a low-confidence semantic margin on a genuine paraphrase still gets corroborated by the lexical signal often enough, and a low-confidence semantic margin on real noise has no lexical corroboration to borrow from either.
 
@@ -22685,7 +22685,7 @@ Elapsed seconds: 110.4487. Peak RSS MB: 554.13.
 }
 ```
 
-Elapsed seconds: 62.5396. Peak RSS MB: 508.27.
+Elapsed seconds: 49.1526. Peak RSS MB: 506.17.
 - Scale-down: 3 no-context asks, 1 retrieval-miss case, 1 genuine case -- enough to prove the mechanism and its boundary, not a broad open-domain QA benchmark.
 - Conclusion: The no-context fallback works and, critically, stays exactly where FORBIDDEN.md's exception draws the line: a genuinely empty passages list gets an explicitly disclaimed, ungrounded answer, while a real retrieval miss -- passages were given, just none of them relevant -- still abstains exactly as it did before this branch existed. The two cases are structurally distinguished (checked before any retrieval runs, not by a confidence score), so there is no way for a struggling retrieval to slide into the ungrounded path and dodge abstention.
 
@@ -22823,7 +22823,7 @@ Elapsed seconds: 0.0283. Peak RSS MB: 127.75.
 }
 ```
 
-Elapsed seconds: 50.3413. Peak RSS MB: 510.16.
+Elapsed seconds: 34.6335. Peak RSS MB: 507.93.
 - Scale-down: 1 fixture, 1 ask, 2 decoy entities -- a proof the mechanism works and stays scoped, not a stress test of deep multi-hop chains or many simultaneous cross-references.
 - Conclusion: Combining facts about one entity across two different chapters -- something navigate_dual's single-path descent cannot do by construction, proven directly by the counterfactual showing its leaf alone never includes the Company Registry fact -- now works through the identical brain.reason(ask, passages) entry point, via a purely additive graph-expansion step that only adds passages an entity link actually justifies. The Employees/Meera and Company Registry/Zenith passages are untouched decoys proving the expansion is scoped to the entity actually named in the ask, not a blanket merge of every chapter.
 
@@ -22988,6 +22988,151 @@ Elapsed seconds: 474.5048. Peak RSS MB: 146.52.
 Elapsed seconds: 135.874. Peak RSS MB: 765.05.
 - Scale-down: 6-7 leaves, one deliberately injected conflict -- a proof the mechanism works and stays quiet when it should, not a scale test (EXP-077 already measured generative fidelity at 80 leaves; this is a different mechanism, checked separately).
 - Conclusion: Both mechanisms work as intended: a genuinely consistent multi-page document produces zero false-positive flags, and a deliberately injected later-page contradiction about the same person and the same fact (address) is caught, naming exactly which earlier page it conflicts with and what the two values were -- not just 'something is wrong somewhere'. This closes EXP-053's gap directly: a check that previously did not exist at all for long-form writing, built on lab.common.working_memory's bounded 'RAM' (subject-verb-object triples only, never full page text kept once a page is behind it).
+
+## EXP-079 Long-form writing wired into brain.reason as its fifth signal
+
+- Status: `closed`
+- Models used: bge-small-en-v1.5 for the document-intent signal (retrieval-style similarity scoring only); flan-t5-small for the rewriter role inside longform (measured separately, EXP-048 onward). No new generative use.
+- Goal: Prove lab.common.intent_signals.wants_document correctly dispatches document-requesting asks to lab.common.longform.write_long_document through lab.common.brain.reason, and -- the real test -- that it does not fire on any short-lookup ask already measured by an earlier exploration.
+- Method: 3 genuine document-requesting asks, run through brain.reason, checked for the signal firing and actually dispatching to longform_write. 4 short-lookup asks drawn directly from EXP-057/069/075's own fixtures (not invented fresh for this test), including the one compound ask that scored closest to DOCUMENT_TAU during calibration, checked that the signal stays silent.
+- Referenced files:
+- `lab/exp_079_longform_signal/run.py`
+- `lab/common/brain.py`
+- `lab/common/intent_signals.py`
+- `lab/common/longform.py`
+- `data/exp_078_longform_consistency/results.json`
+- `data/exp_079_longform_signal/results.json`
+- Results: 3/3 document-requesting asks correctly fired the signal and dispatched to lab.common.longform (scores [0.8835, 0.8992, 0.9225]). 4/4 short-lookup asks (drawn from EXP-057/069/075, not invented fresh) correctly did NOT fire it (scores [0.5282, 0.6331, None, 0.5201]), including the one compound multi-clause ask that scored closest to the threshold during calibration.
+```json
+{
+  "document_asks": {
+    "n": 3,
+    "all_fired": true,
+    "rows": [
+      {
+        "ask": "Write a full report covering every employee, their address, and their employer.",
+        "score": 0.8835,
+        "fired": true,
+        "dispatched_to_longform": true,
+        "decision": "supported"
+      },
+      {
+        "ask": "Draft a complete document summarizing all the people in these records.",
+        "score": 0.8992,
+        "fired": true,
+        "dispatched_to_longform": true,
+        "decision": "supported"
+      },
+      {
+        "ask": "Compose a detailed write-up describing each person mentioned here.",
+        "score": 0.9225,
+        "fired": true,
+        "dispatched_to_longform": true,
+        "decision": "supported"
+      }
+    ]
+  },
+  "lookup_regression": {
+    "n": 4,
+    "none_fired": true,
+    "rows": [
+      {
+        "ask": "What is the notice period?",
+        "score": 0.5282,
+        "fired": false,
+        "decision": "supported",
+        "had_document_signal_step": true
+      },
+      {
+        "ask": "An engineer recorded an additional stress reading on a component last ",
+        "score": 0.6331,
+        "fired": false,
+        "decision": "supported",
+        "had_document_signal_step": true
+      },
+      {
+        "ask": "What is the capital of France?",
+        "score": null,
+        "fired": null,
+        "decision": "ungrounded",
+        "had_document_signal_step": false
+      },
+      {
+        "ask": "Where does Ravi Sharma live, and in which city is his employer registe",
+        "score": 0.5201,
+        "fired": false,
+        "decision": "supported",
+        "had_document_signal_step": true
+      }
+    ]
+  }
+}
+```
+
+Elapsed seconds: 103.4616. Peak RSS MB: 874.65.
+- Scale-down: 7 asks total -- enough to prove the wiring and its most important regression boundary, not an exhaustive sweep of every existing exploration's asks.
+- Conclusion: The long-form signal is now reachable through the same single entry point (lab.common.brain.reason) every other capability in this repo goes through, not a standalone function -- and, more importantly, wiring it in did not disturb any existing short-answer behavior: every lookup ask already measured by an earlier exploration still resolves exactly as it did before this signal existed. EXP-052/053's named gaps are closed end to end, not just as isolated modules.
+
+## EXP-080 dslim/bert-base-NER, actually measured against EXP-033's rule-tagger-vs-spaCy comparison
+
+- Status: `closed`
+- Models used: dslim/bert-base-NER (CoNLL-2003 token classifier, non-generative), via lab.common.real_encoders.real_entities, wired through lab.common.real_ner. No generative model.
+- Goal: Pick up EXP-033's own named follow-up: measure dslim/bert-base-NER (loaded in lab.common.real_encoders since EXP-033/034's era, never actually called for entity detection until now) on the identical gold fixture, for a real three-way comparison against the rule tagger and the spaCy substitute.
+- Method: The same 12 hand-labeled sentences / 19 PERSON-ORG spans EXP-033 used (imported directly from that exploration's GOLD, not re-picked), scored the identical way (text-containment hit counting, micro-averaged precision/recall/F1) against lab.common.real_ner.detect_real, the new wiring of the dslim/bert-base-NER pipeline already loaded in lab.common.real_encoders.
+- Referenced files:
+- `lab/exp_080_real_ner_rerun/run.py`
+- `lab/common/real_ner.py`
+- `lab/common/real_encoders.py`
+- `lab/common/entities.py`
+- `lab/exp_033_real_entities/run.py`
+- `data/exp_033_real_entities/gold.json`
+- `data/exp_033_real_entities/results.json`
+- `data/exp_080_real_ner_rerun/results.json`
+- Results: On the identical EXP-033 fixture (12 sentences, 19 gold PERSON/ORG spans): rule tagger F1 0.7059 (unchanged from EXP-008/033, measured again here as the baseline). dslim/bert-base-NER F1 0.8085 (precision 0.6786, recall 1.0) -- the first real measurement of this checkpoint anywhere in this repo. spaCy en_core_web_sm (EXP-033): F1 0.7619, for reference, not rerun here.
+```json
+{
+  "n_sentences": 12,
+  "n_gold_entities": 19,
+  "rule_tagger": {
+    "precision": 0.8,
+    "recall": 0.6316,
+    "f1": 0.7059,
+    "tp": 12,
+    "fp": 3,
+    "fn": 7
+  },
+  "dslim_bert_base_ner": {
+    "precision": 0.6786,
+    "recall": 1.0,
+    "f1": 0.8085,
+    "tp": 19,
+    "fp": 9,
+    "fn": 0
+  },
+  "spacy_en_core_web_sm_exp033": {
+    "precision": 0.6957,
+    "recall": 0.8421,
+    "f1": 0.7619
+  },
+  "f1_lift_dslim_vs_rule": 0.1026,
+  "f1_lift_dslim_vs_spacy": 0.0466,
+  "real_model_card": {
+    "bge_model": "BAAI/bge-small-en-v1.5",
+    "qa_model": "deepset/deberta-v3-base-squad2",
+    "nli_model": "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli",
+    "ner_model": "dslim/bert-base-NER",
+    "gliner_named_by_blueprint": "urchade/gliner_small-v2.1",
+    "gliner_loaded": false,
+    "gliner_reason": "the `gliner` package is not installed in this environment; dslim/bert-base-NER is the real checkpoint measured for the NER role instead",
+    "huggingface_reachable": true,
+    "all_non_generative": true
+  }
+}
+```
+
+Elapsed seconds: 24.1203. Peak RSS MB: 755.16.
+- Scale-down: Same 12-sentence fixture as EXP-033 -- not a held-out annotated corpus, chosen for a direct, controlled comparison against an already-measured result rather than a fresh, larger evaluation.
+- Conclusion: dslim/bert-base-NER, the actual blueprint-named checkpoint, outperforms both the rule tagger and the spaCy substitute EXP-033 used when HuggingFace was unreachable -- a real, direct three-way comparison, not an assumption that the originally-intended checkpoint would be better just because it's the one the blueprint named. EXP-033/034's gap is closed: the checkpoint was loaded but never actually called for this role until now.
 
 ## Follow-up todos
 

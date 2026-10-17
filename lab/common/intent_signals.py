@@ -63,8 +63,26 @@ TOTAL_EXEMPLARS = (
     "How much is there altogether?",
 )
 
+DOCUMENT_EXEMPLARS = (
+    "Write a full report covering everyone.",
+    "Draft a complete document summarizing all the findings.",
+    "Compose a detailed write-up for each person.",
+    "Produce a long-form summary document.",
+)
+
 IDENTITY_TAU = 0.5971
 TOTAL_TAU = 0.6084
+# First measured value (lab.common.longform's wiring into brain.reason),
+# not swept across multiple domains the way IDENTITY_TAU/TOTAL_TAU were
+# (EXP-069) -- same caveat MIN_SEMANTIC_MARGIN/SEMANTIC_SINGLE_FLOOR carry:
+# a starting point, checked against a handful of asks on both sides, not a
+# validated constant. Measured range: 4 genuine document-requesting asks
+# scored 0.838-0.889; 5 short-lookup asks scored 0.46-0.54, except one
+# compound multi-clause lookup ask (EXP-069's engineering fixture) which
+# scored 0.6621 -- comfortably below the document cluster, but well above
+# a naive midpoint guess would have placed the floor, so this sits with a
+# real margin on both sides rather than splitting the two clusters evenly.
+DOCUMENT_TAU = 0.75
 
 
 def _best_similarity(text: str, exemplars: tuple[str, ...]) -> float:
@@ -81,4 +99,9 @@ def wants_identity(ask: str, tau: float = IDENTITY_TAU) -> dict:
 
 def wants_total(ask: str, tau: float = TOTAL_TAU) -> dict:
     score = _best_similarity(ask, TOTAL_EXEMPLARS)
+    return {"fires": score >= tau, "score": round(score, 4), "tau": tau}
+
+
+def wants_document(ask: str, tau: float = DOCUMENT_TAU) -> dict:
+    score = _best_similarity(ask, DOCUMENT_EXEMPLARS)
     return {"fires": score >= tau, "score": round(score, 4), "tau": tau}

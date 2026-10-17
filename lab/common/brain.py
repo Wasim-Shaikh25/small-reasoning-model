@@ -11,13 +11,17 @@ otherwise just be a classifier picking between separate pipelines: `reason()`
 does not classify the ask into one exclusive type and branch. It runs a fixed
 sequence of independent, domain-agnostic *signal checks* -- is there more than
 one candidate story here (flat, or nested across a hierarchy)? does the ask
-want an identity? a total? is there a rule anywhere in context? -- and only
-the tools whose signal fires actually run. A plain lookup question fires none
-of the extra signals and falls back to the same lab.common.qa extractor
-lab.common.engine already uses. A question like EXP-058's fires three of them
-at once and chains their results. Same function, same code path, every time;
-the input decides how much of it is used, not a label chosen for the input
-ahead of time.
+want an identity? a total? a full written document? is there a rule anywhere
+in context? -- and only the tools whose signal fires actually run. A plain
+lookup question fires none of the extra signals and falls back to the same
+lab.common.qa extractor lab.common.engine already uses. A question like
+EXP-058's fires three of them at once and chains their results. A document
+request (EXP-078, closing what this docstring itself used to name as a
+fifth-signal todo) fires its own signal first and exclusively, dispatching
+to lab.common.longform instead of falling through to the short-answer
+signals below it. Same function, same code path, every time; the input
+decides how much of it is used, not a label chosen for the input ahead of
+time.
 
 One case sits outside that signal-chain entirely and is checked first: zero
 passages at all (FORBIDDEN.md's narrow exception, 2026-10-16). That is not
@@ -41,8 +45,8 @@ use.
 
 Every tool this calls is a primitive already built and separately measured:
   - lab.common.index.Index: hybrid retrieval, EXP-004/015/029/040/058.
-  - lab.common.intent_signals: domain-agnostic identity/total detection,
-    EXP-069 (bge exemplar similarity, not literal keywords).
+  - lab.common.intent_signals: domain-agnostic identity/total/document
+    detection, EXP-069/078 (bge exemplar similarity, not literal keywords).
   - lab.common.semantic_index.SemanticIndex / navigate_dual: real bge
     embeddings, EXP-067/070, used alongside Index (not instead of it) for
     both flat disambiguation and hierarchical navigation -- lexical and
@@ -54,6 +58,10 @@ Every tool this calls is a primitive already built and separately measured:
     combining facts about one named entity across groups/chapters the
     single-path flat/hierarchical resolution above can't reach by design.
   - lab.common.entities: name/address extraction, EXP-009.
+  - lab.common.longform / lab.common.working_memory: ask-derived
+    long-form document writing and cross-page consistency checking,
+    EXP-052/053/078 -- the controller's own bounded "RAM", never the
+    full data, only pointers and short digests back to it.
   - lab.common.calc: arithmetic, EXP-007/014.
   - lab.common.rules: verb-trigger and threshold rule application,
     EXP-057/058/059 (including the role-match guard EXP-058 added).
@@ -73,7 +81,7 @@ from lab.common.calc import sum_amounts
 from lab.common.entities import AMOUNT_RE, detect_primary, parse_address
 from lab.common.graph_index import build_entity_graph, expand_from_entity
 from lab.common.index import Index
-from lab.common.intent_signals import wants_identity, wants_total
+from lab.common.intent_signals import wants_document, wants_identity, wants_total
 from lab.common.nested_index import MIN_DENSE_SCORE, build_nested_index
 from lab.common.qa import answer_with_agreement
 from lab.common.rules import apply_rule, apply_threshold_rule, extract_fact_triple, parse_conditional_rule, parse_threshold_rule
@@ -153,6 +161,37 @@ def reason(ask: str, passages: list[dict]) -> dict:
         return _finish(ask, trace, result["decision"], result["text"], set())
     plan = analyze(ask)
     trace.append({"step": "analyze_ask", "task_type": plan["task_type"], "subquestions": plan["subquestions"]})
+
+    # Long-form dispatch (lab.common.longform, EXP-052/053/078): the fifth
+    # signal this module's own docstring named as a todo since before this
+    # function existed. Checked early and exclusively -- an ask that wants
+    # a written document is a genuinely different shape of answer, not a
+    # longer version of the same short lookup below, so it does not fall
+    # through to disambiguation/identity/total/rule at all once it fires.
+    # decision="supported_with_flags" (a fourth value, alongside
+    # "supported"/"inconclusive"/"ungrounded") is used rather than
+    # unconditionally "supported" when lab.common.working_memory found a
+    # real cross-page contradiction -- calling a self-contradictory
+    # document "supported" would hide exactly the thing this signal exists
+    # to catch.
+    document_signal = wants_document(ask)
+    trace.append({"step": "intent_signal", "signal": "document", **document_signal})
+    if document_signal["fires"]:
+        from lab.common.longform import write_long_document
+
+        findings = [{"finding_id": p["id"], "statement": p["text"], "citation": p["id"]} for p in passages if p.get("text")]
+        doc_result = write_long_document(ask, findings, task=plan["task_type"])
+        trace.append(
+            {
+                "step": "longform_write",
+                "leaves": len(doc_result["rewrite_diagnostics"]),
+                "rewrite_diagnostics": doc_result["rewrite_diagnostics"],
+                "consistency_flags": doc_result["consistency_flags"],
+                "working_memory": doc_result["working_memory"],
+            }
+        )
+        decision = "supported_with_flags" if doc_result["consistency_flags"] else "supported"
+        return _finish(ask, trace, decision, doc_result["document"], set(doc_result["working_memory"]["citations"]))
 
     groups = sorted({p.get("group") for p in passages if p.get("group")})
     citations: set[str] = set()

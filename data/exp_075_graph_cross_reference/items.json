@@ -12,6 +12,13 @@
       ]
     },
     {
+      "step": "intent_signal",
+      "signal": "document",
+      "fires": false,
+      "score": 0.5201,
+      "tau": 0.75
+    },
+    {
       "step": "nested_navigate",
       "path": [
         {

@@ -53,7 +53,7 @@
     "Only gemma3:270m via Ollama tested for this role; flan-t5-small (also permitted by the exception) not yet measured here.",
     "The citation-marker rejection has only been exercised when the model happens not to fabricate one; a case that reliably provokes a fabricated marker (to prove the rejection actually fires) has not been constructed."
   ],
-  "elapsed_sec": 62.5396,
-  "peak_rss_mb": 508.27,
+  "elapsed_sec": 49.1526,
+  "peak_rss_mb": 506.17,
   "models_used": "gemma3:270m via Ollama, in the new no-context role (FORBIDDEN.md 2026-10-16) -- not the rewriter role, a third, separate, narrowly-scoped generative use."
 }

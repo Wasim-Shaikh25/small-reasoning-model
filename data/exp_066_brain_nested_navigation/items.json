@@ -7,6 +7,7 @@
     "resolved_section": "Priya",
     "trace_steps": [
       "analyze_ask",
+      "intent_signal",
       "nested_navigate",
       "intent_signal",
       "extract_identity",
@@ -27,6 +28,7 @@
     "resolved_section": null,
     "trace_steps": [
       "analyze_ask",
+      "intent_signal",
       "nested_navigate"
     ],
     "correct_decision": true,
