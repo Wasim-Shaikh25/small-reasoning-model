@@ -145,7 +145,14 @@ def _group_margin(hits: list[dict], score_key: str) -> float:
     return scores[0] - scores[1]
 
 
-def reason(ask: str, passages: list[dict]) -> dict:
+def reason(ask: str, passages: list[dict], use_real_ner: bool = False) -> dict:
+    """`use_real_ner=True` threads through to every lab.common.entities.
+    detect_primary call this function makes (identity extraction, graph
+    expansion, long-form outlining) -- see that function for why it
+    defaults to False: a real transformers model call is real added
+    latency, which every existing caller of reason() keeps unchanged
+    unless it explicitly opts in.
+    """
     trace = []
     if not passages:
         # FORBIDDEN.md's narrow exception, recorded 2026-10-16: literally no
@@ -180,7 +187,7 @@ def reason(ask: str, passages: list[dict]) -> dict:
         from lab.common.longform import write_long_document
 
         findings = [{"finding_id": p["id"], "statement": p["text"], "citation": p["id"]} for p in passages if p.get("text")]
-        doc_result = write_long_document(ask, findings, task=plan["task_type"])
+        doc_result = write_long_document(ask, findings, task=plan["task_type"], use_real_ner=use_real_ner)
         trace.append(
             {
                 "step": "longform_write",
@@ -304,9 +311,9 @@ def reason(ask: str, passages: list[dict]) -> dict:
     facts: dict = {}
     answer_parts: list[str] = []
 
-    ask_entities = [m["text"] for m in detect_primary(ask) if m["label"] in ("person", "organization")]
+    ask_entities = [m["text"] for m in detect_primary(ask, use_real_ner=use_real_ner) if m["label"] in ("person", "organization")]
     if ask_entities:
-        graph = build_entity_graph(passages)
+        graph = build_entity_graph(passages, use_real_ner=use_real_ner)
         passages_by_id = {p["id"]: p for p in passages}
         scoped_ids = {p["id"] for p in scoped}
         for entity_text in ask_entities:
@@ -346,7 +353,7 @@ def reason(ask: str, passages: list[dict]) -> dict:
     trace.append({"step": "intent_signal", "signal": "identity", **identity_signal})
     if identity_signal["fires"]:
         full_text = " ".join(p["text"] for p in scoped)
-        mentions = detect_primary(full_text)
+        mentions = detect_primary(full_text, use_real_ner=use_real_ner)
         # Prefer a person mention that is unique to this resolved scope over
         # one that also appears outside it (e.g. a doctor's name repeated
         # across every patient's own passages) -- a set-difference check

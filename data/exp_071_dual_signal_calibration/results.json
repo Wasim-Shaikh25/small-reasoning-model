@@ -38,7 +38,7 @@
     "data/exp_071_dual_signal_calibration/results.json"
   ],
   "follow_ups": [],
-  "elapsed_sec": 70.2328,
-  "peak_rss_mb": 558.96,
+  "elapsed_sec": 59.7976,
+  "peak_rss_mb": 557.95,
   "models_used": "bge-small-en-v1.5 for semantic scoring; TF-IDF/BM25 for lexical. No generative model."
 }

@@ -1,0 +1,70 @@
+"""Raw document in, ready-to-reason passages out -- the step the project
+owner asked for by name: "once we give prompt or document it will
+instantly become... all index and everything... needed" before reasoning
+starts.
+
+What that actually requires, checked against how this repo already
+works rather than assumed: lab.common.index.Index and lab.common.
+semantic_index.SemanticIndex already build their structures on the fly
+from whatever passage list they're given, at query time -- there is no
+separate, persisted "build the index" step anywhere in this project (an
+on-disk index is EXP-022's own still-open todo). Same for the entity
+graph (lab.common.graph_index.build_entity_graph): built fresh from a
+passage list each time, not persisted. So the one genuinely missing
+piece, the one this module supplies, is turning raw document text into
+that passage-list shape at all -- chunking -- not a new indexing stage.
+Everything downstream (Index, SemanticIndex, build_entity_graph,
+lab.common.brain.reason) already works the moment a document is in that
+shape; this is what gets it there.
+"""
+
+from __future__ import annotations
+
+import re
+
+
+def chunk_document(raw_text: str, max_words_per_chunk: int = 120) -> list[dict]:
+    """Splits on blank lines (paragraphs) first -- the natural unit a real
+    document is already written in -- then, only if a paragraph is long
+    enough that a single bounded rewrite_unit call would struggle with it
+    (EXP-048 onward measured the rewriter's own reliability degrading
+    well before 120 words), splits that one paragraph further at sentence
+    boundaries. Never splits a sentence in half.
+
+    Returns passages shaped exactly as lab.common.brain.reason and
+    lab.common.longform.write_long_document already expect: a flat list
+    of {"id", "text"} dicts, no new fields, no separate indexing call
+    needed before passing this straight to either of them.
+    """
+    from lab.common.textutil import sentences
+
+    paragraphs = [p.strip() for p in re.split(r"\n\s*\n", raw_text or "") if p.strip()]
+    chunks: list[str] = []
+    for paragraph in paragraphs:
+        if len(paragraph.split()) <= max_words_per_chunk:
+            chunks.append(paragraph)
+            continue
+        current: list[str] = []
+        current_words = 0
+        for sentence in sentences(paragraph):
+            sentence_words = len(sentence.split())
+            if current and current_words + sentence_words > max_words_per_chunk:
+                chunks.append(" ".join(current))
+                current, current_words = [], 0
+            current.append(sentence)
+            current_words += sentence_words
+        if current:
+            chunks.append(" ".join(current))
+
+    return [{"id": f"CHUNK{i:04d}", "text": chunk} for i, chunk in enumerate(chunks)]
+
+
+def load_text_file(path: str) -> str:
+    """Plain .txt/.md. A real .pdf/.docx needs its own reader (python-docx,
+    pypdf) -- not duplicated here since this repo already depends on
+    python-docx for lab.common.docx_writer and would gain nothing from a
+    second copy of that logic.
+    """
+    from pathlib import Path
+
+    return Path(path).read_text(encoding="utf-8", errors="replace")

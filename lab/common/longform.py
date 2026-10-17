@@ -48,7 +48,7 @@ from lab.common.working_memory import WorkingMemory
 MAX_FINDINGS_PER_ENTITY_LEAF = 4
 
 
-def _entity_outline(findings: list[dict]) -> tuple[list[dict], list[dict]]:
+def _entity_outline(findings: list[dict], use_real_ner: bool = False) -> tuple[list[dict], list[dict]]:
     """One or more leaves per distinct person/organization the findings
     are about, in first-seen order, titled with that entity's own name --
     not a generic "Section N". A finding naming no person/org (a global
@@ -71,7 +71,7 @@ def _entity_outline(findings: list[dict]) -> tuple[list[dict], list[dict]]:
     order: list[str] = []
     leftover: list[dict] = []
     for finding in findings:
-        mentions = [m for m in detect_primary(finding["statement"]) if m["label"] in ("person", "organization")]
+        mentions = [m for m in detect_primary(finding["statement"], use_real_ner=use_real_ner) if m["label"] in ("person", "organization")]
         if not mentions:
             leftover.append(finding)
             continue
@@ -98,6 +98,8 @@ def write_long_document(
     checkpoint: str = "flan-t5-small",
     title: str = "Document",
     out_path: Path | None = None,
+    docx_out_path: Path | None = None,
+    use_real_ner: bool = False,
 ) -> dict:
     """Writes one long document from `findings`, page by page, checking
     cross-page consistency as it goes.
@@ -117,7 +119,7 @@ def write_long_document(
     (lab.common.document_writer) and includes its result.
     """
     glossary = glossary or {}
-    entity_leaves, leftover_findings = _entity_outline(findings)
+    entity_leaves, leftover_findings = _entity_outline(findings, use_real_ner=use_real_ner)
     leftover_leaves = build_outline(leftover_findings, task) if leftover_findings else []
     outline = entity_leaves + leftover_leaves
 
@@ -147,11 +149,18 @@ def write_long_document(
 
     document_result = None
     if out_path is not None:
-        document_result = write_document(title, assembled, findings, task, out_path)
+        document_result = write_document(title, assembled, findings, task, out_path, leaf_titles=[leaf["title"] for leaf in outline])
+
+    docx_result = None
+    if docx_out_path is not None:
+        from lab.common.docx_writer import write_docx
+
+        docx_result = write_docx(title, assembled, findings, task, docx_out_path, leaf_titles=[leaf["title"] for leaf in outline])
 
     return {
         "document": document_text,
         "document_result": document_result,
+        "docx_result": docx_result,
         "consistency_flags": consistency_flags,
         "rewrite_diagnostics": rewrite_diagnostics,
         "working_memory": memory.to_dict(),

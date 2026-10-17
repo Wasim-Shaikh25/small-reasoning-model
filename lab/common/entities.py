@@ -165,7 +165,16 @@ def _add(found: list[dict], text: str, match: re.Match, label: str, conf: float,
     )
 
 
-def detect_primary(text: str) -> list[dict]:
+def detect_primary(text: str, use_real_ner: bool = False) -> list[dict]:
+    """`use_real_ner=True` also merges dslim/bert-base-NER's PER/ORG spans
+    (lab.common.real_ner, EXP-080: F1 0.8085, recall 1.0 on that
+    exploration's gold fixture, vs. this regex tagger's 0.7059) in before
+    dedup, so a real mention the regex has no pattern for can still win on
+    confidence. Defaults to False -- a real transformers model call is
+    real added latency every caller of this function would otherwise take
+    on silently; every one of the 80+ explorations that already call this
+    function keeps its exact prior behavior and speed unless it opts in.
+    """
     found: list[dict] = []
     for rx, label, conf in (
         (TITLE_PERSON, "person", 0.9),
@@ -182,6 +191,10 @@ def detect_primary(text: str) -> list[dict]:
     ):
         for match in rx.finditer(text or ""):
             _add(found, text, match, label, conf, "primary")
+    if use_real_ner:
+        from lab.common.real_ner import detect_real
+
+        found.extend(detect_real(text))
     return _dedupe(found)
 
 

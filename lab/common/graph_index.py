@@ -31,15 +31,18 @@ from lab.common.textutil import normalize
 GRAPH_LABELS = ("person", "organization")
 
 
-def build_entity_graph(passages: list[dict]) -> dict:
+def build_entity_graph(passages: list[dict], use_real_ner: bool = False) -> dict:
     """Returns {"nodes": {entity_key: {"text", "label", "passage_ids": set}},
     "edges": {entity_key: set(other_entity_keys)}}.
+
+    `use_real_ner` passes straight through to lab.common.entities.
+    detect_primary -- see that function for why it defaults to False.
     """
     nodes: dict[str, dict] = {}
     edges: dict[str, set] = defaultdict(set)
 
     for passage in passages:
-        mentions = [m for m in detect_primary(passage.get("text", "")) if m["label"] in GRAPH_LABELS]
+        mentions = [m for m in detect_primary(passage.get("text", ""), use_real_ner=use_real_ner) if m["label"] in GRAPH_LABELS]
         keys = []
         for mention in mentions:
             key = normalize(mention["text"])

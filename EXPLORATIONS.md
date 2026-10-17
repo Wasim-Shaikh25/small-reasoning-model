@@ -484,7 +484,7 @@ Elapsed seconds: 0.0888. Peak RSS MB: 32.28.
 }
 ```
 
-Elapsed seconds: 0.0143. Peak RSS MB: 134.2.
+Elapsed seconds: 0.0034. Peak RSS MB: 132.41.
 - Scale-down: 52 short lines and 12 role passages replace the blueprint's 150 to 200 detection lines and 30 role passages. GLiNER, BERT-NER, and libpostal are not loaded.
 - Conclusion: Exact-span F1 is high on easy titled names, suffixed organizations, and fully patterned addresses, and lower on the hard slice (bare company names, amounts in words, lowercase names, courts). Ambiguous place names are flagged rather than treated as high-confidence addresses.
 
@@ -21684,7 +21684,7 @@ Elapsed seconds: 252.4715. Peak RSS MB: 653.29.
 }
 ```
 
-Elapsed seconds: 28.1871. Peak RSS MB: 293.04.
+Elapsed seconds: 5.4308. Peak RSS MB: 292.82.
 - Scale-down: One rule sentence shape ('If <subject>, <verb phrase>, <consequence>.') and single-clause facts with no qualifier. A rule with an exception ('...unless committed in self-defense') is not parsed here -- the same qualifier gap EXP-006/EXP-026 already named for the lexical NLI judge. Multiple candidate rules or facts in the same passage set are not disambiguated; the first of each is used.
 - Conclusion: A general rule given in context can be applied to a specific fact given in context, and the result cited back to both, without a generative model and without training anything new -- a dependency parser's verb extraction plus one lemma comparison is enough for this shape of case. The system correctly abstains rather than answers when the fact doesn't match the rule's verb or when no rule sentence is present at all, instead of defaulting to a guess.
 
@@ -21740,7 +21740,7 @@ Elapsed seconds: 28.1871. Peak RSS MB: 293.04.
 }
 ```
 
-Elapsed seconds: 0.0322. Peak RSS MB: 139.55.
+Elapsed seconds: 0.0184. Peak RSS MB: 139.59.
 - Scale-down: Two stories, one policy, one role-class check. Real documents would have more distractors, multiple candidate policies, and roles stated less explicitly than 'is a contractor for Zenith Corp.' -- this is a scaled-down integration test of the chain, not a benchmark of its ceiling.
 - Conclusion: Disambiguating between two multi-sentence stories by a cue in the ask (not a name), extracting a name and address, summing money mentioned across separate sentences, and applying a company policy threshold rule all chain correctly end to end, each step citable to its own source passage. The second case is the one worth dwelling on: Ravi Sharma's total (INR 45,000) is well over the policy's INR 30,000 threshold, and a rule engine that only checked the number would have incorrectly fired approval on him. Checking that his own story actually describes him with the policy's subject role ('a contractor') -- and finding it doesn't, he's a sales manager -- is what keeps the decision correct. A rule matching a number is not the same as a rule applying to the right person.
 
@@ -21778,7 +21778,7 @@ Elapsed seconds: 0.0322. Peak RSS MB: 139.55.
 }
 ```
 
-Elapsed seconds: 23.459. Peak RSS MB: 293.0.
+Elapsed seconds: 4.7534. Peak RSS MB: 293.17.
 - Scale-down: Six domains, 11 hand-written cases, single-clause rules and facts only -- not a benchmark of how many domains or how complex a rule this can handle, a targeted test of whether the existing mechanism needed domain-specific code to extend, which it did not.
 - Conclusion: The objection this exploration tests directly -- that a 'rule engine' which secretly needs a new rule per question isn't a rule engine at all -- does not hold for the two rule shapes built so far. The verb-trigger matcher works by extracting a sentence's main verb via spaCy's dependency parser and comparing lemmas; that mechanism has no idea whether the verb is 'murder', 'contain', 'run', or 'have' -- it would work on a verb this project has never seen written down anywhere, because the verb comes from the parser's general training, not from a lookup table this project wrote. The threshold matcher works by extracting a number near 'exceeds' and comparing it with the same calc.compare_numbers function EXP-007/014 already used for dates and amounts; it has no idea whether the number is rupees, degrees, or kilometers per hour. This is category A from the research pasted in review (a rule-based expert system: explicit rules and facts, a deterministic reasoning engine) with the narrow end of category B (a neural parser for natural-language understanding feeding a symbolic match step) -- one engine, run on different rulebooks, not a new engine per rulebook. What would genuinely need new code is a *third rule shape* this project hasn't built yet (a rule with an exception clause, a rule comparing two extracted facts to each other rather than to a fixed threshold) -- and that is a real, acknowledged limit, not a hidden one.
 
@@ -21896,7 +21896,7 @@ Elapsed seconds: 23.459. Peak RSS MB: 293.0.
 }
 ```
 
-Elapsed seconds: 60.6037. Peak RSS MB: 594.36.
+Elapsed seconds: 21.8669. Peak RSS MB: 593.5.
 - Scale-down: 8 cases across 3 regimes, not a benchmark of the brain's ceiling -- a targeted test that the single entry point reproduces every prior exploration's answer without per-case wiring.
 - Conclusion: One function handles a plain lookup, a rule-application question, and a multi-signal integrated scenario without the caller choosing a path. The difference between regimes shows up only in the trace -- which internal signal checks fired -- never in which function was called or how it was called. A lookup question fires none of the extra signals and falls back to the same single-slot extractor lab.common.engine already uses; the integrated cases fire three signals at once and chain their results. This is the unification the prior three explorations (EXP-057/058/059) proved piece by piece, now proved as one entry point rather than three scripts a person chooses between.
 
@@ -22018,7 +22018,7 @@ Elapsed seconds: 60.6037. Peak RSS MB: 594.36.
 }
 ```
 
-Elapsed seconds: 621.5368. Peak RSS MB: 721.97.
+Elapsed seconds: 219.6775. Peak RSS MB: 725.2.
 - Scale-down: 10 hand-written cases across 4 domains, not a paraphrase benchmark -- a targeted test of one specific, named brittleness.
 - Conclusion: Exact-lemma matching is exactly as brittle on messy phrasing as the objection predicted: 0.0 accuracy on paraphrased facts that share no verb with their rule, because 'took her life' and 'murdered' are different lemmas even though they describe the same act. Semantic matching recovers all of that gap (1.0 accuracy), using the real DeBERTa-v3 MNLI checkpoint to check whether the specific fact entails the rule's general condition, rather than requiring the same word. This is not a free upgrade: near-miss accuracy drops from 1.0 to 0.5 -- a related-but-insufficient fact (injuring someone in an accident, cooking in a shared kitchen) is exactly where a model that generalizes by meaning risks over-matching where exact lemma comparison, by being too strict, accidentally got it right for the wrong reason. Both numbers are reported, not just the one that favors the fix.
 
@@ -22286,7 +22286,7 @@ Elapsed seconds: 106.2533. Peak RSS MB: 147.0.
 }
 ```
 
-Elapsed seconds: 0.125. Peak RSS MB: 127.38.
+Elapsed seconds: 0.0225. Peak RSS MB: 127.26.
 - Scale-down: 3 chapters, up to 450 leaves, one needle -- not a real 1000-page document or multiple simultaneous needles. Two levels of hierarchy (chapter, section); a real book might want a third (chapter -> section -> paragraph -> sentence).
 - Conclusion: Hierarchical navigation -- scoring each level's children against the ask and descending only into the best match, the same hybrid retriever EXP-004/015/029/040/058/060 already measured, never a language model -- correctly reaches the chapter and section containing a distinctive needle at every size tested, from 27 to 450 leaves, without ever scoring the full leaf set directly: by the final level, the candidate pool it searches is only the handful of leaves in the one resolved section, not the whole tree. This is the mechanism that lets the system work on a 1000-page document without Gemma (or anything else) ever holding more than one small section's worth of content at a time -- navigation cost grows with tree depth, not with total document size. An abstention floor is now in place, and getting it right took a real measured correction, not a guess: a fixed magnitude floor (0.05) correctly caught the off-topic negative control but then wrongly rejected the genuine needle at larger sizes too, because a true match's own dense score shrinks as its chapter's summary grows (0.64 -> 0.017 -> 0.0056 across the three sizes here) -- a magnitude tuned on the small case does not survive scale. A near-zero floor (strictly positive, not how large) does survive it, because true noise is exactly zero, not small, while a diluted-but-genuine signal never quite reaches zero. The gap lab.common.brain's flat disambiguation step has (no abstention threshold there yet either) is still open and is the natural next place to carry this same fix.
 
@@ -22328,7 +22328,7 @@ Elapsed seconds: 0.125. Peak RSS MB: 127.38.
 }
 ```
 
-Elapsed seconds: 50.1163. Peak RSS MB: 510.38.
+Elapsed seconds: 10.1904. Peak RSS MB: 511.12.
 - Scale-down: 2 cases, 2-level hierarchy, 9 passages -- a wiring proof, not a scale test (EXP-065 already measured scale up to 450 leaves for the navigation mechanism alone).
 - Conclusion: The unification EXP-060 proved for flat documents carries over to hierarchical ones without any change at the call site: the same function, given passages tagged with a 'hierarchy' dict instead of a flat 'group' string, navigates the structure (lab.common.nested_index, EXP-065's near-zero abstention floor included) and then runs the identical downstream signals (identity, arithmetic, rule application) EXP-058 already measured. A caller never needs to know or declare whether the document it's handing brain.reason is flat or structured -- the passages' own tags decide, the same 'input decides how much of the machinery runs' principle EXP-060 established for the simpler signals now extends to document structure itself.
 
@@ -22371,7 +22371,7 @@ Elapsed seconds: 50.1163. Peak RSS MB: 510.38.
 }
 ```
 
-Elapsed seconds: 40.8532. Peak RSS MB: 548.89.
+Elapsed seconds: 12.9146. Peak RSS MB: 547.9.
 - Scale-down: One tree size (72 leaves), one needle, one paraphrase pair -- a head-to-head proof, not a scale sweep (EXP-065 already measured TF-IDF scale separately).
 - Conclusion: The paraphrase case is exactly where lexical and semantic retrieval diverge as expected: lexical/TF-IDF wrong_answer, semantic/bge correct on an ask sharing almost no exact wording with the needle. Margin-based abstention on real embeddings holds up on the off-topic negative control (semantic/bge outcome: correct_abstain), confirming the predicted fix for the floor's known failure mode on embeddings (unrelated text scores ~0.1-0.3 cosine, never near zero, so the near-zero floor used for TF-IDF would never fire on embeddings) -- a relative top1-vs-runner-up gap generalizes across both scoring methods where an absolute floor does not. This measured result supports combining both signals rather than replacing TF-IDF outright: lexical retrieval still resolved the exact-wording case correctly and is cheaper, while semantic retrieval is what's load-bearing specifically for paraphrase/synonym asks -- the two are complementary, not substitutes, matching the recommendation made before this was built.
 
@@ -22445,7 +22445,7 @@ Elapsed seconds: 40.8532. Peak RSS MB: 548.89.
 }
 ```
 
-Elapsed seconds: 69.6613. Peak RSS MB: 575.27.
+Elapsed seconds: 35.3479. Peak RSS MB: 575.16.
 - Scale-down: 3 margin-sweep fixtures, 1 single-child case, 4 flat-disambiguation cases -- enough to validate the mechanism and get a first real measurement of separability, not an exhaustive calibration.
 - Conclusion: All three gaps named after EXP-067 were addressed and re-measured rather than assumed fixed. Flat disambiguation now abstains correctly on the off-topic case and still answers both EXP-060 regression cases, using the identical dual-signal (lexical floor + semantic margin, independent checks that must agree) design EXP-067 validated for hierarchical navigation -- the same mechanism now covers both branches of lab.common.brain. The disambiguation fix worked on the paraphrase case from the first run (it resolved the correct group); what failed downstream of it at the time this exploration was first run was a *separate* issue this exploration exposed rather than caused: brain.py's _wants_identity and _wants_total were literal keyword checks ('name' + 'address', a fixed list of total-cue words), so a paraphrased ask could pass disambiguation correctly and still get no answer. That gap was closed in EXP-069 (semantic intent signals, replacing the literal keyword checks) -- this file reflects a rerun after that fix, which is why the paraphrase case now passes end to end rather than failing downstream the way it did when this exploration was first written. The single-candidate gap in navigate_semantic is closed by falling back to the TF-IDF dense floor specifically where a margin can't be computed, reusing lab.common.nested_index's already-measured constant rather than inventing a new number. The margin sweep found the two populations are NOT cleanly separable (min genuine 0.0031 <= max noise 0.0631) -- meaning no single fixed threshold can be fully trusted across different vocabularies, a real limitation to flag rather than paper over with a confident-sounding constant.
 
@@ -22527,7 +22527,7 @@ Elapsed seconds: 69.6613. Peak RSS MB: 575.27.
 }
 ```
 
-Elapsed seconds: 40.6324. Peak RSS MB: 516.6.
+Elapsed seconds: 21.3543. Peak RSS MB: 515.21.
 - Scale-down: 3 new domains, 1 fixture each, 10+10 calibration asks per signal -- enough to demonstrate removal and generalization, not an exhaustive domain sweep.
 - Conclusion: The literal domain/keyword hardcoding found after EXP-068 -- ask.py's lessee/lessor cues, brain.py's TOTAL_CUES and name+address substring check -- is removed and replaced with lab.common.intent_signals' bge exemplar similarity, which describes question FORM (who/where, how-much/total) rather than any subject vocabulary. Calibration across four domains (including two never used anywhere else in this repo) found real separation for both signals, so the current thresholds rest on a measured gap rather than one lucky guess. All three brand-new domains (medical, insurance, engineering) -- invented for this exploration specifically so nothing in them could match a pre-existing hardcoded word -- pass end to end through the unchanged lab.common.brain.reason entry point: same disambiguation, same identity extraction, same arithmetic, same rule application already proven on lease/contract fixtures, now proven on content the pipeline has genuinely never seen before.
 
@@ -22587,7 +22587,7 @@ Elapsed seconds: 40.6324. Peak RSS MB: 516.6.
 }
 ```
 
-Elapsed seconds: 35.6987. Peak RSS MB: 512.71.
+Elapsed seconds: 18.5115. Peak RSS MB: 511.98.
 - Scale-down: 1 fixture, 2 chapters, 5 cases -- a wiring/before-after proof, not a scale test (EXP-065 already measured the lexical mechanism's scale, EXP-067 the semantic mechanism's paraphrase case).
 - Conclusion: lab.common.brain's hierarchical branch now uses the same lexical+semantic dual-signal design (lab.common.semantic_index.navigate_dual) the flat branch already had, closing the gap this exploration was built to close. The paraphrase cases are exactly where the two diverge, as predicted: the dual-signal navigator resolves both correctly while the lexical-only navigator it replaces does not -- direct, measured evidence this wiring is load-bearing, not cosmetic. The two regression cases (exact wording) and the off-topic negative control hold under both navigators, confirming this is additive -- the new signal only helps on asks where lexical alone was already weak, it does not regress the cases lexical alone already handled.
 
@@ -22630,7 +22630,7 @@ Elapsed seconds: 35.6987. Peak RSS MB: 512.71.
 }
 ```
 
-Elapsed seconds: 70.2328. Peak RSS MB: 558.96.
+Elapsed seconds: 37.1438. Peak RSS MB: 558.72.
 - Scale-down: 5 fixtures, 8 asks each -- enough to check the dual-signal claim directly, not an exhaustive calibration across every possible domain.
 - Conclusion: Requiring lexical agreement does compensate for the semantic margin's own unreliability: every case resolves or abstains correctly end to end, even though EXP-068 measured the semantic margin alone as not cleanly separable across fixtures. The dual-signal requirement -- not a better single threshold -- is what makes this robust: a low-confidence semantic margin on a genuine paraphrase still gets corroborated by the lexical signal often enough, and a low-confidence semantic margin on real noise has no lexical corroboration to borrow from either.
 
@@ -22685,7 +22685,7 @@ Elapsed seconds: 70.2328. Peak RSS MB: 558.96.
 }
 ```
 
-Elapsed seconds: 49.1526. Peak RSS MB: 506.17.
+Elapsed seconds: 24.99. Peak RSS MB: 506.95.
 - Scale-down: 3 no-context asks, 1 retrieval-miss case, 1 genuine case -- enough to prove the mechanism and its boundary, not a broad open-domain QA benchmark.
 - Conclusion: The no-context fallback works and, critically, stays exactly where FORBIDDEN.md's exception draws the line: a genuinely empty passages list gets an explicitly disclaimed, ungrounded answer, while a real retrieval miss -- passages were given, just none of them relevant -- still abstains exactly as it did before this branch existed. The two cases are structurally distinguished (checked before any retrieval runs, not by a confidence score), so there is no way for a struggling retrieval to slide into the ungrounded path and dodge abstention.
 
@@ -22796,7 +22796,7 @@ Elapsed seconds: 1588.1011. Peak RSS MB: 1083.36.
 }
 ```
 
-Elapsed seconds: 0.0283. Peak RSS MB: 127.75.
+Elapsed seconds: 0.0059. Peak RSS MB: 125.84.
 - Scale-down: 2 prompt samples, 1 document sample (5 findings, 2 leaves) -- enough to prove both contracts hold, not a broad document-formatting test.
 - Conclusion: The mandatory prompt contract (lab.common.prompt_contract) is now the one shared way every generative call site builds a prompt, and migrating the existing rewriter role onto it changed nothing about what gets sent to the model -- confirmed by direct string equality, not assumed from the refactor being 'just a wrapper'. The document-assembly capstone (lab.common.document_writer) writes one complete, correctly-structured file: a table of contents with exactly as many entries as there are leaves, and a citation index that exactly matches what the assembled body actually cites -- every structural fact still decided by Python, nothing by a model.
 
@@ -22823,7 +22823,7 @@ Elapsed seconds: 0.0283. Peak RSS MB: 127.75.
 }
 ```
 
-Elapsed seconds: 34.6335. Peak RSS MB: 507.93.
+Elapsed seconds: 15.1971. Peak RSS MB: 508.4.
 - Scale-down: 1 fixture, 1 ask, 2 decoy entities -- a proof the mechanism works and stays scoped, not a stress test of deep multi-hop chains or many simultaneous cross-references.
 - Conclusion: Combining facts about one entity across two different chapters -- something navigate_dual's single-path descent cannot do by construction, proven directly by the counterfactual showing its leaf alone never includes the Company Registry fact -- now works through the identical brain.reason(ask, passages) entry point, via a purely additive graph-expansion step that only adds passages an entity link actually justifies. The Employees/Meera and Company Registry/Zenith passages are untouched decoys proving the expansion is scoped to the entity actually named in the ask, not a blanket merge of every chapter.
 
@@ -22985,7 +22985,7 @@ Elapsed seconds: 474.5048. Peak RSS MB: 146.52.
 }
 ```
 
-Elapsed seconds: 135.874. Peak RSS MB: 765.05.
+Elapsed seconds: 26.6465. Peak RSS MB: 774.65.
 - Scale-down: 6-7 leaves, one deliberately injected conflict -- a proof the mechanism works and stays quiet when it should, not a scale test (EXP-077 already measured generative fidelity at 80 leaves; this is a different mechanism, checked separately).
 - Conclusion: Both mechanisms work as intended: a genuinely consistent multi-page document produces zero false-positive flags, and a deliberately injected later-page contradiction about the same person and the same fact (address) is caught, naming exactly which earlier page it conflicts with and what the two values were -- not just 'something is wrong somewhere'. This closes EXP-053's gap directly: a check that previously did not exist at all for long-form writing, built on lab.common.working_memory's bounded 'RAM' (subject-verb-object triples only, never full page text kept once a page is behind it).
 
@@ -23069,7 +23069,7 @@ Elapsed seconds: 135.874. Peak RSS MB: 765.05.
 }
 ```
 
-Elapsed seconds: 103.4616. Peak RSS MB: 874.65.
+Elapsed seconds: 36.0176. Peak RSS MB: 874.74.
 - Scale-down: 7 asks total -- enough to prove the wiring and its most important regression boundary, not an exhaustive sweep of every existing exploration's asks.
 - Conclusion: The long-form signal is now reachable through the same single entry point (lab.common.brain.reason) every other capability in this repo goes through, not a standalone function -- and, more importantly, wiring it in did not disturb any existing short-answer behavior: every lookup ask already measured by an earlier exploration still resolves exactly as it did before this signal existed. EXP-052/053's named gaps are closed end to end, not just as isolated modules.
 
@@ -23133,6 +23133,86 @@ Elapsed seconds: 103.4616. Peak RSS MB: 874.65.
 Elapsed seconds: 24.1203. Peak RSS MB: 755.16.
 - Scale-down: Same 12-sentence fixture as EXP-033 -- not a held-out annotated corpus, chosen for a direct, controlled comparison against an already-measured result rather than a fresh, larger evaluation.
 - Conclusion: dslim/bert-base-NER, the actual blueprint-named checkpoint, outperforms both the rule tagger and the spaCy substitute EXP-033 used when HuggingFace was unreachable -- a real, direct three-way comparison, not an assumption that the originally-intended checkpoint would be better just because it's the one the blueprint named. EXP-033/034's gap is closed: the checkpoint was loaded but never actually called for this role until now.
+
+## EXP-081 The full pipeline, auto-ingesting and rewriting a real document through brain.reason
+
+- Status: `closed`
+- Models used: dslim/bert-base-NER (entity detection, live via use_real_ner=True, not generative) + flan-t5-small (bounded rewriter role, fidelity-gated, fell back to deterministic extraction on every leaf this run) via lab.common.rewriter_backends.
+- Goal: Prove, end to end and through the single lab.common.brain.reason entry point (not a hand-assembled call sequence), that a real, previously-unseen document can be given as raw text plus an ask and come out the other side as a cited, consistency-checked, formatted .docx -- with dslim/bert-base-NER (EXP-080) actually live in the loop, not just standalone-measured -- and report honestly what a real document's density does to the generative rewriter's fidelity gate along the way.
+- Method: A real ~2,400-word, 13-article GDPR excerpt (fetched live from gdpr-info.eu, embedded here as a fixture for reproducibility) auto-chunked by lab.common.ingest.chunk_document into 69 passages, then passed with an ask to lab.common.brain.reason(use_real_ner=True) -- the real dispatch path -- and, to capture the .docx/.md file outputs brain.reason's own signature doesn't expose, an identical lab.common.longform.write_long_document call with the same inputs plus out_path/docx_out_path.
+- Referenced files:
+- `lab/exp_081_real_document_pipeline/run.py`
+- `lab/common/brain.py`
+- `lab/common/ingest.py`
+- `lab/common/longform.py`
+- `lab/common/working_memory.py`
+- `lab/common/docx_writer.py`
+- `lab/common/document_writer.py`
+- `lab/common/real_ner.py`
+- `lab/common/intent_signals.py`
+- `data/exp_078_longform_consistency/results.json`
+- `data/exp_079_longform_signal/results.json`
+- `data/exp_080_real_ner_rerun/results.json`
+- `data/exp_081_real_document_pipeline/results.json`
+- Results: Auto-chunked a real 2,368-word, 13-article GDPR excerpt into 69 passages with no manual pre-structuring. 'Rewrite this regulation into a clear, well-organized compliance summary.' (the phrasing tried by hand first) scores 0.6795 against wants_document's 0.75 threshold -- does NOT fire. 'Write a document summarizing this regulation in plain language.' scores 0.7846 -- fires. Calling lab.common.brain.reason with the firing ask and the raw passages (use_real_ner=True) dispatched to lab.common.longform as expected and returned decision='supported_with_flags' with 69 citations. Of 19 leaves written, 0 used flan-t5-small's generation and 19 fell back to the deterministic extractive path -- all of them, driven mainly by ['citations', 'nli'] gate failures (dense modal/numeric regulatory language). 11 cross-page consistency flag(s) were raised, mostly the generic subjects 'the controller'/'the data subject' recurring across unrelated articles with different objects -- a known heuristic limitation of same-subject+same-verb matching on a document this repetitive, not necessarily genuine contradictions. Both a .docx (19 sections, 69 citations) and a .md (2684 words) were written to disk.
+```json
+{
+  "source_document": {
+    "words": 2368,
+    "articles": 13,
+    "chunks": 69
+  },
+  "document_signal_calibration": {
+    "ask_tried_first": {
+      "text": "Rewrite this regulation into a clear, well-organized compliance summary.",
+      "fires": false,
+      "score": 0.6795,
+      "tau": 0.75
+    },
+    "ask_that_fires": {
+      "text": "Write a document summarizing this regulation in plain language.",
+      "fires": true,
+      "score": 0.7846,
+      "tau": 0.75
+    }
+  },
+  "brain_reason_dispatch": {
+    "decision": "supported_with_flags",
+    "answer_word_count": 2475,
+    "num_citations": 69,
+    "dispatched_to_longform": true
+  },
+  "rewrite_fidelity": {
+    "total_leaves": 19,
+    "used_generative": 0,
+    "fell_back_to_extractive": 19,
+    "fallback_reason_counts": {
+      "citations": 19,
+      "modal": 16,
+      "nli": 18,
+      "numbers": 10
+    }
+  },
+  "consistency_flags": 11,
+  "working_memory_pages": 19,
+  "docx_result": {
+    "path": "C:\\python_project\\small-reasoning-model\\data\\exp_081_real_document_pipeline\\gdpr_rewritten.docx",
+    "sections": 19,
+    "citations_indexed": 69
+  },
+  "md_result": {
+    "path": "C:\\python_project\\small-reasoning-model\\data\\exp_081_real_document_pipeline\\gdpr_rewritten.md",
+    "sha256": "c4292d46044a37aaba20518fe2139d7a2772418fbdcf9998cd19e4dff63c3722",
+    "sections": 19,
+    "word_count": 2684,
+    "citations_indexed": 69
+  }
+}
+```
+
+Elapsed seconds: 281.3791. Peak RSS MB: 884.09.
+- Scale-down: One real document (69 passages, 19 leaves) -- a genuine end-to-end proof, not a benchmark across many documents or domains.
+- Conclusion: The full pipeline -- raw text to chunks to entity-grouped outline to fidelity-gated rewrite to cross-page consistency check to a real .docx -- runs end to end on a genuine, previously-unseen document through the single brain.reason entry point, with dslim/bert-base-NER live in the loop (not just separately measured, EXP-080). But the honest, load-bearing result is the fidelity gate's behavior on real text: GDPR's dense modal/numeric legal language defeated flan-t5-small's generation on every leaf, so this run is a working, well-structured extractive assembler on this document, not yet a demonstrated generative rewriter at this density -- exactly the gap EXP-048/077 already flagged for toy and synthetic leaves, now confirmed on real text too, not assumed fixed by wiring alone. Separately, wants_document's threshold is measurably phrasing-sensitive: a natural 'rewrite X' ask the pipeline's own builder tried first does not cross it, while 'write a document summarizing X' does -- a usability gap for a user who does not already know this signal's calibration.
 
 ## Follow-up todos
 

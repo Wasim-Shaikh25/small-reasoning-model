@@ -1,0 +1,85 @@
+{
+  "id": "EXP-081",
+  "title": "The full pipeline, auto-ingesting and rewriting a real document through brain.reason",
+  "status": "closed",
+  "goal": "Prove, end to end and through the single lab.common.brain.reason entry point (not a hand-assembled call sequence), that a real, previously-unseen document can be given as raw text plus an ask and come out the other side as a cited, consistency-checked, formatted .docx -- with dslim/bert-base-NER (EXP-080) actually live in the loop, not just standalone-measured -- and report honestly what a real document's density does to the generative rewriter's fidelity gate along the way.",
+  "method": "A real ~2,400-word, 13-article GDPR excerpt (fetched live from gdpr-info.eu, embedded here as a fixture for reproducibility) auto-chunked by lab.common.ingest.chunk_document into 69 passages, then passed with an ask to lab.common.brain.reason(use_real_ner=True) -- the real dispatch path -- and, to capture the .docx/.md file outputs brain.reason's own signature doesn't expose, an identical lab.common.longform.write_long_document call with the same inputs plus out_path/docx_out_path.",
+  "metrics": {
+    "source_document": {
+      "words": 2368,
+      "articles": 13,
+      "chunks": 69
+    },
+    "document_signal_calibration": {
+      "ask_tried_first": {
+        "text": "Rewrite this regulation into a clear, well-organized compliance summary.",
+        "fires": false,
+        "score": 0.6795,
+        "tau": 0.75
+      },
+      "ask_that_fires": {
+        "text": "Write a document summarizing this regulation in plain language.",
+        "fires": true,
+        "score": 0.7846,
+        "tau": 0.75
+      }
+    },
+    "brain_reason_dispatch": {
+      "decision": "supported_with_flags",
+      "answer_word_count": 2475,
+      "num_citations": 69,
+      "dispatched_to_longform": true
+    },
+    "rewrite_fidelity": {
+      "total_leaves": 19,
+      "used_generative": 0,
+      "fell_back_to_extractive": 19,
+      "fallback_reason_counts": {
+        "citations": 19,
+        "modal": 16,
+        "nli": 18,
+        "numbers": 10
+      }
+    },
+    "consistency_flags": 11,
+    "working_memory_pages": 19,
+    "docx_result": {
+      "path": "C:\\python_project\\small-reasoning-model\\data\\exp_081_real_document_pipeline\\gdpr_rewritten.docx",
+      "sections": 19,
+      "citations_indexed": 69
+    },
+    "md_result": {
+      "path": "C:\\python_project\\small-reasoning-model\\data\\exp_081_real_document_pipeline\\gdpr_rewritten.md",
+      "sha256": "c4292d46044a37aaba20518fe2139d7a2772418fbdcf9998cd19e4dff63c3722",
+      "sections": 19,
+      "word_count": 2684,
+      "citations_indexed": 69
+    }
+  },
+  "results_prose": "Auto-chunked a real 2,368-word, 13-article GDPR excerpt into 69 passages with no manual pre-structuring. 'Rewrite this regulation into a clear, well-organized compliance summary.' (the phrasing tried by hand first) scores 0.6795 against wants_document's 0.75 threshold -- does NOT fire. 'Write a document summarizing this regulation in plain language.' scores 0.7846 -- fires. Calling lab.common.brain.reason with the firing ask and the raw passages (use_real_ner=True) dispatched to lab.common.longform as expected and returned decision='supported_with_flags' with 69 citations. Of 19 leaves written, 0 used flan-t5-small's generation and 19 fell back to the deterministic extractive path -- all of them, driven mainly by ['citations', 'nli'] gate failures (dense modal/numeric regulatory language). 11 cross-page consistency flag(s) were raised, mostly the generic subjects 'the controller'/'the data subject' recurring across unrelated articles with different objects -- a known heuristic limitation of same-subject+same-verb matching on a document this repetitive, not necessarily genuine contradictions. Both a .docx (19 sections, 69 citations) and a .md (2684 words) were written to disk.",
+  "conclusion": "The full pipeline -- raw text to chunks to entity-grouped outline to fidelity-gated rewrite to cross-page consistency check to a real .docx -- runs end to end on a genuine, previously-unseen document through the single brain.reason entry point, with dslim/bert-base-NER live in the loop (not just separately measured, EXP-080). But the honest, load-bearing result is the fidelity gate's behavior on real text: GDPR's dense modal/numeric legal language defeated flan-t5-small's generation on every leaf, so this run is a working, well-structured extractive assembler on this document, not yet a demonstrated generative rewriter at this density -- exactly the gap EXP-048/077 already flagged for toy and synthetic leaves, now confirmed on real text too, not assumed fixed by wiring alone. Separately, wants_document's threshold is measurably phrasing-sensitive: a natural 'rewrite X' ask the pipeline's own builder tried first does not cross it, while 'write a document summarizing X' does -- a usability gap for a user who does not already know this signal's calibration.",
+  "scale_down": "One real document (69 passages, 19 leaves) -- a genuine end-to-end proof, not a benchmark across many documents or domains.",
+  "referenced_files": [
+    "lab/exp_081_real_document_pipeline/run.py",
+    "lab/common/brain.py",
+    "lab/common/ingest.py",
+    "lab/common/longform.py",
+    "lab/common/working_memory.py",
+    "lab/common/docx_writer.py",
+    "lab/common/document_writer.py",
+    "lab/common/real_ner.py",
+    "lab/common/intent_signals.py",
+    "data/exp_078_longform_consistency/results.json",
+    "data/exp_079_longform_signal/results.json",
+    "data/exp_080_real_ner_rerun/results.json",
+    "data/exp_081_real_document_pipeline/results.json"
+  ],
+  "follow_ups": [
+    "flan-t5-small's fidelity gate rejected generation on 100% of this document's leaves -- a larger or fine-tuned checkpoint (e.g. the registered nagbhaskar55/gemma-3-270m-bhaskar-finetune, EXP-076) should be re-run on this identical fixture to see whether a better generator changes this result, or whether dense regulatory language defeats the gate regardless of checkpoint.",
+    "wants_document's threshold (tau=0.75) is phrasing-sensitive enough that a natural first attempt ('rewrite this regulation...') fails to fire it -- worth either lowering tau with a wider calibration set (EXP-079 only calibrated against 3 document asks and 4 lookup asks) or accepting the current precision/recall tradeoff explicitly rather than by accident.",
+    "The cross-page consistency checker's false-positive rate on repetitive legal text (same generic subject, many unrelated clauses) was not measured here, only observed qualitatively -- a dedicated precision measurement (how many of the 11 flags are genuine contradictions vs. same-subject coincidences) is a real follow-up before trusting this flag on this kind of document."
+  ],
+  "elapsed_sec": 1070.1714,
+  "peak_rss_mb": 1264.96,
+  "models_used": "dslim/bert-base-NER (entity detection, live via use_real_ner=True, not generative) + flan-t5-small (bounded rewriter role, fidelity-gated, fell back to deterministic extraction on every leaf this run) via lab.common.rewriter_backends."
+}

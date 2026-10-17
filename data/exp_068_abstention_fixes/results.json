@@ -74,7 +74,7 @@
     "If MIN_SEMANTIC_MARGIN is adjusted, rerun EXP-066/067 to confirm nothing regresses.",
     "The single-child fallback still can't catch a paraphrased ask the way the margin check can -- only exercised against an exact/off-topic pair here, not a paraphrase against a lone candidate."
   ],
-  "elapsed_sec": 69.6613,
-  "peak_rss_mb": 575.27,
+  "elapsed_sec": 34.2792,
+  "peak_rss_mb": 577.25,
   "models_used": "bge-small-en-v1.5 for all semantic scoring (retrieval only, no generation); TF-IDF/BM25 (lab.common.index) for the lexical signal and the single-child fallback floor."
 }

@@ -23,15 +23,11 @@ from lab.common.assemble import build_outline
 from lab.common.verify import citation_markers
 
 
-def _table_of_contents(outline: list[dict]) -> str:
-    return "\n".join(f"{i + 1}. {leaf['title']}" for i, leaf in enumerate(outline))
-
-
 def _citation_index(markers: list[str]) -> str:
     return "\n".join(f"- [{m}]" for m in sorted(set(markers)))
 
 
-def write_document(title: str, assembled: dict, findings: list[dict], task: str, out_path: Path) -> dict:
+def write_document(title: str, assembled: dict, findings: list[dict], task: str, out_path: Path, leaf_titles: list[str] | None = None) -> dict:
     """Render assembled findings (lab.common.assemble.assemble()'s output) as
     one formatted Markdown file and write it to `out_path`.
 
@@ -40,14 +36,23 @@ def write_document(title: str, assembled: dict, findings: list[dict], task: str,
     here (rather than threading it through assemble()'s return value) always
     reproduces the same leaf titles, at the cost of one cheap recomputation
     instead of changing assemble()'s existing return contract.
+
+    `leaf_titles`, when given, is used for the table of contents instead of
+    the recomputed outline -- lab.common.longform already knows its own
+    leaves' real (entity-grouped) titles, and rebuilding build_outline's own
+    4-per-leaf "Section N" numbering here produced a table of contents that
+    didn't match the document's actual section headers (caught inspecting a
+    real GDPR rewrite's output, same mismatch lab.common.docx_writer already
+    had a leaf_titles parameter to avoid).
     """
     outline = build_outline(findings, task)
     cite_markers = citation_markers(assembled["document"])
+    toc_titles = leaf_titles if leaf_titles is not None else [leaf["title"] for leaf in outline]
 
     sections = [
         f"# {title}",
         "## Table of Contents",
-        _table_of_contents(outline),
+        "\n".join(f"{i + 1}. {t}" for i, t in enumerate(toc_titles)),
         "## Document",
         assembled["document"],
         "## Citation Index",
@@ -62,7 +67,7 @@ def write_document(title: str, assembled: dict, findings: list[dict], task: str,
     return {
         "path": str(out_path),
         "sha256": hashlib.sha256(rendered.encode("utf-8")).hexdigest(),
-        "sections": len(outline),
+        "sections": len(toc_titles),
         "word_count": len(rendered.split()),
         "citations_indexed": len(cite_markers),
     }
