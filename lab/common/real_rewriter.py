@@ -17,7 +17,7 @@ import re
 from lab.common.assemble import render_unit
 from lab.common.prompt_contract import build as build_prompt_contract
 from lab.common.relevance import ask_relevance
-from lab.common.verify import bidirectional_nli, citation_markers, entity_number_check, modality_preserved
+from lab.common.verify import bidirectional_nli, citation_markers, entity_number_check, modality_preserved, strip_citation_markers
 
 MODEL_NAME = "google/flan-t5-small"
 
@@ -93,7 +93,16 @@ def fidelity_gate(src_text: str, out_text: str, cite_ids: list[str], ask: str | 
     it no longer serves the ask -- these are two different failure modes, not
     one.
     """
-    numbers = entity_number_check(src_text, out_text)
+    # Citation markers contain digits too ("[5]"), and lab.common.textutil.
+    # numbers() has no way to tell a citation id from a real quantity -- so
+    # comparing the two texts unmodified double-counts one dropped citation
+    # as both a "citations" failure and a "numbers" failure (found while
+    # investigating why Qwen2.5-0.5B-Instruct's otherwise-faithful rewrites
+    # were scored as having dropped numbers that were never really content
+    # numbers at all, only citation ids). Stripping markers before this one
+    # check keeps it about actual quantities; the citation check below
+    # still runs on the unmodified text, where the markers belong.
+    numbers = entity_number_check(strip_citation_markers(src_text), strip_citation_markers(out_text))
     modal_ok = modality_preserved(src_text, out_text)
     nli = bidirectional_nli(src_text, out_text)
     found_markers = set(citation_markers(out_text))

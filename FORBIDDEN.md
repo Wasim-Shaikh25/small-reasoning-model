@@ -36,7 +36,7 @@ available for any other use.
 
 This exception exists so verified findings can be joined into flowing prose instead of a bulleted list of cited sentences (`ARCHITECTURE.md` sections 3.7 and 3.10), while every other hard constraint in section 1 of `ARCHITECTURE.md` still holds. All of the following must be true, or the exception does not apply and the deterministic fallback (`lab/common/assemble.py`, unchanged) is used instead:
 
-- **Small checkpoint only.** `flan-t5-small` (or a comparably small T5 checkpoint, roughly under 300M parameters); `gemma3:270m` run locally via Ollama (also roughly under 300M parameters, same size ceiling, same role); or, as of 2026-10-16, `nagbhaskar55/gemma-3-270m-bhaskar-finetune` (268M params, same ceiling, downloaded once from HuggingFace and run locally via transformers). Not `flan-t5-base`, not `flan-t5-large`, not a larger Gemma 3 variant, not any other checkpoint, without a separate, explicit decision recorded here. All three are measured on the identical fidelity gate and fixtures (EXP-048/054/056/062 for FLAN-T5-small; EXP-063/064 for gemma3:270m; EXP-076 for the legal-tuned checkpoint) -- this entry does not declare a winner, it records that all three are permitted to be tried.
+- **Small checkpoint only.** `flan-t5-small` (or a comparably small T5 checkpoint, roughly under 300M parameters); `gemma3:270m` run locally via Ollama (also roughly under 300M parameters, same size ceiling, same role); `nagbhaskar55/gemma-3-270m-bhaskar-finetune` (268M params, same ceiling, downloaded once from HuggingFace and run locally via transformers, as of 2026-10-16); or, as of 2026-10-18, `Qwen/Qwen2.5-0.5B-Instruct` (0.49B params, under the separately widened ~500M ceiling recorded below, downloaded once from HuggingFace and run locally via transformers). Not `flan-t5-base`, not `flan-t5-large`, not a larger Gemma 3 or Qwen variant, not any other checkpoint, without a separate, explicit decision recorded here. All four are measured on the identical fidelity gate and fixtures (EXP-048/054/056/062 for FLAN-T5-small; EXP-063/064 for gemma3:270m; EXP-076 for the legal-tuned checkpoint; EXP-081's real-document fixture for Qwen2.5-0.5B-Instruct) -- this entry does not declare a winner, it records that all four are permitted to be tried.
 - **Rewriter role only, never proposer, extractor, or judge.** It receives a batch of already-verified `(statement, citation)` findings and a style instruction, and returns prose covering only those findings. It is never given raw retrieved passages to search, never asked to answer a question, decide a fact, or judge support/contradiction. Extraction stays on the lexical QA extractor (and, when reachable, a real non-generative extractive QA encoder); verification stays on the NLI judge (and, when reachable, a real NLI encoder). A generative model never grades its own output.
 - **Fidelity-gated.** Every rewrite is checked before use: every number, date, name, and amount in the input must appear in the output; `not/no/shall/may/must/unless/except/only/provided` must not change; input and output must entail each other both ways; every citation marker must survive. On any failure, the rewrite is discarded and the deterministic verbatim-findings text (`lab/common/assemble.py`'s current behavior) is returned instead. This is `ARCHITECTURE.md` section 3.7's fidelity validator, not a new invention.
 - **No new facts, ever.** If a rewrite introduces a name, number, date, or claim absent from its input findings, that is a fidelity failure, not a style choice, and is rejected.
@@ -53,6 +53,32 @@ The rewriter exception above covers using a pretrained checkpoint as-is. Fine-tu
 - **`gemma3:270m` on HuggingFace is gate-restricted** (manual license acceptance); this environment has no HF credentials that have accepted it, and none were obtained to work around that. `flan-t5-small` is used for this fine-tuning instead -- it is the original bounded-rewriter checkpoint, ungated, and EXP-048/054/056/062 already measured the identical multi-fact-synthesis failure on it, so it is a faithful substitute for the question being tested, not a different one. This substitution is logged here, not silent; if Gemma access is ever obtained, the same recipe should be retried there before assuming the result transfers.
 - **Measured against the same fixture the failure was found on**, not a new, easier one: EXP-048/054/062/064's 4-fact-leaf case, the one every non-fine-tuning approach tried so far (retry loops, decoding constraints) failed to fix.
 - **Reversible, same as the base exception.** If the fine-tuned adapter doesn't measurably improve the fidelity pass rate on held-out cases, it is not adopted and the unmodified checkpoint remains the only path.
+
+### A fourth bounded-rewriter checkpoint, and a widened size ceiling (project owner's call, 2026-10-18)
+
+EXP-081 measured flan-t5-small failing the fidelity gate on 100% of a real
+document's leaves (19/19), mostly on `numbers`/`modal`/`nli` checks -- a
+faithful-paraphrase failure, not a reasoning failure (the project owner's
+own diagnosis, confirmed against `lab/common/calc.py`: every arithmetic/
+date decision in this pipeline already runs as real code, never model
+guesswork, so a "convert to code and run it" fix does not apply to a
+paraphrase-fidelity problem). The project owner's call: try
+[`Qwen/Qwen2.5-0.5B-Instruct`](https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct)
+(0.49B parameters, 0.36B non-embedding, 24 layers, Apache-2.0, ungated) in
+the rewriter role, on the theory that a 2024-era, more carefully
+instruction-tuned decoder-only model follows "preserve these exact facts"
+constraints better than flan-t5-small's 2022-era T5 instruction tuning,
+independent of the two being close in parameter count.
+
+This explicitly widens the "roughly under 300M parameters" ceiling in the
+bounded rewriter exception's "Small checkpoint only" bullet to roughly
+under 500M, for this one named checkpoint only -- not a general license to
+use any sub-500M model. Every other constraint is unchanged: rewriter role
+only, fidelity-gated, no new facts ever, measured and reported exactly
+like the three checkpoints already named, reversible if the fidelity pass
+rate does not measurably improve. Runs via `transformers`
+(`AutoModelForCausalLM`, chat-template prompting), not Ollama -- it does
+not widen what Ollama may run.
 
 Encoder checkpoints named in the blueprint (DeBERTa, GLiNER, BERT-NER, bge) are still not loaded in this POC. The explorations use classical substitutes, or, where reachable, real non-generative pretrained substitutes (see `lab/common/real_models.py`), and say so either way. A later experiment may train a small head or a span tagger only on labels stored in this repository. Outside the one bounded rewriter exception above, nothing here may download or call a generative model.
 

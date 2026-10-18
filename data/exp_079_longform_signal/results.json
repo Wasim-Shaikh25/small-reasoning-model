@@ -82,7 +82,7 @@
     "DOCUMENT_TAU=0.75 is a first measured value from a small sample (EXP-069-style multi-domain calibration not yet done for this signal) -- the same caveat every other first-measured threshold in this repo carries.",
     "Not yet tested: an ask that genuinely wants both a short answer AND implies document-length output in the same compound sentence -- which signal should win is not yet a decided, measured case."
   ],
-  "elapsed_sec": 49.0852,
-  "peak_rss_mb": 874.82,
+  "elapsed_sec": 158.6865,
+  "peak_rss_mb": 739.25,
   "models_used": "bge-small-en-v1.5 for the document-intent signal (retrieval-style similarity scoring only); flan-t5-small for the rewriter role inside longform (measured separately, EXP-048 onward). No new generative use."
 }

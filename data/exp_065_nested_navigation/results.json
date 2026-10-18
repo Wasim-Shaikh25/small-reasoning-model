@@ -105,7 +105,7 @@
     "Wire this into lab.common.brain as a second disambiguation mode, used when passages carry multiple hierarchy-level tags instead of one flat 'group' tag -- not yet done, this exploration only proves the navigation mechanism standalone.",
     "Test with 3+ levels of hierarchy and with more than one needle to navigate to in the same ask."
   ],
-  "elapsed_sec": 0.0379,
-  "peak_rss_mb": 127.01,
+  "elapsed_sec": 0.2987,
+  "peak_rss_mb": 126.58,
   "models_used": "No model decides navigation. lab.common.index's hybrid retriever (TF-IDF + BM25, unchanged) scores each level; the same classical substitute every retrieval exploration in this project has used."
 }

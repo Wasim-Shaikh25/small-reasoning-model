@@ -59,6 +59,32 @@ def chunk_document(raw_text: str, max_words_per_chunk: int = 120) -> list[dict]:
     return [{"id": f"CHUNK{i:04d}", "text": chunk} for i, chunk in enumerate(chunks)]
 
 
+def findings_from_chunks(chunks: list[dict]) -> list[dict]:
+    """The only sanctioned way to turn chunk_document's output into the
+    findings shape lab.common.longform/lab.common.assemble expect.
+
+    chunk_document's own "id" field (e.g. "CHUNK0008") is an internal
+    bookkeeping label for this module's own chunking step -- it was never
+    meant to be read by the document's eventual reader. A first version of
+    this pipeline's own test script built findings by hand with
+    `"citation": c["id"]`, which put that internal id directly into
+    lab.common.assemble.render_unit's "[{cite}]" marker and so into the
+    rendered document body and citation index verbatim (caught inspecting
+    a real GDPR rewrite's output). Citation markers are presentation, not
+    internals: whatever naming scheme this module's chunking happens to
+    use is exactly the kind of implementation detail a document's reader
+    should never see, so this function hard-codes a clean, sequential,
+    content-free citation label ("1", "2", "3", ...) instead -- stable
+    and unique (what citation_integrity/coverage_report actually need),
+    carrying no information about how the text was chunked.
+
+    finding_id keeps chunk_document's own id -- that field is internal
+    bookkeeping only (coverage_report tracks it, nothing renders it into
+    the document text), so there is nothing for it to leak.
+    """
+    return [{"finding_id": c["id"], "statement": c["text"], "citation": str(i + 1)} for i, c in enumerate(chunks)]
+
+
 def load_text_file(path: str) -> str:
     """Plain .txt/.md. A real .pdf/.docx needs its own reader (python-docx,
     pypdf) -- not duplicated here since this repo already depends on

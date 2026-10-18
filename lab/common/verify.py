@@ -65,6 +65,27 @@ def citation_markers(text: str) -> list[str]:
     return re.findall(r"\[([A-Za-z0-9_-]+)\]", text or "")
 
 
+def strip_citation_markers(text: str) -> str:
+    """Removes every `[marker]` lab.common.verify.citation_markers would
+    find, collapsing the whitespace left behind. These markers are the
+    pipeline's own internal grounding-verification bookkeeping (EXP-081
+    caught them leaking as raw "[CHUNK0008]" ids; fixed by giving them a
+    clean display form in lab.common.ingest.findings_from_chunks -- but
+    the project owner's own call, once that was explained, was that
+    *no* internal marker belongs in a final document a reader sees at
+    all, clean or not: a real citation to an actual source (a statute, a
+    paper) is a different thing entirely and stays, because it is part of
+    the content, not an artifact of how this pipeline checked its own
+    work). This function is the presentation-layer step that removes them
+    right before a document is written for a reader -- every internal
+    check (fidelity gate, coverage, citation integrity) still runs on the
+    marker-containing text beforehand, unaffected.
+    """
+    import re
+
+    return re.sub(r"\s*\[[A-Za-z0-9_-]+\]", "", text or "")
+
+
 def modality_preserved(source: str, output: str) -> bool:
     return sorted(modals(source)) == sorted(modals(output))
 

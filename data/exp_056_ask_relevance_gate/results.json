@@ -46,7 +46,7 @@
     "EXP-052's ask-driven table of contents would give this gate a fixture where ask-relevance actually needs to catch something numbers/NLI don't.",
     "If the prompt fix's gain holds up on a larger fixture, make it the default single-finding prompt rather than an experimental variant."
   ],
-  "elapsed_sec": 252.4715,
-  "peak_rss_mb": 653.29,
+  "elapsed_sec": 255.2387,
+  "peak_rss_mb": 680.75,
   "models_used": "google/flan-t5-small, the same local checkpoint EXP-048/054 measured. Part A uses no model, classical token-coverage only."
 }

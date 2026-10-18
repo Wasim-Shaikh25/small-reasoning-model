@@ -184,9 +184,19 @@ def reason(ask: str, passages: list[dict], use_real_ner: bool = False) -> dict:
     document_signal = wants_document(ask)
     trace.append({"step": "intent_signal", "signal": "document", **document_signal})
     if document_signal["fires"]:
+        from lab.common.ingest import findings_from_chunks
         from lab.common.longform import write_long_document
 
-        findings = [{"finding_id": p["id"], "statement": p["text"], "citation": p["id"]} for p in passages if p.get("text")]
+        # findings_from_chunks assigns a clean, sequential citation label
+        # ("1", "2", ...) instead of reusing a passage's own id directly --
+        # that id is whatever naming scheme the caller's retrieval/ingest
+        # step happens to use internally (a chunk id, a database key, a
+        # leaf id), never meant for a document's reader to see, and
+        # lab.common.assemble.render_unit writes the citation field
+        # verbatim into the rendered document body (caught on a real
+        # document whose passages were named "CHUNK0008" -- that string
+        # ended up in the final .docx, EXP-081).
+        findings = findings_from_chunks([p for p in passages if p.get("text")])
         doc_result = write_long_document(ask, findings, task=plan["task_type"], use_real_ner=use_real_ner)
         trace.append(
             {

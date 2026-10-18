@@ -25,7 +25,14 @@ TITLE_PERSON = re.compile(
 # because it's part of the name. _add() trims that leading word off when
 # the match is sentence-initial -- a generic English-capitalization rule,
 # not a list of role words to recognize.
-FULL_PERSON = re.compile(r"\b[A-Z][a-z]{1,20}(?:\s+[A-Z][a-z]{1,20}){1,2}\b")
+#
+# The gap between title-case words is [ \t]+, not \s+ -- \s+ crosses a
+# blank-line paragraph break, which let this pattern join the last word of
+# one paragraph to the first word of the next ("Definitions" + "\n\n" +
+# "For" read as a two-word name) on a real multi-paragraph document
+# (EXP-081). No existing fixture statement has an embedded newline this
+# would otherwise need to match through.
+FULL_PERSON = re.compile(r"\b[A-Z][a-z]{1,20}(?:[ \t]+[A-Z][a-z]{1,20}){1,2}\b")
 INITIAL_PERSON = re.compile(r"\b[A-Z]\.\s?[A-Z][a-z]+\b")
 ORG_RE = re.compile(
     r"\b[A-Z][A-Za-z0-9&]*(?:\s+[A-Z][A-Za-z0-9&]*){0,4}\s+"
@@ -166,13 +173,33 @@ def _add(found: list[dict], text: str, match: re.Match, label: str, conf: float,
 
 
 def detect_primary(text: str, use_real_ner: bool = False) -> list[dict]:
-    """`use_real_ner=True` also merges dslim/bert-base-NER's PER/ORG spans
-    (lab.common.real_ner, EXP-080: F1 0.8085, recall 1.0 on that
-    exploration's gold fixture, vs. this regex tagger's 0.7059) in before
-    dedup, so a real mention the regex has no pattern for can still win on
-    confidence. Defaults to False -- a real transformers model call is
-    real added latency every caller of this function would otherwise take
-    on silently; every one of the 80+ explorations that already call this
+    """`use_real_ner=True` replaces -- not just supplements -- the regex
+    tagger's person/organization role with dslim/bert-base-NER's PER/ORG
+    spans (lab.common.real_ner, EXP-080: F1 0.8085, recall 1.0 on that
+    exploration's gold fixture, vs. this regex tagger's 0.7059).
+
+    A first version of this flag only appended the real model's spans on
+    top of the regex ones before dedup, on the theory that a real mention
+    the regex has no pattern for could still win on confidence. EXP-081's
+    real-document run caught why that is the wrong merge: FULL_PERSON's
+    "two Title-Case words in a row" heuristic has no way to tell a real
+    name from a capitalized common-noun phrase, and tagged "Member State"
+    and "Member States" as person mentions in GDPR text that names no
+    actual person anywhere. dslim/bert-base-NER, given the same text,
+    correctly found zero PER/ORG spans -- but additive merging meant its
+    correct silence never suppressed the regex tagger's wrong guesses, so
+    the measured accuracy win from EXP-080 was never actually reaching
+    detect_primary's output. Replacing the role, not adding to it, is what
+    "wire in the better model" has to mean for a label it was measured to
+    beat outright.
+
+    Other label types (address/date/amount/defined term) dslim was never
+    trained to produce, so the regex tagger still owns those unchanged
+    whether use_real_ner is True or False.
+
+    Defaults to False -- a real transformers model call is real added
+    latency every caller of this function would otherwise take on
+    silently; every one of the 80+ explorations that already call this
     function keeps its exact prior behavior and speed unless it opts in.
     """
     found: list[dict] = []
@@ -189,6 +216,8 @@ def detect_primary(text: str, use_real_ner: bool = False) -> list[dict]:
         (DATE_RE, "date", 0.9),
         (AMOUNT_RE, "amount", 0.86),
     ):
+        if use_real_ner and label in ("person", "organization"):
+            continue
         for match in rx.finditer(text or ""):
             _add(found, text, match, label, conf, "primary")
     if use_real_ner:

@@ -16,7 +16,7 @@ from lab.common.assemble import build_outline
 from lab.common.verify import citation_markers
 
 
-def write_docx(title: str, assembled: dict, findings: list[dict], task: str, out_path: Path, leaf_titles: list[str] | None = None) -> dict:
+def write_docx(title: str, assembled: dict, findings: list[dict], task: str, out_path: Path, leaf_titles: list[str] | None = None, include_citation_index: bool = True) -> dict:
     """`leaf_titles`, when given (lab.common.longform already knows its
     own leaves' real titles), is used for the table of contents instead
     of rebuilding a generic outline -- so a document written with
@@ -24,6 +24,13 @@ def write_docx(title: str, assembled: dict, findings: list[dict], task: str, out
     lab.common.assemble.build_outline's own 4-per-leaf "Section N"
     naming, which is a different grouping entirely for a long-form
     document.
+
+    `include_citation_index` defaults to True, matching lab.common.
+    document_writer.write_document's identical parameter and for the same
+    reason: lab.common.longform.write_long_document -- the end-reader-
+    facing path -- passes `assembled["document"]` already stripped of
+    internal citation markers and include_citation_index=False, so no
+    pipeline-internal id reaches the .docx a reader opens.
     """
     from docx import Document
 
@@ -47,10 +54,11 @@ def write_docx(title: str, assembled: dict, findings: list[dict], task: str, out
             if line.strip():
                 doc.add_paragraph(line)
 
-    doc.add_heading("Citation Index", level=1)
     markers = sorted(set(citation_markers(assembled["document"])))
-    for marker in markers:
-        doc.add_paragraph(f"[{marker}]", style="List Bullet")
+    if include_citation_index:
+        doc.add_heading("Citation Index", level=1)
+        for marker in markers:
+            doc.add_paragraph(f"[{marker}]", style="List Bullet")
 
     out_path = Path(out_path)
     out_path.parent.mkdir(parents=True, exist_ok=True)

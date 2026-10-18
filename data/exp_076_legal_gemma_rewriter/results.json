@@ -61,7 +61,7 @@
     "If the citation-marker gap is the only failure mode (as EXP-063's identical pattern suggests), apply the same post-hoc splice or decoding-constrained approach and remeasure.",
     "Not yet tested: whether this checkpoint's chat-template prompting (vs. the plain-string prompting flan-t5-small/gemma3:270m-via-Ollama use) itself affects fidelity independent of the checkpoint's own fine-tuning -- a confound this exploration doesn't isolate."
   ],
-  "elapsed_sec": 110.8949,
-  "peak_rss_mb": 1088.37,
+  "elapsed_sec": 116.4541,
+  "peak_rss_mb": 1479.46,
   "models_used": "nagbhaskar55/gemma-3-270m-bhaskar-finetune (base google/gemma-3-270m-it), a third-party fine-tune, measured not trusted. Rewriter role only, same fidelity gate as every other checkpoint in this repo."
 }

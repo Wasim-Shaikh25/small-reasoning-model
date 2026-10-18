@@ -25,7 +25,7 @@
     "max_hops=2 is a fixed constant in brain.py's call; not yet tested whether a 3+ hop chain (entity A -> org B -> parent org C) is ever needed or whether 2 hops starts pulling in too much on a denser real document.",
     "Entity matching is lab.common.entities' exact-text regex detection (EXP-009), not a resolved-coreference graph (lab.common.entities.resolve_mentions exists for spelling variants but isn't used here) -- 'Ravi Sharma' and 'R. Sharma' would be two different graph nodes, not one."
   ],
-  "elapsed_sec": 30.8364,
-  "peak_rss_mb": 507.43,
+  "elapsed_sec": 92.7092,
+  "peak_rss_mb": 498.39,
   "models_used": "None. Entity detection is the same classical regex substitute used everywhere else in this repo (lab.common.entities); graph traversal is plain breadth-first search."
 }

@@ -39,6 +39,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from lab.common.assemble import build_outline
+from lab.common.doc_tools import assign_findings_to_sections, load_template
 from lab.common.document_writer import write_document
 from lab.common.entities import detect_primary
 from lab.common.rewriter_backends import rewrite_unit
@@ -46,6 +47,34 @@ from lab.common.working_memory import WorkingMemory
 
 
 MAX_FINDINGS_PER_ENTITY_LEAF = 4
+
+
+def _template_outline(template: dict, findings: list[dict]) -> list[dict]:
+    """The outline a registered lab.common.doc_tools template dictates,
+    instead of entity-grouping or arbitrary count-bucketing: one leaf per
+    template section, in the template's own declared order, titled with
+    the section's own title. Each leaf also carries the section's own
+    `instructions` (the project owner's actual ask: give the rewriter the
+    document's real formatting rules instead of a generic combine-these-
+    findings instruction, so it doesn't have to guess a legal notice's or
+    a lecture note's shape from its own training data).
+
+    An empty section (no finding routed to it) is still included, not
+    dropped -- a visibly empty "Demand" section in a legal notice is a
+    real, reportable fact about the input findings, not a layout detail
+    to hide.
+    """
+    sections_with_findings, _ = assign_findings_to_sections(template, findings)
+    return [
+        {
+            "leaf_id": f"T{i:04d}",
+            "title": section["title"],
+            "finding_ids": [f["finding_id"] for f in section["findings"]],
+            "findings": section["findings"],
+            "section_instructions": section["instructions"],
+        }
+        for i, section in enumerate(sections_with_findings)
+    ]
 
 
 def _entity_outline(findings: list[dict], use_real_ner: bool = False) -> tuple[list[dict], list[dict]]:
@@ -100,6 +129,7 @@ def write_long_document(
     out_path: Path | None = None,
     docx_out_path: Path | None = None,
     use_real_ner: bool = False,
+    template_id: str | None = None,
 ) -> dict:
     """Writes one long document from `findings`, page by page, checking
     cross-page consistency as it goes.
@@ -112,6 +142,14 @@ def write_long_document(
     a real gap, not a finished design, and the honest state is "not used
     yet," not a half-working mechanism dressed up as ask-driven.
 
+    `template_id`, when given (a registered lab.common.doc_tools template,
+    e.g. "legal_notice" or "college_notes"), replaces entity-grouping
+    entirely: the outline comes from the template's own declared sections,
+    in its own order, each carrying its own per-section instructions
+    instead of the generic "combine these findings" prompt every other
+    leaf gets. When omitted (the default), behavior is unchanged from
+    before this parameter existed.
+
     Returns {"document_result", "consistency_flags", "rewrite_diagnostics",
     "working_memory"} -- `consistency_flags` is never empty-by-default-
     assumption; it is whatever WorkingMemory actually found, reported as
@@ -119,9 +157,13 @@ def write_long_document(
     (lab.common.document_writer) and includes its result.
     """
     glossary = glossary or {}
-    entity_leaves, leftover_findings = _entity_outline(findings, use_real_ner=use_real_ner)
-    leftover_leaves = build_outline(leftover_findings, task) if leftover_findings else []
-    outline = entity_leaves + leftover_leaves
+    if template_id is not None:
+        template = load_template(template_id)
+        outline = _template_outline(template, findings)
+    else:
+        entity_leaves, leftover_findings = _entity_outline(findings, use_real_ner=use_real_ner)
+        leftover_leaves = build_outline(leftover_findings, task) if leftover_findings else []
+        outline = entity_leaves + leftover_leaves
 
     memory = WorkingMemory()
     rendered_units = []
@@ -129,7 +171,17 @@ def write_long_document(
     consistency_flags = []
 
     for leaf in outline:
-        result = rewrite_unit(leaf, glossary, checkpoint=checkpoint)
+        if not leaf["findings"]:
+            # An empty template section: nothing to rewrite or fidelity-
+            # check, and feeding the generative model zero source text
+            # would make its fidelity checks meaningless. Reported
+            # explicitly ("no_findings"), not silently skipped.
+            unit_text = leaf["title"]
+            rewrite_diagnostics.append({"leaf_id": leaf["leaf_id"], "used_generative": False, "fallback_reason": ["no_findings"]})
+            rendered_units.append(unit_text)
+            continue
+
+        result = rewrite_unit(leaf, glossary, checkpoint=checkpoint, ask=leaf.get("section_instructions"))
         unit_text = result["text"] if result["text"].startswith(leaf["title"]) else f"{leaf['title']}\n{result['text']}"
         rendered_units.append(unit_text)
         rewrite_diagnostics.append(
@@ -147,18 +199,34 @@ def write_long_document(
     document_text = "\n\n".join(rendered_units)
     assembled = {"document": document_text}
 
+    # The internal grounding-verification bookkeeping (citation markers)
+    # stops here -- lab.common.working_memory's consistency check above
+    # already ran on the marker-containing text, and every per-leaf
+    # fidelity_gate call already checked citation integrity during
+    # generation. Nothing past this point is a reader of this document:
+    # strip_citation_markers (lab.common.verify) is the project owner's
+    # own call, once the internal-id leak was explained, that no pipeline-
+    # internal marker belongs in a file a reader opens, clean display form
+    # or not -- only a real citation to an actual outside source, written
+    # as part of a finding's own statement text, would ever belong there.
+    from lab.common.verify import strip_citation_markers
+
+    reader_facing_document = strip_citation_markers(document_text)
+    reader_facing_assembled = {"document": reader_facing_document}
+
     document_result = None
     if out_path is not None:
-        document_result = write_document(title, assembled, findings, task, out_path, leaf_titles=[leaf["title"] for leaf in outline])
+        document_result = write_document(title, reader_facing_assembled, findings, task, out_path, leaf_titles=[leaf["title"] for leaf in outline], include_citation_index=False)
 
     docx_result = None
     if docx_out_path is not None:
         from lab.common.docx_writer import write_docx
 
-        docx_result = write_docx(title, assembled, findings, task, docx_out_path, leaf_titles=[leaf["title"] for leaf in outline])
+        docx_result = write_docx(title, reader_facing_assembled, findings, task, docx_out_path, leaf_titles=[leaf["title"] for leaf in outline], include_citation_index=False)
 
     return {
         "document": document_text,
+        "document_for_reader": reader_facing_document,
         "document_result": document_result,
         "docx_result": docx_result,
         "consistency_flags": consistency_flags,

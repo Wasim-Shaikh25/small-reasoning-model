@@ -27,7 +27,7 @@ def _citation_index(markers: list[str]) -> str:
     return "\n".join(f"- [{m}]" for m in sorted(set(markers)))
 
 
-def write_document(title: str, assembled: dict, findings: list[dict], task: str, out_path: Path, leaf_titles: list[str] | None = None) -> dict:
+def write_document(title: str, assembled: dict, findings: list[dict], task: str, out_path: Path, leaf_titles: list[str] | None = None, include_citation_index: bool = True) -> dict:
     """Render assembled findings (lab.common.assemble.assemble()'s output) as
     one formatted Markdown file and write it to `out_path`.
 
@@ -44,6 +44,19 @@ def write_document(title: str, assembled: dict, findings: list[dict], task: str,
     didn't match the document's actual section headers (caught inspecting a
     real GDPR rewrite's output, same mismatch lab.common.docx_writer already
     had a leaf_titles parameter to avoid).
+
+    `include_citation_index` defaults to True so this function's existing
+    contract (EXP-074, which checks the index exactly matches the markers
+    present in `assembled["document"]`) is unchanged for any direct caller.
+    lab.common.longform.write_long_document -- the actual end-reader-facing
+    path -- passes `assembled["document"]` already stripped of markers
+    (lab.common.verify.strip_citation_markers) and include_citation_index
+    =False: the project owner's call that a pipeline's own internal
+    grounding-verification bookkeeping belongs in the checks that already
+    ran before this function was called, never in a file a reader opens. A
+    real citation to an actual outside source, if a template ever needs
+    one, is a different thing -- part of the content, written into a
+    finding's own statement text, not this internal marker.
     """
     outline = build_outline(findings, task)
     cite_markers = citation_markers(assembled["document"])
@@ -55,9 +68,9 @@ def write_document(title: str, assembled: dict, findings: list[dict], task: str,
         "\n".join(f"{i + 1}. {t}" for i, t in enumerate(toc_titles)),
         "## Document",
         assembled["document"],
-        "## Citation Index",
-        _citation_index(cite_markers),
     ]
+    if include_citation_index:
+        sections += ["## Citation Index", _citation_index(cite_markers)]
     rendered = "\n\n".join(sections) + "\n"
 
     out_path = Path(out_path)

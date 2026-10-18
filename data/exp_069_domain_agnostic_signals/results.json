@@ -82,7 +82,7 @@
     "ask.py still has COMPARE_CUES/CHRON_CUES/REWRITE_CUES/REASON_CUES keyword lists for classify_task -- none contained domain-specific words like lessee/lessor, and brain.py's identity/total signals no longer depend on task_type at all, so they were out of scope here, but they're still literal-keyword classifiers.",
     "entities.py's regex patterns (STREET_RE's Road/Street/Avenue suffixes, NOT_PERSON's India-specific place names) assume Indian address conventions -- a structural/geographic assumption, not a subject-domain one, but still not universal; untested on addresses formatted differently."
   ],
-  "elapsed_sec": 18.8173,
-  "peak_rss_mb": 515.26,
+  "elapsed_sec": 145.3789,
+  "peak_rss_mb": 404.45,
   "models_used": "bge-small-en-v1.5 for intent-signal scoring (retrieval only, no generation); all other steps are the same classical/deterministic primitives already measured elsewhere in this repo."
 }

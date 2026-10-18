@@ -52,7 +52,7 @@
     "document_writer only emits Markdown; a .docx or PDF target would need its own writer behind the same assembled-dict input, not a different contract.",
     "The no-context fallback (lab.common.open_domain, EXP-072) does not yet route its prompt through labeled=True in a measured way beyond a smoke check -- worth its own identity-style check once that path is exercised more."
   ],
-  "elapsed_sec": 0.04,
-  "peak_rss_mb": 125.54,
+  "elapsed_sec": 0.1569,
+  "peak_rss_mb": 116.74,
   "models_used": "None -- both checks are pure string/file comparisons, no model loaded."
 }

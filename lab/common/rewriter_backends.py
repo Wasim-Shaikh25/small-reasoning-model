@@ -44,6 +44,12 @@ def _gemma3_270m_legal_finetune(prompt: str, max_tokens: int) -> str:
     return generate(prompt, max_tokens)
 
 
+def _qwen2_5_0_5b_instruct(prompt: str, max_tokens: int) -> str:
+    from lab.common.real_rewriter_qwen import generate
+
+    return generate(prompt, max_tokens)
+
+
 # Keys must match FORBIDDEN.md's bounded rewriter exception exactly -- this
 # registry does not decide what's permitted, it only wires up what already
 # is. Adding an entry here without a matching FORBIDDEN.md/models.json
@@ -52,6 +58,7 @@ BACKENDS: dict[str, Callable[[str, int], str]] = {
     "flan-t5-small": _flan_t5_small,
     "gemma3:270m": _gemma3_270m_ollama,
     "nagbhaskar55/gemma-3-270m-bhaskar-finetune": _gemma3_270m_legal_finetune,
+    "Qwen/Qwen2.5-0.5B-Instruct": _qwen2_5_0_5b_instruct,
 }
 
 

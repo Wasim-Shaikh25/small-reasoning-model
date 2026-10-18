@@ -57,7 +57,7 @@ sys.path.insert(0, str(ROOT))
 
 from lab.common.brain import reason
 from lab.common.harness import Run
-from lab.common.ingest import chunk_document
+from lab.common.ingest import chunk_document, findings_from_chunks
 from lab.common.intent_signals import wants_document
 
 FILES = [
@@ -242,42 +242,55 @@ def main():
 
     chunks = chunk_document(GDPR_TEXT)
     passages = [{"id": c["id"], "text": c["text"]} for c in chunks]
+    findings = findings_from_chunks(chunks)
 
     signal_tried_first = wants_document(ASK_TRIED_FIRST)
     signal_that_fires = wants_document(ASK_THAT_FIRES)
 
-    docx_path = run.out_dir / "gdpr_rewritten.docx"
-    md_path = run.out_dir / "gdpr_rewritten.md"
-
     # The literal entry point every other capability in this repo goes
     # through -- raw passages and an ask, nothing hand-wired in between.
-    # write_long_document's own out_path/docx_out_path aren't reachable
-    # through brain.reason's signature, so the files are written via a
-    # second, identical call with the paths -- the trace/decision/
-    # citations wrapping is what's being proven here, not a second
-    # mechanism, since both calls dispatch through the same
-    # wants_document -> write_long_document path with the same inputs.
+    # brain.reason's own longform dispatch always uses write_long_document's
+    # default checkpoint (flan-t5-small) -- it has no checkpoint parameter
+    # of its own, so this call proves dispatch wiring, not a checkpoint
+    # comparison. The comparison itself happens below via direct
+    # write_long_document calls, same inputs, each checkpoint named
+    # explicitly -- that's what EXP-081's own earlier run already did for
+    # flan-t5-small; this version adds Qwen2.5-0.5B-Instruct side by side.
     result = reason(ASK_THAT_FIRES, passages, use_real_ner=True)
 
     from lab.common.longform import write_long_document
 
-    findings = [{"finding_id": p["id"], "statement": p["text"], "citation": p["id"]} for p in passages]
-    file_result = write_long_document(
-        ASK_THAT_FIRES,
-        findings,
-        checkpoint="flan-t5-small",
-        title="GDPR Compliance Summary (Rewritten)",
-        out_path=md_path,
-        docx_out_path=docx_path,
-        use_real_ner=True,
-    )
+    def _run_checkpoint(checkpoint: str, file_stem: str) -> dict:
+        file_result = write_long_document(
+            ASK_THAT_FIRES,
+            findings,
+            checkpoint=checkpoint,
+            title="GDPR Compliance Summary (Rewritten)",
+            out_path=run.out_dir / f"{file_stem}.md",
+            docx_out_path=run.out_dir / f"{file_stem}.docx",
+            use_real_ner=True,
+        )
+        used = sum(1 for d in file_result["rewrite_diagnostics"] if d["used_generative"])
+        total = len(file_result["rewrite_diagnostics"])
+        fallback_counts: dict[str, int] = {}
+        for diag in file_result["rewrite_diagnostics"]:
+            for reason_tag in diag["fallback_reason"] or []:
+                fallback_counts[reason_tag] = fallback_counts.get(reason_tag, 0) + 1
+        return {
+            "checkpoint": checkpoint,
+            "total_leaves": total,
+            "used_generative": used,
+            "fell_back_to_extractive": total - used,
+            "fidelity_pass_rate": round(used / max(1, total), 4),
+            "fallback_reason_counts": fallback_counts,
+            "consistency_flags": len(file_result["consistency_flags"]),
+            "working_memory_pages": len(file_result["working_memory"]["pages"]),
+            "docx_result": file_result["docx_result"],
+            "md_result": file_result["document_result"],
+        }
 
-    used_generative_count = sum(1 for d in file_result["rewrite_diagnostics"] if d["used_generative"])
-    total_leaves = len(file_result["rewrite_diagnostics"])
-    fallback_reason_counts: dict[str, int] = {}
-    for diag in file_result["rewrite_diagnostics"]:
-        for reason_tag in diag["fallback_reason"] or []:
-            fallback_reason_counts[reason_tag] = fallback_reason_counts.get(reason_tag, 0) + 1
+    flan_t5_small = _run_checkpoint("flan-t5-small", "gdpr_rewritten")
+    qwen2_5_0_5b = _run_checkpoint("Qwen/Qwen2.5-0.5B-Instruct", "gdpr_rewritten_qwen")
 
     metrics = {
         "source_document": {"words": len(GDPR_TEXT.split()), "articles": 13, "chunks": len(chunks)},
@@ -291,95 +304,96 @@ def main():
             "num_citations": len(result["citations"]),
             "dispatched_to_longform": any(step.get("step") == "longform_write" for step in result["trace"]),
         },
-        "rewrite_fidelity": {
-            "total_leaves": total_leaves,
-            "used_generative": used_generative_count,
-            "fell_back_to_extractive": total_leaves - used_generative_count,
-            "fallback_reason_counts": fallback_reason_counts,
-        },
-        "consistency_flags": len(file_result["consistency_flags"]),
-        "working_memory_pages": len(file_result["working_memory"]["pages"]),
-        "docx_result": file_result["docx_result"],
-        "md_result": file_result["document_result"],
+        "rewrite_fidelity_by_checkpoint": {"flan-t5-small": flan_t5_small, "Qwen/Qwen2.5-0.5B-Instruct": qwen2_5_0_5b},
     }
 
     dispatched = metrics["brain_reason_dispatch"]["dispatched_to_longform"]
-    all_extractive = used_generative_count == 0
+    qwen_better = qwen2_5_0_5b["fidelity_pass_rate"] > flan_t5_small["fidelity_pass_rate"]
 
     prose = (
         f"Auto-chunked a real 2,368-word, 13-article GDPR excerpt into {len(chunks)} passages with no manual "
         f"pre-structuring. '{ASK_TRIED_FIRST}' (the phrasing tried by hand first) scores "
         f"{signal_tried_first['score']} against wants_document's {signal_tried_first['tau']} threshold -- does "
-        f"NOT fire. '{ASK_THAT_FIRES}' scores {signal_that_fires['score']} -- fires. Calling lab.common.brain."
-        f"reason with the firing ask and the raw passages (use_real_ner=True) dispatched to lab.common.longform "
+        f"NOT fire. '{ASK_THAT_FIRES}' scores {signal_that_fires['score']} -- fires. brain.reason (which always "
+        f"uses the default checkpoint, flan-t5-small) dispatched to lab.common.longform "
         f"{'as expected' if dispatched else 'UNEXPECTEDLY DID NOT dispatch'} and returned decision="
-        f"'{result['decision']}' with {metrics['brain_reason_dispatch']['num_citations']} citations. Of "
-        f"{total_leaves} leaves written, {used_generative_count} used flan-t5-small's generation and "
-        f"{total_leaves - used_generative_count} fell back to the deterministic extractive path -- "
-        f"{'all of them' if all_extractive else 'most of them'}, driven mainly by "
-        f"{sorted(fallback_reason_counts, key=fallback_reason_counts.get, reverse=True)[:2]} gate failures "
-        f"(dense modal/numeric regulatory language). {len(file_result['consistency_flags'])} cross-page "
-        f"consistency flag(s) were raised, mostly the generic subjects 'the controller'/'the data subject' "
-        f"recurring across unrelated articles with different objects -- a known heuristic limitation of "
-        f"same-subject+same-verb matching on a document this repetitive, not necessarily genuine "
-        f"contradictions. Both a .docx ({file_result['docx_result']['sections']} sections, "
-        f"{file_result['docx_result']['citations_indexed']} citations) and a .md "
-        f"({file_result['document_result']['word_count']} words) were written to disk."
+        f"'{result['decision']}' with {metrics['brain_reason_dispatch']['num_citations']} citations. Checkpoint "
+        f"comparison on the identical {flan_t5_small['total_leaves']}-leaf fixture: flan-t5-small passed the "
+        f"fidelity gate on {flan_t5_small['used_generative']}/{flan_t5_small['total_leaves']} leaves "
+        f"({flan_t5_small['fidelity_pass_rate']}), Qwen2.5-0.5B-Instruct on "
+        f"{qwen2_5_0_5b['used_generative']}/{qwen2_5_0_5b['total_leaves']} ({qwen2_5_0_5b['fidelity_pass_rate']}) -- "
+        f"{'Qwen2.5-0.5B-Instruct measurably improved the fidelity pass rate' if qwen_better else 'Qwen2.5-0.5B-Instruct did NOT improve the fidelity pass rate'} "
+        f"on this real document. flan-t5-small's dominant failure reasons: "
+        f"{sorted(flan_t5_small['fallback_reason_counts'], key=flan_t5_small['fallback_reason_counts'].get, reverse=True)}; "
+        f"Qwen2.5-0.5B-Instruct's: {sorted(qwen2_5_0_5b['fallback_reason_counts'], key=qwen2_5_0_5b['fallback_reason_counts'].get, reverse=True)}. "
+        f"Both checkpoints' .docx/.md files were written to disk for direct comparison."
     )
 
     conclusion = (
-        "The full pipeline -- raw text to chunks to entity-grouped outline to fidelity-gated rewrite to "
-        "cross-page consistency check to a real .docx -- runs end to end on a genuine, previously-unseen "
-        "document through the single brain.reason entry point, with dslim/bert-base-NER live in the loop "
-        "(not just separately measured, EXP-080). But the honest, load-bearing result is the fidelity gate's "
-        "behavior on real text: GDPR's dense modal/numeric legal language defeated flan-t5-small's generation "
-        "on every leaf, so this run is a working, well-structured extractive assembler on this document, not "
-        "yet a demonstrated generative rewriter at this density -- exactly the gap EXP-048/077 already flagged "
-        "for toy and synthetic leaves, now confirmed on real text too, not assumed fixed by wiring alone. "
-        "Separately, wants_document's threshold is measurably phrasing-sensitive: a natural 'rewrite X' ask "
-        "the pipeline's own builder tried first does not cross it, while 'write a document summarizing X' does "
-        "-- a usability gap for a user who does not already know this signal's calibration."
-        if dispatched
-        else "brain.reason did NOT dispatch to the long-form writer even with a document-scoring ask -- see "
-        "metrics.brain_reason_dispatch for what it did instead. Reported as measured, not assumed to work."
+        (
+            "Qwen2.5-0.5B-Instruct measurably outperforms flan-t5-small's fidelity pass rate on this real "
+            "document, supporting the hypothesis that a more carefully instruction-tuned 2024-era decoder-only "
+            "model holds onto 'preserve these exact facts' constraints better than flan-t5-small's 2022-era T5 "
+            "tuning, independent of being close in parameter count (0.49B vs 0.08B -- Qwen is larger, but the "
+            "project owner's own diagnosis was training quality, not size, and this result is at least "
+            "consistent with that, not a controlled isolation of the two factors)."
+            if qwen_better
+            else "Qwen2.5-0.5B-Instruct did NOT measurably improve the fidelity pass rate over flan-t5-small on "
+            "this real document -- see metrics.rewrite_fidelity_by_checkpoint for the exact failure reasons "
+            "each checkpoint hit. This is evidence that dense modal/numeric regulatory language defeats the "
+            "fidelity gate's current thresholds somewhat independent of which small checkpoint generates the "
+            "rewrite, not just a flan-t5-small-specific weakness. Reported as measured, not assumed to improve "
+            "just because a newer or larger model was substituted."
+        )
+        + (
+            " brain.reason itself still defaults to flan-t5-small (write_long_document's own default "
+            "checkpoint) -- this comparison used direct write_long_document calls with each checkpoint named "
+            "explicitly; making Qwen2.5-0.5B-Instruct the live default for brain.reason's own dispatch is a "
+            "separate decision, not made here."
+        )
     )
 
     run.finish(
-        title="The full pipeline, auto-ingesting and rewriting a real document through brain.reason",
+        title="The full pipeline on a real document through brain.reason, and a flan-t5-small vs Qwen2.5-0.5B-Instruct fidelity comparison",
         goal=(
             "Prove, end to end and through the single lab.common.brain.reason entry point (not a hand-assembled "
             "call sequence), that a real, previously-unseen document can be given as raw text plus an ask and "
             "come out the other side as a cited, consistency-checked, formatted .docx -- with dslim/bert-base-"
-            "NER (EXP-080) actually live in the loop, not just standalone-measured -- and report honestly what "
-            "a real document's density does to the generative rewriter's fidelity gate along the way."
+            "NER (EXP-080) actually live in the loop, not just standalone-measured -- and measure whether "
+            "Qwen2.5-0.5B-Instruct (permitted 2026-10-18, FORBIDDEN.md) improves the rewriter's fidelity pass "
+            "rate on this same fixture over flan-t5-small's measured 0% (this exploration's own earlier run), "
+            "testing the hypothesis that the failure is about training quality, not raw parameter count."
         ),
         method=(
             "A real ~2,400-word, 13-article GDPR excerpt (fetched live from gdpr-info.eu, embedded here as a "
             "fixture for reproducibility) auto-chunked by lab.common.ingest.chunk_document into 69 passages, "
-            "then passed with an ask to lab.common.brain.reason(use_real_ner=True) -- the real dispatch path -- "
-            "and, to capture the .docx/.md file outputs brain.reason's own signature doesn't expose, an "
-            "identical lab.common.longform.write_long_document call with the same inputs plus out_path/"
-            "docx_out_path."
+            "then passed with an ask to lab.common.brain.reason(use_real_ner=True) -- the real dispatch path, "
+            "which always uses write_long_document's default checkpoint (flan-t5-small). Separately, the "
+            "identical findings are run through two direct lab.common.longform.write_long_document calls, "
+            "each naming a different checkpoint explicitly (flan-t5-small, then Qwen/Qwen2.5-0.5B-Instruct), "
+            "same fidelity gate, same findings, same use_real_ner=True -- a controlled before/after on the one "
+            "variable that changed."
         ),
         metrics=metrics,
         results_prose=prose,
         conclusion=conclusion,
-        scale_down="One real document (69 passages, 19 leaves) -- a genuine end-to-end proof, not a benchmark across many documents or domains.",
-        referenced_files=FILES,
+        scale_down="One real document (69 passages, 19 leaves), two checkpoints -- a genuine end-to-end proof and a real controlled comparison, not a benchmark across many documents, domains, or checkpoints.",
+        referenced_files=FILES + ["lab/common/real_rewriter_qwen.py", "FORBIDDEN.md", "lab/config/models.json"],
         follow_ups=[
-            "flan-t5-small's fidelity gate rejected generation on 100% of this document's leaves -- a larger or fine-tuned checkpoint (e.g. the registered nagbhaskar55/gemma-3-270m-bhaskar-finetune, EXP-076) should be re-run on this identical fixture to see whether a better generator changes this result, or whether dense regulatory language defeats the gate regardless of checkpoint.",
+            "If Qwen2.5-0.5B-Instruct's fidelity pass rate is still well under 1.0, the next checkpoints to try on this identical fixture are the already-registered nagbhaskar55/gemma-3-270m-bhaskar-finetune (EXP-076) and gemma3:270m, to separate 'needs a bigger/different base model' from 'needs domain-specific fine-tuning' as the actual fix.",
             "wants_document's threshold (tau=0.75) is phrasing-sensitive enough that a natural first attempt ('rewrite this regulation...') fails to fire it -- worth either lowering tau with a wider calibration set (EXP-079 only calibrated against 3 document asks and 4 lookup asks) or accepting the current precision/recall tradeoff explicitly rather than by accident.",
-            "The cross-page consistency checker's false-positive rate on repetitive legal text (same generic subject, many unrelated clauses) was not measured here, only observed qualitatively -- a dedicated precision measurement (how many of the 11 flags are genuine contradictions vs. same-subject coincidences) is a real follow-up before trusting this flag on this kind of document.",
+            "brain.reason's longform dispatch still hardcodes flan-t5-small as write_long_document's default checkpoint -- making the better-measured checkpoint the live default (rather than only reachable via a direct write_long_document call) is a separate, deliberate decision, not made in this exploration.",
+            "The cross-page consistency checker's false-positive rate on repetitive legal text (same generic subject, many unrelated clauses) was not measured here, only observed qualitatively -- a dedicated precision measurement is a real follow-up before trusting this flag on this kind of document.",
         ],
         models_used=(
             "dslim/bert-base-NER (entity detection, live via use_real_ner=True, not generative) + "
-            "flan-t5-small (bounded rewriter role, fidelity-gated, fell back to deterministic extraction on "
-            "every leaf this run) via lab.common.rewriter_backends."
+            "flan-t5-small and Qwen/Qwen2.5-0.5B-Instruct (bounded rewriter role, fidelity-gated, each run on "
+            "the identical 19-leaf fixture for a controlled comparison) via lab.common.rewriter_backends."
         ),
     )
 
-    print(f"wrote docx: {file_result['docx_result']['path']}")
-    print(f"wrote md: {file_result['document_result']['path']}")
+    print(f"flan-t5-small: {flan_t5_small['used_generative']}/{flan_t5_small['total_leaves']} passed, wrote {flan_t5_small['docx_result']['path']}")
+    print(f"Qwen2.5-0.5B-Instruct: {qwen2_5_0_5b['used_generative']}/{qwen2_5_0_5b['total_leaves']} passed, wrote {qwen2_5_0_5b['docx_result']['path']}")
 
 
 if __name__ == "__main__":
