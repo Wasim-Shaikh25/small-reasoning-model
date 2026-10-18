@@ -578,6 +578,129 @@ TODOS = [
         "conclusion": "Todo. Depends on EXP-052's outline existing first, so there are multiple pages worth checking against each other.",
         "scale_down": "",
     },
+    {
+        "id": "EXP-084",
+        "title": "Plan-then-execute layer for brain.reason",
+        "status": "todo",
+        "goal": (
+            "Separate planning from execution in lab/common/brain.py: compute an explicit, inspectable list "
+            "of pipeline stage names -- chosen from a fixed, named registry, never freely generated text -- "
+            "based on which closed-set signals fire (wants_document, wants_identity, wants_total, and a new "
+            "wants_rule_application feeding lab/common/inference.py), before any stage actually executes. "
+            "The project owner's own proposal, verbatim: 'give one simple prompt and system have to perform "
+            "multistep work so it should first create full plan and than execute that... it will keep it in "
+            "control.' A single real branch (wants_document's existing path) is not enough to prove this "
+            "generalizes, so a second, genuinely different branch (wants_rule_application -> forward_chain) "
+            "must exist in this same step, not deferred to a later todo."
+        ),
+        "method": "Not run.",
+        "models_used": (
+            "bge-small-en-v1.5 (lab/common/real_encoders.py), the same embedding-similarity mechanism lab/"
+            "common/intent_signals.py already uses for wants_document/wants_identity/wants_total. The plan "
+            "itself is always a selection among a fixed set of named stages, never a freely generated plan -- "
+            "this introduces no new generative or hallucination risk beyond what wants_document already "
+            "carries. No generative model."
+        ),
+        "referenced_files": [
+            "lab/common/brain.py",
+            "lab/common/intent_signals.py",
+            "lab/common/inference.py",
+            "lab/exp_079_longform_signal/run.py",
+            "lab/exp_083_symbolic_inference/run.py",
+        ],
+        "results_prose": "Not run.",
+        "conclusion": "Todo. Needs its own wants_rule_application signal built in this same step (not borrowed from elsewhere) to have two genuinely different plan branches to prove the pattern against.",
+        "scale_down": "",
+    },
+    {
+        "id": "EXP-085",
+        "title": "Multi-exception (OR-combined) rule scoping, measured on GDPR Art 9's actual four exceptions",
+        "status": "todo",
+        "goal": (
+            "Extend lab/common/inference.py's split_exception from one trailing 'unless <condition>' clause "
+            "to a list of alternative exception conditions combined by OR ('unless A, B, or C'), each checked "
+            "independently via the existing check_exception/NLI mechanism (unchanged) and combined so that "
+            "ANY exception holding blocks the rule's consequence, none holding with all unknown still marks "
+            "it conditional (the same honest-abstention posture EXP-083 already proved for one exception), "
+            "and none holding with at least one confidently not-holding derives cleanly. Measured on the real "
+            "motivating case this gap was found against: GDPR Article 9 -- one prohibition, four listed "
+            "exceptions -- not a restated toy single-exception rule."
+        ),
+        "method": "Not run.",
+        "models_used": (
+            "spaCy dependency parser (multi-exception clause splitting, deterministic) + MoritzLaurer/"
+            "DeBERTa-v3-base-mnli-fever-anli (per-exception entailment, already used unchanged by lab/common/"
+            "inference.py's check_exception, one bounded judgment per exception). No generative model."
+        ),
+        "referenced_files": [
+            "lab/common/inference.py",
+            "lab/exp_083_symbolic_inference/run.py",
+            "lab/exp_081_real_document_pipeline/run.py",
+        ],
+        "results_prose": "Not run.",
+        "conclusion": "Todo. The GDPR Art 9 fixture already exists verbatim in lab/exp_081_real_document_pipeline/run.py's GDPR_TEXT -- this needs new rule/exception parsing over text already in the repo, not a new document.",
+        "scale_down": "",
+    },
+    {
+        "id": "EXP-086",
+        "title": "Cross-sentence coreference resolution (fastcoref) feeding fact/rule extraction",
+        "status": "todo",
+        "goal": (
+            "Add fastcoref (F-COREF, AACL 2022; MIT-licensed, encoder-based mention-ranking, not generative; "
+            "pip-installable with a spaCy v3 pipeline component) as a document-level pre-processing step, "
+            "resolving 'he'/'it'/'they' across sentence boundaries before lab/common/rules.py and lab/common/"
+            "inference.py run per-sentence. The project owner's own motivating example (Rohan/Arun) doesn't "
+            "hit this gap -- its pronoun is within the same clause as the trigger fact, already handled by "
+            "lab/common/inference.py's bound_subject substitution -- but a real multi-sentence document will. "
+            "Falls back to that existing within-clause-only binding if fastcoref is unavailable or a given "
+            "pronoun's resolution confidence is low; never a hard failure."
+        ),
+        "method": "Not run. Check fastcoref actually installs and runs in this environment before measuring anything -- not assumed compatible.",
+        "models_used": (
+            "fastcoref (encoder-based, non-generative) -- a new dependency, permitted the same way dslim/"
+            "bert-base-NER and bge were: a real, pretrained, non-generative substitute for a capability this "
+            "repo doesn't yet have, never a generative model."
+        ),
+        "referenced_files": [
+            "lab/common/inference.py",
+            "lab/common/rules.py",
+            "lab/common/ingest.py",
+        ],
+        "results_prose": "Not run.",
+        "conclusion": "Todo. A real installation/compatibility check in this environment (one third-party comparison noted a pinned spaCy 3.0.6 requirement that may conflict with this repo's own spaCy version) comes before any accuracy measurement -- not assumed resolved.",
+        "scale_down": "",
+    },
+    {
+        "id": "EXP-087",
+        "title": "Flint-style legal role extraction and deontic modal classification",
+        "status": "todo",
+        "goal": (
+            "Replace generic subject/verb/object extraction with legal-SRL's own Actor / Activation Condition "
+            "/ Act / Object roles (the 'Flint framework', measured in a 2025 Artificial Intelligence and Law "
+            "comparison to outperform generic SRL for legal normative text) for rule/fact extraction, and "
+            "classify each extracted act's modal (shall/must/may/shall not) into an explicit deontic operator "
+            "(obligation/permission/prohibition) instead of lab/common/textutil.py's modals()'s current "
+            "'preserve this word unchanged' treatment -- so lab/common/inference.py can eventually tell 'X "
+            "may disclose' apart from 'X shall disclose' when deciding whether and how to chain a "
+            "consequence, not just whether the same word survived a rewrite."
+        ),
+        "method": "Not run. The largest, least-scoped of these four todos -- likely needs its own narrower sub-exploration for role extraction alone before combining with deontic classification.",
+        "models_used": (
+            "spaCy dependency parser (role/modal extraction, deterministic) -- no openly-released pretrained "
+            "Flint-role model was confirmed available during this session's research; the 2025 AI&Law paper's "
+            "model/dataset release status was not confirmed. This todo may need to build the role mapping "
+            "heuristically from dependency labels rather than load an existing checkpoint. No generative "
+            "model, under any version of this todo."
+        ),
+        "referenced_files": [
+            "lab/common/rules.py",
+            "lab/common/inference.py",
+            "lab/common/textutil.py",
+        ],
+        "results_prose": "Not run.",
+        "conclusion": "Todo. Whether a fine-tuned Flint-role model/dataset is actually downloadable, or this must be built heuristically from dependency labels alone, should be determined before scoping the rest of this todo, not after starting to build it.",
+        "scale_down": "",
+    },
 ]
 
 RERUN_TODOS = [
