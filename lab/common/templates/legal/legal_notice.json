@@ -1,0 +1,30 @@
+{
+  "id": "legal_notice",
+  "tool": "legal",
+  "title": "Legal Notice",
+  "description": "A formal legal notice sent by one party to another before taking further legal action: identifies the parties, states the facts, makes a demand, and gives a deadline.",
+  "tone": "formal legal register, third person, no contractions",
+  "citation_style": "[n]",
+  "sections": [
+    {
+      "title": "Notice Header",
+      "content_description": "Who is sending the notice, who is receiving it, and the date it was sent.",
+      "instructions": "State who is sending this notice, who is receiving it, and the date, using only the names and date given in the findings. Do not invent any name, title, or date not present in the findings."
+    },
+    {
+      "title": "Statement of Facts",
+      "content_description": "What happened: the events, defaults, or breaches that led to this notice being sent.",
+      "instructions": "State the factual background that led to this notice, in the order the facts are given. Use only the facts present in the findings -- do not add context, motive, or explanation not stated there."
+    },
+    {
+      "title": "Demand",
+      "content_description": "What the sender is demanding the recipient do: pay an amount, stop an action, or take some specific step.",
+      "instructions": "State exactly what is being demanded of the recipient (an action, a payment, a cessation), using only what the findings state is being demanded. Do not propose a remedy the findings do not mention."
+    },
+    {
+      "title": "Deadline and Consequence",
+      "content_description": "The deadline by which the recipient must comply, and what will happen if they do not.",
+      "instructions": "State the deadline for compliance and the stated consequence of non-compliance, using only the deadline and consequence given in the findings. Do not invent a deadline or threaten a consequence not stated."
+    }
+  ]
+}

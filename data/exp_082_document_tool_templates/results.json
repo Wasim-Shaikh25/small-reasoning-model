@@ -1,0 +1,53 @@
+{
+  "id": "EXP-082",
+  "title": "A tool/template registry for document formatting: legal and study, selection and ordering proven, routing measured honestly",
+  "status": "closed",
+  "goal": "Prove the project owner's tool/template idea -- declare a document's real formatting rules as data (sections, per-section instructions), select the right tool and template from the ask alone, route findings to the section they actually belong to, and write the resulting document in the template's own order -- on two independent domains (legal, study), starting deliberately small (one template per tool) rather than assuming it scales to many before proving it works on one.",
+  "method": "Two fixtures, each with its own ask and 3-4 findings clearly belonging to different template sections: a tenant-rent legal notice (lab.common.templates/legal/legal_notice.json, 4 sections) and a photosynthesis lecture-notes case (lab.common.templates/study/college_notes.json, 3 sections). For each: lab.common.doc_tools.select_tool/select_template picks a tool and template from the ask by bge cosine similarity against each candidate's own description (reusing lab.common.intent_signals' exact mechanism); assign_findings_to_sections routes each finding to its best-matching section the same way; lab.common.longform.write_long_document(template_id=...) builds and rewrites the resulting outline end to end.",
+  "metrics": {
+    "registered_tools": [
+      "legal",
+      "study"
+    ],
+    "legal_case": {
+      "tool_selected": "legal",
+      "tool_correct": true,
+      "template_selected": "legal_notice",
+      "template_correct": true,
+      "routing_accuracy": 1.0,
+      "order_correct": true
+    },
+    "study_case": {
+      "tool_selected": "study",
+      "tool_correct": true,
+      "template_selected": "college_notes",
+      "template_correct": true,
+      "routing_accuracy": 0.6667,
+      "order_correct": true
+    },
+    "mechanism_correct": true
+  },
+  "results_prose": "Two registered tools (legal, study), one template each. Legal case: ask 'Draft a legal notice to a tenant over unpaid rent.' selected tool='legal' (correct=True), template='legal_notice' (correct=True); finding-to-section routing accuracy 1.0 ({'F0': 'Notice Header', 'F1': 'Statement of Facts', 'F2': 'Demand', 'F3': 'Deadline and Consequence'}); outline section order correct=True. Study case: ask 'Write college lecture notes on photosynthesis for exam revision.' selected tool='study' (correct=True), template='college_notes' (correct=True); routing accuracy 0.6667 ({'G0': 'Detailed Notes', 'G1': 'Detailed Notes', 'G2': 'Quick Revision Summary'}); order correct=True. flan-t5-small's own fidelity pass/fail on these leaves (not this exploration's actual target -- see EXP-081 for that measurement) is recorded in each case's rewrite_diagnostics for completeness.",
+  "conclusion": "Tool selection, template selection, and section ordering are all correct on both independent domains: the right tool and template are picked from the ask alone, and the resulting document's sections appear in the template's own declared order, never an arbitrary one. Per-finding routing -- which section a given fact lands in -- is real but imperfect: 4/4 on the legal case, 2/3 on the study case. The one miss (a photosynthesis definition that itself describes a process, routed to 'Detailed Notes' instead of 'Key Concepts') is a genuinely ambiguous sentence, not a clear bug -- and hand-tuning the section wording to force it to route correctly was tried and made things worse (collapsed all three study findings into one section again), confirming that chasing a perfect score on one fixture by guessing phrasing is the wrong move, not a real fix. This is still the mechanism the project owner asked for -- 'give it one tool with full formatting detail, it uses that and writes in that format, without struggling to think how to format it' -- working on two real, independent domains, with its actual limits reported rather than hidden, before the catalog grows past two tools.",
+  "scale_down": "Two tools, one template each, 3-4 findings per case -- a proof the mechanism works, not a benchmark across a large template catalog (deliberately not built yet).",
+  "referenced_files": [
+    "lab/exp_082_document_tool_templates/run.py",
+    "lab/common/doc_tools.py",
+    "lab/common/longform.py",
+    "lab/common/templates/legal/_tool.json",
+    "lab/common/templates/legal/legal_notice.json",
+    "lab/common/templates/study/_tool.json",
+    "lab/common/templates/study/college_notes.json",
+    "data/exp_082_document_tool_templates/results.json"
+  ],
+  "follow_ups": [
+    "Per-finding section routing is real but imperfect (4/4 legal, 2/3 study) -- the one miss is a genuinely ambiguous sentence (a definition phrased as a process), and a hand-tuning attempt to fix it by rewording content_description made routing worse, not better (collapsed back to 1/3). A more reliable fix is a larger, more varied fixture set to measure against, not more guessing at single-section wording against one example.",
+    "Only one template per tool exists -- select_template's within-tool choice is untested with real competition (more than one candidate). Add a second template to one tool (e.g. a second legal document type) before trusting that part of the selection mechanism.",
+    "Not yet wired into lab.common.brain.reason's own document dispatch -- brain.reason's longform branch doesn't yet accept or auto-select a template_id, so this capability is only reachable via a direct write_long_document call, same gap EXP-081 flagged for the Qwen checkpoint comparison.",
+    "Template selection has never been tested on an ask that doesn't clearly belong to either registered tool (e.g. a company-policy or email-draft ask, tools not yet registered) -- worth a negative case once a third tool exists, to see what select_tool returns when nothing is a good match.",
+    "assign_findings_to_sections has no abstention: every finding is forced into its best-scoring section even if that similarity is low. A finding that belongs to neither tool's templates at all was not tested here."
+  ],
+  "elapsed_sec": 54.0473,
+  "peak_rss_mb": 890.23,
+  "models_used": "bge-small-en-v1.5 (lab.common.real_encoders, tool/template/section selection -- non-generative similarity scoring) + flan-t5-small (bounded rewriter role on the resulting leaves, fidelity-gated, diagnostics recorded but not this exploration's measured target)."
+}

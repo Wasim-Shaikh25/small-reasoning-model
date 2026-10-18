@@ -1,0 +1,137 @@
+{
+  "legal": {
+    "label": "legal_notice_case",
+    "tool_selected": "legal",
+    "tool_score": 0.6173,
+    "tool_correct": true,
+    "template_selected": "legal_notice",
+    "template_score": 0.6541,
+    "template_correct": true,
+    "routed_section_by_finding": {
+      "F0": "Notice Header",
+      "F1": "Statement of Facts",
+      "F2": "Demand",
+      "F3": "Deadline and Consequence"
+    },
+    "routing_accuracy": 1.0,
+    "section_titles_in_order": [
+      "Notice Header",
+      "Statement of Facts",
+      "Demand",
+      "Deadline and Consequence"
+    ],
+    "outline_titles_actual": [
+      "Notice Header",
+      "Statement of Facts",
+      "Demand",
+      "Deadline and Consequence"
+    ],
+    "order_correct": true,
+    "rewrite_diagnostics": [
+      {
+        "leaf_id": "T0000",
+        "used_generative": false,
+        "fallback_reason": [
+          "nli",
+          "citations",
+          "ask_relevance"
+        ]
+      },
+      {
+        "leaf_id": "T0001",
+        "used_generative": false,
+        "fallback_reason": [
+          "nli",
+          "citations",
+          "ask_relevance"
+        ]
+      },
+      {
+        "leaf_id": "T0002",
+        "used_generative": false,
+        "fallback_reason": [
+          "nli",
+          "citations",
+          "ask_relevance"
+        ]
+      },
+      {
+        "leaf_id": "T0003",
+        "used_generative": false,
+        "fallback_reason": [
+          "nli",
+          "citations",
+          "ask_relevance"
+        ]
+      }
+    ],
+    "document_sample": "Notice Header\nRavi Sharma, the landlord, is sending this notice to Priya Nair, the tenant, on 10 October 2026. [1]\n\nStatement of Facts\nPriya Nair has not paid rent for the months of August and September 2026. [2]\n\nDemand\nRavi Sharma demands payment of the outstanding rent of 45000 INR. [3]\n\nDeadline and Consequence\nPriya Nair must pay within 15 days of this notice, failing which eviction proceedings will be initiated. [4]",
+    "md_result": {
+      "path": "C:\\python_project\\small-reasoning-model\\data\\exp_082_document_tool_templates\\legal_notice_case.md",
+      "sha256": "4c226a760af21049845a2b8f3022e60f7ad45c9a9ec9f4be8afc9279dc4f5a70",
+      "sections": 4,
+      "word_count": 90,
+      "citations_indexed": 0
+    }
+  },
+  "study": {
+    "label": "college_notes_case",
+    "tool_selected": "study",
+    "tool_score": 0.7015,
+    "tool_correct": true,
+    "template_selected": "college_notes",
+    "template_score": 0.7178,
+    "template_correct": true,
+    "routed_section_by_finding": {
+      "G0": "Detailed Notes",
+      "G1": "Detailed Notes",
+      "G2": "Quick Revision Summary"
+    },
+    "routing_accuracy": 0.6667,
+    "section_titles_in_order": [
+      "Key Concepts",
+      "Detailed Notes",
+      "Quick Revision Summary"
+    ],
+    "outline_titles_actual": [
+      "Key Concepts",
+      "Detailed Notes",
+      "Quick Revision Summary"
+    ],
+    "order_correct": true,
+    "rewrite_diagnostics": [
+      {
+        "leaf_id": "T0000",
+        "used_generative": false,
+        "fallback_reason": [
+          "no_findings"
+        ]
+      },
+      {
+        "leaf_id": "T0001",
+        "used_generative": false,
+        "fallback_reason": [
+          "nli",
+          "citations",
+          "ask_relevance"
+        ]
+      },
+      {
+        "leaf_id": "T0002",
+        "used_generative": false,
+        "fallback_reason": [
+          "citations",
+          "ask_relevance"
+        ]
+      }
+    ],
+    "document_sample": "Key Concepts\n\nDetailed Notes\nPhotosynthesis is the process by which green plants convert light energy into chemical energy. [1]\nChlorophyll in the chloroplasts absorbs sunlight, which drives the conversion of carbon dioxide and water into glucose and oxygen. [2]\n\nQuick Revision Summary\nThe overall reaction can be summarized as: carbon dioxide plus water, in the presence of light, yields glucose and oxygen. [3]",
+    "md_result": {
+      "path": "C:\\python_project\\small-reasoning-model\\data\\exp_082_document_tool_templates\\college_notes_case.md",
+      "sha256": "ce70d0a3f0c25d4ea2f0407eff4ef7bf37c24f15bbb110674fd0be0d4e998420",
+      "sections": 3,
+      "word_count": 80,
+      "citations_indexed": 0
+    }
+  }
+}
