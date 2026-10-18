@@ -1,0 +1,36 @@
+{
+  "id": "EXP-053",
+  "title": "Cross-page consistency check for book-length assembly, closed formally and checked at real distance",
+  "status": "closed",
+  "goal": "Close EXP-053's own stub entry (EXPLORATIONS.md still listed it as `todo` despite EXP-078's conclusion already stating 'this closes EXP-053's gap directly' -- a bookkeeping gap) and check the specific distance EXP-053's own goal named ('page 40 against page 4'), which EXP-078's 6-7 leaf fixture never actually exercised.",
+  "method": "lab.common.working_memory.WorkingMemory (already built, unchanged) called directly across 40 simulated pages: page 4 states a fact about Ravi Sharma, 35 unrelated pages follow, page 40 restates the same subject+verb with a different value. Checks the flag fires, names the correct two pages, and that none of the 37 unrelated pages produces a false positive.",
+  "metrics": {
+    "n_pages": 40,
+    "n_flags": 1,
+    "conflict_flag": {
+      "leaf_id": "page-40",
+      "subject": "Ravi Sharma",
+      "verb_lemma": "live",
+      "new_object": "88 New Colony Road , Nagpur 440001",
+      "conflicts_with_leaf_id": "page-4",
+      "prior_object": "14 MG Road , Pune 411001"
+    },
+    "distance_correct": true,
+    "no_other_flags": true,
+    "pages_remembered": true,
+    "all_correct": true
+  },
+  "results_prose": "40 simulated pages, one claim about Ravi Sharma's address on page 4 and a contradicting claim about the same subject+verb on page 40 (36 pages later): 1 flag(s) fired, {'leaf_id': 'page-40', 'subject': 'Ravi Sharma', 'verb_lemma': 'live', 'new_object': '88 New Colony Road , Nagpur 440001', 'conflicts_with_leaf_id': 'page-4', 'prior_object': '14 MG Road , Pune 411001'}. The flag correctly names page-40 as the source and page-4 as what it conflicts with (True), with no other page (37 unrelated pages in between, each about a different person) producing a false-positive flag (True).",
+  "conclusion": "EXP-053's own named goal -- 'page 40 against page 4', not just an adjacent-page check -- is met: WorkingMemory's bounded per-page digest (subject-verb-object triples only, never full page text) still catches a contradiction 36 pages apart with zero false positives among 37 unrelated pages in between. The mechanism itself was already proven through the full pipeline by EXP-078 ('this closes EXP-053's gap directly', its own conclusion) -- this exploration closes EXP-053's own stub entry formally and checks the specific book-length distance its goal named, which EXP-078's 6-7 leaf fixture did not.",
+  "scale_down": "Calls WorkingMemory directly, not through the full write_long_document pipeline with a generative rewriter on top -- EXP-077/078 already measured that combination separately at smaller scale; this exploration isolates the consistency-check mechanism itself at the distance its own goal named. 40 pages, one injected conflict, not an exhaustive search over conflict positions.",
+  "referenced_files": [
+    "lab/exp_053_cross_page_consistency/run.py",
+    "lab/common/working_memory.py",
+    "lab/common/rules.py",
+    "data/exp_078_longform_consistency/results.json"
+  ],
+  "follow_ups": [],
+  "elapsed_sec": 14.0804,
+  "peak_rss_mb": 292.29,
+  "models_used": "lab.common.rules.extract_fact_triple (spaCy dependency parse, deterministic, unchanged). No generative model, no new dependency."
+}

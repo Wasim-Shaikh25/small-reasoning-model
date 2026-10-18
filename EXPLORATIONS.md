@@ -21538,6 +21538,72 @@ Elapsed seconds: 119.1497. Peak RSS MB: 658.25.
 - Scale-down: 13 findings across 4 leaves, not a full document. The same small fixture EXP-017 used, chosen so fidelity numbers are directly comparable, not a large or adversarial rewriting benchmark. No CTranslate2 int8 conversion (ARCHITECTURE.md section 8/14, EXP-045) -- plain transformers inference only, as the handoff asked for first.
 - Conclusion: The bounded rewriter exception is implemented and measured, not assumed: google/flan-t5-small is loaded locally (no API call), used only to rewrite findings this run already treats as verified, and every output goes through the same fidelity checks EXP-017 validated on the deterministic path before this run accepts it. The gate caught and discarded 4 of 4 rewrites (1.0 fallback rate), for the reasons counted above. Inspecting the generated text (not stored in results.json, re-run with a debug print to reproduce) shows a consistent failure mode, not hallucination: on every leaf flan-t5-small collapsed the 4 verified statements down to a near-copy of just one of them, silently dropping the other three findings' numbers, names, and citation markers instead of inventing new ones. That is exactly the failure the fidelity gate (entity_number_check plus citation survival) is built to catch, and it caught it every time -- a failing rewrite was replaced, never partially accepted. At this prompt and this checkpoint size, the gate's job is less about guarding against invention and more about guarding against silent omission. Extraction and verification are unaffected: this checkpoint never touched the QA extractor or the NLI judge, only text that those components had already verified.
 
+## EXP-052 Ask-driven table of contents, closed via entity-based outline grouping, not ask sub-question decomposition
+
+- Status: `closed`
+- Models used: lab.common.entities.detect_primary with use_real_ner=False (rule-based person/organization detection, deterministic). No generative model -- this exploration deliberately does not invoke the rewriter (EXP-077/078 already measured that separately).
+- Goal: Close EXP-052 honestly: the stub's own literal goal (derive the outline from the ask's own sub-question decomposition) was tried in an earlier version of lab.common.longform and abandoned (EXP-078) after it produced titles mismatched to their own leaf's content. Document that finding and demonstrate the superseding mechanism -- per-entity outline grouping -- still meets the real need: a stable, data-derived skeleton instead of an arbitrary count-based bucket.
+- Method: lab.common.longform._entity_outline (already built, unchanged) called directly on 4 findings spanning 2 named entities plus 1 entity-less global statement, checking that each leaf is titled by the entity its own findings describe and that the entity-less finding falls to the existing leftover/count-based path instead of being forced into a group.
+- Referenced files:
+- `lab/exp_052_ask_driven_outline/run.py`
+- `lab/common/longform.py`
+- `lab/common/entities.py`
+- `data/exp_078_longform_consistency/results.json`
+- Results: 4 findings (2 about Ravi Sharma, 1 about Meera Iyer, 1 global policy statement naming no entity) -> 2 entity leaves titled ['Ravi Sharma', 'Meera Iyer'] plus 1 leftover finding(s) (['F3']). Ravi's leaf correctly holds both his findings (True); Meera's leaf correctly holds hers alone (True); the entity-less policy statement correctly falls to the count-based fallback instead of being forced into a group (True).
+```json
+{
+  "n_leaves": 2,
+  "titles": [
+    "Ravi Sharma",
+    "Meera Iyer"
+  ],
+  "ravi_leaf_correct": true,
+  "meera_leaf_correct": true,
+  "leftover_correct": true,
+  "no_generic_titles": true,
+  "all_correct": true
+}
+```
+
+Elapsed seconds: 0.0041. Peak RSS MB: 139.3.
+- Scale-down: 4 findings, 2 entities -- enough to prove per-entity grouping and the leftover fallback both work, not a scale test (EXP-078 already measured this mechanism at 6-7 leaves with a real generative rewriter on top). Does not re-test the originally-proposed ask-sub-question approach itself -- that was EXP-078's own finding, cited here, not re-derived.
+- Conclusion: EXP-052's real need -- a stable document skeleton instead of an arbitrary 4-per-leaf grouping -- is met in production by lab.common.longform._entity_outline, NOT by the ask-sub-question-decomposition approach the stub originally specified, which EXP-078 found and abandoned (it produced titles mismatched to their own leaf's content; the bucketing stayed arbitrary, only the label changed). Every leaf here is titled by the entity its own findings are actually about, and an entity-less finding correctly falls through to the existing count-based fallback rather than being forced into a group it doesn't belong to.
+
+## EXP-053 Cross-page consistency check for book-length assembly, closed formally and checked at real distance
+
+- Status: `closed`
+- Models used: lab.common.rules.extract_fact_triple (spaCy dependency parse, deterministic, unchanged). No generative model, no new dependency.
+- Goal: Close EXP-053's own stub entry (EXPLORATIONS.md still listed it as `todo` despite EXP-078's conclusion already stating 'this closes EXP-053's gap directly' -- a bookkeeping gap) and check the specific distance EXP-053's own goal named ('page 40 against page 4'), which EXP-078's 6-7 leaf fixture never actually exercised.
+- Method: lab.common.working_memory.WorkingMemory (already built, unchanged) called directly across 40 simulated pages: page 4 states a fact about Ravi Sharma, 35 unrelated pages follow, page 40 restates the same subject+verb with a different value. Checks the flag fires, names the correct two pages, and that none of the 37 unrelated pages produces a false positive.
+- Referenced files:
+- `lab/exp_053_cross_page_consistency/run.py`
+- `lab/common/working_memory.py`
+- `lab/common/rules.py`
+- `data/exp_078_longform_consistency/results.json`
+- Results: 40 simulated pages, one claim about Ravi Sharma's address on page 4 and a contradicting claim about the same subject+verb on page 40 (36 pages later): 1 flag(s) fired, {'leaf_id': 'page-40', 'subject': 'Ravi Sharma', 'verb_lemma': 'live', 'new_object': '88 New Colony Road , Nagpur 440001', 'conflicts_with_leaf_id': 'page-4', 'prior_object': '14 MG Road , Pune 411001'}. The flag correctly names page-40 as the source and page-4 as what it conflicts with (True), with no other page (37 unrelated pages in between, each about a different person) producing a false-positive flag (True).
+```json
+{
+  "n_pages": 40,
+  "n_flags": 1,
+  "conflict_flag": {
+    "leaf_id": "page-40",
+    "subject": "Ravi Sharma",
+    "verb_lemma": "live",
+    "new_object": "88 New Colony Road , Nagpur 440001",
+    "conflicts_with_leaf_id": "page-4",
+    "prior_object": "14 MG Road , Pune 411001"
+  },
+  "distance_correct": true,
+  "no_other_flags": true,
+  "pages_remembered": true,
+  "all_correct": true
+}
+```
+
+Elapsed seconds: 14.0804. Peak RSS MB: 292.29.
+- Scale-down: Calls WorkingMemory directly, not through the full write_long_document pipeline with a generative rewriter on top -- EXP-077/078 already measured that combination separately at smaller scale; this exploration isolates the consistency-check mechanism itself at the distance its own goal named. 40 pages, one injected conflict, not an exhaustive search over conflict positions.
+- Conclusion: EXP-053's own named goal -- 'page 40 against page 4', not just an adjacent-page check -- is met: WorkingMemory's bounded per-page digest (subject-verb-object triples only, never full page text) still catches a contradiction 36 pages apart with zero false positives among 37 unrelated pages in between. The mechanism itself was already proven through the full pipeline by EXP-078 ('this closes EXP-053's gap directly', its own conclusion) -- this exploration closes EXP-053's own stub entry formally and checks the specific book-length distance its goal named, which EXP-078's 6-7 leaf fixture did not.
+
 ## EXP-054 Does narrowing the rewriter's task size prevent EXP-048's collapse?
 
 - Status: `closed`
@@ -23838,41 +23904,6 @@ Elapsed seconds: 175.2834. Peak RSS MB: 856.15.
 
 - Scale-down: 
 - Conclusion: Todo. Depends on EXP-049's relevance score as one input feature.
-
-## EXP-052 Ask-driven table of contents before page-wise assembly
-
-- Status: `todo`
-- Models used: Deterministic code only: the existing ask analyzer's sub-ask decomposition plus a section-count/ordering rule. No new model, generative or otherwise -- this is wiring between two already-built modules.
-- Goal: Build a deterministic outline directly from the ask -- what sections or sub-answers does this question imply -- before lab/common/assemble.build_outline buckets findings into 4-per-leaf groups, so long-form output has a stable skeleton instead of an arbitrary grouping. This is the missing wiring between the ask analyzer and the page-wise assembler that EXP-018 already proved scales (5,000 findings to 42,506 words without holding the whole document in memory).
-- Method: Not run.
-- Referenced files:
-- `lab/common/ask.py`
-- `lab/common/assemble.py`
-- `lab/exp_002_ask_analyzer/run.py`
-- `lab/exp_018_longform/run.py`
-- Results: Not run.
-
-
-- Scale-down: 
-- Conclusion: Todo.
-
-## EXP-053 Cross-page consistency check for book-length assembly
-
-- Status: `todo`
-- Models used: Deterministic code (graph adjacency, stored verified notes) plus the existing NLI judge (lexical, or the real DeBERTa-v3 MNLI checkpoint once EXP-031 closes) to flag a cross-page contradiction. No generative model.
-- Goal: When assembling many pages, check that a fact asserted on a late page doesn't contradict one asserted on an early page, using lab/common/graph.py's entity graph and lab/common/memory.py's verified-note recall as the index a human would flip back to, instead of re-reading the whole document. Nothing today checks page 40 against page 4; this is the missing piece for genuinely unlimited-length output.
-- Method: Not run.
-- Referenced files:
-- `lab/common/graph.py`
-- `lab/common/memory.py`
-- `lab/common/assemble.py`
-- `lab/common/verify.py`
-- `lab/exp_015_paged_memory/run.py`
-- Results: Not run.
-
-
-- Scale-down: 
-- Conclusion: Todo. Depends on EXP-052's outline existing first, so there are multiple pages worth checking against each other.
 
 ## EXP-084 Plan-then-execute layer for brain.reason
 

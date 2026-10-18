@@ -1,0 +1,45 @@
+{
+  "leaves": [
+    {
+      "leaf_id": "E0000",
+      "title": "Ravi Sharma",
+      "finding_ids": [
+        "F0",
+        "F1"
+      ],
+      "findings": [
+        {
+          "finding_id": "F0",
+          "statement": "Ravi Sharma lives at 14 MG Road, Pune 411001.",
+          "citation": "C0"
+        },
+        {
+          "finding_id": "F1",
+          "statement": "Ravi Sharma works at ABC Pvt Ltd.",
+          "citation": "C1"
+        }
+      ]
+    },
+    {
+      "leaf_id": "E0001",
+      "title": "Meera Iyer",
+      "finding_ids": [
+        "F2"
+      ],
+      "findings": [
+        {
+          "finding_id": "F2",
+          "statement": "Meera Iyer lives at 22 Lake View Road, Chennai 600028.",
+          "citation": "C2"
+        }
+      ]
+    }
+  ],
+  "leftover": [
+    {
+      "finding_id": "F3",
+      "statement": "The retention period for all records is 7 years.",
+      "citation": "C3"
+    }
+  ]
+}

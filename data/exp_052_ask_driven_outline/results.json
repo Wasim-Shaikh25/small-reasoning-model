@@ -1,0 +1,32 @@
+{
+  "id": "EXP-052",
+  "title": "Ask-driven table of contents, closed via entity-based outline grouping, not ask sub-question decomposition",
+  "status": "closed",
+  "goal": "Close EXP-052 honestly: the stub's own literal goal (derive the outline from the ask's own sub-question decomposition) was tried in an earlier version of lab.common.longform and abandoned (EXP-078) after it produced titles mismatched to their own leaf's content. Document that finding and demonstrate the superseding mechanism -- per-entity outline grouping -- still meets the real need: a stable, data-derived skeleton instead of an arbitrary count-based bucket.",
+  "method": "lab.common.longform._entity_outline (already built, unchanged) called directly on 4 findings spanning 2 named entities plus 1 entity-less global statement, checking that each leaf is titled by the entity its own findings describe and that the entity-less finding falls to the existing leftover/count-based path instead of being forced into a group.",
+  "metrics": {
+    "n_leaves": 2,
+    "titles": [
+      "Ravi Sharma",
+      "Meera Iyer"
+    ],
+    "ravi_leaf_correct": true,
+    "meera_leaf_correct": true,
+    "leftover_correct": true,
+    "no_generic_titles": true,
+    "all_correct": true
+  },
+  "results_prose": "4 findings (2 about Ravi Sharma, 1 about Meera Iyer, 1 global policy statement naming no entity) -> 2 entity leaves titled ['Ravi Sharma', 'Meera Iyer'] plus 1 leftover finding(s) (['F3']). Ravi's leaf correctly holds both his findings (True); Meera's leaf correctly holds hers alone (True); the entity-less policy statement correctly falls to the count-based fallback instead of being forced into a group (True).",
+  "conclusion": "EXP-052's real need -- a stable document skeleton instead of an arbitrary 4-per-leaf grouping -- is met in production by lab.common.longform._entity_outline, NOT by the ask-sub-question-decomposition approach the stub originally specified, which EXP-078 found and abandoned (it produced titles mismatched to their own leaf's content; the bucketing stayed arbitrary, only the label changed). Every leaf here is titled by the entity its own findings are actually about, and an entity-less finding correctly falls through to the existing count-based fallback rather than being forced into a group it doesn't belong to.",
+  "scale_down": "4 findings, 2 entities -- enough to prove per-entity grouping and the leftover fallback both work, not a scale test (EXP-078 already measured this mechanism at 6-7 leaves with a real generative rewriter on top). Does not re-test the originally-proposed ask-sub-question approach itself -- that was EXP-078's own finding, cited here, not re-derived.",
+  "referenced_files": [
+    "lab/exp_052_ask_driven_outline/run.py",
+    "lab/common/longform.py",
+    "lab/common/entities.py",
+    "data/exp_078_longform_consistency/results.json"
+  ],
+  "follow_ups": [],
+  "elapsed_sec": 0.0041,
+  "peak_rss_mb": 139.3,
+  "models_used": "lab.common.entities.detect_primary with use_real_ner=False (rule-based person/organization detection, deterministic). No generative model -- this exploration deliberately does not invoke the rewriter (EXP-077/078 already measured that separately)."
+}

@@ -512,61 +512,6 @@ TODOS = [
         "scale_down": "",
     },
     {
-        "id": "EXP-052",
-        "title": "Ask-driven table of contents before page-wise assembly",
-        "status": "todo",
-        "goal": (
-            "Build a deterministic outline directly from the ask -- what sections or sub-answers does this "
-            "question imply -- before lab/common/assemble.build_outline buckets findings into 4-per-leaf "
-            "groups, so long-form output has a stable skeleton instead of an arbitrary grouping. This is the "
-            "missing wiring between the ask analyzer and the page-wise assembler that EXP-018 already proved "
-            "scales (5,000 findings to 42,506 words without holding the whole document in memory)."
-        ),
-        "method": "Not run.",
-        "models_used": (
-            "Deterministic code only: the existing ask analyzer's sub-ask decomposition plus a section-count/"
-            "ordering rule. No new model, generative or otherwise -- this is wiring between two already-"
-            "built modules."
-        ),
-        "referenced_files": [
-            "lab/common/ask.py",
-            "lab/common/assemble.py",
-            "lab/exp_002_ask_analyzer/run.py",
-            "lab/exp_018_longform/run.py",
-        ],
-        "results_prose": "Not run.",
-        "conclusion": "Todo.",
-        "scale_down": "",
-    },
-    {
-        "id": "EXP-053",
-        "title": "Cross-page consistency check for book-length assembly",
-        "status": "todo",
-        "goal": (
-            "When assembling many pages, check that a fact asserted on a late page doesn't contradict one "
-            "asserted on an early page, using lab/common/graph.py's entity graph and lab/common/memory.py's "
-            "verified-note recall as the index a human would flip back to, instead of re-reading the whole "
-            "document. Nothing today checks page 40 against page 4; this is the missing piece for genuinely "
-            "unlimited-length output."
-        ),
-        "method": "Not run.",
-        "models_used": (
-            "Deterministic code (graph adjacency, stored verified notes) plus the existing NLI judge (lexical, "
-            "or the real DeBERTa-v3 MNLI checkpoint once EXP-031 closes) to flag a cross-page contradiction. "
-            "No generative model."
-        ),
-        "referenced_files": [
-            "lab/common/graph.py",
-            "lab/common/memory.py",
-            "lab/common/assemble.py",
-            "lab/common/verify.py",
-            "lab/exp_015_paged_memory/run.py",
-        ],
-        "results_prose": "Not run.",
-        "conclusion": "Todo. Depends on EXP-052's outline existing first, so there are multiple pages worth checking against each other.",
-        "scale_down": "",
-    },
-    {
         "id": "EXP-084",
         "title": "Plan-then-execute layer for brain.reason",
         "status": "todo",
