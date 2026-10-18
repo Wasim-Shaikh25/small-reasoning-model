@@ -1,0 +1,359 @@
+{
+  "case1_single_hop": {
+    "facts": [
+      {
+        "raw": "Rohan killed Arun.",
+        "subject": "Rohan",
+        "verb_lemma": "kill",
+        "object": "Arun"
+      },
+      {
+        "subject": "Rohan",
+        "verb_lemma": "be",
+        "object": "a crime",
+        "raw": "it is a crime",
+        "conditional": false,
+        "derivation": {
+          "rule": "If anyone kills another person, it is a crime and he will go to jail.",
+          "fact": "Rohan killed Arun.",
+          "exception_check": {
+            "status": "no_exception",
+            "best_entail": null,
+            "best_contradict": null,
+            "best_context": null
+          }
+        }
+      },
+      {
+        "subject": "Rohan",
+        "verb_lemma": "go",
+        "object": "jail",
+        "raw": "he will go to jail",
+        "conditional": false,
+        "derivation": {
+          "rule": "If anyone kills another person, it is a crime and he will go to jail.",
+          "fact": "Rohan killed Arun.",
+          "exception_check": {
+            "status": "no_exception",
+            "best_entail": null,
+            "best_contradict": null,
+            "best_context": null
+          }
+        }
+      }
+    ],
+    "trace": [
+      {
+        "step": 0,
+        "rule": "If anyone kills another person, it is a crime and he will go to jail.",
+        "fact": "Rohan killed Arun.",
+        "derived": {
+          "subject": "Rohan",
+          "verb_lemma": "be",
+          "object": "a crime",
+          "raw": "it is a crime",
+          "conditional": false,
+          "derivation": {
+            "rule": "If anyone kills another person, it is a crime and he will go to jail.",
+            "fact": "Rohan killed Arun.",
+            "exception_check": {
+              "status": "no_exception",
+              "best_entail": null,
+              "best_contradict": null,
+              "best_context": null
+            }
+          }
+        },
+        "blocked_by_exception": null
+      },
+      {
+        "step": 0,
+        "rule": "If anyone kills another person, it is a crime and he will go to jail.",
+        "fact": "Rohan killed Arun.",
+        "derived": {
+          "subject": "Rohan",
+          "verb_lemma": "go",
+          "object": "jail",
+          "raw": "he will go to jail",
+          "conditional": false,
+          "derivation": {
+            "rule": "If anyone kills another person, it is a crime and he will go to jail.",
+            "fact": "Rohan killed Arun.",
+            "exception_check": {
+              "status": "no_exception",
+              "best_entail": null,
+              "best_contradict": null,
+              "best_context": null
+            }
+          }
+        },
+        "blocked_by_exception": null
+      }
+    ],
+    "steps": 2
+  },
+  "case2_multi_hop_chain": {
+    "facts": [
+      {
+        "raw": "Rohan killed Arun.",
+        "subject": "Rohan",
+        "verb_lemma": "kill",
+        "object": "Arun"
+      },
+      {
+        "subject": "Rohan",
+        "verb_lemma": "be",
+        "object": "a crime",
+        "raw": "it is a crime",
+        "conditional": false,
+        "derivation": {
+          "rule": "If anyone kills another person, it is a crime and he will go to jail.",
+          "fact": "Rohan killed Arun.",
+          "exception_check": {
+            "status": "no_exception",
+            "best_entail": null,
+            "best_contradict": null,
+            "best_context": null
+          }
+        }
+      },
+      {
+        "subject": "Rohan",
+        "verb_lemma": "go",
+        "object": "jail",
+        "raw": "he will go to jail",
+        "conditional": false,
+        "derivation": {
+          "rule": "If anyone kills another person, it is a crime and he will go to jail.",
+          "fact": "Rohan killed Arun.",
+          "exception_check": {
+            "status": "no_exception",
+            "best_entail": null,
+            "best_contradict": null,
+            "best_context": null
+          }
+        }
+      },
+      {
+        "subject": "Rohan",
+        "verb_lemma": "suspend",
+        "object": "their license",
+        "raw": "their license will be suspended",
+        "conditional": false,
+        "derivation": {
+          "rule": "If a person goes to jail, their license will be suspended.",
+          "fact": "he will go to jail",
+          "exception_check": {
+            "status": "no_exception",
+            "best_entail": null,
+            "best_contradict": null,
+            "best_context": null
+          }
+        }
+      }
+    ],
+    "trace": [
+      {
+        "step": 0,
+        "rule": "If anyone kills another person, it is a crime and he will go to jail.",
+        "fact": "Rohan killed Arun.",
+        "derived": {
+          "subject": "Rohan",
+          "verb_lemma": "be",
+          "object": "a crime",
+          "raw": "it is a crime",
+          "conditional": false,
+          "derivation": {
+            "rule": "If anyone kills another person, it is a crime and he will go to jail.",
+            "fact": "Rohan killed Arun.",
+            "exception_check": {
+              "status": "no_exception",
+              "best_entail": null,
+              "best_contradict": null,
+              "best_context": null
+            }
+          }
+        },
+        "blocked_by_exception": null
+      },
+      {
+        "step": 0,
+        "rule": "If anyone kills another person, it is a crime and he will go to jail.",
+        "fact": "Rohan killed Arun.",
+        "derived": {
+          "subject": "Rohan",
+          "verb_lemma": "go",
+          "object": "jail",
+          "raw": "he will go to jail",
+          "conditional": false,
+          "derivation": {
+            "rule": "If anyone kills another person, it is a crime and he will go to jail.",
+            "fact": "Rohan killed Arun.",
+            "exception_check": {
+              "status": "no_exception",
+              "best_entail": null,
+              "best_contradict": null,
+              "best_context": null
+            }
+          }
+        },
+        "blocked_by_exception": null
+      },
+      {
+        "step": 1,
+        "rule": "If a person goes to jail, their license will be suspended.",
+        "fact": "he will go to jail",
+        "derived": {
+          "subject": "Rohan",
+          "verb_lemma": "suspend",
+          "object": "their license",
+          "raw": "their license will be suspended",
+          "conditional": false,
+          "derivation": {
+            "rule": "If a person goes to jail, their license will be suspended.",
+            "fact": "he will go to jail",
+            "exception_check": {
+              "status": "no_exception",
+              "best_entail": null,
+              "best_contradict": null,
+              "best_context": null
+            }
+          }
+        },
+        "blocked_by_exception": null
+      }
+    ],
+    "steps": 3
+  },
+  "case3_exception_unresolved": {
+    "facts": [
+      {
+        "raw": "Rohan killed Arun.",
+        "subject": "Rohan",
+        "verb_lemma": "kill",
+        "object": "Arun"
+      },
+      {
+        "subject": "Rohan",
+        "verb_lemma": "be",
+        "object": "a crime",
+        "raw": "it is a crime",
+        "conditional": true,
+        "derivation": {
+          "rule": "If a person kills another person, it is a crime, unless it was self-defense.",
+          "fact": "Rohan killed Arun.",
+          "exception_check": {
+            "status": "unknown",
+            "best_entail": 0.0,
+            "best_contradict": 0.0,
+            "best_context": null
+          }
+        }
+      }
+    ],
+    "trace": [
+      {
+        "step": 0,
+        "rule": "If a person kills another person, it is a crime, unless it was self-defense.",
+        "fact": "Rohan killed Arun.",
+        "derived": {
+          "subject": "Rohan",
+          "verb_lemma": "be",
+          "object": "a crime",
+          "raw": "it is a crime",
+          "conditional": true,
+          "derivation": {
+            "rule": "If a person kills another person, it is a crime, unless it was self-defense.",
+            "fact": "Rohan killed Arun.",
+            "exception_check": {
+              "status": "unknown",
+              "best_entail": 0.0,
+              "best_contradict": 0.0,
+              "best_context": null
+            }
+          }
+        },
+        "blocked_by_exception": null
+      }
+    ],
+    "steps": 2
+  },
+  "case4_exception_holds": {
+    "facts": [
+      {
+        "raw": "Rohan killed Arun.",
+        "subject": "Rohan",
+        "verb_lemma": "kill",
+        "object": "Arun"
+      }
+    ],
+    "trace": [
+      {
+        "step": 0,
+        "rule": "If a person kills another person, it is a crime, unless it was self-defense.",
+        "fact": "Rohan killed Arun.",
+        "derived": null,
+        "blocked_by_exception": {
+          "status": "holds",
+          "best_entail": 0.9069,
+          "best_contradict": 0.0029,
+          "best_context": "Rohan acted in self-defense when he killed Arun."
+        }
+      }
+    ],
+    "steps": 1
+  },
+  "case5_exception_not_holds": {
+    "facts": [
+      {
+        "raw": "Rohan killed Arun.",
+        "subject": "Rohan",
+        "verb_lemma": "kill",
+        "object": "Arun"
+      },
+      {
+        "subject": "Rohan",
+        "verb_lemma": "be",
+        "object": "a crime",
+        "raw": "it is a crime",
+        "conditional": false,
+        "derivation": {
+          "rule": "If a person kills another person, it is a crime, unless it was self-defense.",
+          "fact": "Rohan killed Arun.",
+          "exception_check": {
+            "status": "not_holds",
+            "best_entail": 0.0002,
+            "best_contradict": 0.9985,
+            "best_context": "It was not self-defense; Rohan attacked Arun without provocation."
+          }
+        }
+      }
+    ],
+    "trace": [
+      {
+        "step": 0,
+        "rule": "If a person kills another person, it is a crime, unless it was self-defense.",
+        "fact": "Rohan killed Arun.",
+        "derived": {
+          "subject": "Rohan",
+          "verb_lemma": "be",
+          "object": "a crime",
+          "raw": "it is a crime",
+          "conditional": false,
+          "derivation": {
+            "rule": "If a person kills another person, it is a crime, unless it was self-defense.",
+            "fact": "Rohan killed Arun.",
+            "exception_check": {
+              "status": "not_holds",
+              "best_entail": 0.0002,
+              "best_contradict": 0.9985,
+              "best_context": "It was not self-defense; Rohan attacked Arun without provocation."
+            }
+          }
+        },
+        "blocked_by_exception": null
+      }
+    ],
+    "steps": 2
+  }
+}

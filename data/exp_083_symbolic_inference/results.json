@@ -1,0 +1,80 @@
+{
+  "id": "EXP-083",
+  "title": "Multi-step symbolic inference: rule+fact to predicates, forward-chained, with honest exception handling",
+  "status": "closed",
+  "goal": "Prove the project owner's own proposal -- convert a stated rule and a stated fact into logical/predicate form and let deterministic code chain the consequences across multiple steps, entirely without a generative model -- on the exact motivating example (Rohan/Arun), a genuine multi-step chain, and an exception clause in all three of its honest states (unresolved, holds, does not hold).",
+  "method": "lab.common.rules.extract_fact_triple/parse_conditional_rule (existing, unmodified) extract the fact and rule; lab.common.inference.instantiate_consequence turns a matched rule's consequence into new predicate(s) bound to the triggering entity; forward_chain repeatedly applies every rule to every known fact (including newly derived ones) until a round derives nothing new. Five cases: single hop, a 3-step chain through a second rule, and the same exception-bearing rule run with no context, context affirming the exception, and context contradicting it.",
+  "metrics": {
+    "case1_single_hop": {
+      "correct": true,
+      "derived_facts": [
+        [
+          "Rohan",
+          "be",
+          "a crime"
+        ],
+        [
+          "Rohan",
+          "go",
+          "jail"
+        ]
+      ]
+    },
+    "case2_multi_hop_chain": {
+      "correct": true,
+      "steps": 3,
+      "derived_facts": [
+        [
+          "Rohan",
+          "be",
+          "a crime"
+        ],
+        [
+          "Rohan",
+          "go",
+          "jail"
+        ],
+        [
+          "Rohan",
+          "suspend",
+          "their license"
+        ]
+      ]
+    },
+    "case3_exception_unresolved": {
+      "correct": true,
+      "status": "unknown",
+      "conditional": true
+    },
+    "case4_exception_holds": {
+      "correct": true,
+      "derived_count": 0
+    },
+    "case5_exception_not_holds": {
+      "correct": true,
+      "conditional": false
+    },
+    "all_correct": true
+  },
+  "results_prose": "Case 1 (single hop): kill(Rohan, Arun) + the rule derived [('Rohan', 'be', 'a crime'), ('Rohan', 'go', 'jail')] -- correct=True. Case 2 (3-step chain, kill -> crime+jail -> license suspended): derived [('Rohan', 'be', 'a crime'), ('Rohan', 'go', 'jail'), ('Rohan', 'suspend', 'their license')] in 3 rounds -- correct=True (this case caught and fixed a real possessive-pronoun subject-binding bug before this run). Case 3 (exception exists, no context either way): derived the consequence but marked conditional=True, status='unknown' -- correct=True. Case 4 (context affirms the exception): 0 facts derived (consequence correctly suppressed) -- correct=True. Case 5 (context contradicts the exception): derived cleanly with conditional=False -- correct=True.",
+  "conclusion": "Multi-step symbolic inference -- converting a stated rule and a stated fact into predicate form, unifying the trigger, binding the consequence's subject to the actual named entity, and chaining a derived fact into further rules until nothing new follows -- works as a real mechanism, not just on the single-hop case this project already had (EXP-057/059/061), but genuinely across multiple steps. The exception handling is the part that matters most for trust: an exception whose truth the given context never actually states is never silently treated as false, only as unresolved and visibly flagged, and a rule with no stated exception at all is never confused with one whose exception just happens to not apply here. Every step runs through spaCy's dependency parser or the real DeBERTa-v3 NLI classifier -- no generative model anywhere in the conversion from language to rule/fact form, the project owner's own explicit requirement, so nothing in this chain can hallucinate a predicate that was never actually stated.",
+  "scale_down": "Five hand-built cases proving each named mechanism works, not a broad benchmark across many rules or a real multi-exception statute (GDPR Art 9's four exceptions) -- that combination is a named follow-up, not covered here.",
+  "referenced_files": [
+    "lab/exp_083_symbolic_inference/run.py",
+    "lab/common/inference.py",
+    "lab/common/rules.py",
+    "data/exp_057_rule_application/results.json",
+    "data/exp_059_cross_domain_rules/results.json",
+    "data/exp_061_semantic_rule_matching/results.json",
+    "data/exp_083_symbolic_inference/results.json"
+  ],
+  "follow_ups": [
+    "Not yet tested on a rule with more than one exception combined by OR (GDPR Art 9's actual shape: four listed exceptions, any one of which blocks the prohibition) -- split_exception only handles a single trailing 'unless' clause, not a disjunction of several.",
+    "_extract_clause_predicate's possessive-subject fix (case 2) was found on exactly one example ('their license will be suspended') -- worth testing on other possessive shapes ('his bail will be denied', 'her assets will be seized') before trusting it generalizes, the same caution EXP-082 learned the hard way about hand-tuning against one fixture.",
+    "check_exception's NLI call reads the whole context sentence as one premise; a longer passage with the exception's evidence buried in one clause among many was not tested -- EXP-056/069's sentence-splitting approach for ask-relevance may be needed here too if this scales to real documents.",
+    "Not yet wired into lab.common.brain.reason as a signal -- this module is callable standalone, the same gap lab.common.longform had before EXP-079 wired it in."
+  ],
+  "elapsed_sec": 124.5098,
+  "peak_rss_mb": 637.47,
+  "models_used": "spaCy en_core_web_sm dependency parser (fact/rule/consequence extraction, non-generative, deterministic) + MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli (exception entailment, one bounded judgment per check, non-generative). No generative model anywhere in this exploration."
+}
