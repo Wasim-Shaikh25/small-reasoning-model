@@ -21802,7 +21802,7 @@ Elapsed seconds: 12.8878. Peak RSS MB: 292.07.
 - `data/exp_057_rule_application/results.json`
 - `data/exp_058_integrated_scenario/results.json`
 - `data/exp_060_unified_brain/results.json`
-- Results: On 8 cases spanning three regimes (plain lookup, rule application, integrated disambiguation+arithmetic+policy), all through the identical lab.common.brain.reason(ask, passages) call, 8 are correct (accuracy 1.0). The trace shows which internal steps fired per regime: lookup cases use ['analyze_ask', 'extract_identity', 'intent_signal', 'lookup_fallback'], the rule case uses ['analyze_ask', 'apply_rule', 'find_rule', 'intent_signal'], the integrated cases use ['analyze_ask', 'apply_rule', 'compute_total', 'disambiguate', 'extract_identity', 'find_rule', 'intent_signal'] -- different internal steps, same external call.
+- Results: On 8 cases spanning three regimes (plain lookup, rule application, integrated disambiguation+arithmetic+policy), all through the identical lab.common.brain.reason(ask, passages) call, 8 are correct (accuracy 1.0). The trace shows which internal steps fired per regime: lookup cases use ['analyze_ask', 'extract_identity', 'intent_signal', 'lookup_fallback'], the rule case uses ['analyze_ask', 'apply_rule', 'check_exception', 'find_rule', 'intent_signal'], the integrated cases use ['analyze_ask', 'apply_rule', 'compute_total', 'disambiguate', 'extract_identity', 'find_rule', 'intent_signal'] -- different internal steps, same external call.
 ```json
 {
   "n": 8,
@@ -21824,6 +21824,7 @@ Elapsed seconds: 12.8878. Peak RSS MB: 292.07.
       "trace_steps_used": [
         "analyze_ask",
         "apply_rule",
+        "check_exception",
         "find_rule",
         "intent_signal"
       ]
@@ -21896,7 +21897,7 @@ Elapsed seconds: 12.8878. Peak RSS MB: 292.07.
 }
 ```
 
-Elapsed seconds: 108.8114. Peak RSS MB: 471.7.
+Elapsed seconds: 69.352. Peak RSS MB: 593.22.
 - Scale-down: 8 cases across 3 regimes, not a benchmark of the brain's ceiling -- a targeted test that the single entry point reproduces every prior exploration's answer without per-case wiring.
 - Conclusion: One function handles a plain lookup, a rule-application question, and a multi-signal integrated scenario without the caller choosing a path. The difference between regimes shows up only in the trace -- which internal signal checks fired -- never in which function was called or how it was called. A lookup question fires none of the extra signals and falls back to the same single-slot extractor lab.common.engine already uses; the integrated cases fire three signals at once and chain their results. This is the unification the prior three explorations (EXP-057/058/059) proved piece by piece, now proved as one entry point rather than three scripts a person chooses between.
 
@@ -23364,9 +23365,296 @@ Elapsed seconds: 54.0473. Peak RSS MB: 890.23.
 }
 ```
 
-Elapsed seconds: 124.5098. Peak RSS MB: 637.47.
+Elapsed seconds: 360.0401. Peak RSS MB: 541.12.
 - Scale-down: Five hand-built cases proving each named mechanism works, not a broad benchmark across many rules or a real multi-exception statute (GDPR Art 9's four exceptions) -- that combination is a named follow-up, not covered here.
 - Conclusion: Multi-step symbolic inference -- converting a stated rule and a stated fact into predicate form, unifying the trigger, binding the consequence's subject to the actual named entity, and chaining a derived fact into further rules until nothing new follows -- works as a real mechanism, not just on the single-hop case this project already had (EXP-057/059/061), but genuinely across multiple steps. The exception handling is the part that matters most for trust: an exception whose truth the given context never actually states is never silently treated as false, only as unresolved and visibly flagged, and a rule with no stated exception at all is never confused with one whose exception just happens to not apply here. Every step runs through spaCy's dependency parser or the real DeBERTa-v3 NLI classifier -- no generative model anywhere in the conversion from language to rule/fact form, the project owner's own explicit requirement, so nothing in this chain can hallucinate a predicate that was never actually stated.
+
+## EXP-085 Multi-exception (OR-combined) rule scoping, measured on GDPR Art 9's actual three exceptions
+
+- Status: `closed`
+- Models used: spaCy en_core_web_sm dependency parser (fact/rule extraction, unchanged, non-generative) + MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli (per-exception entailment via the existing, unmodified check_exception, one bounded judgment per alternative, non-generative). No generative model anywhere in this exploration.
+- Goal: Extend lab.common.inference's single-exception handling (EXP-083) to a disjunction of several alternative exceptions combined by OR, each still checked by the existing, unmodified check_exception/NLI mechanism, and prove the OR-combination's three honest states (any holds blocks; all unknown still derives but conditional; none holds with at least one confidently ruled out derives cleanly) on the real motivating case this gap was found against -- GDPR Article 9, not a restated single-exception rule.
+- Method: lab.common.inference.split_exceptions (new) generalizes split_exception's single trailing 'unless <condition>' clause to a list of alternatives, split only on ';' so a single alternative's own internal commas/or's are preserved. lab.common.inference.check_exceptions (new) calls the existing, unmodified check_exception once per alternative and OR-combines the three-way verdict. forward_chain now calls split_exceptions/check_exceptions in place of the singular functions -- a one-item list degenerates to the exact same behavior the singular path always had, confirmed by re-running EXP-083 after this change (data/exp_083_symbolic_inference/results.json, re-rendered, unchanged). The rule itself is one hand-composed sentence in parse_conditional_rule's one supported shape, its three exception alternatives pulled verbatim (by regex, with an assertion on the count) from lab.exp_081_real_document_pipeline.run's own real ~2,400-word GDPR fixture, not retyped by hand and not a new document.
+- Referenced files:
+- `lab/exp_085_multi_exception_scoping/run.py`
+- `lab/common/inference.py`
+- `lab/common/rules.py`
+- `lab/exp_081_real_document_pipeline/run.py`
+- `lab/exp_083_symbolic_inference/run.py`
+- `data/exp_083_symbolic_inference/results.json`
+- `data/exp_085_multi_exception_scoping/results.json`
+- Results: Rule: 3 OR-combined exceptions pulled verbatim from the repo's own GDPR_TEXT fixture (found 3, not the 4 EXPLORATIONS.md's own prior EXP-085 entry claimed). Case 1 (no context, all 3 unknown): per-exception statuses ['unknown', 'unknown', 'unknown'], overall 'unknown', derived-but-conditional -- correct=True. Case 2 (context affirms the consent alternative): 0 facts derived (blocked) -- correct=True. Case 3 (context affirms the DIFFERENT vital-interests alternative): 0 facts derived (also blocked) -- correct=True, proving the OR-combination checks every listed alternative, not just whichever one case 2 happened to use. Case 4 (context only contradicts the consent alternative; the other two stay unknown): per-exception statuses ['not_holds', 'unknown', 'unknown'], overall 'not_holds', derived cleanly (conditional=False) -- correct=True.
+```json
+{
+  "gdpr_art9_exceptions_found": 3,
+  "case1_all_unknown": {
+    "correct": true,
+    "status": "unknown",
+    "per_exception": [
+      "unknown",
+      "unknown",
+      "unknown"
+    ]
+  },
+  "case2_holds_via_consent": {
+    "correct": true,
+    "derived_count": 0
+  },
+  "case3_holds_via_vital_interests": {
+    "correct": true,
+    "derived_count": 0
+  },
+  "case4_not_holds_one_contradicted": {
+    "correct": true,
+    "status": "not_holds",
+    "per_exception": [
+      "not_holds",
+      "unknown",
+      "unknown"
+    ]
+  },
+  "all_correct": true
+}
+```
+
+Elapsed seconds: 615.794. Peak RSS MB: 733.06.
+- Scale-down: One hand-composed rule sentence (parse_conditional_rule's one supported shape), not an automatic parse of GDPR Art 9's own real multi-sentence prohibition+exception wording -- that would need a genuinely different rule-sentence parser (closer to EXP-087's Flint-role scope), a separate and much larger piece of work, not required to prove the OR-combination mechanism itself. The repo's own GDPR_TEXT fixture has 3 listed exceptions for Art 9, not the 4 this project's own prior EXP-085 todo entry claimed (real GDPR Art 9 has a 4th paragraph, covering non-profit-body members' data, that this fixture does not include) -- measured against the fixture that actually exists in this repo, corrected here rather than restated uncritically. Four hand-built cases proving each named combination state, not a broad benchmark across many multi-exception rules.
+- Conclusion: Multi-exception OR-combination works on GDPR Art 9's own real exception text, not just a restated single-exception toy rule: any one of several listed alternatives blocks the consequence when it holds (proven on two different alternatives, not only the first), the consequence still derives -- visibly flagged conditional -- when every alternative is genuinely unresolved, and it derives cleanly once none holds and at least one alternative is confidently ruled out, without needing every alternative individually ruled out first. check_exception's own per-exception judgment is unchanged; check_exceptions only combines its existing three-way verdict across more than one condition, split on ';' so that a single alternative's own internal commas and 'or's (common in real statutory text) are never mistaken for a boundary between alternatives.
+
+## EXP-088 Real-world validation of multi-exception scoping against authoritative GDPR Art 9 scenarios, no tuning
+
+- Status: `closed`
+- Models used: MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli (per-exception entailment via the existing, unmodified check_exception/check_exceptions). No generative model. No new dependency.
+- Goal: Re-validate EXP-085's OR-combination mechanism (split_exceptions/check_exceptions, unchanged) against real-world scenarios fetched from authoritative sources -- the UK ICO's own published worked examples and a real GDPR enforcement decision -- phrased as those sources actually state them, with no rewording toward the GDPR clause's own vocabulary and no iteration against the model's score, directly answering the objection that EXP-085's own validation sentences were tuned to pass rather than drawn from real evidence.
+- Method: Same rule/fact fixture as EXP-085 (lab.exp_085_multi_exception_scoping.run.RULE_TEXT/FACT_TEXT, imported unchanged), run through the same unmodified forward_chain/check_exceptions. Four context texts replace EXP-085's hand-tuned sentences: three ICO worked examples (one per exception, each expected to measure as 'holds') and one real AEPD enforcement decision describing an actual Article 9 violation on an unrelated fact pattern (expected to measure as 'unknown', not 'not_holds', since it never specifically addresses any of the three listed exceptions). Each case's measured status is compared to its expected real-world conclusion and reported, match or not, with no retry.
+- Referenced files:
+- `lab/exp_088_real_world_validation/run.py`
+- `lab/common/inference.py`
+- `lab/exp_085_multi_exception_scoping/run.py`
+- `data/exp_085_multi_exception_scoping/results.json`
+- `data/exp_088_real_world_validation/results.json`
+- Results: 3/4 cases' measured status matched the real-world expected conclusion, with no wording retried or tuned after seeing a score. consent_ico_gym: expected='holds', measured='holds' (matches_expected=True) -- per-exception: [holds(e=0.7944,c=0.0039), unknown(e=0.0804,c=0.0286), unknown(e=0.0081,c=0.0056)] | vital_interests_ico_unconscious: expected='holds', measured='holds' (matches_expected=True) -- per-exception: [not_holds(e=0.0014,c=0.9703), holds(e=0.937,c=0.0041), unknown(e=0.0695,c=0.0085)] | legal_claims_ico_tribunal: expected='holds', measured='unknown' (matches_expected=False) -- per-exception: [unknown(e=0.0042,c=0.0046), unknown(e=0.2638,c=0.0155), unknown(e=0.6914,c=0.0083)] | violation_aepd_eurocollege: expected='unknown', measured='unknown' (matches_expected=True) -- per-exception: [unknown(e=0.0054,c=0.0076), unknown(e=0.0579,c=0.013), unknown(e=0.0107,c=0.0086)]
+```json
+{
+  "consent_ico_gym": {
+    "expected_real_world": "holds",
+    "measured_status": "holds",
+    "matches_expected": true,
+    "per_exception": [
+      {
+        "status": "holds",
+        "best_entail": 0.7944,
+        "best_contradict": 0.0039
+      },
+      {
+        "status": "unknown",
+        "best_entail": 0.0804,
+        "best_contradict": 0.0286
+      },
+      {
+        "status": "unknown",
+        "best_entail": 0.0081,
+        "best_contradict": 0.0056
+      }
+    ]
+  },
+  "vital_interests_ico_unconscious": {
+    "expected_real_world": "holds",
+    "measured_status": "holds",
+    "matches_expected": true,
+    "per_exception": [
+      {
+        "status": "not_holds",
+        "best_entail": 0.0014,
+        "best_contradict": 0.9703
+      },
+      {
+        "status": "holds",
+        "best_entail": 0.937,
+        "best_contradict": 0.0041
+      },
+      {
+        "status": "unknown",
+        "best_entail": 0.0695,
+        "best_contradict": 0.0085
+      }
+    ]
+  },
+  "legal_claims_ico_tribunal": {
+    "expected_real_world": "holds",
+    "measured_status": "unknown",
+    "matches_expected": false,
+    "per_exception": [
+      {
+        "status": "unknown",
+        "best_entail": 0.0042,
+        "best_contradict": 0.0046
+      },
+      {
+        "status": "unknown",
+        "best_entail": 0.2638,
+        "best_contradict": 0.0155
+      },
+      {
+        "status": "unknown",
+        "best_entail": 0.6914,
+        "best_contradict": 0.0083
+      }
+    ]
+  },
+  "violation_aepd_eurocollege": {
+    "expected_real_world": "unknown",
+    "measured_status": "unknown",
+    "matches_expected": true,
+    "per_exception": [
+      {
+        "status": "unknown",
+        "best_entail": 0.0054,
+        "best_contradict": 0.0076
+      },
+      {
+        "status": "unknown",
+        "best_entail": 0.0579,
+        "best_contradict": 0.013
+      },
+      {
+        "status": "unknown",
+        "best_entail": 0.0107,
+        "best_contradict": 0.0086
+      }
+    ]
+  }
+}
+```
+
+Elapsed seconds: 1056.5634. Peak RSS MB: 736.59.
+- Scale-down: Four real scenarios (three ICO worked examples plus one enforcement decision), not a broad corpus of case law -- a real validation of the mechanism's entailment gate against authoritative, unmodified source language, not a comprehensive legal benchmark. Each ICO scenario is restated as a short declarative summary close to the source's own wording rather than quoted at full length -- reproducing the full guidance page verbatim was neither necessary nor appropriate to copy at length.
+- Conclusion: On real worked examples fetched from the UK ICO's own published guidance and a real AEPD enforcement decision -- never reworded to mirror GDPR Art 9's own clause phrasing, never tuned against the model's score -- 3/4 cases matched the expected real-world conclusion. At least one real-world scenario did not match the expected conclusion -- see metrics.per_exception for the exact entailment/contradiction scores measured. This is the honest finding EXP-085's hand-tuned validation could not surface: check_exception's entailment gate may not generalize past text engineered to closely mirror the exception clause's own wording, which is exactly the brittleness EXP-085's own follow-ups already flagged as a real risk on natural (not hand-tuned) context text.
+
+## EXP-089 Exception-aware rule application wired into brain.reason's one production entry point
+
+- Status: `closed`
+- Models used: Same as EXP-083/085: spaCy dependency parser (unchanged) + MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli via the existing, unmodified check_exception/check_exceptions. No generative model, no new dependency -- this exploration only wires existing, already-measured pieces into reason().
+- Goal: Close the gap EXP-083/085 both named as a follow-up: the exception-aware multi-exception OR-combination mechanism they proved standalone was never reachable from lab.common.brain.reason, the single entry point every other capability in this repo goes through. Wire it into reason()'s existing verb-rule branch and prove all three of its honest states (unresolved -> flagged; holds -> suppressed; ruled out -> clean) are reachable by passing plain passages through reason() alone, not by calling forward_chain directly.
+- Method: lab.common.brain.reason's existing `if applied['matched']:` branch (verb-trigger rule shape) now calls lab.common.inference.split_exceptions/check_exceptions (both unchanged, proven in EXP-085) against every other given passage as context before asserting the rule's consequence. decision='supported_with_flags' (already used by the longform cross-page-contradiction path) is reused for an unresolved exception; a held exception suppresses the consequence and returns an explanatory line instead, the same pattern the existing threshold-rule role-mismatch branch already used. Three cases, same rule/fact fixture as EXP-085, run through reason(ask, passages) directly.
+- Referenced files:
+- `lab/exp_089_brain_integration/run.py`
+- `lab/common/brain.py`
+- `lab/common/inference.py`
+- `lab/common/rules.py`
+- `lab/exp_085_multi_exception_scoping/run.py`
+- Results: Case 1 (rule+fact, no other passages): decision='supported_with_flags', text="MedCorp processed Aisha. [fact-1] matches the rule's trigger (process): If anyone processes special category data, it is unlawful, unless the data subject has given explicit consent to the processing of those personal data for one or more specified purposes; processing is necessary to protect the vital interests of the data subject or of another natural person where the data subject is physically or legally incapable of giving consent; or processing is necessary for the establishment, exercise or defence of legal claims or whenever courts are acting in their judicial capacity. [rule-1] Therefore, it is unlawful, unless the data subject has given explicit consent to the processing of those personal data for one or more specified purposes; processing is necessary to protect the vital interests of the data subject or of another natural person where the data subject is physically or legally incapable of giving consent; or processing is necessary for the establishment, exercise or defence of legal claims or whenever courts are acting in their judicial capacity (the rule's exception is unresolved -- not confirmed either way).." -- correct=True. Case 2 (+ a passage stating the consent exception holds): decision='supported', text="policy does not apply: the rule's exception holds ('If anyone processes special category data, it is unlawful, unless the data subject has given explicit consent to the processing of those personal data for one or more specified purposes; processing is necessary to protect the vital interests of the data subject or of another natural person where the data subject is physically or legally incapable of giving consent; or processing is necessary for the establishment, exercise or defence of legal claims or whenever courts are acting in their judicial capacity.') [rule-1]." -- consequence blocked=True. Case 3 (+ a passage contradicting only the consent alternative): decision='supported', text="MedCorp processed Aisha. [fact-1] matches the rule's trigger (process): If anyone processes special category data, it is unlawful, unless the data subject has given explicit consent to the processing of those personal data for one or more specified purposes; processing is necessary to protect the vital interests of the data subject or of another natural person where the data subject is physically or legally incapable of giving consent; or processing is necessary for the establishment, exercise or defence of legal claims or whenever courts are acting in their judicial capacity. [rule-1] Therefore, it is unlawful, unless the data subject has given explicit consent to the processing of those personal data for one or more specified purposes; processing is necessary to protect the vital interests of the data subject or of another natural person where the data subject is physically or legally incapable of giving consent; or processing is necessary for the establishment, exercise or defence of legal claims or whenever courts are acting in their judicial capacity.." -- correct=True.
+```json
+{
+  "case1_no_context": {
+    "decision": "supported_with_flags",
+    "text": "MedCorp processed Aisha. [fact-1] matches the rule's trigger (process): If anyone processes special category data, it is unlawful, unless the data subject has given explicit consent to the processing of those personal data for one or more specified purposes; processing is necessary to protect the vital interests of the data subject or of another natural person where the data subject is physically or legally incapable of giving consent; or processing is necessary for the establishment, exercise or defence of legal claims or whenever courts are acting in their judicial capacity. [rule-1] Therefore, it is unlawful, unless the data subject has given explicit consent to the processing of those personal data for one or more specified purposes; processing is necessary to protect the vital interests of the data subject or of another natural person where the data subject is physically or legally incapable of giving consent; or processing is necessary for the establishment, exercise or defence of legal claims or whenever courts are acting in their judicial capacity (the rule's exception is unresolved -- not confirmed either way)..",
+    "correct": true
+  },
+  "case2_exception_holds": {
+    "decision": "supported",
+    "text": "policy does not apply: the rule's exception holds ('If anyone processes special category data, it is unlawful, unless the data subject has given explicit consent to the processing of those personal data for one or more specified purposes; processing is necessary to protect the vital interests of the data subject or of another natural person where the data subject is physically or legally incapable of giving consent; or processing is necessary for the establishment, exercise or defence of legal claims or whenever courts are acting in their judicial capacity.') [rule-1].",
+    "blocked": true
+  },
+  "case3_exception_contradicted": {
+    "decision": "supported",
+    "text": "MedCorp processed Aisha. [fact-1] matches the rule's trigger (process): If anyone processes special category data, it is unlawful, unless the data subject has given explicit consent to the processing of those personal data for one or more specified purposes; processing is necessary to protect the vital interests of the data subject or of another natural person where the data subject is physically or legally incapable of giving consent; or processing is necessary for the establishment, exercise or defence of legal claims or whenever courts are acting in their judicial capacity. [rule-1] Therefore, it is unlawful, unless the data subject has given explicit consent to the processing of those personal data for one or more specified purposes; processing is necessary to protect the vital interests of the data subject or of another natural person where the data subject is physically or legally incapable of giving consent; or processing is necessary for the establishment, exercise or defence of legal claims or whenever courts are acting in their judicial capacity..",
+    "correct": true
+  },
+  "all_correct": true
+}
+```
+
+Elapsed seconds: 333.8058. Peak RSS MB: 855.0.
+- Scale-down: Only the verb-trigger rule shape (parse_conditional_rule) is wired -- the threshold-rule branch (parse_threshold_rule/apply_threshold_rule) does not go through split_exceptions/check_exceptions at all and is unaffected by this exploration, a real and separate gap if a threshold rule's own consequence ever carries an 'unless' clause. Three hand-built cases through reason(), not a broad test across many rule/passage combinations.
+- Conclusion: The exception-aware rule-application path is now reachable from lab.common.brain.reason itself, not only from a standalone forward_chain call: an unresolved exception derives the consequence but flags the overall decision (supported_with_flags), a confirmed exception suppresses the consequence entirely and returns an explanatory non-applicability line instead of asserting it, and a confidently ruled-out exception derives cleanly with no flag -- all three reachable by passing plain passages through the one entry point every other capability already goes through, with no hand-assembled call sequence.
+
+## EXP-090 Grammar-driven connective detection (replacing the hardcoded 'unless' regex), measured on 20 connectives and the full real GDPR text
+
+- Status: `closed`
+- Models used: spaCy en_core_web_sm dependency parser (structural connective detection, deterministic) plus a small, documented, closed-class lemma/phrase-to-operator lookup table grounded in DiMLex-Eng/PDTB. No generative model, no new dependency, no NLI call in this exploration -- detection and classification only, no truth-judgment over any clause's content.
+- Goal: Replace lab.common.inference's single hardcoded 'unless' keyword regex with a structural, grammar-driven connective detector (lab.common.connectives.find_connectives) spanning PDTB's four top-level discourse-relation classes, grounded in spaCy's actual dependency-parse output (checked empirically before writing the detection patterns, not assumed), and prove it generalizes across 20 different connectives through ONE function -- then run it over the full real GDPR text already in this repo (not a new document) to see literally what connective structure it contains, reporting every recognized and unrecognized instance honestly.
+- Method: lab.common.connectives.find_connectives (new) walks spaCy's dependency parse for three structural patterns measured directly against real output: mark+advcl/pcomp (if/unless/although/because/until/.../'that' in 'provided that'/'as' in 'as long as'), prep+pcomp/pobj (except/except that/despite/provided/'in' in 'in case'), and cc (and/or). Each match's phrase is looked up in a small, documented operator table (CONNECTIVE_TABLE/COMBINATOR_TABLE); an unmatched phrase is returned with operator=None rather than dropped. Measured on 20 hand-built sentences (one per connective, the same sentences used to ground the detection patterns) and on every sentence of the real GDPR_TEXT fixture from EXP-081.
+- Referenced files:
+- `lab/exp_090_connective_detection/run.py`
+- `lab/common/connectives.py`
+- `lab/common/textutil.py`
+- `lab/exp_081_real_document_pipeline/run.py`
+- Results: 20/20 hand-built connective sentences correctly classified through the SAME detection function (accuracy=1.0), covering all 7 operators -- all correct. On the full real 103-sentence GDPR text (13 articles, not just Art 9): 53 sentences contained at least one detected connective, 118 recognized by phrase: {'or': 62, 'and': 48, 'if': 5, 'as': 1, 'unless': 2}. Two genuine 'unless' exception clauses were found OUTSIDE Art 9 -- in Art 12 ('...shall not refuse to act on the request of the data subject...unless the controller demonstrates that it is not in a position to identify the data subject') and Art 33 ('...notify the personal data breach to the supervisory authority, unless the personal data breach is unlikely to result in a risk...') -- found by the SAME detector that classified the hand-built cases, not a second hand-built fixture; neither was ever reachable by EXP-085/088/089's single hand-composed Art-9 sentence. 4 connective-shaped tokens were detected structurally but not in the operator table, flagged rather than dropped or guessed: [('than', 'mark+advcl'), ('whether', 'mark+pcomp'), ('whether', 'mark+pcomp'), ('for', 'mark+advcl')] -- 'than' (comparative degree, 'no longer THAN is necessary'), 'for' (a purpose clause, 'measures FOR ensuring...'), and 'whether' x2 (an embedded question as a preposition's object, not a discourse relation) -- none of these are PDTB discourse connectives at all, and none were misclassified into the wrong operator; they were correctly left unrecognized.
+```json
+{
+  "connective_cases": {
+    "n": 20,
+    "correct": 20,
+    "accuracy": 1.0,
+    "by_label": {
+      "if": true,
+      "provided that": true,
+      "only if": true,
+      "as long as": true,
+      "in case": true,
+      "unless": true,
+      "except": true,
+      "except that": true,
+      "although": true,
+      "even though": true,
+      "even if": true,
+      "despite": true,
+      "until": true,
+      "before": true,
+      "after": true,
+      "once": true,
+      "because": true,
+      "since": true,
+      "and": true,
+      "or": true
+    }
+  },
+  "gdpr_full_document": {
+    "total_sentences": 103,
+    "sentences_with_a_connective": 53,
+    "connectives_recognized": 118,
+    "connectives_unrecognized": 4,
+    "recognized_phrase_counts": {
+      "or": 62,
+      "and": 48,
+      "if": 5,
+      "as": 1,
+      "unless": 2
+    },
+    "unrecognized_instances": [
+      {
+        "phrase": "than",
+        "dep_pattern": "mark+advcl",
+        "sentence": "Personal data shall be kept in a form which permits identification of data subjects for no longer than is necessary for the purposes for which the personal data are processed."
+      },
+      {
+        "phrase": "whether",
+        "dep_pattern": "mark+pcomp",
+        "sentence": "When assessing whether consent is freely given, utmost account shall be taken of whether the performance of a contract is conditional on consent to the processing of personal data that is not necessary for the performance of that contract."
+      },
+      {
+        "phrase": "whether",
+        "dep_pattern": "mark+pcomp",
+        "sentence": "The data subject shall have the right to obtain from the controller confirmation as to whether or not personal data concerning him or her are being processed, and, where that is the case, access to the personal data and information about the purposes of the processing, the categories of personal data concerned, and the recipients to whom the personal data have been or will be disclosed."
+      },
+      {
+        "phrase": "for",
+        "dep_pattern": "mark+advcl",
+        "sentence": "The controller shall implement appropriate technical and organisational measures for ensuring that, by default, only personal data which are necessary for each specific purpose of the processing are processed."
+      }
+    ],
+    "unless_sentences_found": [
+      "The controller shall not refuse to act on the request of the data subject for exercising his or her rights, unless the controller demonstrates that it is not in a position to identify the data subject.",
+      "In the case of a personal data breach, the controller shall without undue delay and, where feasible, not later than 72 hours after having become aware of it, notify the personal data breach to the supervisory authority, unless the personal data breach is unlikely to result in a risk to the rights and freedoms of natural persons."
+    ]
+  }
+}
+```
+
+Elapsed seconds: 17.8436. Peak RSS MB: 386.15.
+- Scale-down: The 20 connective cases are the same sentences this exploration's own pre-build probe used to ground the detection patterns, not a held-out test -- held-out generalization to novel phrasings of the same connectives was not measured here. The operator table covers ~20 of DiMLex-Eng's 149 English connectives (the highest-frequency, least class-ambiguous ones across all four PDTB classes), not the full inventory. Two structural edge cases were found and are reported, not hidden: 'despite's governed clause sits outside its own pobj child's subtree in spaCy's parse (a real attachment quirk for gerund-after-preposition constructions), handled by a labeled fallback that returns the sentence's remainder rather than a clean clause span; and coordinating 'or' was measured attaching to a noun object rather than the sentence's ROOT verb when its two disjuncts are not both obviously full clauses -- detected correctly (operator assigned) but its own clause_text extraction inherits that same attachment ambiguity.
+- Conclusion: The SAME grammar-driven detection function correctly classified 20/20 different connectives (not 20 different hardcoded regexes), spanning all four PDTB classes and both combinators -- a real generalization past the single 'unless' keyword match this project used before. Run against the full real GDPR text (not the single hand-built rule sentence EXP-085/088/089 used), it surfaces real connective instances -- see data/exp_090_connective_detection/cases.json's gdpr_document_findings for every one, by sentence -- giving this project, for the first time, visibility into what logical structure the ACTUAL statute contains beyond the one exception-bearing Art 9 passage every prior exploration hand-picked. Detection and classification are proven; wiring each operator's own reasoning semantics (concession never blocks; temporal is not modeled; causal is never a gate) into the forward-chaining mechanism is explicitly a separate, later step, named in follow_ups, not done here.
 
 ## Follow-up todos
 
@@ -23530,22 +23818,6 @@ Elapsed seconds: 124.5098. Peak RSS MB: 637.47.
 
 - Scale-down: 
 - Conclusion: Todo. Needs its own wants_rule_application signal built in this same step (not borrowed from elsewhere) to have two genuinely different plan branches to prove the pattern against.
-
-## EXP-085 Multi-exception (OR-combined) rule scoping, measured on GDPR Art 9's actual four exceptions
-
-- Status: `todo`
-- Models used: spaCy dependency parser (multi-exception clause splitting, deterministic) + MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli (per-exception entailment, already used unchanged by lab/common/inference.py's check_exception, one bounded judgment per exception). No generative model.
-- Goal: Extend lab/common/inference.py's split_exception from one trailing 'unless <condition>' clause to a list of alternative exception conditions combined by OR ('unless A, B, or C'), each checked independently via the existing check_exception/NLI mechanism (unchanged) and combined so that ANY exception holding blocks the rule's consequence, none holding with all unknown still marks it conditional (the same honest-abstention posture EXP-083 already proved for one exception), and none holding with at least one confidently not-holding derives cleanly. Measured on the real motivating case this gap was found against: GDPR Article 9 -- one prohibition, four listed exceptions -- not a restated toy single-exception rule.
-- Method: Not run.
-- Referenced files:
-- `lab/common/inference.py`
-- `lab/exp_083_symbolic_inference/run.py`
-- `lab/exp_081_real_document_pipeline/run.py`
-- Results: Not run.
-
-
-- Scale-down: 
-- Conclusion: Todo. The GDPR Art 9 fixture already exists verbatim in lab/exp_081_real_document_pipeline/run.py's GDPR_TEXT -- this needs new rule/exception parsing over text already in the repo, not a new document.
 
 ## EXP-086 Cross-sentence coreference resolution (fastcoref) feeding fact/rule extraction
 

@@ -613,35 +613,6 @@ TODOS = [
         "scale_down": "",
     },
     {
-        "id": "EXP-085",
-        "title": "Multi-exception (OR-combined) rule scoping, measured on GDPR Art 9's actual four exceptions",
-        "status": "todo",
-        "goal": (
-            "Extend lab/common/inference.py's split_exception from one trailing 'unless <condition>' clause "
-            "to a list of alternative exception conditions combined by OR ('unless A, B, or C'), each checked "
-            "independently via the existing check_exception/NLI mechanism (unchanged) and combined so that "
-            "ANY exception holding blocks the rule's consequence, none holding with all unknown still marks "
-            "it conditional (the same honest-abstention posture EXP-083 already proved for one exception), "
-            "and none holding with at least one confidently not-holding derives cleanly. Measured on the real "
-            "motivating case this gap was found against: GDPR Article 9 -- one prohibition, four listed "
-            "exceptions -- not a restated toy single-exception rule."
-        ),
-        "method": "Not run.",
-        "models_used": (
-            "spaCy dependency parser (multi-exception clause splitting, deterministic) + MoritzLaurer/"
-            "DeBERTa-v3-base-mnli-fever-anli (per-exception entailment, already used unchanged by lab/common/"
-            "inference.py's check_exception, one bounded judgment per exception). No generative model."
-        ),
-        "referenced_files": [
-            "lab/common/inference.py",
-            "lab/exp_083_symbolic_inference/run.py",
-            "lab/exp_081_real_document_pipeline/run.py",
-        ],
-        "results_prose": "Not run.",
-        "conclusion": "Todo. The GDPR Art 9 fixture already exists verbatim in lab/exp_081_real_document_pipeline/run.py's GDPR_TEXT -- this needs new rule/exception parsing over text already in the repo, not a new document.",
-        "scale_down": "",
-    },
-    {
         "id": "EXP-086",
         "title": "Cross-sentence coreference resolution (fastcoref) feeding fact/rule extraction",
         "status": "todo",
