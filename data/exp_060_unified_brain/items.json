@@ -85,7 +85,8 @@
       "intent_signal",
       "intent_signal",
       "find_rule",
-      "apply_rule"
+      "apply_rule",
+      "check_exception"
     ],
     "correct_decision": true,
     "correct_content": true

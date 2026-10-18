@@ -81,6 +81,7 @@ from lab.common.calc import sum_amounts
 from lab.common.entities import AMOUNT_RE, detect_primary, parse_address
 from lab.common.graph_index import build_entity_graph, expand_from_entity
 from lab.common.index import Index
+from lab.common.inference import check_exceptions, split_exceptions
 from lab.common.intent_signals import wants_document, wants_identity, wants_total
 from lab.common.nested_index import MIN_DENSE_SCORE, build_nested_index
 from lab.common.qa import answer_with_agreement
@@ -320,6 +321,7 @@ def reason(ask: str, passages: list[dict], use_real_ner: bool = False) -> dict:
     # real work for every ask that doesn't need this.
     facts: dict = {}
     answer_parts: list[str] = []
+    rule_conditional = False
 
     ask_entities = [m["text"] for m in detect_primary(ask, use_real_ner=use_real_ner) if m["label"] in ("person", "organization")]
     if ask_entities:
@@ -426,8 +428,32 @@ def reason(ask: str, passages: list[dict], use_real_ner: bool = False) -> dict:
                 applied = apply_rule(rule, fact)
                 trace.append({"step": "apply_rule", "kind": "verb", "result": applied, "fact_passage": fact_passage["id"]})
                 if applied["matched"]:
-                    citations.update([rule_passage["id"], fact_passage["id"]])
-                    answer_parts.append(f"{fact_passage['text']} [{fact_passage['id']}] matches the rule's trigger ({applied['trigger_lemma']}): {rule['raw']} [{rule_passage['id']}] Therefore, {applied['consequence']}.")
+                    # apply_rule's own lemma-match check has no idea the
+                    # rule's consequence might carry an "unless" clause --
+                    # EXP-083/085 proved split_exceptions/check_exceptions
+                    # standalone, but until this call existed, reason()
+                    # itself never checked a matched rule's own exception
+                    # at all (EXP-089). Every OTHER given passage is the
+                    # context an exception is checked against -- the same
+                    # "exceptions are global policy text, not scoped to one
+                    # story" principle _find_rule already applies when it
+                    # scans every passage, not just `scoped`.
+                    _, exception_conditions = split_exceptions(rule["consequence"])
+                    exception_context = [p["text"] for p in passages if p["id"] not in (rule_passage["id"], fact_passage["id"])]
+                    exception_result = check_exceptions(exception_conditions, exception_context)
+                    trace.append({"step": "check_exception", "result": exception_result})
+                    if exception_result["status"] == "holds":
+                        answer_parts.append(f"policy does not apply: the rule's exception holds ({rule['raw']!r}) [{rule_passage['id']}]")
+                    else:
+                        citations.update([rule_passage["id"], fact_passage["id"]])
+                        conditional = exception_result["status"] == "unknown"
+                        if conditional:
+                            rule_conditional = True
+                        suffix = " (the rule's exception is unresolved -- not confirmed either way)" if conditional else ""
+                        answer_parts.append(
+                            f"{fact_passage['text']} [{fact_passage['id']}] matches the rule's trigger ({applied['trigger_lemma']}): "
+                            f"{rule['raw']} [{rule_passage['id']}] Therefore, {applied['consequence']}{suffix}."
+                        )
 
     if not answer_parts:
         # No identity/total/rule signal fired -- this is a plain lookup ask.
@@ -439,7 +465,8 @@ def reason(ask: str, passages: list[dict], use_real_ner: bool = False) -> dict:
         citations.add(qa["passage_id"])
         return _finish(ask, trace, "supported", f"{qa['span']} [{qa['passage_id']}]", citations, facts=facts)
 
-    return _finish(ask, trace, "supported", ". ".join(answer_parts) + ".", citations, facts=facts)
+    final_decision = "supported_with_flags" if rule_conditional else "supported"
+    return _finish(ask, trace, final_decision, ". ".join(answer_parts) + ".", citations, facts=facts)
 
 
 def _finish(ask, trace, decision, text, citations, facts=None, reason=None) -> dict:
