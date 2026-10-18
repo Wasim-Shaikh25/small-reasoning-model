@@ -429,18 +429,6 @@ TODOS = [
         "scale_down": "",
     },
     {
-        "id": "EXP-026",
-        "title": "Qualification rules",
-        "status": "todo",
-        "goal": "Add code rules for except, unless, and provided that if the lexical judge keeps missing them.",
-        "method": "Not run.",
-        "models_used": "Code rules only. ContractNLI is a Phase 3 NLI alternative and is not this todo. The checker stays deterministic.",
-        "referenced_files": [],
-        "results_prose": "Not run.",
-        "conclusion": "Todo. This stays a deterministic checker.",
-        "scale_down": "",
-    },
-    {
         "id": "EXP-049",
         "title": "Per-word relevance and grammaticality scoring for the ask pipeline",
         "status": "todo",
@@ -670,6 +658,32 @@ TODOS = [
         ],
         "results_prose": "Not run.",
         "conclusion": "Todo. Whether a fine-tuned Flint-role model/dataset is actually downloadable, or this must be built heuristically from dependency labels alone, should be determined before scoping the rest of this todo, not after starting to build it.",
+        "scale_down": "",
+    },
+    {
+        "id": "EXP-092",
+        "title": "Replace intent_signals.py's hardcoded _CLAUSE_SPLIT_RE (r\"[?.;]|\\band\\b\") with grammar-driven clause splitting",
+        "status": "todo",
+        "goal": (
+            "Found while closing EXP-026: lab.common.intent_signals._CLAUSE_SPLIT_RE splits an ask into "
+            "clauses with a literal regex match on the word 'and' -- the same class of hardcoding EXP-090/091 "
+            "removed from lab.common.inference, and wrong on top of it for the same reason EXP-026's "
+            "_clauses fix was: a compound noun phrase ask ('What is their name and address?' -- one of "
+            "intent_signals.IDENTITY_EXEMPLARS itself) gets shredded into two meaningless fragments ('What is "
+            "their name', 'address?') instead of being recognized as one clause. Replace it with the same "
+            "structural find_connectives-based detection EXP-026 used for lab.common.inference._clauses."
+        ),
+        "method": "Not run. Deliberately NOT done inside EXP-026 -- this one is load-bearing for EXP-069's calibrated MIN_DENSE_SCORE/MIN_SEMANTIC_MARGIN thresholds and EXP-078/079's document-signal scores, all measured against the OLD splitting behavior. Changing it requires rerunning and reverifying all three before trusting the new numbers, not just swapping the regex.",
+        "models_used": "spaCy en_core_web_sm dependency parser via lab.common.connectives.find_connectives (already built, EXP-090/026). No new model.",
+        "referenced_files": [
+            "lab/common/intent_signals.py",
+            "lab/common/connectives.py",
+            "lab/exp_069_domain_agnostic_signals/run.py",
+            "lab/exp_078_longform_consistency/run.py",
+            "lab/exp_079_longform_signal/run.py",
+        ],
+        "results_prose": "Not run.",
+        "conclusion": "Todo. Must re-run EXP-069/078/079 after the change, not just EXP-026's own cases, before trusting the calibrated thresholds still hold.",
         "scale_down": "",
     },
 ]

@@ -1498,6 +1498,49 @@ Elapsed seconds: 3.0143. Peak RSS MB: 170.86.
 - Scale-down: 25 real documents / 76 chunks, not a full production collection. One Reuters category, not a cross-domain mix. The blueprint's archive store is Qdrant; this POC keeps the in-memory index.
 - Conclusion: The chunker, written for lease fixtures, runs unmodified on real, open-domain news text and produces well-formed chunks with verified-substring summaries. This closes the EXP-025 todo: a real, public, non-confidential document collection is now attached and reused by EXP-029, EXP-032, and EXP-033.
 
+## EXP-026 Qualification rules for except/unless/provided-that, closed as two opposite-polarity condition classes, not one
+
+- Status: `closed`
+- Models used: spaCy en_core_web_sm dependency parser via lab.common.connectives.find_connectives (already built in EXP-090, unchanged here) plus the existing, unmodified MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli NLI call inside check_exception. No new model, no generative model.
+- Goal: Close the repo's oldest open todo for 'except'/'unless'/'provided that' qualification clauses -- correctly, which the stub's own wording (treat all three the same) would not have done. Generalize lab.common.inference's exception mechanism to recognize CONDITION_POSITIVE (provided that/only if/as long as/in case) alongside the existing CONDITION_NEGATIVE (unless/except/except that), with the correct mirrored blocking rule for each, and remove two further hardcoded keyword regexes found while doing it: the alternative-splitter's literal 'or' match and _clauses' literal 'and' match.
+- Method: lab.common.inference.split_exception/split_exceptions generalized to detect either Operator.CONDITION_NEGATIVE or CONDITION_POSITIVE via find_connectives and return the detected polarity; check_exceptions takes that polarity and applies the mirrored OR-combination rule (negative: any-holds blocks; positive: all-confirmed-false blocks). The alternative-splitter's literal regex match on 'or' and _clauses' literal regex match on 'and' were both replaced with find_connectives-based structural detection. Four cases through lab.common.brain.reason/_clauses directly, re-running the full EXP-083/085/088/089/091 regression suite first to confirm zero behavior change for every existing 'unless'/'except' case.
+- Referenced files:
+- `lab/exp_026_qualification_rules/run.py`
+- `lab/common/inference.py`
+- `lab/common/connectives.py`
+- `lab/common/brain.py`
+- Results: Case 1 ('provided that' phrasing, condition affirmed): decision='supported', text="MedCorp processed Aisha. [fact-1] matches the rule's trigger (process): If anyone processes special category data, it is lawful, provided that the data subject has given explicit consent to the processing of those personal data for one or more specified purposes. [rule-provided] Therefore, it is lawful, provided that the data subject has given explicit consent to the processing of those personal data for one or more specified purposes.." -- clean=True. Case 2 (condition contradicted): decision='supported', text="policy does not apply: the rule's condition is not satisfied ('If anyone processes special category data, it is lawful, provided that the data subject has given explicit consent to the processing of those personal data for one or more specified purposes.') [rule-provided]." -- blocked=True. Case 3 (no context): decision='supported_with_flags', text="MedCorp processed Aisha. [fact-1] matches the rule's trigger (process): If anyone processes special category data, it is lawful, provided that the data subject has given explicit consent to the processing of those personal data for one or more specified purposes. [rule-provided] Therefore, it is lawful, provided that the data subject has given explicit consent to the processing of those personal data for one or more specified purposes (the rule's condition is unresolved -- not confirmed either way).." -- flagged=True. Case 4 (a non-clausal 'and', 'the registration and license will be suspended'): _clauses returned ['the registration and license will be suspended'] -- correct=True (the old r'\band\b' regex would have returned ['the registration', 'license will be suspended'], two meaningless fragments).
+```json
+{
+  "case1_positive_condition_holds": {
+    "decision": "supported",
+    "text": "MedCorp processed Aisha. [fact-1] matches the rule's trigger (process): If anyone processes special category data, it is lawful, provided that the data subject has given explicit consent to the processing of those personal data for one or more specified purposes. [rule-provided] Therefore, it is lawful, provided that the data subject has given explicit consent to the processing of those personal data for one or more specified purposes..",
+    "clean": true
+  },
+  "case2_positive_condition_blocked": {
+    "decision": "supported",
+    "text": "policy does not apply: the rule's condition is not satisfied ('If anyone processes special category data, it is lawful, provided that the data subject has given explicit consent to the processing of those personal data for one or more specified purposes.') [rule-provided].",
+    "blocked": true
+  },
+  "case3_positive_condition_unresolved": {
+    "decision": "supported_with_flags",
+    "text": "MedCorp processed Aisha. [fact-1] matches the rule's trigger (process): If anyone processes special category data, it is lawful, provided that the data subject has given explicit consent to the processing of those personal data for one or more specified purposes. [rule-provided] Therefore, it is lawful, provided that the data subject has given explicit consent to the processing of those personal data for one or more specified purposes (the rule's condition is unresolved -- not confirmed either way)..",
+    "flagged": true
+  },
+  "case4_non_clausal_and_not_split": {
+    "clauses": [
+      "the registration and license will be suspended"
+    ],
+    "correct": true
+  },
+  "all_correct": true
+}
+```
+
+Elapsed seconds: 133.8243. Peak RSS MB: 852.61.
+- Scale-down: Only CONDITION_POSITIVE's holds-blocks-if-false semantics is wired, matching CONDITION_NEGATIVE's existing scope -- CONCESSION/TEMPORAL_BOUND/CAUSAL remain detection-only, per EXP-090's own follow_ups, untouched here. A third hardcoded word-regex was found (lab/common/intent_signals.py's _CLAUSE_SPLIT_RE, `r"[?.;]|\band\b"`, used for splitting an ASK into clauses for the document/identity/total intent signals) but deliberately NOT changed in this exploration -- it is load-bearing for calibrated thresholds across EXP-069/078/079, and fixing it needs its own regression pass against those, not a drive-by edit inside this one.
+- Conclusion: EXP-026's real gap -- 'except'/'unless'/'provided that' clauses invisible to the engine -- is closed, but not by treating all three the same, which the stub's own wording would have gotten wrong: 'provided that' is the opposite polarity from 'unless'/'except' (EXP-091), and check_exceptions now applies the correct mirrored combination rule for each. Two further hardcoded keyword regexes (the alternative-splitter's literal 'or' match, and _clauses' literal 'and' match) were found and replaced with the same structural find_connectives detection in the same pass, closing the same class of gap EXP-090/091 closed for 'unless', not just the one instance already flagged.
+
 ## EXP-029 Hybrid retrieval with a real pretrained dense model, on real documents
 
 - Status: `closed`
@@ -23365,7 +23408,7 @@ Elapsed seconds: 54.0473. Peak RSS MB: 890.23.
 }
 ```
 
-Elapsed seconds: 260.8769. Peak RSS MB: 492.69.
+Elapsed seconds: 164.5735. Peak RSS MB: 631.11.
 - Scale-down: Five hand-built cases proving each named mechanism works, not a broad benchmark across many rules or a real multi-exception statute (GDPR Art 9's four exceptions) -- that combination is a named follow-up, not covered here.
 - Conclusion: Multi-step symbolic inference -- converting a stated rule and a stated fact into predicate form, unifying the trigger, binding the consequence's subject to the actual named entity, and chaining a derived fact into further rules until nothing new follows -- works as a real mechanism, not just on the single-hop case this project already had (EXP-057/059/061), but genuinely across multiple steps. The exception handling is the part that matters most for trust: an exception whose truth the given context never actually states is never silently treated as false, only as unresolved and visibly flagged, and a rule with no stated exception at all is never confused with one whose exception just happens to not apply here. Every step runs through spaCy's dependency parser or the real DeBERTa-v3 NLI classifier -- no generative model anywhere in the conversion from language to rule/fact form, the project owner's own explicit requirement, so nothing in this chain can hallucinate a predicate that was never actually stated.
 
@@ -23417,7 +23460,7 @@ Elapsed seconds: 260.8769. Peak RSS MB: 492.69.
 }
 ```
 
-Elapsed seconds: 421.6926. Peak RSS MB: 734.05.
+Elapsed seconds: 619.8212. Peak RSS MB: 683.29.
 - Scale-down: One hand-composed rule sentence (parse_conditional_rule's one supported shape), not an automatic parse of GDPR Art 9's own real multi-sentence prohibition+exception wording -- that would need a genuinely different rule-sentence parser (closer to EXP-087's Flint-role scope), a separate and much larger piece of work, not required to prove the OR-combination mechanism itself. The repo's own GDPR_TEXT fixture has 3 listed exceptions for Art 9, not the 4 this project's own prior EXP-085 todo entry claimed (real GDPR Art 9 has a 4th paragraph, covering non-profit-body members' data, that this fixture does not include) -- measured against the fixture that actually exists in this repo, corrected here rather than restated uncritically. Four hand-built cases proving each named combination state, not a broad benchmark across many multi-exception rules.
 - Conclusion: Multi-exception OR-combination works on GDPR Art 9's own real exception text, not just a restated single-exception toy rule: any one of several listed alternatives blocks the consequence when it holds (proven on two different alternatives, not only the first), the consequence still derives -- visibly flagged conditional -- when every alternative is genuinely unresolved, and it derives cleanly once none holds and at least one alternative is confidently ruled out, without needing every alternative individually ruled out first. check_exception's own per-exception judgment is unchanged; check_exceptions only combines its existing three-way verdict across more than one condition, split on ';' so that a single alternative's own internal commas and 'or's (common in real statutory text) are never mistaken for a boundary between alternatives.
 
@@ -23527,7 +23570,7 @@ Elapsed seconds: 421.6926. Peak RSS MB: 734.05.
 }
 ```
 
-Elapsed seconds: 2062.424. Peak RSS MB: 667.89.
+Elapsed seconds: 1201.8657. Peak RSS MB: 739.8.
 - Scale-down: Four real scenarios (three ICO worked examples plus one enforcement decision), not a broad corpus of case law -- a real validation of the mechanism's entailment gate against authoritative, unmodified source language, not a comprehensive legal benchmark. Each ICO scenario is restated as a short declarative summary close to the source's own wording rather than quoted at full length -- reproducing the full guidance page verbatim was neither necessary nor appropriate to copy at length.
 - Conclusion: On real worked examples fetched from the UK ICO's own published guidance and a real AEPD enforcement decision -- never reworded to mirror GDPR Art 9's own clause phrasing, never tuned against the model's score -- 3/4 cases matched the expected real-world conclusion. At least one real-world scenario did not match the expected conclusion -- see metrics.per_exception for the exact entailment/contradiction scores measured. This is the honest finding EXP-085's hand-tuned validation could not surface: check_exception's entailment gate may not generalize past text engineered to closely mirror the exception clause's own wording, which is exactly the brittleness EXP-085's own follow-ups already flagged as a real risk on natural (not hand-tuned) context text.
 
@@ -23565,7 +23608,7 @@ Elapsed seconds: 2062.424. Peak RSS MB: 667.89.
 }
 ```
 
-Elapsed seconds: 602.1152. Peak RSS MB: 595.86.
+Elapsed seconds: 340.2117. Peak RSS MB: 856.3.
 - Scale-down: Only the verb-trigger rule shape (parse_conditional_rule) is wired -- the threshold-rule branch (parse_threshold_rule/apply_threshold_rule) does not go through split_exceptions/check_exceptions at all and is unaffected by this exploration, a real and separate gap if a threshold rule's own consequence ever carries an 'unless' clause. Three hand-built cases through reason(), not a broad test across many rule/passage combinations.
 - Conclusion: The exception-aware rule-application path is now reachable from lab.common.brain.reason itself, not only from a standalone forward_chain call: an unresolved exception derives the consequence but flags the overall decision (supported_with_flags), a confirmed exception suppresses the consequence entirely and returns an explanatory non-applicability line instead of asserting it, and a confidently ruled-out exception derives cleanly with no flag -- all three reachable by passing plain passages through the one entry point every other capability already goes through, with no hand-assembled call sequence.
 
@@ -23696,7 +23739,7 @@ Elapsed seconds: 32.5967. Peak RSS MB: 385.97.
 }
 ```
 
-Elapsed seconds: 544.1639. Peak RSS MB: 600.11.
+Elapsed seconds: 175.2834. Peak RSS MB: 856.15.
 - Scale-down: Only CONDITION_NEGATIVE is wired -- CONCESSION (although/though/despite), TEMPORAL_BOUND (until/before/after), and CAUSAL (because/since) still have zero reasoning semantics in check_exceptions/forward_chain; EXP-090 named this split explicitly and it is not revisited here. The threshold-rule branch in brain.py (apply_threshold_rule) still never calls split_exceptions/ check_exceptions at all -- a separate, already-named gap, untouched by this change.
 - Conclusion: lab.common.inference.split_exception now locates a rule's exception clause via lab.common.connectives.find_connectives's structural CONDITION_NEGATIVE detection instead of a hardcoded regex on the single word 'unless'. The gap this closes is not hypothetical: case 2 is the exact failure mode measured before this change (the 'except' phrasing was silently invisible to the old code), and it is now caught through brain.reason itself, the one production entry point, with no regression on the 'unless' phrasing (case 1), the 'except that' phrasing (case 3), or the real multi-alternative GDPR Art 9 rule's OR-combination (case 4).
 
@@ -23743,20 +23786,6 @@ Elapsed seconds: 544.1639. Peak RSS MB: 600.11.
 
 - Scale-down: 
 - Conclusion: Todo. Do not download a pretrained NER or generative model.
-
-## EXP-026 Qualification rules
-
-- Status: `todo`
-- Models used: Code rules only. ContractNLI is a Phase 3 NLI alternative and is not this todo. The checker stays deterministic.
-- Goal: Add code rules for except, unless, and provided that if the lexical judge keeps missing them.
-- Method: Not run.
-- Referenced files:
-- none yet
-- Results: Not run.
-
-
-- Scale-down: 
-- Conclusion: Todo. This stays a deterministic checker.
 
 ## EXP-049 Per-word relevance and grammaticality scoring for the ask pipeline
 
@@ -23894,6 +23923,24 @@ Elapsed seconds: 544.1639. Peak RSS MB: 600.11.
 
 - Scale-down: 
 - Conclusion: Todo. Whether a fine-tuned Flint-role model/dataset is actually downloadable, or this must be built heuristically from dependency labels alone, should be determined before scoping the rest of this todo, not after starting to build it.
+
+## EXP-092 Replace intent_signals.py's hardcoded _CLAUSE_SPLIT_RE (r"[?.;]|\band\b") with grammar-driven clause splitting
+
+- Status: `todo`
+- Models used: spaCy en_core_web_sm dependency parser via lab.common.connectives.find_connectives (already built, EXP-090/026). No new model.
+- Goal: Found while closing EXP-026: lab.common.intent_signals._CLAUSE_SPLIT_RE splits an ask into clauses with a literal regex match on the word 'and' -- the same class of hardcoding EXP-090/091 removed from lab.common.inference, and wrong on top of it for the same reason EXP-026's _clauses fix was: a compound noun phrase ask ('What is their name and address?' -- one of intent_signals.IDENTITY_EXEMPLARS itself) gets shredded into two meaningless fragments ('What is their name', 'address?') instead of being recognized as one clause. Replace it with the same structural find_connectives-based detection EXP-026 used for lab.common.inference._clauses.
+- Method: Not run. Deliberately NOT done inside EXP-026 -- this one is load-bearing for EXP-069's calibrated MIN_DENSE_SCORE/MIN_SEMANTIC_MARGIN thresholds and EXP-078/079's document-signal scores, all measured against the OLD splitting behavior. Changing it requires rerunning and reverifying all three before trusting the new numbers, not just swapping the regex.
+- Referenced files:
+- `lab/common/intent_signals.py`
+- `lab/common/connectives.py`
+- `lab/exp_069_domain_agnostic_signals/run.py`
+- `lab/exp_078_longform_consistency/run.py`
+- `lab/exp_079_longform_signal/run.py`
+- Results: Not run.
+
+
+- Scale-down: 
+- Conclusion: Todo. Must re-run EXP-069/078/079 after the change, not just EXP-026's own cases, before trusting the calibrated thresholds still hold.
 
 ## Proposed-model reruns
 

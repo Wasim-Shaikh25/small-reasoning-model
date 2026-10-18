@@ -96,8 +96,8 @@ def main():
     case3_clean = case3["decision"] == "supported" and "unresolved" not in case3["text"] and "Therefore" in case3["text"]
 
     gdpr_rule = parse_conditional_rule(GDPR_MULTI_EXCEPTION_RULE_TEXT)
-    _, gdpr_alternatives = split_exceptions(gdpr_rule["consequence"])
-    case4_correct = len(gdpr_alternatives) == 3
+    _, gdpr_alternatives, gdpr_polarity = split_exceptions(gdpr_rule["consequence"])
+    case4_correct = len(gdpr_alternatives) == 3 and gdpr_polarity == "negative"
 
     run.write_json(
         "cases.json",

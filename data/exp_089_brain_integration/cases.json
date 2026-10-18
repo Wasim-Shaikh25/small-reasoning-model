@@ -77,7 +77,8 @@
               "best_context": null
             }
           ]
-        }
+        },
+        "polarity": "negative"
       }
     ]
   },
@@ -156,7 +157,8 @@
               "best_context": "The data subject has given explicit consent to the processing of those personal data for one or more specified purposes."
             }
           ]
-        }
+        },
+        "polarity": "negative"
       }
     ]
   },
@@ -238,7 +240,8 @@
               "best_context": "Aisha never gave any consent at all for this processing."
             }
           ]
-        }
+        },
+        "polarity": "negative"
       }
     ]
   }

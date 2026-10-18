@@ -44,46 +44,90 @@ from lab.common.rules import _parser
 PRONOUN_SUBJECTS = {"he", "she", "it", "they", "him", "her", "them", "someone", "anyone", "somebody", "something", "one"}
 POSSESSIVE_PRONOUNS = {"my", "your", "his", "her", "its", "our", "their"}
 
-_EXCEPTION_ALT_RE = re.compile(r";\s*(?:or\s+)?", re.I)
+_ALTERNATIVE_SEP_RE = re.compile(r";\s*")  # pure punctuation -- no word is matched here
+
+
+def _strip_leading_combinator(alternative: str) -> str:
+    """"unless A; B; or C" splits on ";" into ["A", "B", "or C"] -- the
+    trailing alternative's own leading "or" is not part of its condition
+    text. Stripping it used to be a second hardcoded regex match on the
+    literal word "or" (`(?:or\\s+)?` inside the old _EXCEPTION_ALT_RE) --
+    the exact same violation _UNLESS_RE was, just in the alternative-
+    splitter instead of the exception-splitter. Finds the leading
+    combinator the same structural way: lab.common.connectives.
+    find_connectives detects "or"/"and" via spaCy's `cc` dependency
+    (Operator.COMBINATOR_OR/_AND), and this only strips a match whose own
+    anchor_text actually starts this fragment -- not just any "or"/"and"
+    appearing anywhere inside it (a real alternative is often itself full
+    of internal "or"s, e.g. "exercise or defence of legal claims").
+    """
+    alternative = alternative.strip()
+    for match in find_connectives(alternative):
+        if match.operator in (Operator.COMBINATOR_AND, Operator.COMBINATOR_OR) and alternative.lower().startswith(match.anchor_text.lower() + " "):
+            return alternative[len(match.anchor_text) :].strip()
+    return alternative
+
+
+def _find_condition_match(consequence: str):
+    """The one connective, if any, that gates this consequence -- either
+    polarity. CONDITION_NEGATIVE (unless/except/except that) blocks the
+    consequence if its own clause is TRUE; CONDITION_POSITIVE (provided
+    that/only if/as long as/in case) blocks it if its own clause is FALSE
+    -- opposite logical roles for the same trailing-clause position, which
+    is exactly why EXP-026's own goal ("code rules for except, unless, and
+    provided that") would have been wrong to treat all three identically.
+    Only the first match (leftmost) is used, matching the old single-
+    "unless" regex's maxsplit=1 behavior.
+    """
+    matches = [m for m in find_connectives(consequence) if m.operator in (Operator.CONDITION_NEGATIVE, Operator.CONDITION_POSITIVE)]
+    return matches[0] if matches else None
 
 
 def split_exception(consequence: str) -> tuple[str, str | None]:
-    """Splits a consequence clause's trailing exception clause off, the one
-    rule shape lab.common.rules.parse_conditional_rule's own docstring
-    names as a known, unparsed limit ("a rule with an exception is not
-    parsed here"). Returns (consequence_without_exception,
-    exception_condition_or_None).
+    """Splits a consequence clause's trailing exception/condition clause
+    off, the one rule shape lab.common.rules.parse_conditional_rule's own
+    docstring names as a known, unparsed limit ("a rule with an exception
+    is not parsed here"). Returns (consequence_without_condition,
+    condition_text_or_None) -- polarity-agnostic, since
+    instantiate_consequence (its only caller) just needs the consequence
+    text with any trailing gate stripped, regardless of which way the gate
+    points.
 
-    EXP-091: finds the exception clause via lab.common.connectives.
-    find_connectives's structural CONDITION_NEGATIVE detection (unless,
-    except, except that -- the grammatical class that blocks its main
-    clause if true), not a literal keyword regex on the single word
+    EXP-091/EXP-026: finds the clause via lab.common.connectives.
+    find_connectives's structural detection (both CONDITION_NEGATIVE and
+    CONDITION_POSITIVE), not a literal keyword regex on the single word
     "unless". This project's earlier _UNLESS_RE regex here was exactly the
     hardcoding the project owner ruled out: it could never recognize
-    "except"/"except that" phrasing a real statute (GDPR itself) actually
-    uses. The connective's own anchor_text (its exact surface form, e.g.
-    "unless", "except that") locates the split point in the original
-    string -- the same single-point split the old regex did, just at a
-    position grammar decided was a genuine subordinating exception
-    connective instead of one hardcoded word.
+    "except"/"except that"/"provided that" phrasing a real statute (GDPR
+    itself uses "except"). The connective's own anchor_text (its exact
+    surface form) locates the split point in the original string -- the
+    same single-point split the old regex did, just at a position grammar
+    decided was a genuine subordinating connective instead of one
+    hardcoded word.
     """
-    matches = [m for m in find_connectives(consequence) if m.operator == Operator.CONDITION_NEGATIVE]
-    if not matches:
+    match = _find_condition_match(consequence)
+    if match is None:
         return consequence.strip(), None
-    anchor = matches[0].anchor_text
-    idx = consequence.lower().find(anchor.lower())
+    idx = consequence.lower().find(match.anchor_text.lower())
     if idx == -1:
         return consequence.strip(), None
-    before, after = consequence[:idx], consequence[idx + len(anchor) :]
+    before, after = consequence[:idx], consequence[idx + len(match.anchor_text) :]
     return before.strip().rstrip(","), after.strip().rstrip(".")
 
 
-def split_exceptions(consequence: str) -> tuple[str, list[str]]:
-    """Same exception-clause split as split_exception, but the condition
-    itself may be a disjunction of several alternative exceptions ("unless
-    A; B; or C") instead of exactly one -- GDPR Art 9's actual shape (one
-    prohibition, three listed exceptions, any one of which blocks it), not
-    the single-exception toy rule EXP-083 measured.
+def split_exceptions(consequence: str) -> tuple[str, list[str], str | None]:
+    """Same clause split as split_exception, but the condition itself may
+    be a disjunction of several alternatives ("unless A; B; or C")
+    instead of exactly one -- GDPR Art 9's actual shape (one prohibition,
+    three listed exceptions, any one of which blocks it), not the single-
+    exception toy rule EXP-083 measured -- AND, since EXP-026, aware of
+    which polarity gates the consequence: "negative" for unless/except/
+    except that (blocks if the condition is true), "positive" for
+    provided that/only if/as long as/in case (blocks if the condition is
+    FALSE -- the opposite). check_exceptions below needs this to apply the
+    opposite combination rule; every earlier caller only ever saw negative
+    conditions, so this is a strict generalization of the shape, not a
+    behavior change for existing "unless"/"except" rules.
 
     Alternatives are split on ";" (optionally followed by "or") only, never
     on a bare "," or "or" -- a real exception clause is itself often full of
@@ -91,26 +135,62 @@ def split_exceptions(consequence: str) -> tuple[str, list[str]]:
     legal claims or whenever courts are acting in their judicial
     capacity"), so splitting on those would shred one alternative into
     several. The semicolon is the only separator this function treats as
-    "a new alternative starts here". Returns (consequence_without_exception,
-    list_of_exception_conditions) -- an empty list when there is no
-    exception clause at all, a one-item list for a single exception (the
-    exact same condition split_exception would have returned), so this is a
-    strict generalization, not a different rule shape.
+    "a new alternative starts here". Returns (consequence_without_condition,
+    list_of_conditions, polarity_or_None) -- an empty list and None
+    polarity when there is no condition clause at all, a one-item list for
+    a single condition (the exact same text split_exception would have
+    returned), so this is a strict generalization, not a different rule
+    shape.
     """
-    consequence_without, exception_text = split_exception(consequence)
-    if exception_text is None:
-        return consequence_without, []
-    alternatives = [alt.strip() for alt in _EXCEPTION_ALT_RE.split(exception_text) if alt.strip()]
-    return consequence_without, alternatives
+    match = _find_condition_match(consequence)
+    if match is None:
+        return consequence.strip(), [], None
+    idx = consequence.lower().find(match.anchor_text.lower())
+    before, after = consequence[:idx], consequence[idx + len(match.anchor_text) :]
+    condition_text = after.strip().rstrip(".")
+    alternatives = [_strip_leading_combinator(alt) for alt in _ALTERNATIVE_SEP_RE.split(condition_text) if alt.strip()]
+    polarity = "negative" if match.operator == Operator.CONDITION_NEGATIVE else "positive"
+    return before.strip().rstrip(","), alternatives, polarity
 
 
 def _clauses(consequence: str) -> list[str]:
-    """Top-level conjunction split only ("X and Y" -> ["X", "Y"]) -- the
-    same deliberately shallow approach lab.common.intent_signals' own
-    clause splitter uses, not a general parser for arbitrary nested
-    conjunctions.
+    """Top-level conjunction split only ("X and Y" -> ["X", "Y"]), found
+    structurally rather than by matching every occurrence of the literal
+    word "and" (the old `re.split(r"\\band\\b", ...)` here -- the same
+    class of hardcoding _UNLESS_RE was elsewhere in this module, and wrong
+    on top of it: "the registration and license will be suspended" is ONE
+    clause with a compound subject, and the old regex would have shredded
+    it into two meaningless fragments, "the registration" and "license
+    will be suspended").
+
+    A split point is an "and" token whose dependency label is "cc", whose
+    head is the sentence's own main verb/auxiliary, AND which has a
+    sibling "conj" token that is itself a verb/auxiliary -- i.e. two
+    independent clauses coordinated by "and", confirmed structurally, not
+    one clause's compound subject/object sharing a single verb. Checked
+    directly against spaCy's real parse (not assumed from a textbook
+    heuristic): "it is a crime and he will go to jail" has "and" headed by
+    "is" (ROOT AUX) with a sibling "go" (conj VERB) -- splits correctly;
+    "the registration and license will be suspended" has "and" headed by
+    "registration" (a NOUN, not a verb) -- does not split.
     """
-    return [c.strip() for c in re.split(r"\band\b", consequence, flags=re.I) if c.strip()]
+    doc = _parser()(consequence)
+    split_points = [
+        tok.i
+        for tok in doc
+        if tok.dep_ == "cc"
+        and tok.lemma_.lower() == "and"
+        and tok.head.pos_ in ("VERB", "AUX")
+        and any(child.dep_ == "conj" and child.pos_ in ("VERB", "AUX") for child in tok.head.children)
+    ]
+    if not split_points:
+        return [consequence.strip()] if consequence.strip() else []
+    clauses, start = [], 0
+    for idx in split_points:
+        clauses.append(doc[start:idx].text.strip())
+        start = idx + 1
+    clauses.append(doc[start:].text.strip())
+    return [c for c in clauses if c]
 
 
 def _extract_clause_predicate(clause: str, bound_subject: str) -> dict | None:
@@ -220,37 +300,59 @@ def check_exception(exception_condition: str | None, context_texts: list[str], t
     return {"status": status, "best_entail": round(best_entail, 4), "best_contradict": round(best_contradict, 4), "best_context": best_context}
 
 
-def check_exceptions(exception_conditions: list[str], context_texts: list[str], tau: float = 0.75) -> dict:
+def check_exceptions(exception_conditions: list[str], context_texts: list[str], polarity: str = "negative", tau: float = 0.75) -> dict:
     """OR-combines `check_exception`'s own three-way verdict across every
-    alternative exception condition in a disjunction ("unless A, B, or C")
-    -- `check_exception` itself is unchanged, called once per alternative,
-    exactly the same bounded per-exception NLI judgment it always made.
+    alternative condition in a disjunction ("unless A, B, or C" or
+    "provided that A, B, or C") -- `check_exception` itself is unchanged,
+    called once per alternative, exactly the same bounded per-condition
+    NLI judgment it always made.
 
-    Combination, in the same honest-abstention spirit as the single-
-    exception case:
-      - any alternative `holds` -> overall `holds` (the rule's consequence
-        is blocked -- it only takes one of several listed exceptions to
-        apply).
+    The returned `status` always means the same thing regardless of
+    `polarity`: "holds" -> block the consequence, "not_holds" -> proceed
+    cleanly, "unknown" -> proceed but flag as unresolved -- so every
+    caller (lab.common.brain.reason, forward_chain) keeps checking
+    status=="holds"/"unknown" exactly as it already did; this function
+    absorbs the polarity difference (EXP-026) internally rather than
+    pushing it onto callers.
+
+    polarity="negative" (unless/except -- blocks if the condition is
+    TRUE), in the same honest-abstention spirit as the single-exception
+    case:
+      - any alternative `holds` -> overall `holds` (blocked -- it only
+        takes one of several listed exceptions to apply).
       - none holds, and every alternative is `unknown` -> overall
         `unknown` (nothing in the given context speaks to any of them, so
-        the consequence is still derived but marked conditional, never
-        silently treated as if no exception could possibly apply).
+        the consequence is still derived but marked conditional).
       - none holds, and at least one is confidently `not_holds` -> overall
-        `not_holds` (the consequence derives cleanly; the context doesn't
-        have to rule out every alternative individually, only none may
-        hold and at least one must be confidently ruled out).
-    An empty list (no "unless" clause at all) returns `no_exception`, same
-    as `check_exception(None, ...)`.
+        `not_holds` (derives cleanly; the context doesn't have to rule out
+        every alternative individually).
+
+    polarity="positive" (provided that/only if/as long as/in case --
+    blocks if the condition is FALSE, the mirror image):
+      - any alternative `holds` -> overall `not_holds` (proceeds cleanly
+        -- it only takes one of several listed ways of satisfying the
+        condition).
+      - every alternative is confidently `not_holds` -> overall `holds`
+        (blocked -- the condition is confirmed false in every listed
+        form, not just unconfirmed).
+      - otherwise (a mix including at least one `unknown`, none `holds`)
+        -> overall `unknown` (the condition isn't confirmed true anywhere,
+        but isn't confirmed false everywhere either -- proceed flagged,
+        never silently assume the gate failed).
+
+    An empty list (no condition clause at all) returns `no_exception`,
+    same as `check_exception(None, ...)`.
     """
     if not exception_conditions:
         return {"status": "no_exception", "per_exception": []}
     results = [check_exception(condition, context_texts, tau=tau) for condition in exception_conditions]
-    if any(r["status"] == "holds" for r in results):
-        status = "holds"
-    elif all(r["status"] == "unknown" for r in results):
-        status = "unknown"
+    any_holds = any(r["status"] == "holds" for r in results)
+    all_unknown = all(r["status"] == "unknown" for r in results)
+    all_not_holds = all(r["status"] == "not_holds" for r in results)
+    if polarity == "negative":
+        status = "holds" if any_holds else "unknown" if all_unknown else "not_holds"
     else:
-        status = "not_holds"
+        status = "not_holds" if any_holds else "holds" if all_not_holds else "unknown"
     return {"status": status, "per_exception": results}
 
 
@@ -276,11 +378,11 @@ def forward_chain(facts: list[dict], rules: list[dict], context_texts: list[str]
     for step in range(max_steps):
         new_this_step = []
         for rule in rules:
-            _, exception_conditions = split_exceptions(rule["consequence"])
+            _, exception_conditions, polarity = split_exceptions(rule["consequence"])
             for fact in known:
                 if fact.get("subject") is None or fact["verb_lemma"] != rule["trigger_lemma"]:
                     continue
-                exception_result = check_exceptions(exception_conditions, context_texts)
+                exception_result = check_exceptions(exception_conditions, context_texts, polarity or "negative")
                 if exception_result["status"] == "holds":
                     trace.append({"step": step, "rule": rule["raw"], "fact": fact["raw"], "derived": None, "blocked_by_exception": exception_result})
                     continue

@@ -429,27 +429,35 @@ def reason(ask: str, passages: list[dict], use_real_ner: bool = False) -> dict:
                 trace.append({"step": "apply_rule", "kind": "verb", "result": applied, "fact_passage": fact_passage["id"]})
                 if applied["matched"]:
                     # apply_rule's own lemma-match check has no idea the
-                    # rule's consequence might carry an "unless" clause --
-                    # EXP-083/085 proved split_exceptions/check_exceptions
-                    # standalone, but until this call existed, reason()
-                    # itself never checked a matched rule's own exception
-                    # at all (EXP-089). Every OTHER given passage is the
-                    # context an exception is checked against -- the same
-                    # "exceptions are global policy text, not scoped to one
-                    # story" principle _find_rule already applies when it
-                    # scans every passage, not just `scoped`.
-                    _, exception_conditions = split_exceptions(rule["consequence"])
+                    # rule's consequence might carry a trailing exception/
+                    # condition clause -- EXP-083/085 proved split_exceptions/
+                    # check_exceptions standalone, but until this call
+                    # existed, reason() itself never checked a matched
+                    # rule's own condition at all (EXP-089). EXP-026
+                    # generalized the mechanism beyond "unless"-style
+                    # negative exceptions to also recognize "provided that"-
+                    # style positive conditions (the opposite polarity: they
+                    # block the consequence if FALSE, not if true), so
+                    # polarity is threaded through here too. Every OTHER
+                    # given passage is the context a condition is checked
+                    # against -- the same "exceptions are global policy
+                    # text, not scoped to one story" principle _find_rule
+                    # already applies when it scans every passage, not just
+                    # `scoped`.
+                    _, exception_conditions, polarity = split_exceptions(rule["consequence"])
                     exception_context = [p["text"] for p in passages if p["id"] not in (rule_passage["id"], fact_passage["id"])]
-                    exception_result = check_exceptions(exception_conditions, exception_context)
-                    trace.append({"step": "check_exception", "result": exception_result})
+                    exception_result = check_exceptions(exception_conditions, exception_context, polarity or "negative")
+                    trace.append({"step": "check_exception", "result": exception_result, "polarity": polarity})
                     if exception_result["status"] == "holds":
-                        answer_parts.append(f"policy does not apply: the rule's exception holds ({rule['raw']!r}) [{rule_passage['id']}]")
+                        reason_phrase = "the rule's exception holds" if polarity == "negative" else "the rule's condition is not satisfied"
+                        answer_parts.append(f"policy does not apply: {reason_phrase} ({rule['raw']!r}) [{rule_passage['id']}]")
                     else:
                         citations.update([rule_passage["id"], fact_passage["id"]])
                         conditional = exception_result["status"] == "unknown"
                         if conditional:
                             rule_conditional = True
-                        suffix = " (the rule's exception is unresolved -- not confirmed either way)" if conditional else ""
+                        unresolved_phrase = "the rule's exception is unresolved" if polarity == "negative" else "the rule's condition is unresolved"
+                        suffix = f" ({unresolved_phrase} -- not confirmed either way)" if conditional else ""
                         answer_parts.append(
                             f"{fact_passage['text']} [{fact_passage['id']}] matches the rule's trigger ({applied['trigger_lemma']}): "
                             f"{rule['raw']} [{rule_passage['id']}] Therefore, {applied['consequence']}{suffix}."
