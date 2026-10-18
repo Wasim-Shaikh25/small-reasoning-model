@@ -38,34 +38,52 @@ from __future__ import annotations
 
 import re
 
+from lab.common.connectives import Operator, find_connectives
 from lab.common.rules import _parser
 
 PRONOUN_SUBJECTS = {"he", "she", "it", "they", "him", "her", "them", "someone", "anyone", "somebody", "something", "one"}
 POSSESSIVE_PRONOUNS = {"my", "your", "his", "her", "its", "our", "their"}
 
-_UNLESS_RE = re.compile(r"\bunless\b", re.I)
 _EXCEPTION_ALT_RE = re.compile(r";\s*(?:or\s+)?", re.I)
 
 
 def split_exception(consequence: str) -> tuple[str, str | None]:
-    """Splits a consequence clause's trailing "...unless <condition>" off,
-    the one rule shape lab.common.rules.parse_conditional_rule's own
-    docstring names as a known, unparsed limit ("a rule with an exception
-    is not parsed here"). Returns (consequence_without_exception,
+    """Splits a consequence clause's trailing exception clause off, the one
+    rule shape lab.common.rules.parse_conditional_rule's own docstring
+    names as a known, unparsed limit ("a rule with an exception is not
+    parsed here"). Returns (consequence_without_exception,
     exception_condition_or_None).
+
+    EXP-091: finds the exception clause via lab.common.connectives.
+    find_connectives's structural CONDITION_NEGATIVE detection (unless,
+    except, except that -- the grammatical class that blocks its main
+    clause if true), not a literal keyword regex on the single word
+    "unless". This project's earlier _UNLESS_RE regex here was exactly the
+    hardcoding the project owner ruled out: it could never recognize
+    "except"/"except that" phrasing a real statute (GDPR itself) actually
+    uses. The connective's own anchor_text (its exact surface form, e.g.
+    "unless", "except that") locates the split point in the original
+    string -- the same single-point split the old regex did, just at a
+    position grammar decided was a genuine subordinating exception
+    connective instead of one hardcoded word.
     """
-    parts = _UNLESS_RE.split(consequence, maxsplit=1)
-    if len(parts) == 1:
+    matches = [m for m in find_connectives(consequence) if m.operator == Operator.CONDITION_NEGATIVE]
+    if not matches:
         return consequence.strip(), None
-    return parts[0].strip().rstrip(","), parts[1].strip().rstrip(".")
+    anchor = matches[0].anchor_text
+    idx = consequence.lower().find(anchor.lower())
+    if idx == -1:
+        return consequence.strip(), None
+    before, after = consequence[:idx], consequence[idx + len(anchor) :]
+    return before.strip().rstrip(","), after.strip().rstrip(".")
 
 
 def split_exceptions(consequence: str) -> tuple[str, list[str]]:
-    """Same trailing "...unless <condition>" split as split_exception, but
-    the condition itself may be a disjunction of several alternative
-    exceptions ("unless A; B; or C") instead of exactly one -- GDPR Art 9's
-    actual shape (one prohibition, three listed exceptions, any one of
-    which blocks it), not the single-exception toy rule EXP-083 measured.
+    """Same exception-clause split as split_exception, but the condition
+    itself may be a disjunction of several alternative exceptions ("unless
+    A; B; or C") instead of exactly one -- GDPR Art 9's actual shape (one
+    prohibition, three listed exceptions, any one of which blocks it), not
+    the single-exception toy rule EXP-083 measured.
 
     Alternatives are split on ";" (optionally followed by "or") only, never
     on a bare "," or "or" -- a real exception clause is itself often full of
@@ -74,10 +92,10 @@ def split_exceptions(consequence: str) -> tuple[str, list[str]]:
     capacity"), so splitting on those would shred one alternative into
     several. The semicolon is the only separator this function treats as
     "a new alternative starts here". Returns (consequence_without_exception,
-    list_of_exception_conditions) -- an empty list when there is no "unless"
-    clause at all, a one-item list for a single exception (the exact same
-    condition split_exception would have returned), so this is a strict
-    generalization, not a different rule shape.
+    list_of_exception_conditions) -- an empty list when there is no
+    exception clause at all, a one-item list for a single exception (the
+    exact same condition split_exception would have returned), so this is a
+    strict generalization, not a different rule shape.
     """
     consequence_without, exception_text = split_exception(consequence)
     if exception_text is None:

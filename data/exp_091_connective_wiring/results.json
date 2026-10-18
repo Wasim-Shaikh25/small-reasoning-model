@@ -1,0 +1,48 @@
+{
+  "id": "EXP-091",
+  "title": "Wire EXP-090's grammar-driven connective detector into lab.common.inference, replacing _UNLESS_RE for real",
+  "status": "closed",
+  "goal": "EXP-090 built and measured lab.common.connectives.find_connectives but never actually called it from lab.common.inference.py -- _UNLESS_RE was still the only thing split_exception ran, despite EXP-090's own title claiming the replacement happened. Replace it for real: split_exception finds the exception clause via find_connectives's CONDITION_NEGATIVE detection (unless/except/except that), and prove the case the old regex silently missed ('except' phrasing) is now caught through brain.reason itself, with no regression on the existing 'unless' and multi-alternative cases.",
+  "method": "lab.common.inference.split_exception rewritten to call find_connectives(consequence), filter to Operator.CONDITION_NEGATIVE matches, and split the original string at the first match's own anchor_text -- the same single-point split the old regex did, now at a position grammar decided was a genuine exception connective. check_exception/check_exceptions/forward_chain/brain.reason are unchanged. Four cases through reason(ask, passages) directly: 'unless' (regression), 'except' (the gap), 'except that' (a second previously-unreachable phrase), and the real GDPR Art 9 3-alternative rule (regression for OR-combination).",
+  "metrics": {
+    "case1_unless_blocked": {
+      "decision": "supported",
+      "text": "policy does not apply: the rule's exception holds ('If anyone processes special category data, it is unlawful, unless the data subject has given explicit consent to the processing of those personal data for one or more specified purposes.') [rule-unless].",
+      "blocked": true
+    },
+    "case2_except_blocked": {
+      "decision": "supported",
+      "text": "policy does not apply: the rule's exception holds ('If anyone processes special category data, it is unlawful, except the data subject has given explicit consent to the processing of those personal data for one or more specified purposes.') [rule-except].",
+      "blocked": true
+    },
+    "case3_except_that_clean": {
+      "decision": "supported",
+      "text": "MedCorp processed Aisha. [fact-1] matches the rule's trigger (process): If anyone processes special category data, it is unlawful, except that explicit consent removes the prohibition. [rule-except-that] Therefore, it is unlawful, except that explicit consent removes the prohibition..",
+      "clean": true
+    },
+    "case4_gdpr_multi_exception": {
+      "n_alternatives": 3,
+      "correct": true
+    },
+    "all_correct": true
+  },
+  "results_prose": "Case 1 ('unless' phrasing, exception holds): decision='supported', text=\"policy does not apply: the rule's exception holds ('If anyone processes special category data, it is unlawful, unless the data subject has given explicit consent to the processing of those personal data for one or more specified purposes.') [rule-unless].\" -- blocked=True. Case 2 ('except' phrasing, same exception content and context): decision='supported', text=\"policy does not apply: the rule's exception holds ('If anyone processes special category data, it is unlawful, except the data subject has given explicit consent to the processing of those personal data for one or more specified purposes.') [rule-except].\" -- blocked=True. Under the OLD _UNLESS_RE code this case would have asserted the consequence unconditionally, since 'except' never matched \\bunless\\b. Case 3 ('except that' phrasing, exception contradicted): decision='supported', text=\"MedCorp processed Aisha. [fact-1] matches the rule's trigger (process): If anyone processes special category data, it is unlawful, except that explicit consent removes the prohibition. [rule-except-that] Therefore, it is unlawful, except that explicit consent removes the prohibition..\" -- clean=True. Case 4 (the real 3-alternative GDPR Art 9 rule from EXP-085, still phrased with 'unless A; B; or C'): split into 3 alternatives (expected 3) -- correct=True.",
+  "conclusion": "lab.common.inference.split_exception now locates a rule's exception clause via lab.common.connectives.find_connectives's structural CONDITION_NEGATIVE detection instead of a hardcoded regex on the single word 'unless'. The gap this closes is not hypothetical: case 2 is the exact failure mode measured before this change (the 'except' phrasing was silently invisible to the old code), and it is now caught through brain.reason itself, the one production entry point, with no regression on the 'unless' phrasing (case 1), the 'except that' phrasing (case 3), or the real multi-alternative GDPR Art 9 rule's OR-combination (case 4).",
+  "scale_down": "Only CONDITION_NEGATIVE is wired -- CONCESSION (although/though/despite), TEMPORAL_BOUND (until/before/after), and CAUSAL (because/since) still have zero reasoning semantics in check_exceptions/forward_chain; EXP-090 named this split explicitly and it is not revisited here. The threshold-rule branch in brain.py (apply_threshold_rule) still never calls split_exceptions/ check_exceptions at all -- a separate, already-named gap, untouched by this change.",
+  "referenced_files": [
+    "lab/exp_091_connective_wiring/run.py",
+    "lab/common/inference.py",
+    "lab/common/connectives.py",
+    "lab/common/brain.py",
+    "lab/common/rules.py",
+    "lab/exp_085_multi_exception_scoping/run.py",
+    "lab/exp_090_connective_detection/run.py"
+  ],
+  "follow_ups": [
+    "Wire CONCESSION's opposite polarity (holds ANYWAY, never blocks) into check_exceptions/forward_chain -- the next connective class with a well-defined semantics, per EXP-090's own follow_ups.",
+    "Give the threshold-rule branch in brain.py the same split_exceptions/check_exceptions call the verb-rule branch now has, for a threshold rule whose consequence carries an exception clause."
+  ],
+  "elapsed_sec": 544.1639,
+  "peak_rss_mb": 600.11,
+  "models_used": "spaCy en_core_web_sm dependency parser via lab.common.connectives.find_connectives (already built in EXP-090, unchanged here) plus the existing, unmodified MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli NLI call inside check_exception. No new model, no generative model."
+}

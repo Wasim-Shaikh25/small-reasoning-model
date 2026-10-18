@@ -86,7 +86,7 @@
     "The operator table covers ~20 of 149 DiMLex-Eng connectives -- extending coverage (and testing whether the same three structural patterns hold for the remaining ~129) is a real, boundable next step, not an open-ended one, since the full inventory is already catalogued externally.",
     "find_connectives has not been tested on a sentence with more than one connective interacting (e.g. 'unless A, provided that B, until C') -- the real GDPR document run above may or may not contain such a sentence; check gdpr_document_findings for any sentence with multiple connectives before assuming single-connective-per-sentence is the common case."
   ],
-  "elapsed_sec": 17.8436,
-  "peak_rss_mb": 386.15,
+  "elapsed_sec": 32.5967,
+  "peak_rss_mb": 385.97,
   "models_used": "spaCy en_core_web_sm dependency parser (structural connective detection, deterministic) plus a small, documented, closed-class lemma/phrase-to-operator lookup table grounded in DiMLex-Eng/PDTB. No generative model, no new dependency, no NLI call in this exploration -- detection and classification only, no truth-judgment over any clause's content."
 }

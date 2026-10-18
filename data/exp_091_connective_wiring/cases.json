@@ -1,0 +1,211 @@
+{
+  "case1_unless_blocked": {
+    "ask": "Does MedCorp's processing of Aisha's data comply with the rule, or does an exception apply?",
+    "decision": "supported",
+    "text": "policy does not apply: the rule's exception holds ('If anyone processes special category data, it is unlawful, unless the data subject has given explicit consent to the processing of those personal data for one or more specified purposes.') [rule-unless].",
+    "citations": [],
+    "facts": {},
+    "trace": [
+      {
+        "step": "analyze_ask",
+        "task_type": "lookup",
+        "subquestions": [
+          "Does MedCorp's processing of Aisha's data comply with the rule, or does an exception apply?"
+        ]
+      },
+      {
+        "step": "intent_signal",
+        "signal": "document",
+        "fires": false,
+        "score": 0.5397,
+        "tau": 0.75
+      },
+      {
+        "step": "intent_signal",
+        "signal": "identity",
+        "fires": false,
+        "score": 0.5776,
+        "tau": 0.5971
+      },
+      {
+        "step": "intent_signal",
+        "signal": "total",
+        "fires": false,
+        "score": 0.5,
+        "tau": 0.6084
+      },
+      {
+        "step": "find_rule",
+        "kind": "verb",
+        "rule": "If anyone processes special category data, it is unlawful, unless the data subject has given explicit consent to the processing of those personal data for one or more specified purposes."
+      },
+      {
+        "step": "apply_rule",
+        "kind": "verb",
+        "result": {
+          "matched": true,
+          "trigger_lemma": "process",
+          "fact_verb_lemma": "process",
+          "consequence": "it is unlawful, unless the data subject has given explicit consent to the processing of those personal data for one or more specified purposes"
+        },
+        "fact_passage": "fact-1"
+      },
+      {
+        "step": "check_exception",
+        "result": {
+          "status": "holds",
+          "per_exception": [
+            {
+              "status": "holds",
+              "best_entail": 0.9941,
+              "best_contradict": 0.0008,
+              "best_context": "The data subject has given explicit consent to the processing of those personal data for one or more specified purposes."
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "case2_except_blocked": {
+    "ask": "Does MedCorp's processing of Aisha's data comply with the rule, or does an exception apply?",
+    "decision": "supported",
+    "text": "policy does not apply: the rule's exception holds ('If anyone processes special category data, it is unlawful, except the data subject has given explicit consent to the processing of those personal data for one or more specified purposes.') [rule-except].",
+    "citations": [],
+    "facts": {},
+    "trace": [
+      {
+        "step": "analyze_ask",
+        "task_type": "lookup",
+        "subquestions": [
+          "Does MedCorp's processing of Aisha's data comply with the rule, or does an exception apply?"
+        ]
+      },
+      {
+        "step": "intent_signal",
+        "signal": "document",
+        "fires": false,
+        "score": 0.5397,
+        "tau": 0.75
+      },
+      {
+        "step": "intent_signal",
+        "signal": "identity",
+        "fires": false,
+        "score": 0.5776,
+        "tau": 0.5971
+      },
+      {
+        "step": "intent_signal",
+        "signal": "total",
+        "fires": false,
+        "score": 0.5,
+        "tau": 0.6084
+      },
+      {
+        "step": "find_rule",
+        "kind": "verb",
+        "rule": "If anyone processes special category data, it is unlawful, except the data subject has given explicit consent to the processing of those personal data for one or more specified purposes."
+      },
+      {
+        "step": "apply_rule",
+        "kind": "verb",
+        "result": {
+          "matched": true,
+          "trigger_lemma": "process",
+          "fact_verb_lemma": "process",
+          "consequence": "it is unlawful, except the data subject has given explicit consent to the processing of those personal data for one or more specified purposes"
+        },
+        "fact_passage": "fact-1"
+      },
+      {
+        "step": "check_exception",
+        "result": {
+          "status": "holds",
+          "per_exception": [
+            {
+              "status": "holds",
+              "best_entail": 0.9941,
+              "best_contradict": 0.0008,
+              "best_context": "The data subject has given explicit consent to the processing of those personal data for one or more specified purposes."
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "case3_except_that_clean": {
+    "ask": "Does MedCorp's processing of Aisha's data comply with the rule, or does an exception apply?",
+    "decision": "supported",
+    "text": "MedCorp processed Aisha. [fact-1] matches the rule's trigger (process): If anyone processes special category data, it is unlawful, except that explicit consent removes the prohibition. [rule-except-that] Therefore, it is unlawful, except that explicit consent removes the prohibition..",
+    "citations": [
+      "fact-1",
+      "rule-except-that"
+    ],
+    "facts": {},
+    "trace": [
+      {
+        "step": "analyze_ask",
+        "task_type": "lookup",
+        "subquestions": [
+          "Does MedCorp's processing of Aisha's data comply with the rule, or does an exception apply?"
+        ]
+      },
+      {
+        "step": "intent_signal",
+        "signal": "document",
+        "fires": false,
+        "score": 0.5397,
+        "tau": 0.75
+      },
+      {
+        "step": "intent_signal",
+        "signal": "identity",
+        "fires": false,
+        "score": 0.5776,
+        "tau": 0.5971
+      },
+      {
+        "step": "intent_signal",
+        "signal": "total",
+        "fires": false,
+        "score": 0.5,
+        "tau": 0.6084
+      },
+      {
+        "step": "find_rule",
+        "kind": "verb",
+        "rule": "If anyone processes special category data, it is unlawful, except that explicit consent removes the prohibition."
+      },
+      {
+        "step": "apply_rule",
+        "kind": "verb",
+        "result": {
+          "matched": true,
+          "trigger_lemma": "process",
+          "fact_verb_lemma": "process",
+          "consequence": "it is unlawful, except that explicit consent removes the prohibition"
+        },
+        "fact_passage": "fact-1"
+      },
+      {
+        "step": "check_exception",
+        "result": {
+          "status": "not_holds",
+          "per_exception": [
+            {
+              "status": "not_holds",
+              "best_entail": 0.0001,
+              "best_contradict": 0.9982,
+              "best_context": "Aisha never gave any consent at all for this processing."
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "case4_gdpr_multi_exception_alternatives": [
+    "the data subject has given explicit consent to the processing of those personal data for one or more specified purposes",
+    "processing is necessary to protect the vital interests of the data subject or of another natural person where the data subject is physically or legally incapable of giving consent",
+    "processing is necessary for the establishment, exercise or defence of legal claims or whenever courts are acting in their judicial capacity"
+  ]
+}

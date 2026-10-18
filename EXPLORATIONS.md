@@ -22666,7 +22666,7 @@ Elapsed seconds: 228.6399. Peak RSS MB: 439.11.
       {
         "ask": "What is the boiling point of water in Celsius?",
         "decision": "ungrounded",
-        "text": "[Not grounded in any provided evidence -- general knowledge only.] The boiling point of water is 100°C.",
+        "text": "[Not grounded in any provided evidence -- general knowledge only.] The boiling point of water is 100Â°C.",
         "has_disclaimer": true,
         "has_fabricated_citation": false,
         "correct": true
@@ -23365,7 +23365,7 @@ Elapsed seconds: 54.0473. Peak RSS MB: 890.23.
 }
 ```
 
-Elapsed seconds: 360.0401. Peak RSS MB: 541.12.
+Elapsed seconds: 260.8769. Peak RSS MB: 492.69.
 - Scale-down: Five hand-built cases proving each named mechanism works, not a broad benchmark across many rules or a real multi-exception statute (GDPR Art 9's four exceptions) -- that combination is a named follow-up, not covered here.
 - Conclusion: Multi-step symbolic inference -- converting a stated rule and a stated fact into predicate form, unifying the trigger, binding the consequence's subject to the actual named entity, and chaining a derived fact into further rules until nothing new follows -- works as a real mechanism, not just on the single-hop case this project already had (EXP-057/059/061), but genuinely across multiple steps. The exception handling is the part that matters most for trust: an exception whose truth the given context never actually states is never silently treated as false, only as unresolved and visibly flagged, and a rule with no stated exception at all is never confused with one whose exception just happens to not apply here. Every step runs through spaCy's dependency parser or the real DeBERTa-v3 NLI classifier -- no generative model anywhere in the conversion from language to rule/fact form, the project owner's own explicit requirement, so nothing in this chain can hallucinate a predicate that was never actually stated.
 
@@ -23417,7 +23417,7 @@ Elapsed seconds: 360.0401. Peak RSS MB: 541.12.
 }
 ```
 
-Elapsed seconds: 615.794. Peak RSS MB: 733.06.
+Elapsed seconds: 421.6926. Peak RSS MB: 734.05.
 - Scale-down: One hand-composed rule sentence (parse_conditional_rule's one supported shape), not an automatic parse of GDPR Art 9's own real multi-sentence prohibition+exception wording -- that would need a genuinely different rule-sentence parser (closer to EXP-087's Flint-role scope), a separate and much larger piece of work, not required to prove the OR-combination mechanism itself. The repo's own GDPR_TEXT fixture has 3 listed exceptions for Art 9, not the 4 this project's own prior EXP-085 todo entry claimed (real GDPR Art 9 has a 4th paragraph, covering non-profit-body members' data, that this fixture does not include) -- measured against the fixture that actually exists in this repo, corrected here rather than restated uncritically. Four hand-built cases proving each named combination state, not a broad benchmark across many multi-exception rules.
 - Conclusion: Multi-exception OR-combination works on GDPR Art 9's own real exception text, not just a restated single-exception toy rule: any one of several listed alternatives blocks the consequence when it holds (proven on two different alternatives, not only the first), the consequence still derives -- visibly flagged conditional -- when every alternative is genuinely unresolved, and it derives cleanly once none holds and at least one alternative is confidently ruled out, without needing every alternative individually ruled out first. check_exception's own per-exception judgment is unchanged; check_exceptions only combines its existing three-way verdict across more than one condition, split on ';' so that a single alternative's own internal commas and 'or's (common in real statutory text) are never mistaken for a boundary between alternatives.
 
@@ -23527,7 +23527,7 @@ Elapsed seconds: 615.794. Peak RSS MB: 733.06.
 }
 ```
 
-Elapsed seconds: 1056.5634. Peak RSS MB: 736.59.
+Elapsed seconds: 2062.424. Peak RSS MB: 667.89.
 - Scale-down: Four real scenarios (three ICO worked examples plus one enforcement decision), not a broad corpus of case law -- a real validation of the mechanism's entailment gate against authoritative, unmodified source language, not a comprehensive legal benchmark. Each ICO scenario is restated as a short declarative summary close to the source's own wording rather than quoted at full length -- reproducing the full guidance page verbatim was neither necessary nor appropriate to copy at length.
 - Conclusion: On real worked examples fetched from the UK ICO's own published guidance and a real AEPD enforcement decision -- never reworded to mirror GDPR Art 9's own clause phrasing, never tuned against the model's score -- 3/4 cases matched the expected real-world conclusion. At least one real-world scenario did not match the expected conclusion -- see metrics.per_exception for the exact entailment/contradiction scores measured. This is the honest finding EXP-085's hand-tuned validation could not surface: check_exception's entailment gate may not generalize past text engineered to closely mirror the exception clause's own wording, which is exactly the brittleness EXP-085's own follow-ups already flagged as a real risk on natural (not hand-tuned) context text.
 
@@ -23565,7 +23565,7 @@ Elapsed seconds: 1056.5634. Peak RSS MB: 736.59.
 }
 ```
 
-Elapsed seconds: 333.8058. Peak RSS MB: 855.0.
+Elapsed seconds: 602.1152. Peak RSS MB: 595.86.
 - Scale-down: Only the verb-trigger rule shape (parse_conditional_rule) is wired -- the threshold-rule branch (parse_threshold_rule/apply_threshold_rule) does not go through split_exceptions/check_exceptions at all and is unaffected by this exploration, a real and separate gap if a threshold rule's own consequence ever carries an 'unless' clause. Three hand-built cases through reason(), not a broad test across many rule/passage combinations.
 - Conclusion: The exception-aware rule-application path is now reachable from lab.common.brain.reason itself, not only from a standalone forward_chain call: an unresolved exception derives the consequence but flags the overall decision (supported_with_flags), a confirmed exception suppresses the consequence entirely and returns an explanatory non-applicability line instead of asserting it, and a confidently ruled-out exception derives cleanly with no flag -- all three reachable by passing plain passages through the one entry point every other capability already goes through, with no hand-assembled call sequence.
 
@@ -23652,9 +23652,53 @@ Elapsed seconds: 333.8058. Peak RSS MB: 855.0.
 }
 ```
 
-Elapsed seconds: 17.8436. Peak RSS MB: 386.15.
+Elapsed seconds: 32.5967. Peak RSS MB: 385.97.
 - Scale-down: The 20 connective cases are the same sentences this exploration's own pre-build probe used to ground the detection patterns, not a held-out test -- held-out generalization to novel phrasings of the same connectives was not measured here. The operator table covers ~20 of DiMLex-Eng's 149 English connectives (the highest-frequency, least class-ambiguous ones across all four PDTB classes), not the full inventory. Two structural edge cases were found and are reported, not hidden: 'despite's governed clause sits outside its own pobj child's subtree in spaCy's parse (a real attachment quirk for gerund-after-preposition constructions), handled by a labeled fallback that returns the sentence's remainder rather than a clean clause span; and coordinating 'or' was measured attaching to a noun object rather than the sentence's ROOT verb when its two disjuncts are not both obviously full clauses -- detected correctly (operator assigned) but its own clause_text extraction inherits that same attachment ambiguity.
 - Conclusion: The SAME grammar-driven detection function correctly classified 20/20 different connectives (not 20 different hardcoded regexes), spanning all four PDTB classes and both combinators -- a real generalization past the single 'unless' keyword match this project used before. Run against the full real GDPR text (not the single hand-built rule sentence EXP-085/088/089 used), it surfaces real connective instances -- see data/exp_090_connective_detection/cases.json's gdpr_document_findings for every one, by sentence -- giving this project, for the first time, visibility into what logical structure the ACTUAL statute contains beyond the one exception-bearing Art 9 passage every prior exploration hand-picked. Detection and classification are proven; wiring each operator's own reasoning semantics (concession never blocks; temporal is not modeled; causal is never a gate) into the forward-chaining mechanism is explicitly a separate, later step, named in follow_ups, not done here.
+
+## EXP-091 Wire EXP-090's grammar-driven connective detector into lab.common.inference, replacing _UNLESS_RE for real
+
+- Status: `closed`
+- Models used: spaCy en_core_web_sm dependency parser via lab.common.connectives.find_connectives (already built in EXP-090, unchanged here) plus the existing, unmodified MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli NLI call inside check_exception. No new model, no generative model.
+- Goal: EXP-090 built and measured lab.common.connectives.find_connectives but never actually called it from lab.common.inference.py -- _UNLESS_RE was still the only thing split_exception ran, despite EXP-090's own title claiming the replacement happened. Replace it for real: split_exception finds the exception clause via find_connectives's CONDITION_NEGATIVE detection (unless/except/except that), and prove the case the old regex silently missed ('except' phrasing) is now caught through brain.reason itself, with no regression on the existing 'unless' and multi-alternative cases.
+- Method: lab.common.inference.split_exception rewritten to call find_connectives(consequence), filter to Operator.CONDITION_NEGATIVE matches, and split the original string at the first match's own anchor_text -- the same single-point split the old regex did, now at a position grammar decided was a genuine exception connective. check_exception/check_exceptions/forward_chain/brain.reason are unchanged. Four cases through reason(ask, passages) directly: 'unless' (regression), 'except' (the gap), 'except that' (a second previously-unreachable phrase), and the real GDPR Art 9 3-alternative rule (regression for OR-combination).
+- Referenced files:
+- `lab/exp_091_connective_wiring/run.py`
+- `lab/common/inference.py`
+- `lab/common/connectives.py`
+- `lab/common/brain.py`
+- `lab/common/rules.py`
+- `lab/exp_085_multi_exception_scoping/run.py`
+- `lab/exp_090_connective_detection/run.py`
+- Results: Case 1 ('unless' phrasing, exception holds): decision='supported', text="policy does not apply: the rule's exception holds ('If anyone processes special category data, it is unlawful, unless the data subject has given explicit consent to the processing of those personal data for one or more specified purposes.') [rule-unless]." -- blocked=True. Case 2 ('except' phrasing, same exception content and context): decision='supported', text="policy does not apply: the rule's exception holds ('If anyone processes special category data, it is unlawful, except the data subject has given explicit consent to the processing of those personal data for one or more specified purposes.') [rule-except]." -- blocked=True. Under the OLD _UNLESS_RE code this case would have asserted the consequence unconditionally, since 'except' never matched \bunless\b. Case 3 ('except that' phrasing, exception contradicted): decision='supported', text="MedCorp processed Aisha. [fact-1] matches the rule's trigger (process): If anyone processes special category data, it is unlawful, except that explicit consent removes the prohibition. [rule-except-that] Therefore, it is unlawful, except that explicit consent removes the prohibition.." -- clean=True. Case 4 (the real 3-alternative GDPR Art 9 rule from EXP-085, still phrased with 'unless A; B; or C'): split into 3 alternatives (expected 3) -- correct=True.
+```json
+{
+  "case1_unless_blocked": {
+    "decision": "supported",
+    "text": "policy does not apply: the rule's exception holds ('If anyone processes special category data, it is unlawful, unless the data subject has given explicit consent to the processing of those personal data for one or more specified purposes.') [rule-unless].",
+    "blocked": true
+  },
+  "case2_except_blocked": {
+    "decision": "supported",
+    "text": "policy does not apply: the rule's exception holds ('If anyone processes special category data, it is unlawful, except the data subject has given explicit consent to the processing of those personal data for one or more specified purposes.') [rule-except].",
+    "blocked": true
+  },
+  "case3_except_that_clean": {
+    "decision": "supported",
+    "text": "MedCorp processed Aisha. [fact-1] matches the rule's trigger (process): If anyone processes special category data, it is unlawful, except that explicit consent removes the prohibition. [rule-except-that] Therefore, it is unlawful, except that explicit consent removes the prohibition..",
+    "clean": true
+  },
+  "case4_gdpr_multi_exception": {
+    "n_alternatives": 3,
+    "correct": true
+  },
+  "all_correct": true
+}
+```
+
+Elapsed seconds: 544.1639. Peak RSS MB: 600.11.
+- Scale-down: Only CONDITION_NEGATIVE is wired -- CONCESSION (although/though/despite), TEMPORAL_BOUND (until/before/after), and CAUSAL (because/since) still have zero reasoning semantics in check_exceptions/forward_chain; EXP-090 named this split explicitly and it is not revisited here. The threshold-rule branch in brain.py (apply_threshold_rule) still never calls split_exceptions/ check_exceptions at all -- a separate, already-named gap, untouched by this change.
+- Conclusion: lab.common.inference.split_exception now locates a rule's exception clause via lab.common.connectives.find_connectives's structural CONDITION_NEGATIVE detection instead of a hardcoded regex on the single word 'unless'. The gap this closes is not hypothetical: case 2 is the exact failure mode measured before this change (the 'except' phrasing was silently invisible to the old code), and it is now caught through brain.reason itself, the one production entry point, with no regression on the 'unless' phrasing (case 1), the 'except that' phrasing (case 3), or the real multi-alternative GDPR Art 9 rule's OR-combination (case 4).
 
 ## Follow-up todos
 

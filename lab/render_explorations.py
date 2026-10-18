@@ -795,7 +795,7 @@ def main():
     lines.append("")
     for row in RERUN_TODOS:
         lines.extend(_section(row))
-    (ROOT / "EXPLORATIONS.md").write_text("\n".join(lines) + "\n")
+    (ROOT / "EXPLORATIONS.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
     print(
         f"wrote EXPLORATIONS.md with {len(results)} closed, {len(TODOS)} todo, "
         f"and {len(RERUN_TODOS)} rerun todos"
