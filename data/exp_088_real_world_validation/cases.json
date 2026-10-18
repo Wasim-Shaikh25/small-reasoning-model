@@ -1,0 +1,114 @@
+{
+  "consent_ico_gym": {
+    "context": "A gym introduced a facial recognition system to allow members access to its facilities. It offered members a choice rather than making it a condition of entry, and relied on explicit consent for processing the biometric facial scans of the members who indicated that they preferred that option.",
+    "source": "https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/lawful-basis/special-category-data/what-are-the-conditions-for-processing/ (ICO worked example, Article 9(2)(a))",
+    "expected_real_world": "holds",
+    "measured_status": "holds",
+    "derived_count": 0,
+    "per_exception": [
+      {
+        "status": "holds",
+        "best_entail": 0.7944,
+        "best_contradict": 0.0039,
+        "best_context": "A gym introduced a facial recognition system to allow members access to its facilities. It offered members a choice rather than making it a condition of entry, and relied on explicit consent for processing the biometric facial scans of the members who indicated that they preferred that option."
+      },
+      {
+        "status": "unknown",
+        "best_entail": 0.0804,
+        "best_contradict": 0.0286,
+        "best_context": "A gym introduced a facial recognition system to allow members access to its facilities. It offered members a choice rather than making it a condition of entry, and relied on explicit consent for processing the biometric facial scans of the members who indicated that they preferred that option."
+      },
+      {
+        "status": "unknown",
+        "best_entail": 0.0081,
+        "best_contradict": 0.0056,
+        "best_context": "A gym introduced a facial recognition system to allow members access to its facilities. It offered members a choice rather than making it a condition of entry, and relied on explicit consent for processing the biometric facial scans of the members who indicated that they preferred that option."
+      }
+    ],
+    "matches_expected": true
+  },
+  "vital_interests_ico_unconscious": {
+    "context": "A member of staff experienced an accident at work, sustained serious injuries, and was unconscious. Their employer could not obtain the employee's consent to give the ambulance crew details of the employee's medication allergies, and so relied on the vital interests condition for the processing.",
+    "source": "https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/lawful-basis/special-category-data/what-are-the-conditions-for-processing/ (ICO worked example, Article 9(2)(c))",
+    "expected_real_world": "holds",
+    "measured_status": "holds",
+    "derived_count": 0,
+    "per_exception": [
+      {
+        "status": "not_holds",
+        "best_entail": 0.0014,
+        "best_contradict": 0.9703,
+        "best_context": "A member of staff experienced an accident at work, sustained serious injuries, and was unconscious. Their employer could not obtain the employee's consent to give the ambulance crew details of the employee's medication allergies, and so relied on the vital interests condition for the processing."
+      },
+      {
+        "status": "holds",
+        "best_entail": 0.937,
+        "best_contradict": 0.0041,
+        "best_context": "A member of staff experienced an accident at work, sustained serious injuries, and was unconscious. Their employer could not obtain the employee's consent to give the ambulance crew details of the employee's medication allergies, and so relied on the vital interests condition for the processing."
+      },
+      {
+        "status": "unknown",
+        "best_entail": 0.0695,
+        "best_contradict": 0.0085,
+        "best_context": "A member of staff experienced an accident at work, sustained serious injuries, and was unconscious. Their employer could not obtain the employee's consent to give the ambulance crew details of the employee's medication allergies, and so relied on the vital interests condition for the processing."
+      }
+    ],
+    "matches_expected": true
+  },
+  "legal_claims_ico_tribunal": {
+    "context": "An employer was being sued by one of its employees following an accident at work. The employer shared the accident details, including injury information, with its solicitors to obtain legal advice and defend the claim.",
+    "source": "https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/lawful-basis/special-category-data/what-are-the-conditions-for-processing/ (ICO worked example, Article 9(2)(f))",
+    "expected_real_world": "holds",
+    "measured_status": "unknown",
+    "derived_count": 1,
+    "per_exception": [
+      {
+        "status": "unknown",
+        "best_entail": 0.0042,
+        "best_contradict": 0.0046,
+        "best_context": "An employer was being sued by one of its employees following an accident at work. The employer shared the accident details, including injury information, with its solicitors to obtain legal advice and defend the claim."
+      },
+      {
+        "status": "unknown",
+        "best_entail": 0.2638,
+        "best_contradict": 0.0155,
+        "best_context": "An employer was being sued by one of its employees following an accident at work. The employer shared the accident details, including injury information, with its solicitors to obtain legal advice and defend the claim."
+      },
+      {
+        "status": "unknown",
+        "best_entail": 0.6914,
+        "best_contradict": 0.0083,
+        "best_context": "An employer was being sued by one of its employees following an accident at work. The employer shared the accident details, including injury information, with its solicitors to obtain legal advice and defend the claim."
+      }
+    ],
+    "matches_expected": false
+  },
+  "violation_aepd_eurocollege": {
+    "context": "A Spanish data protection authority fined an English-language school for requiring students and visitors to provide medical certificates and COVID-19 test certificates as a condition of entry, finding that no exception under Article 9 permitted this processing of health data.",
+    "source": "https://www.edpb.europa.eu/news/national-news/2024/spanish-es-fines-eurocollege-oxford-english-institute-sl-gdpr-infringements_es (Spanish AEPD enforcement decision against Eurocollege Oxford English Institute SL)",
+    "expected_real_world": "unknown",
+    "measured_status": "unknown",
+    "derived_count": 1,
+    "per_exception": [
+      {
+        "status": "unknown",
+        "best_entail": 0.0054,
+        "best_contradict": 0.0076,
+        "best_context": "A Spanish data protection authority fined an English-language school for requiring students and visitors to provide medical certificates and COVID-19 test certificates as a condition of entry, finding that no exception under Article 9 permitted this processing of health data."
+      },
+      {
+        "status": "unknown",
+        "best_entail": 0.0579,
+        "best_contradict": 0.013,
+        "best_context": "A Spanish data protection authority fined an English-language school for requiring students and visitors to provide medical certificates and COVID-19 test certificates as a condition of entry, finding that no exception under Article 9 permitted this processing of health data."
+      },
+      {
+        "status": "unknown",
+        "best_entail": 0.0107,
+        "best_contradict": 0.0086,
+        "best_context": "A Spanish data protection authority fined an English-language school for requiring students and visitors to provide medical certificates and COVID-19 test certificates as a condition of entry, finding that no exception under Article 9 permitted this processing of health data."
+      }
+    ],
+    "matches_expected": true
+  }
+}
