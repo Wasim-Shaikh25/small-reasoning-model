@@ -1,0 +1,260 @@
+{
+  "case1_all_unknown": {
+    "facts": [
+      {
+        "raw": "MedCorp processed Aisha.",
+        "subject": "MedCorp",
+        "verb_lemma": "process",
+        "object": "Aisha"
+      },
+      {
+        "subject": "MedCorp",
+        "verb_lemma": "be",
+        "object": "unlawful",
+        "raw": "it is unlawful",
+        "conditional": true,
+        "derivation": {
+          "rule": "If anyone processes special category data, it is unlawful, unless the data subject has given explicit consent to the processing of those personal data for one or more specified purposes; processing is necessary to protect the vital interests of the data subject or of another natural person where the data subject is physically or legally incapable of giving consent; or processing is necessary for the establishment, exercise or defence of legal claims or whenever courts are acting in their judicial capacity.",
+          "fact": "MedCorp processed Aisha.",
+          "exception_check": {
+            "status": "unknown",
+            "per_exception": [
+              {
+                "status": "unknown",
+                "best_entail": 0.0,
+                "best_contradict": 0.0,
+                "best_context": null
+              },
+              {
+                "status": "unknown",
+                "best_entail": 0.0,
+                "best_contradict": 0.0,
+                "best_context": null
+              },
+              {
+                "status": "unknown",
+                "best_entail": 0.0,
+                "best_contradict": 0.0,
+                "best_context": null
+              }
+            ]
+          }
+        }
+      }
+    ],
+    "trace": [
+      {
+        "step": 0,
+        "rule": "If anyone processes special category data, it is unlawful, unless the data subject has given explicit consent to the processing of those personal data for one or more specified purposes; processing is necessary to protect the vital interests of the data subject or of another natural person where the data subject is physically or legally incapable of giving consent; or processing is necessary for the establishment, exercise or defence of legal claims or whenever courts are acting in their judicial capacity.",
+        "fact": "MedCorp processed Aisha.",
+        "derived": {
+          "subject": "MedCorp",
+          "verb_lemma": "be",
+          "object": "unlawful",
+          "raw": "it is unlawful",
+          "conditional": true,
+          "derivation": {
+            "rule": "If anyone processes special category data, it is unlawful, unless the data subject has given explicit consent to the processing of those personal data for one or more specified purposes; processing is necessary to protect the vital interests of the data subject or of another natural person where the data subject is physically or legally incapable of giving consent; or processing is necessary for the establishment, exercise or defence of legal claims or whenever courts are acting in their judicial capacity.",
+            "fact": "MedCorp processed Aisha.",
+            "exception_check": {
+              "status": "unknown",
+              "per_exception": [
+                {
+                  "status": "unknown",
+                  "best_entail": 0.0,
+                  "best_contradict": 0.0,
+                  "best_context": null
+                },
+                {
+                  "status": "unknown",
+                  "best_entail": 0.0,
+                  "best_contradict": 0.0,
+                  "best_context": null
+                },
+                {
+                  "status": "unknown",
+                  "best_entail": 0.0,
+                  "best_contradict": 0.0,
+                  "best_context": null
+                }
+              ]
+            }
+          }
+        },
+        "blocked_by_exception": null
+      }
+    ],
+    "steps": 2
+  },
+  "case2_holds_via_consent": {
+    "facts": [
+      {
+        "raw": "MedCorp processed Aisha.",
+        "subject": "MedCorp",
+        "verb_lemma": "process",
+        "object": "Aisha"
+      }
+    ],
+    "trace": [
+      {
+        "step": 0,
+        "rule": "If anyone processes special category data, it is unlawful, unless the data subject has given explicit consent to the processing of those personal data for one or more specified purposes; processing is necessary to protect the vital interests of the data subject or of another natural person where the data subject is physically or legally incapable of giving consent; or processing is necessary for the establishment, exercise or defence of legal claims or whenever courts are acting in their judicial capacity.",
+        "fact": "MedCorp processed Aisha.",
+        "derived": null,
+        "blocked_by_exception": {
+          "status": "holds",
+          "per_exception": [
+            {
+              "status": "holds",
+              "best_entail": 0.9941,
+              "best_contradict": 0.0008,
+              "best_context": "The data subject has given explicit consent to the processing of those personal data for one or more specified purposes."
+            },
+            {
+              "status": "not_holds",
+              "best_entail": 0.0016,
+              "best_contradict": 0.8913,
+              "best_context": "The data subject has given explicit consent to the processing of those personal data for one or more specified purposes."
+            },
+            {
+              "status": "unknown",
+              "best_entail": 0.0024,
+              "best_contradict": 0.0027,
+              "best_context": "The data subject has given explicit consent to the processing of those personal data for one or more specified purposes."
+            }
+          ]
+        }
+      }
+    ],
+    "steps": 1
+  },
+  "case3_holds_via_vital_interests": {
+    "facts": [
+      {
+        "raw": "MedCorp processed Aisha.",
+        "subject": "MedCorp",
+        "verb_lemma": "process",
+        "object": "Aisha"
+      }
+    ],
+    "trace": [
+      {
+        "step": 0,
+        "rule": "If anyone processes special category data, it is unlawful, unless the data subject has given explicit consent to the processing of those personal data for one or more specified purposes; processing is necessary to protect the vital interests of the data subject or of another natural person where the data subject is physically or legally incapable of giving consent; or processing is necessary for the establishment, exercise or defence of legal claims or whenever courts are acting in their judicial capacity.",
+        "fact": "MedCorp processed Aisha.",
+        "derived": null,
+        "blocked_by_exception": {
+          "status": "holds",
+          "per_exception": [
+            {
+              "status": "not_holds",
+              "best_entail": 0.0007,
+              "best_contradict": 0.9903,
+              "best_context": "Processing was necessary to protect the vital interests of the data subject or of another natural person where the data subject was physically or legally incapable of giving consent."
+            },
+            {
+              "status": "holds",
+              "best_entail": 0.9075,
+              "best_contradict": 0.0043,
+              "best_context": "Processing was necessary to protect the vital interests of the data subject or of another natural person where the data subject was physically or legally incapable of giving consent."
+            },
+            {
+              "status": "unknown",
+              "best_entail": 0.0195,
+              "best_contradict": 0.0114,
+              "best_context": "Processing was necessary to protect the vital interests of the data subject or of another natural person where the data subject was physically or legally incapable of giving consent."
+            }
+          ]
+        }
+      }
+    ],
+    "steps": 1
+  },
+  "case4_not_holds_one_contradicted": {
+    "facts": [
+      {
+        "raw": "MedCorp processed Aisha.",
+        "subject": "MedCorp",
+        "verb_lemma": "process",
+        "object": "Aisha"
+      },
+      {
+        "subject": "MedCorp",
+        "verb_lemma": "be",
+        "object": "unlawful",
+        "raw": "it is unlawful",
+        "conditional": false,
+        "derivation": {
+          "rule": "If anyone processes special category data, it is unlawful, unless the data subject has given explicit consent to the processing of those personal data for one or more specified purposes; processing is necessary to protect the vital interests of the data subject or of another natural person where the data subject is physically or legally incapable of giving consent; or processing is necessary for the establishment, exercise or defence of legal claims or whenever courts are acting in their judicial capacity.",
+          "fact": "MedCorp processed Aisha.",
+          "exception_check": {
+            "status": "not_holds",
+            "per_exception": [
+              {
+                "status": "not_holds",
+                "best_entail": 0.0002,
+                "best_contradict": 0.998,
+                "best_context": "Aisha never gave any consent at all for this processing."
+              },
+              {
+                "status": "unknown",
+                "best_entail": 0.013,
+                "best_contradict": 0.0045,
+                "best_context": "Aisha never gave any consent at all for this processing."
+              },
+              {
+                "status": "unknown",
+                "best_entail": 0.0051,
+                "best_contradict": 0.0033,
+                "best_context": "Aisha never gave any consent at all for this processing."
+              }
+            ]
+          }
+        }
+      }
+    ],
+    "trace": [
+      {
+        "step": 0,
+        "rule": "If anyone processes special category data, it is unlawful, unless the data subject has given explicit consent to the processing of those personal data for one or more specified purposes; processing is necessary to protect the vital interests of the data subject or of another natural person where the data subject is physically or legally incapable of giving consent; or processing is necessary for the establishment, exercise or defence of legal claims or whenever courts are acting in their judicial capacity.",
+        "fact": "MedCorp processed Aisha.",
+        "derived": {
+          "subject": "MedCorp",
+          "verb_lemma": "be",
+          "object": "unlawful",
+          "raw": "it is unlawful",
+          "conditional": false,
+          "derivation": {
+            "rule": "If anyone processes special category data, it is unlawful, unless the data subject has given explicit consent to the processing of those personal data for one or more specified purposes; processing is necessary to protect the vital interests of the data subject or of another natural person where the data subject is physically or legally incapable of giving consent; or processing is necessary for the establishment, exercise or defence of legal claims or whenever courts are acting in their judicial capacity.",
+            "fact": "MedCorp processed Aisha.",
+            "exception_check": {
+              "status": "not_holds",
+              "per_exception": [
+                {
+                  "status": "not_holds",
+                  "best_entail": 0.0002,
+                  "best_contradict": 0.998,
+                  "best_context": "Aisha never gave any consent at all for this processing."
+                },
+                {
+                  "status": "unknown",
+                  "best_entail": 0.013,
+                  "best_contradict": 0.0045,
+                  "best_context": "Aisha never gave any consent at all for this processing."
+                },
+                {
+                  "status": "unknown",
+                  "best_entail": 0.0051,
+                  "best_contradict": 0.0033,
+                  "best_context": "Aisha never gave any consent at all for this processing."
+                }
+              ]
+            }
+          }
+        },
+        "blocked_by_exception": null
+      }
+    ],
+    "steps": 2
+  }
+}

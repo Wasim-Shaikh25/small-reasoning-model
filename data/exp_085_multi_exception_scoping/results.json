@@ -1,0 +1,59 @@
+{
+  "id": "EXP-085",
+  "title": "Multi-exception (OR-combined) rule scoping, measured on GDPR Art 9's actual three exceptions",
+  "status": "closed",
+  "goal": "Extend lab.common.inference's single-exception handling (EXP-083) to a disjunction of several alternative exceptions combined by OR, each still checked by the existing, unmodified check_exception/NLI mechanism, and prove the OR-combination's three honest states (any holds blocks; all unknown still derives but conditional; none holds with at least one confidently ruled out derives cleanly) on the real motivating case this gap was found against -- GDPR Article 9, not a restated single-exception rule.",
+  "method": "lab.common.inference.split_exceptions (new) generalizes split_exception's single trailing 'unless <condition>' clause to a list of alternatives, split only on ';' so a single alternative's own internal commas/or's are preserved. lab.common.inference.check_exceptions (new) calls the existing, unmodified check_exception once per alternative and OR-combines the three-way verdict. forward_chain now calls split_exceptions/check_exceptions in place of the singular functions -- a one-item list degenerates to the exact same behavior the singular path always had, confirmed by re-running EXP-083 after this change (data/exp_083_symbolic_inference/results.json, re-rendered, unchanged). The rule itself is one hand-composed sentence in parse_conditional_rule's one supported shape, its three exception alternatives pulled verbatim (by regex, with an assertion on the count) from lab.exp_081_real_document_pipeline.run's own real ~2,400-word GDPR fixture, not retyped by hand and not a new document.",
+  "metrics": {
+    "gdpr_art9_exceptions_found": 3,
+    "case1_all_unknown": {
+      "correct": true,
+      "status": "unknown",
+      "per_exception": [
+        "unknown",
+        "unknown",
+        "unknown"
+      ]
+    },
+    "case2_holds_via_consent": {
+      "correct": true,
+      "derived_count": 0
+    },
+    "case3_holds_via_vital_interests": {
+      "correct": true,
+      "derived_count": 0
+    },
+    "case4_not_holds_one_contradicted": {
+      "correct": true,
+      "status": "not_holds",
+      "per_exception": [
+        "not_holds",
+        "unknown",
+        "unknown"
+      ]
+    },
+    "all_correct": true
+  },
+  "results_prose": "Rule: 3 OR-combined exceptions pulled verbatim from the repo's own GDPR_TEXT fixture (found 3, not the 4 EXPLORATIONS.md's own prior EXP-085 entry claimed). Case 1 (no context, all 3 unknown): per-exception statuses ['unknown', 'unknown', 'unknown'], overall 'unknown', derived-but-conditional -- correct=True. Case 2 (context affirms the consent alternative): 0 facts derived (blocked) -- correct=True. Case 3 (context affirms the DIFFERENT vital-interests alternative): 0 facts derived (also blocked) -- correct=True, proving the OR-combination checks every listed alternative, not just whichever one case 2 happened to use. Case 4 (context only contradicts the consent alternative; the other two stay unknown): per-exception statuses ['not_holds', 'unknown', 'unknown'], overall 'not_holds', derived cleanly (conditional=False) -- correct=True.",
+  "conclusion": "Multi-exception OR-combination works on GDPR Art 9's own real exception text, not just a restated single-exception toy rule: any one of several listed alternatives blocks the consequence when it holds (proven on two different alternatives, not only the first), the consequence still derives -- visibly flagged conditional -- when every alternative is genuinely unresolved, and it derives cleanly once none holds and at least one alternative is confidently ruled out, without needing every alternative individually ruled out first. check_exception's own per-exception judgment is unchanged; check_exceptions only combines its existing three-way verdict across more than one condition, split on ';' so that a single alternative's own internal commas and 'or's (common in real statutory text) are never mistaken for a boundary between alternatives.",
+  "scale_down": "One hand-composed rule sentence (parse_conditional_rule's one supported shape), not an automatic parse of GDPR Art 9's own real multi-sentence prohibition+exception wording -- that would need a genuinely different rule-sentence parser (closer to EXP-087's Flint-role scope), a separate and much larger piece of work, not required to prove the OR-combination mechanism itself. The repo's own GDPR_TEXT fixture has 3 listed exceptions for Art 9, not the 4 this project's own prior EXP-085 todo entry claimed (real GDPR Art 9 has a 4th paragraph, covering non-profit-body members' data, that this fixture does not include) -- measured against the fixture that actually exists in this repo, corrected here rather than restated uncritically. Four hand-built cases proving each named combination state, not a broad benchmark across many multi-exception rules.",
+  "referenced_files": [
+    "lab/exp_085_multi_exception_scoping/run.py",
+    "lab/common/inference.py",
+    "lab/common/rules.py",
+    "lab/exp_081_real_document_pipeline/run.py",
+    "lab/exp_083_symbolic_inference/run.py",
+    "data/exp_083_symbolic_inference/results.json",
+    "data/exp_085_multi_exception_scoping/results.json"
+  ],
+  "follow_ups": [
+    "Not tested on a rule where TWO OR MORE alternatives simultaneously hold at once (only one alternative holding at a time was exercised here) -- the any()-based combination should be unaffected, but this specific case was not run.",
+    "GDPR Art 9's real 4th paragraph (non-profit bodies processing their own members' data) is not in this repo's GDPR_TEXT fixture at all -- extending that fixture, or fetching the complete Art 9 text, is a real follow-up before calling this fixture complete.",
+    "Automatically parsing GDPR Art 9's own real sentence shape (one prohibition sentence, followed by several separate 'This prohibition shall not apply if...' sentences) directly, instead of hand-composing a single parse_conditional_rule-shaped sentence from its extracted exception clauses, needs a genuinely different rule-sentence parser -- not built here.",
+    "check_exceptions's NLI call still reads one context sentence as one premise per alternative, the same known limit EXP-083 already named for the single-exception case -- a longer passage with one alternative's evidence buried among many unrelated clauses was not tested.",
+    "The real DeBERTa-v3 MNLI checkpoint's entailment score for these two exception conditions (consent; vital interests) was measured to be sharply sensitive to lexical distance from the condition's own wording: a context sentence naming the specific data subject and restructuring the sentence (e.g. 'Processing was necessary to protect the vital interests of Aisha, who was physically incapable of giving consent.') scored entail=0.24-0.39, well under tau=0.75, while a near-verbatim restatement of the same fact (only tense-shifted) scored 0.91-0.99. Cases 2 and 3's context texts were tuned against the real model for exactly this reason, not picked blind. check_exception's entailment gate works only when the given context stays close to the exception's own phrasing -- a real document's evidence almost never will -- so this is a real brittleness, not an artifact of this exploration's fixtures, and a genuine blocker before trusting this mechanism on natural (not hand-tuned) context text."
+  ],
+  "elapsed_sec": 615.794,
+  "peak_rss_mb": 733.06,
+  "models_used": "spaCy en_core_web_sm dependency parser (fact/rule extraction, unchanged, non-generative) + MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli (per-exception entailment via the existing, unmodified check_exception, one bounded judgment per alternative, non-generative). No generative model anywhere in this exploration."
+}

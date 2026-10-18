@@ -18,9 +18,7 @@
           "fact": "Rohan killed Arun.",
           "exception_check": {
             "status": "no_exception",
-            "best_entail": null,
-            "best_contradict": null,
-            "best_context": null
+            "per_exception": []
           }
         }
       },
@@ -35,9 +33,7 @@
           "fact": "Rohan killed Arun.",
           "exception_check": {
             "status": "no_exception",
-            "best_entail": null,
-            "best_contradict": null,
-            "best_context": null
+            "per_exception": []
           }
         }
       }
@@ -58,9 +54,7 @@
             "fact": "Rohan killed Arun.",
             "exception_check": {
               "status": "no_exception",
-              "best_entail": null,
-              "best_contradict": null,
-              "best_context": null
+              "per_exception": []
             }
           }
         },
@@ -81,9 +75,7 @@
             "fact": "Rohan killed Arun.",
             "exception_check": {
               "status": "no_exception",
-              "best_entail": null,
-              "best_contradict": null,
-              "best_context": null
+              "per_exception": []
             }
           }
         },
@@ -111,9 +103,7 @@
           "fact": "Rohan killed Arun.",
           "exception_check": {
             "status": "no_exception",
-            "best_entail": null,
-            "best_contradict": null,
-            "best_context": null
+            "per_exception": []
           }
         }
       },
@@ -128,9 +118,7 @@
           "fact": "Rohan killed Arun.",
           "exception_check": {
             "status": "no_exception",
-            "best_entail": null,
-            "best_contradict": null,
-            "best_context": null
+            "per_exception": []
           }
         }
       },
@@ -145,9 +133,7 @@
           "fact": "he will go to jail",
           "exception_check": {
             "status": "no_exception",
-            "best_entail": null,
-            "best_contradict": null,
-            "best_context": null
+            "per_exception": []
           }
         }
       }
@@ -168,9 +154,7 @@
             "fact": "Rohan killed Arun.",
             "exception_check": {
               "status": "no_exception",
-              "best_entail": null,
-              "best_contradict": null,
-              "best_context": null
+              "per_exception": []
             }
           }
         },
@@ -191,9 +175,7 @@
             "fact": "Rohan killed Arun.",
             "exception_check": {
               "status": "no_exception",
-              "best_entail": null,
-              "best_contradict": null,
-              "best_context": null
+              "per_exception": []
             }
           }
         },
@@ -214,9 +196,7 @@
             "fact": "he will go to jail",
             "exception_check": {
               "status": "no_exception",
-              "best_entail": null,
-              "best_contradict": null,
-              "best_context": null
+              "per_exception": []
             }
           }
         },
@@ -244,9 +224,14 @@
           "fact": "Rohan killed Arun.",
           "exception_check": {
             "status": "unknown",
-            "best_entail": 0.0,
-            "best_contradict": 0.0,
-            "best_context": null
+            "per_exception": [
+              {
+                "status": "unknown",
+                "best_entail": 0.0,
+                "best_contradict": 0.0,
+                "best_context": null
+              }
+            ]
           }
         }
       }
@@ -267,9 +252,14 @@
             "fact": "Rohan killed Arun.",
             "exception_check": {
               "status": "unknown",
-              "best_entail": 0.0,
-              "best_contradict": 0.0,
-              "best_context": null
+              "per_exception": [
+                {
+                  "status": "unknown",
+                  "best_entail": 0.0,
+                  "best_contradict": 0.0,
+                  "best_context": null
+                }
+              ]
             }
           }
         },
@@ -295,9 +285,14 @@
         "derived": null,
         "blocked_by_exception": {
           "status": "holds",
-          "best_entail": 0.9069,
-          "best_contradict": 0.0029,
-          "best_context": "Rohan acted in self-defense when he killed Arun."
+          "per_exception": [
+            {
+              "status": "holds",
+              "best_entail": 0.9069,
+              "best_contradict": 0.0029,
+              "best_context": "Rohan acted in self-defense when he killed Arun."
+            }
+          ]
         }
       }
     ],
@@ -322,9 +317,14 @@
           "fact": "Rohan killed Arun.",
           "exception_check": {
             "status": "not_holds",
-            "best_entail": 0.0002,
-            "best_contradict": 0.9985,
-            "best_context": "It was not self-defense; Rohan attacked Arun without provocation."
+            "per_exception": [
+              {
+                "status": "not_holds",
+                "best_entail": 0.0002,
+                "best_contradict": 0.9985,
+                "best_context": "It was not self-defense; Rohan attacked Arun without provocation."
+              }
+            ]
           }
         }
       }
@@ -345,9 +345,14 @@
             "fact": "Rohan killed Arun.",
             "exception_check": {
               "status": "not_holds",
-              "best_entail": 0.0002,
-              "best_contradict": 0.9985,
-              "best_context": "It was not self-defense; Rohan attacked Arun without provocation."
+              "per_exception": [
+                {
+                  "status": "not_holds",
+                  "best_entail": 0.0002,
+                  "best_contradict": 0.9985,
+                  "best_context": "It was not self-defense; Rohan attacked Arun without provocation."
+                }
+              ]
             }
           }
         },

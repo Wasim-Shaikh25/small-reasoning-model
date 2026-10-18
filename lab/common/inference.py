@@ -44,6 +44,7 @@ PRONOUN_SUBJECTS = {"he", "she", "it", "they", "him", "her", "them", "someone", 
 POSSESSIVE_PRONOUNS = {"my", "your", "his", "her", "its", "our", "their"}
 
 _UNLESS_RE = re.compile(r"\bunless\b", re.I)
+_EXCEPTION_ALT_RE = re.compile(r";\s*(?:or\s+)?", re.I)
 
 
 def split_exception(consequence: str) -> tuple[str, str | None]:
@@ -57,6 +58,32 @@ def split_exception(consequence: str) -> tuple[str, str | None]:
     if len(parts) == 1:
         return consequence.strip(), None
     return parts[0].strip().rstrip(","), parts[1].strip().rstrip(".")
+
+
+def split_exceptions(consequence: str) -> tuple[str, list[str]]:
+    """Same trailing "...unless <condition>" split as split_exception, but
+    the condition itself may be a disjunction of several alternative
+    exceptions ("unless A; B; or C") instead of exactly one -- GDPR Art 9's
+    actual shape (one prohibition, three listed exceptions, any one of
+    which blocks it), not the single-exception toy rule EXP-083 measured.
+
+    Alternatives are split on ";" (optionally followed by "or") only, never
+    on a bare "," or "or" -- a real exception clause is itself often full of
+    internal commas and "or"s ("the establishment, exercise or defence of
+    legal claims or whenever courts are acting in their judicial
+    capacity"), so splitting on those would shred one alternative into
+    several. The semicolon is the only separator this function treats as
+    "a new alternative starts here". Returns (consequence_without_exception,
+    list_of_exception_conditions) -- an empty list when there is no "unless"
+    clause at all, a one-item list for a single exception (the exact same
+    condition split_exception would have returned), so this is a strict
+    generalization, not a different rule shape.
+    """
+    consequence_without, exception_text = split_exception(consequence)
+    if exception_text is None:
+        return consequence_without, []
+    alternatives = [alt.strip() for alt in _EXCEPTION_ALT_RE.split(exception_text) if alt.strip()]
+    return consequence_without, alternatives
 
 
 def _clauses(consequence: str) -> list[str]:
@@ -175,6 +202,40 @@ def check_exception(exception_condition: str | None, context_texts: list[str], t
     return {"status": status, "best_entail": round(best_entail, 4), "best_contradict": round(best_contradict, 4), "best_context": best_context}
 
 
+def check_exceptions(exception_conditions: list[str], context_texts: list[str], tau: float = 0.75) -> dict:
+    """OR-combines `check_exception`'s own three-way verdict across every
+    alternative exception condition in a disjunction ("unless A, B, or C")
+    -- `check_exception` itself is unchanged, called once per alternative,
+    exactly the same bounded per-exception NLI judgment it always made.
+
+    Combination, in the same honest-abstention spirit as the single-
+    exception case:
+      - any alternative `holds` -> overall `holds` (the rule's consequence
+        is blocked -- it only takes one of several listed exceptions to
+        apply).
+      - none holds, and every alternative is `unknown` -> overall
+        `unknown` (nothing in the given context speaks to any of them, so
+        the consequence is still derived but marked conditional, never
+        silently treated as if no exception could possibly apply).
+      - none holds, and at least one is confidently `not_holds` -> overall
+        `not_holds` (the consequence derives cleanly; the context doesn't
+        have to rule out every alternative individually, only none may
+        hold and at least one must be confidently ruled out).
+    An empty list (no "unless" clause at all) returns `no_exception`, same
+    as `check_exception(None, ...)`.
+    """
+    if not exception_conditions:
+        return {"status": "no_exception", "per_exception": []}
+    results = [check_exception(condition, context_texts, tau=tau) for condition in exception_conditions]
+    if any(r["status"] == "holds" for r in results):
+        status = "holds"
+    elif all(r["status"] == "unknown" for r in results):
+        status = "unknown"
+    else:
+        status = "not_holds"
+    return {"status": status, "per_exception": results}
+
+
 def forward_chain(facts: list[dict], rules: list[dict], context_texts: list[str] | None = None, max_steps: int = 10) -> dict:
     """Repeatedly matches every rule against every known fact, derives new
     facts (instantiate_consequence), and feeds those back in as candidate
@@ -197,11 +258,11 @@ def forward_chain(facts: list[dict], rules: list[dict], context_texts: list[str]
     for step in range(max_steps):
         new_this_step = []
         for rule in rules:
-            _, exception_text = split_exception(rule["consequence"])
+            _, exception_conditions = split_exceptions(rule["consequence"])
             for fact in known:
                 if fact.get("subject") is None or fact["verb_lemma"] != rule["trigger_lemma"]:
                     continue
-                exception_result = check_exception(exception_text, context_texts)
+                exception_result = check_exceptions(exception_conditions, context_texts)
                 if exception_result["status"] == "holds":
                     trace.append({"step": step, "rule": rule["raw"], "fact": fact["raw"], "derived": None, "blocked_by_exception": exception_result})
                     continue
