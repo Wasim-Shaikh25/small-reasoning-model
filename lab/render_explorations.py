@@ -429,34 +429,6 @@ TODOS = [
         "scale_down": "",
     },
     {
-        "id": "EXP-051",
-        "title": "Sentence role-tagging classifier (direct answer / supporting evidence / background / contradiction)",
-        "status": "todo",
-        "goal": (
-            "Replace the current binary found/missing/conflicted status (lab/common/verify.coverage_check) "
-            "with a 4-way role label per shortlisted sentence -- direct_answer, supporting_evidence, "
-            "background, contradiction -- so the page-wise writer knows how to use each sentence, not just "
-            "whether it passed verification. This is the 'mark how to use them' step of the relevance "
-            "cascade."
-        ),
-        "method": "Not run.",
-        "models_used": (
-            "Multinomial logistic regression (sklearn), the same head shape as EXP-011's next_action_head, "
-            "trained only on labels stored in this repository. Features: NLI probabilities (lexical judge, "
-            "or the real DeBERTa-v3 MNLI checkpoint once EXP-031 closes), ask-relevance score, and sentence "
-            "position. No generative model."
-        ),
-        "referenced_files": [
-            "lab/exp_011_decision_heads/run.py",
-            "lab/common/verify.py",
-            "lab/common/nli.py",
-            "lab/common/real_encoders.py",
-        ],
-        "results_prose": "Not run.",
-        "conclusion": "Todo. Depends on EXP-049's relevance score as one input feature.",
-        "scale_down": "",
-    },
-    {
         "id": "EXP-086",
         "title": "Cross-sentence coreference resolution (fastcoref) feeding fact/rule extraction",
         "status": "todo",

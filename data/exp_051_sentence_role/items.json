@@ -1,0 +1,282 @@
+[
+  {
+    "ask": "What is the security deposit?",
+    "claim": "The security deposit is INR 50000.",
+    "sentence": "The security deposit is INR 50000.",
+    "role": "direct_answer",
+    "position": 0.8385
+  },
+  {
+    "ask": "What is the security deposit?",
+    "claim": "The security deposit is INR 50000.",
+    "sentence": "The security deposit is INR 50000.",
+    "role": "direct_answer",
+    "position": 0.2461
+  },
+  {
+    "ask": "What is the security deposit?",
+    "claim": "The security deposit is INR 50000.",
+    "sentence": "The security deposit is INR 50000.",
+    "role": "direct_answer",
+    "position": 0.8326
+  },
+  {
+    "ask": "What is the rent?",
+    "claim": "The rent is INR 25000.",
+    "sentence": "The rent is INR 25000.",
+    "role": "direct_answer",
+    "position": 0.9264
+  },
+  {
+    "ask": "What is the cure period?",
+    "claim": "The cure period is 10 days.",
+    "sentence": "The cure period is 10 days.",
+    "role": "direct_answer",
+    "position": 0.5483
+  },
+  {
+    "ask": "What is the cure period?",
+    "claim": "The cure period is 10 days.",
+    "sentence": "The cure period is 10 days.",
+    "role": "direct_answer",
+    "position": 0.7315
+  },
+  {
+    "ask": "What is the rent?",
+    "claim": "The rent is INR 25000.",
+    "sentence": "The rent is INR 25000.",
+    "role": "direct_answer",
+    "position": 0.5861
+  },
+  {
+    "ask": "What is the rent?",
+    "claim": "The rent is INR 25000.",
+    "sentence": "The rent is INR 25000.",
+    "role": "direct_answer",
+    "position": 0.3868
+  },
+  {
+    "ask": "What is the rent?",
+    "claim": "The rent is INR 25000.",
+    "sentence": "The rent is INR 25000.",
+    "role": "direct_answer",
+    "position": 0.4039
+  },
+  {
+    "ask": "What is the notice period?",
+    "claim": "The notice period is 30 days.",
+    "sentence": "The notice period is 30 days.",
+    "role": "direct_answer",
+    "position": 0.8526
+  },
+  {
+    "ask": "What is the notice period?",
+    "claim": "The notice period is 30 days.",
+    "sentence": "The notice period is 30 days.",
+    "role": "direct_answer",
+    "position": 0.5389
+  },
+  {
+    "ask": "What is the notice period?",
+    "claim": "The notice period is 30 days.",
+    "sentence": "The notice period is 30 days.",
+    "role": "direct_answer",
+    "position": 0.4778
+  },
+  {
+    "ask": "What is the security deposit?",
+    "claim": "The security deposit is INR 50000.",
+    "sentence": "The security deposit is INR 50000.",
+    "role": "direct_answer",
+    "position": 0.3473
+  },
+  {
+    "ask": "What is the rent?",
+    "claim": "The rent is INR 25000.",
+    "sentence": "The rent is INR 25000.",
+    "role": "direct_answer",
+    "position": 0.3672
+  },
+  {
+    "ask": "What is the security deposit?",
+    "claim": "The security deposit is INR 50000.",
+    "sentence": "The security deposit is INR 50000.",
+    "role": "direct_answer",
+    "position": 0.7643
+  },
+  {
+    "ask": "What is the notice period?",
+    "claim": "The notice period is 30 days.",
+    "sentence": "The notice period is 30 days.",
+    "role": "direct_answer",
+    "position": 0.4382
+  },
+  {
+    "ask": "What is the security deposit?",
+    "claim": "The security deposit is INR 50000.",
+    "sentence": "The security deposit is INR 50000.",
+    "role": "direct_answer",
+    "position": 0.4701
+  },
+  {
+    "ask": "What is the notice period?",
+    "claim": "The notice period is 30 days.",
+    "sentence": "The notice period is 30 days.",
+    "role": "direct_answer",
+    "position": 0.9862
+  },
+  {
+    "ask": "What is the notice period?",
+    "claim": "The notice period is 30 days.",
+    "sentence": "The notice period is 30 days.",
+    "role": "direct_answer",
+    "position": 0.1749
+  },
+  {
+    "ask": "What is the cure period?",
+    "claim": "The cure period is 10 days.",
+    "sentence": "The cure period is 10 days.",
+    "role": "direct_answer",
+    "position": 0.932
+  },
+  {
+    "ask": "What is the cure period?",
+    "claim": "The cure period is 10 days.",
+    "sentence": "The cure period is 10 days.",
+    "role": "direct_answer",
+    "position": 0.9322
+  },
+  {
+    "ask": "What is the security deposit?",
+    "claim": "The security deposit is INR 50000.",
+    "sentence": "The security deposit is INR 50000.",
+    "role": "direct_answer",
+    "position": 0.9778
+  },
+  {
+    "ask": "What is the rent?",
+    "claim": "The rent is INR 25000.",
+    "sentence": "The rent is INR 25000.",
+    "role": "direct_answer",
+    "position": 0.112
+  },
+  {
+    "ask": "What is the security deposit?",
+    "claim": "The security deposit is INR 50000.",
+    "sentence": "The security deposit is INR 50000.",
+    "role": "direct_answer",
+    "position": 0.5894
+  },
+  {
+    "ask": "What is the cure period?",
+    "claim": "The cure period is 10 days.",
+    "sentence": "The cure period is 10 days.",
+    "role": "direct_answer",
+    "position": 0.4953
+  },
+  {
+    "ask": "What is the cure period?",
+    "claim": "The cure period is 10 days.",
+    "sentence": "The cure period is 10 days.",
+    "role": "direct_answer",
+    "position": 0.6516
+  },
+  {
+    "ask": "What is the cure period?",
+    "claim": "The cure period is 10 days.",
+    "sentence": "The cure period is 10 days.",
+    "role": "direct_answer",
+    "position": 0.8299
+  },
+  {
+    "ask": "What is the notice period?",
+    "claim": "The notice period is 30 days.",
+    "sentence": "The notice period is 30 days.",
+    "role": "direct_answer",
+    "position": 0.9969
+  },
+  {
+    "ask": "What is the notice period?",
+    "claim": "The notice period is 30 days.",
+    "sentence": "The notice period is 30 days.",
+    "role": "direct_answer",
+    "position": 0.5237
+  },
+  {
+    "ask": "What is the rent?",
+    "claim": "The rent is INR 25000.",
+    "sentence": "The rent is INR 25000.",
+    "role": "direct_answer",
+    "position": 0.9253
+  },
+  {
+    "ask": "What is the cure period?",
+    "claim": "The cure period is 10 days.",
+    "sentence": "The cure period is 10 days.",
+    "role": "direct_answer",
+    "position": 0.8392
+  },
+  {
+    "ask": "What is the notice period?",
+    "claim": "The notice period is 30 days.",
+    "sentence": "The notice period is 30 days.",
+    "role": "direct_answer",
+    "position": 0.3276
+  },
+  {
+    "ask": "What is the notice period?",
+    "claim": "The notice period is 30 days.",
+    "sentence": "The notice period is 30 days.",
+    "role": "direct_answer",
+    "position": 0.8793
+  },
+  {
+    "ask": "What is the cure period?",
+    "claim": "The cure period is 10 days.",
+    "sentence": "The cure period is 10 days.",
+    "role": "direct_answer",
+    "position": 0.5607
+  },
+  {
+    "ask": "What is the rent?",
+    "claim": "The rent is INR 25000.",
+    "sentence": "The rent is INR 25000.",
+    "role": "direct_answer",
+    "position": 0.2249
+  },
+  {
+    "ask": "What is the cure period?",
+    "claim": "The cure period is 10 days.",
+    "sentence": "The cure period is 10 days.",
+    "role": "direct_answer",
+    "position": 0.5864
+  },
+  {
+    "ask": "What is the security deposit?",
+    "claim": "The security deposit is INR 50000.",
+    "sentence": "The security deposit is INR 50000.",
+    "role": "direct_answer",
+    "position": 0.8109
+  },
+  {
+    "ask": "What is the notice period?",
+    "claim": "The notice period is 30 days.",
+    "sentence": "The notice period is 30 days.",
+    "role": "direct_answer",
+    "position": 0.3227
+  },
+  {
+    "ask": "What is the rent?",
+    "claim": "The rent is INR 25000.",
+    "sentence": "The rent is INR 25000.",
+    "role": "direct_answer",
+    "position": 0.5356
+  },
+  {
+    "ask": "What is the cure period?",
+    "claim": "The cure period is 10 days.",
+    "sentence": "The cure period is 10 days.",
+    "role": "direct_answer",
+    "position": 0.982
+  }
+]
