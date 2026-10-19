@@ -429,61 +429,6 @@ TODOS = [
         "scale_down": "",
     },
     {
-        "id": "EXP-049",
-        "title": "Per-word relevance and grammaticality scoring for the ask pipeline",
-        "status": "todo",
-        "goal": (
-            "Score each content word in a candidate sentence for (a) relevance to the ask -- token/lemma "
-            "overlap and salience against the ask's content terms -- and (b) local grammatical well-"
-            "formedness -- subject/verb/object intact, not a sentence fragment -- before a sentence is "
-            "allowed into the shortlist that feeds extraction. This is the first stage of the word-by-word "
-            "relevance cascade: chunk the prompt, then check every nearby word's relevance and grammar "
-            "before deciding how to use the sentence."
-        ),
-        "method": "Not run.",
-        "models_used": (
-            "spaCy's dependency parser (already a dependency via lab/common/real_models.py, non-generative) "
-            "for the grammaticality signal; lab/common/textutil's content_tokens/coverage for the ask-"
-            "relevance signal. No generative model, no new checkpoint."
-        ),
-        "referenced_files": [
-            "lab/common/textutil.py",
-            "lab/common/real_models.py",
-            "lab/common/ask.py",
-            "lab/common/qa.py",
-            "ARCHITECTURE.md",
-            "AGENT.md",
-        ],
-        "results_prose": "Not run.",
-        "conclusion": "Todo. Feeds the shortlisting step EXP-051 marks with a role, once this scoring exists.",
-        "scale_down": "",
-    },
-    {
-        "id": "EXP-050",
-        "title": "Neighbor-sentence coherence check for page-wise assembly",
-        "status": "todo",
-        "goal": (
-            "Before a sentence is placed into an outline leaf (lab/common/assemble.build_outline), measure "
-            "whether it reads coherently next to its immediate neighbors -- consecutive-sentence similarity "
-            "plus a discourse-connective rule check (however, therefore, in addition, and similar) -- so a "
-            "leaf whose findings don't flow as a sequence can be flagged or reordered before it is written."
-        ),
-        "method": "Not run.",
-        "models_used": (
-            "bge-small-en-v1.5 (lab/common/real_encoders.py, already loaded for EXP-040/042) for consecutive-"
-            "sentence similarity, with spaCy static vectors as a fallback; a small rule table for discourse "
-            "connectives. No generative model."
-        ),
-        "referenced_files": [
-            "lab/common/real_encoders.py",
-            "lab/common/assemble.py",
-            "lab/common/textutil.py",
-        ],
-        "results_prose": "Not run.",
-        "conclusion": "Todo.",
-        "scale_down": "",
-    },
-    {
         "id": "EXP-051",
         "title": "Sentence role-tagging classifier (direct answer / supporting evidence / background / contradiction)",
         "status": "todo",

@@ -1,0 +1,972 @@
+{
+  "hand_built": [
+    {
+      "label": "coherent_same_topic",
+      "index": 0,
+      "first": "The data subject has given explicit consent to the processing.",
+      "second": "The consent covers one or more specified purposes.",
+      "similarity": 0.7901,
+      "opening_connective": "or",
+      "opening_connective_operator": "combinator_or",
+      "flagged": false,
+      "expected_flagged": false,
+      "correct": true
+    },
+    {
+      "label": "coherent_signaled_shift",
+      "index": 0,
+      "first": "The data subject has given explicit consent to the processing.",
+      "second": "However, the controller must still notify the supervisory authority of any breach.",
+      "similarity": 0.5336,
+      "opening_connective": "however",
+      "opening_connective_operator": "concession",
+      "flagged": false,
+      "expected_flagged": false,
+      "correct": true
+    },
+    {
+      "label": "incoherent_unsignaled_jump",
+      "index": 0,
+      "first": "The data subject has given explicit consent to the processing.",
+      "second": "The weather in Mumbai is pleasant during the monsoon season.",
+      "similarity": 0.5005,
+      "opening_connective": null,
+      "opening_connective_operator": null,
+      "flagged": true,
+      "expected_flagged": true,
+      "correct": true
+    },
+    {
+      "label": "incoherent_signaled_but_unrelated",
+      "index": 0,
+      "first": "The data subject has given explicit consent to the processing.",
+      "second": "Moreover, the weather in Mumbai is pleasant during the monsoon season.",
+      "similarity": 0.4928,
+      "opening_connective": "moreover",
+      "opening_connective_operator": "combinator_and",
+      "flagged": false,
+      "expected_flagged": false,
+      "correct": true
+    }
+  ],
+  "gdpr_pairs": [
+    {
+      "index": 0,
+      "first": "Art.",
+      "second": "4 GDPR",
+      "similarity": 0.4366,
+      "opening_connective": null,
+      "opening_connective_operator": null,
+      "flagged": true
+    },
+    {
+      "index": 1,
+      "first": "4 GDPR",
+      "second": "Definitions",
+      "similarity": 0.551,
+      "opening_connective": null,
+      "opening_connective_operator": null,
+      "flagged": true
+    },
+    {
+      "index": 2,
+      "first": "Definitions",
+      "second": "For the purposes of this Regulation:",
+      "similarity": 0.6472,
+      "opening_connective": null,
+      "opening_connective_operator": null,
+      "flagged": true
+    },
+    {
+      "index": 3,
+      "first": "For the purposes of this Regulation:",
+      "second": "'personal data' means any information relating to an identified or identifiable natural person ('data subject'); an identifiable natural person is one who can be identified, directly or indirectly, in particular by reference to an identifier such as a name, an identification number, location data, an online identifier or to one or more factors specific to the physical, physiological, genetic, mental, economic, cultural or social identity of that natural person.",
+      "similarity": 0.526,
+      "opening_connective": "or",
+      "opening_connective_operator": "combinator_or",
+      "flagged": false
+    },
+    {
+      "index": 4,
+      "first": "'personal data' means any information relating to an identified or identifiable natural person ('data subject'); an identifiable natural person is one who can be identified, directly or indirectly, in particular by reference to an identifier such as a name, an identification number, location data, an online identifier or to one or more factors specific to the physical, physiological, genetic, mental, economic, cultural or social identity of that natural person.",
+      "second": "'processing' means any operation or set of operations which is performed on personal data or on sets of personal data, whether or not by automated means, such as collection, recording, organisation, structuring, storage, adaptation or alteration, retrieval, consultation, use, disclosure by transmission, dissemination or otherwise making available, alignment or combination, restriction, erasure or destruction.",
+      "similarity": 0.7267,
+      "opening_connective": "or",
+      "opening_connective_operator": "combinator_or",
+      "flagged": false
+    },
+    {
+      "index": 5,
+      "first": "'processing' means any operation or set of operations which is performed on personal data or on sets of personal data, whether or not by automated means, such as collection, recording, organisation, structuring, storage, adaptation or alteration, retrieval, consultation, use, disclosure by transmission, dissemination or otherwise making available, alignment or combination, restriction, erasure or destruction.",
+      "second": "'controller' means the natural or legal person, public authority, agency or other body which, alone or jointly with others, determines the purposes and means of the processing of personal data.",
+      "similarity": 0.6901,
+      "opening_connective": "or",
+      "opening_connective_operator": "combinator_or",
+      "flagged": false
+    },
+    {
+      "index": 6,
+      "first": "'controller' means the natural or legal person, public authority, agency or other body which, alone or jointly with others, determines the purposes and means of the processing of personal data.",
+      "second": "'processor' means a natural or legal person, public authority, agency or other body which processes personal data on behalf of the controller.",
+      "similarity": 0.8563,
+      "opening_connective": "or",
+      "opening_connective_operator": "combinator_or",
+      "flagged": false
+    },
+    {
+      "index": 7,
+      "first": "'processor' means a natural or legal person, public authority, agency or other body which processes personal data on behalf of the controller.",
+      "second": "'consent' of the data subject means any freely given, specific, informed and unambiguous indication of the data subject's wishes by which he or she, by a statement or by a clear affirmative action, signifies agreement to the processing of personal data relating to him or her.",
+      "similarity": 0.673,
+      "opening_connective": "and",
+      "opening_connective_operator": "combinator_and",
+      "flagged": false
+    },
+    {
+      "index": 8,
+      "first": "'consent' of the data subject means any freely given, specific, informed and unambiguous indication of the data subject's wishes by which he or she, by a statement or by a clear affirmative action, signifies agreement to the processing of personal data relating to him or her.",
+      "second": "'personal data breach' means a breach of security leading to the accidental or unlawful destruction, loss, alteration, unauthorised disclosure of, or access to, personal data transmitted, stored or otherwise processed.",
+      "similarity": 0.6715,
+      "opening_connective": "or",
+      "opening_connective_operator": "combinator_or",
+      "flagged": false
+    },
+    {
+      "index": 9,
+      "first": "'personal data breach' means a breach of security leading to the accidental or unlawful destruction, loss, alteration, unauthorised disclosure of, or access to, personal data transmitted, stored or otherwise processed.",
+      "second": "'supervisory authority' means an independent public authority which is established by a Member State pursuant to Article 51.",
+      "similarity": 0.5256,
+      "opening_connective": null,
+      "opening_connective_operator": null,
+      "flagged": true
+    },
+    {
+      "index": 10,
+      "first": "'supervisory authority' means an independent public authority which is established by a Member State pursuant to Article 51.",
+      "second": "Art.",
+      "similarity": 0.4071,
+      "opening_connective": null,
+      "opening_connective_operator": null,
+      "flagged": true
+    },
+    {
+      "index": 11,
+      "first": "Art.",
+      "second": "5 GDPR",
+      "similarity": 0.4362,
+      "opening_connective": null,
+      "opening_connective_operator": null,
+      "flagged": true
+    },
+    {
+      "index": 12,
+      "first": "5 GDPR",
+      "second": "Principles relating to processing of personal data",
+      "similarity": 0.695,
+      "opening_connective": null,
+      "opening_connective_operator": null,
+      "flagged": false
+    },
+    {
+      "index": 13,
+      "first": "Principles relating to processing of personal data",
+      "second": "Personal data shall be processed lawfully, fairly and in a transparent manner in relation to the data subject.",
+      "similarity": 0.7631,
+      "opening_connective": "and",
+      "opening_connective_operator": "combinator_and",
+      "flagged": false
+    },
+    {
+      "index": 14,
+      "first": "Personal data shall be processed lawfully, fairly and in a transparent manner in relation to the data subject.",
+      "second": "Personal data shall be collected for specified, explicit and legitimate purposes and not further processed in a manner that is incompatible with those purposes.",
+      "similarity": 0.8325,
+      "opening_connective": "and",
+      "opening_connective_operator": "combinator_and",
+      "flagged": false
+    },
+    {
+      "index": 15,
+      "first": "Personal data shall be collected for specified, explicit and legitimate purposes and not further processed in a manner that is incompatible with those purposes.",
+      "second": "Personal data shall be adequate, relevant and limited to what is necessary in relation to the purposes for which they are processed.",
+      "similarity": 0.8403,
+      "opening_connective": "and",
+      "opening_connective_operator": "combinator_and",
+      "flagged": false
+    },
+    {
+      "index": 16,
+      "first": "Personal data shall be adequate, relevant and limited to what is necessary in relation to the purposes for which they are processed.",
+      "second": "Personal data shall be accurate and, where necessary, kept up to date; every reasonable step must be taken to ensure that personal data that are inaccurate are erased or rectified without delay.",
+      "similarity": 0.7531,
+      "opening_connective": "and",
+      "opening_connective_operator": "combinator_and",
+      "flagged": false
+    },
+    {
+      "index": 17,
+      "first": "Personal data shall be accurate and, where necessary, kept up to date; every reasonable step must be taken to ensure that personal data that are inaccurate are erased or rectified without delay.",
+      "second": "Personal data shall be kept in a form which permits identification of data subjects for no longer than is necessary for the purposes for which the personal data are processed.",
+      "similarity": 0.7645,
+      "opening_connective": null,
+      "opening_connective_operator": null,
+      "flagged": false
+    },
+    {
+      "index": 18,
+      "first": "Personal data shall be kept in a form which permits identification of data subjects for no longer than is necessary for the purposes for which the personal data are processed.",
+      "second": "Personal data shall be processed in a manner that ensures appropriate security of the personal data, including protection against unauthorised or unlawful processing and against accidental loss, destruction or damage.",
+      "similarity": 0.8341,
+      "opening_connective": "or",
+      "opening_connective_operator": "combinator_or",
+      "flagged": false
+    },
+    {
+      "index": 19,
+      "first": "Personal data shall be processed in a manner that ensures appropriate security of the personal data, including protection against unauthorised or unlawful processing and against accidental loss, destruction or damage.",
+      "second": "The controller shall be responsible for, and be able to demonstrate compliance with, these principles.",
+      "similarity": 0.5693,
+      "opening_connective": "and",
+      "opening_connective_operator": "combinator_and",
+      "flagged": false
+    },
+    {
+      "index": 20,
+      "first": "The controller shall be responsible for, and be able to demonstrate compliance with, these principles.",
+      "second": "Art.",
+      "similarity": 0.4225,
+      "opening_connective": null,
+      "opening_connective_operator": null,
+      "flagged": true
+    },
+    {
+      "index": 21,
+      "first": "Art.",
+      "second": "6 GDPR",
+      "similarity": 0.4135,
+      "opening_connective": null,
+      "opening_connective_operator": null,
+      "flagged": true
+    },
+    {
+      "index": 22,
+      "first": "6 GDPR",
+      "second": "Lawfulness of processing",
+      "similarity": 0.6214,
+      "opening_connective": null,
+      "opening_connective_operator": null,
+      "flagged": true
+    },
+    {
+      "index": 23,
+      "first": "Lawfulness of processing",
+      "second": "Processing shall be lawful only if and to the extent that at least one of the following applies: the data subject has given consent to the processing of his or her personal data for one or more specific purposes; processing is necessary for the performance of a contract to which the data subject is party; processing is necessary for compliance with a legal obligation to which the controller is subject; processing is necessary in order to protect the vital interests of the data subject; processing is necessary for the performance of a task carried out in the public interest; or processing is necessary for the purposes of the legitimate interests pursued by the controller.",
+      "similarity": 0.8589,
+      "opening_connective": "and",
+      "opening_connective_operator": "combinator_and",
+      "flagged": false
+    },
+    {
+      "index": 24,
+      "first": "Processing shall be lawful only if and to the extent that at least one of the following applies: the data subject has given consent to the processing of his or her personal data for one or more specific purposes; processing is necessary for the performance of a contract to which the data subject is party; processing is necessary for compliance with a legal obligation to which the controller is subject; processing is necessary in order to protect the vital interests of the data subject; processing is necessary for the performance of a task carried out in the public interest; or processing is necessary for the purposes of the legitimate interests pursued by the controller.",
+      "second": "Member States may maintain or introduce more specific provisions to adapt the application of the rules of this Regulation.",
+      "similarity": 0.5914,
+      "opening_connective": "or",
+      "opening_connective_operator": "combinator_or",
+      "flagged": false
+    },
+    {
+      "index": 25,
+      "first": "Member States may maintain or introduce more specific provisions to adapt the application of the rules of this Regulation.",
+      "second": "The controller shall, in order to ascertain whether processing for another purpose is compatible with the purpose for which the personal data are initially collected, take into account the link between the purposes, the context in which the personal data have been collected, the nature of the personal data, the possible consequences of the intended further processing, and the existence of appropriate safeguards.",
+      "similarity": 0.6089,
+      "opening_connective": "and",
+      "opening_connective_operator": "combinator_and",
+      "flagged": false
+    },
+    {
+      "index": 26,
+      "first": "The controller shall, in order to ascertain whether processing for another purpose is compatible with the purpose for which the personal data are initially collected, take into account the link between the purposes, the context in which the personal data have been collected, the nature of the personal data, the possible consequences of the intended further processing, and the existence of appropriate safeguards.",
+      "second": "Art.",
+      "similarity": 0.428,
+      "opening_connective": null,
+      "opening_connective_operator": null,
+      "flagged": true
+    },
+    {
+      "index": 27,
+      "first": "Art.",
+      "second": "7 GDPR",
+      "similarity": 0.4254,
+      "opening_connective": null,
+      "opening_connective_operator": null,
+      "flagged": true
+    },
+    {
+      "index": 28,
+      "first": "7 GDPR",
+      "second": "Conditions for consent",
+      "similarity": 0.6045,
+      "opening_connective": null,
+      "opening_connective_operator": null,
+      "flagged": true
+    },
+    {
+      "index": 29,
+      "first": "Conditions for consent",
+      "second": "Where processing is based on consent, the controller shall be able to demonstrate that the data subject has consented to processing of his or her personal data.",
+      "similarity": 0.6959,
+      "opening_connective": "or",
+      "opening_connective_operator": "combinator_or",
+      "flagged": false
+    },
+    {
+      "index": 30,
+      "first": "Where processing is based on consent, the controller shall be able to demonstrate that the data subject has consented to processing of his or her personal data.",
+      "second": "If the data subject's consent is given in the context of a written declaration which also concerns other matters, the request for consent shall be presented in a manner which is clearly distinguishable from the other matters, in an intelligible and easily accessible form, using clear and plain language.",
+      "similarity": 0.7307,
+      "opening_connective": "if",
+      "opening_connective_operator": "condition_positive",
+      "flagged": false
+    },
+    {
+      "index": 31,
+      "first": "If the data subject's consent is given in the context of a written declaration which also concerns other matters, the request for consent shall be presented in a manner which is clearly distinguishable from the other matters, in an intelligible and easily accessible form, using clear and plain language.",
+      "second": "The data subject shall have the right to withdraw his or her consent at any time.",
+      "similarity": 0.7132,
+      "opening_connective": "or",
+      "opening_connective_operator": "combinator_or",
+      "flagged": false
+    },
+    {
+      "index": 32,
+      "first": "The data subject shall have the right to withdraw his or her consent at any time.",
+      "second": "The withdrawal of consent shall not affect the lawfulness of processing based on consent before its withdrawal.",
+      "similarity": 0.7359,
+      "opening_connective": null,
+      "opening_connective_operator": null,
+      "flagged": false
+    },
+    {
+      "index": 33,
+      "first": "The withdrawal of consent shall not affect the lawfulness of processing based on consent before its withdrawal.",
+      "second": "It shall be as easy to withdraw as to give consent.",
+      "similarity": 0.7018,
+      "opening_connective": "as",
+      "opening_connective_operator": "causal",
+      "flagged": false
+    },
+    {
+      "index": 34,
+      "first": "It shall be as easy to withdraw as to give consent.",
+      "second": "When assessing whether consent is freely given, utmost account shall be taken of whether the performance of a contract is conditional on consent to the processing of personal data that is not necessary for the performance of that contract.",
+      "similarity": 0.6241,
+      "opening_connective": null,
+      "opening_connective_operator": null,
+      "flagged": true
+    },
+    {
+      "index": 35,
+      "first": "When assessing whether consent is freely given, utmost account shall be taken of whether the performance of a contract is conditional on consent to the processing of personal data that is not necessary for the performance of that contract.",
+      "second": "Art.",
+      "similarity": 0.4351,
+      "opening_connective": null,
+      "opening_connective_operator": null,
+      "flagged": true
+    },
+    {
+      "index": 36,
+      "first": "Art.",
+      "second": "12 GDPR",
+      "similarity": 0.4213,
+      "opening_connective": null,
+      "opening_connective_operator": null,
+      "flagged": true
+    },
+    {
+      "index": 37,
+      "first": "12 GDPR",
+      "second": "Transparent information, communication and modalities for the exercise of the rights of the data subject",
+      "similarity": 0.7103,
+      "opening_connective": "and",
+      "opening_connective_operator": "combinator_and",
+      "flagged": false
+    },
+    {
+      "index": 38,
+      "first": "Transparent information, communication and modalities for the exercise of the rights of the data subject",
+      "second": "The controller shall take appropriate measures to provide information relating to processing to the data subject in a concise, transparent, intelligible and easily accessible form, using clear and plain language.",
+      "similarity": 0.755,
+      "opening_connective": "and",
+      "opening_connective_operator": "combinator_and",
+      "flagged": false
+    },
+    {
+      "index": 39,
+      "first": "The controller shall take appropriate measures to provide information relating to processing to the data subject in a concise, transparent, intelligible and easily accessible form, using clear and plain language.",
+      "second": "The controller shall facilitate the exercise of data subject rights.",
+      "similarity": 0.8076,
+      "opening_connective": null,
+      "opening_connective_operator": null,
+      "flagged": false
+    },
+    {
+      "index": 40,
+      "first": "The controller shall facilitate the exercise of data subject rights.",
+      "second": "The controller shall not refuse to act on the request of the data subject for exercising his or her rights, unless the controller demonstrates that it is not in a position to identify the data subject.",
+      "similarity": 0.8428,
+      "opening_connective": "or",
+      "opening_connective_operator": "combinator_or",
+      "flagged": false
+    },
+    {
+      "index": 41,
+      "first": "The controller shall not refuse to act on the request of the data subject for exercising his or her rights, unless the controller demonstrates that it is not in a position to identify the data subject.",
+      "second": "The controller shall provide information on action taken on a request to the data subject without undue delay and in any event within one month of receipt of the request.",
+      "similarity": 0.7425,
+      "opening_connective": "and",
+      "opening_connective_operator": "combinator_and",
+      "flagged": false
+    },
+    {
+      "index": 42,
+      "first": "The controller shall provide information on action taken on a request to the data subject without undue delay and in any event within one month of receipt of the request.",
+      "second": "That period may be extended by two further months where necessary, taking into account the complexity and number of the requests.",
+      "similarity": 0.6276,
+      "opening_connective": "and",
+      "opening_connective_operator": "combinator_and",
+      "flagged": false
+    },
+    {
+      "index": 43,
+      "first": "That period may be extended by two further months where necessary, taking into account the complexity and number of the requests.",
+      "second": "If the controller does not take action on the request of the data subject, the controller shall inform the data subject without delay and at the latest within one month of receipt of the request of the reasons for not taking action.",
+      "similarity": 0.6271,
+      "opening_connective": "if",
+      "opening_connective_operator": "condition_positive",
+      "flagged": false
+    },
+    {
+      "index": 44,
+      "first": "If the controller does not take action on the request of the data subject, the controller shall inform the data subject without delay and at the latest within one month of receipt of the request of the reasons for not taking action.",
+      "second": "Information provided to data subjects shall be provided free of charge.",
+      "similarity": 0.6241,
+      "opening_connective": null,
+      "opening_connective_operator": null,
+      "flagged": true
+    },
+    {
+      "index": 45,
+      "first": "Information provided to data subjects shall be provided free of charge.",
+      "second": "Where requests from a data subject are manifestly unfounded or excessive, the controller may charge a reasonable fee or refuse to act on the request.",
+      "similarity": 0.6957,
+      "opening_connective": "or",
+      "opening_connective_operator": "combinator_or",
+      "flagged": false
+    },
+    {
+      "index": 46,
+      "first": "Where requests from a data subject are manifestly unfounded or excessive, the controller may charge a reasonable fee or refuse to act on the request.",
+      "second": "Art.",
+      "similarity": 0.4177,
+      "opening_connective": null,
+      "opening_connective_operator": null,
+      "flagged": true
+    },
+    {
+      "index": 47,
+      "first": "Art.",
+      "second": "17 GDPR",
+      "similarity": 0.4401,
+      "opening_connective": null,
+      "opening_connective_operator": null,
+      "flagged": true
+    },
+    {
+      "index": 48,
+      "first": "17 GDPR",
+      "second": "Right to erasure",
+      "similarity": 0.5989,
+      "opening_connective": null,
+      "opening_connective_operator": null,
+      "flagged": true
+    },
+    {
+      "index": 49,
+      "first": "Right to erasure",
+      "second": "The data subject shall have the right to obtain from the controller the erasure of personal data concerning him or her without undue delay where one of the following grounds applies: the personal data are no longer necessary in relation to the purposes for which they were collected; the data subject withdraws consent on which the processing is based; the data subject objects to the processing; the personal data have been unlawfully processed; or the personal data have to be erased for compliance with a legal obligation.",
+      "similarity": 0.7589,
+      "opening_connective": "or",
+      "opening_connective_operator": "combinator_or",
+      "flagged": false
+    },
+    {
+      "index": 50,
+      "first": "The data subject shall have the right to obtain from the controller the erasure of personal data concerning him or her without undue delay where one of the following grounds applies: the personal data are no longer necessary in relation to the purposes for which they were collected; the data subject withdraws consent on which the processing is based; the data subject objects to the processing; the personal data have been unlawfully processed; or the personal data have to be erased for compliance with a legal obligation.",
+      "second": "Where the controller has made the personal data public and is obliged to erase the personal data, the controller shall take reasonable steps, including technical measures, to inform other controllers which are processing the personal data that the data subject has requested erasure.",
+      "similarity": 0.8353,
+      "opening_connective": "and",
+      "opening_connective_operator": "combinator_and",
+      "flagged": false
+    },
+    {
+      "index": 51,
+      "first": "Where the controller has made the personal data public and is obliged to erase the personal data, the controller shall take reasonable steps, including technical measures, to inform other controllers which are processing the personal data that the data subject has requested erasure.",
+      "second": "The right to erasure shall not apply to the extent that processing is necessary for exercising the right of freedom of expression and information, for compliance with a legal obligation, for reasons of public interest in the area of public health, for archiving purposes in the public interest, or for the establishment, exercise or defence of legal claims.",
+      "similarity": 0.6153,
+      "opening_connective": "and",
+      "opening_connective_operator": "combinator_and",
+      "flagged": false
+    },
+    {
+      "index": 52,
+      "first": "The right to erasure shall not apply to the extent that processing is necessary for exercising the right of freedom of expression and information, for compliance with a legal obligation, for reasons of public interest in the area of public health, for archiving purposes in the public interest, or for the establishment, exercise or defence of legal claims.",
+      "second": "Art.",
+      "similarity": 0.4355,
+      "opening_connective": null,
+      "opening_connective_operator": null,
+      "flagged": true
+    },
+    {
+      "index": 53,
+      "first": "Art.",
+      "second": "33 GDPR",
+      "similarity": 0.4344,
+      "opening_connective": null,
+      "opening_connective_operator": null,
+      "flagged": true
+    },
+    {
+      "index": 54,
+      "first": "33 GDPR",
+      "second": "Notification of a personal data breach to the supervisory authority",
+      "similarity": 0.6723,
+      "opening_connective": null,
+      "opening_connective_operator": null,
+      "flagged": false
+    },
+    {
+      "index": 55,
+      "first": "Notification of a personal data breach to the supervisory authority",
+      "second": "In the case of a personal data breach, the controller shall without undue delay and, where feasible, not later than 72 hours after having become aware of it, notify the personal data breach to the supervisory authority, unless the personal data breach is unlikely to result in a risk to the rights and freedoms of natural persons.",
+      "similarity": 0.8069,
+      "opening_connective": "and",
+      "opening_connective_operator": "combinator_and",
+      "flagged": false
+    },
+    {
+      "index": 56,
+      "first": "In the case of a personal data breach, the controller shall without undue delay and, where feasible, not later than 72 hours after having become aware of it, notify the personal data breach to the supervisory authority, unless the personal data breach is unlikely to result in a risk to the rights and freedoms of natural persons.",
+      "second": "Where the notification to the supervisory authority is not made within 72 hours, it shall be accompanied by reasons for the delay.",
+      "similarity": 0.6921,
+      "opening_connective": null,
+      "opening_connective_operator": null,
+      "flagged": false
+    },
+    {
+      "index": 57,
+      "first": "Where the notification to the supervisory authority is not made within 72 hours, it shall be accompanied by reasons for the delay.",
+      "second": "The processor shall notify the controller without undue delay after becoming aware of a personal data breach.",
+      "similarity": 0.6184,
+      "opening_connective": null,
+      "opening_connective_operator": null,
+      "flagged": true
+    },
+    {
+      "index": 58,
+      "first": "The processor shall notify the controller without undue delay after becoming aware of a personal data breach.",
+      "second": "The notification shall at least describe the nature of the personal data breach including the categories and approximate number of data subjects concerned, communicate the name and contact details of the data protection officer, describe the likely consequences of the personal data breach, and describe the measures taken or proposed to be taken by the controller to address the personal data breach.",
+      "similarity": 0.7199,
+      "opening_connective": "and",
+      "opening_connective_operator": "combinator_and",
+      "flagged": false
+    },
+    {
+      "index": 59,
+      "first": "The notification shall at least describe the nature of the personal data breach including the categories and approximate number of data subjects concerned, communicate the name and contact details of the data protection officer, describe the likely consequences of the personal data breach, and describe the measures taken or proposed to be taken by the controller to address the personal data breach.",
+      "second": "The controller shall document any personal data breaches, comprising the facts relating to the personal data breach, its effects and the remedial action taken.",
+      "similarity": 0.8053,
+      "opening_connective": "and",
+      "opening_connective_operator": "combinator_and",
+      "flagged": false
+    },
+    {
+      "index": 60,
+      "first": "The controller shall document any personal data breaches, comprising the facts relating to the personal data breach, its effects and the remedial action taken.",
+      "second": "That documentation shall enable the supervisory authority to verify compliance with this Article.",
+      "similarity": 0.6309,
+      "opening_connective": null,
+      "opening_connective_operator": null,
+      "flagged": true
+    },
+    {
+      "index": 61,
+      "first": "That documentation shall enable the supervisory authority to verify compliance with this Article.",
+      "second": "Art.",
+      "similarity": 0.4288,
+      "opening_connective": null,
+      "opening_connective_operator": null,
+      "flagged": true
+    },
+    {
+      "index": 62,
+      "first": "Art.",
+      "second": "9 GDPR",
+      "similarity": 0.4366,
+      "opening_connective": null,
+      "opening_connective_operator": null,
+      "flagged": true
+    },
+    {
+      "index": 63,
+      "first": "9 GDPR",
+      "second": "Processing of special categories of personal data",
+      "similarity": 0.6847,
+      "opening_connective": null,
+      "opening_connective_operator": null,
+      "flagged": false
+    },
+    {
+      "index": 64,
+      "first": "Processing of special categories of personal data",
+      "second": "Processing of personal data revealing racial or ethnic origin, political opinions, religious or philosophical beliefs, or trade union membership, and the processing of genetic data, biometric data for the purpose of uniquely identifying a natural person, data concerning health or data concerning a natural person's sex life or sexual orientation shall be prohibited.",
+      "similarity": 0.7337,
+      "opening_connective": "or",
+      "opening_connective_operator": "combinator_or",
+      "flagged": false
+    },
+    {
+      "index": 65,
+      "first": "Processing of personal data revealing racial or ethnic origin, political opinions, religious or philosophical beliefs, or trade union membership, and the processing of genetic data, biometric data for the purpose of uniquely identifying a natural person, data concerning health or data concerning a natural person's sex life or sexual orientation shall be prohibited.",
+      "second": "This prohibition shall not apply if the data subject has given explicit consent to the processing of those personal data for one or more specified purposes.",
+      "similarity": 0.7457,
+      "opening_connective": "if",
+      "opening_connective_operator": "condition_positive",
+      "flagged": false
+    },
+    {
+      "index": 66,
+      "first": "This prohibition shall not apply if the data subject has given explicit consent to the processing of those personal data for one or more specified purposes.",
+      "second": "This prohibition shall not apply if processing is necessary to protect the vital interests of the data subject or of another natural person where the data subject is physically or legally incapable of giving consent.",
+      "similarity": 0.8981,
+      "opening_connective": "if",
+      "opening_connective_operator": "condition_positive",
+      "flagged": false
+    },
+    {
+      "index": 67,
+      "first": "This prohibition shall not apply if processing is necessary to protect the vital interests of the data subject or of another natural person where the data subject is physically or legally incapable of giving consent.",
+      "second": "This prohibition shall not apply if processing is necessary for the establishment, exercise or defence of legal claims or whenever courts are acting in their judicial capacity.",
+      "similarity": 0.797,
+      "opening_connective": "if",
+      "opening_connective_operator": "condition_positive",
+      "flagged": false
+    },
+    {
+      "index": 68,
+      "first": "This prohibition shall not apply if processing is necessary for the establishment, exercise or defence of legal claims or whenever courts are acting in their judicial capacity.",
+      "second": "Member States may maintain or introduce further conditions, including limitations, with regard to the processing of genetic data, biometric data or data concerning health.",
+      "similarity": 0.5578,
+      "opening_connective": "or",
+      "opening_connective_operator": "combinator_or",
+      "flagged": false
+    },
+    {
+      "index": 69,
+      "first": "Member States may maintain or introduce further conditions, including limitations, with regard to the processing of genetic data, biometric data or data concerning health.",
+      "second": "Art.",
+      "similarity": 0.4068,
+      "opening_connective": null,
+      "opening_connective_operator": null,
+      "flagged": true
+    },
+    {
+      "index": 70,
+      "first": "Art.",
+      "second": "13 GDPR",
+      "similarity": 0.4243,
+      "opening_connective": null,
+      "opening_connective_operator": null,
+      "flagged": true
+    },
+    {
+      "index": 71,
+      "first": "13 GDPR",
+      "second": "Information to be provided where personal data are collected from the data subject",
+      "similarity": 0.6613,
+      "opening_connective": null,
+      "opening_connective_operator": null,
+      "flagged": false
+    },
+    {
+      "index": 72,
+      "first": "Information to be provided where personal data are collected from the data subject",
+      "second": "Where personal data relating to a data subject are collected from the data subject, the controller shall, at the time when personal data are obtained, provide the data subject with the identity and the contact details of the controller, the contact details of the data protection officer, the purposes of the processing, and the recipients or categories of recipients of the personal data.",
+      "similarity": 0.8611,
+      "opening_connective": "and",
+      "opening_connective_operator": "combinator_and",
+      "flagged": false
+    },
+    {
+      "index": 73,
+      "first": "Where personal data relating to a data subject are collected from the data subject, the controller shall, at the time when personal data are obtained, provide the data subject with the identity and the contact details of the controller, the contact details of the data protection officer, the purposes of the processing, and the recipients or categories of recipients of the personal data.",
+      "second": "The controller shall also provide the period for which the personal data will be stored, the existence of the right to request access to and rectification or erasure of personal data, the right to lodge a complaint with a supervisory authority, and whether the provision of personal data is a statutory or contractual requirement.",
+      "similarity": 0.7853,
+      "opening_connective": "and",
+      "opening_connective_operator": "combinator_and",
+      "flagged": false
+    },
+    {
+      "index": 74,
+      "first": "The controller shall also provide the period for which the personal data will be stored, the existence of the right to request access to and rectification or erasure of personal data, the right to lodge a complaint with a supervisory authority, and whether the provision of personal data is a statutory or contractual requirement.",
+      "second": "Where the controller intends to further process the personal data for a purpose other than that for which the personal data were collected, the controller shall provide the data subject prior to that further processing with information on that other purpose.",
+      "similarity": 0.7814,
+      "opening_connective": null,
+      "opening_connective_operator": null,
+      "flagged": false
+    },
+    {
+      "index": 75,
+      "first": "Where the controller intends to further process the personal data for a purpose other than that for which the personal data were collected, the controller shall provide the data subject prior to that further processing with information on that other purpose.",
+      "second": "Art.",
+      "similarity": 0.45,
+      "opening_connective": null,
+      "opening_connective_operator": null,
+      "flagged": true
+    },
+    {
+      "index": 76,
+      "first": "Art.",
+      "second": "15 GDPR",
+      "similarity": 0.4356,
+      "opening_connective": null,
+      "opening_connective_operator": null,
+      "flagged": true
+    },
+    {
+      "index": 77,
+      "first": "15 GDPR",
+      "second": "Right of access by the data subject",
+      "similarity": 0.6366,
+      "opening_connective": null,
+      "opening_connective_operator": null,
+      "flagged": true
+    },
+    {
+      "index": 78,
+      "first": "Right of access by the data subject",
+      "second": "The data subject shall have the right to obtain from the controller confirmation as to whether or not personal data concerning him or her are being processed, and, where that is the case, access to the personal data and information about the purposes of the processing, the categories of personal data concerned, and the recipients to whom the personal data have been or will be disclosed.",
+      "similarity": 0.7834,
+      "opening_connective": "or",
+      "opening_connective_operator": "combinator_or",
+      "flagged": false
+    },
+    {
+      "index": 79,
+      "first": "The data subject shall have the right to obtain from the controller confirmation as to whether or not personal data concerning him or her are being processed, and, where that is the case, access to the personal data and information about the purposes of the processing, the categories of personal data concerned, and the recipients to whom the personal data have been or will be disclosed.",
+      "second": "The controller shall provide a copy of the personal data undergoing processing.",
+      "similarity": 0.8621,
+      "opening_connective": null,
+      "opening_connective_operator": null,
+      "flagged": false
+    },
+    {
+      "index": 80,
+      "first": "The controller shall provide a copy of the personal data undergoing processing.",
+      "second": "For any further copies requested by the data subject, the controller may charge a reasonable fee based on administrative costs.",
+      "similarity": 0.7879,
+      "opening_connective": null,
+      "opening_connective_operator": null,
+      "flagged": false
+    },
+    {
+      "index": 81,
+      "first": "For any further copies requested by the data subject, the controller may charge a reasonable fee based on administrative costs.",
+      "second": "Art.",
+      "similarity": 0.4514,
+      "opening_connective": null,
+      "opening_connective_operator": null,
+      "flagged": true
+    },
+    {
+      "index": 82,
+      "first": "Art.",
+      "second": "25 GDPR",
+      "similarity": 0.4166,
+      "opening_connective": null,
+      "opening_connective_operator": null,
+      "flagged": true
+    },
+    {
+      "index": 83,
+      "first": "25 GDPR",
+      "second": "Data protection by design and by default",
+      "similarity": 0.6779,
+      "opening_connective": "and",
+      "opening_connective_operator": "combinator_and",
+      "flagged": false
+    },
+    {
+      "index": 84,
+      "first": "Data protection by design and by default",
+      "second": "The controller shall implement appropriate technical and organisational measures, such as pseudonymisation, which are designed to implement data-protection principles, such as data minimisation, in an effective manner and to integrate the necessary safeguards into the processing.",
+      "similarity": 0.7307,
+      "opening_connective": "and",
+      "opening_connective_operator": "combinator_and",
+      "flagged": false
+    },
+    {
+      "index": 85,
+      "first": "The controller shall implement appropriate technical and organisational measures, such as pseudonymisation, which are designed to implement data-protection principles, such as data minimisation, in an effective manner and to integrate the necessary safeguards into the processing.",
+      "second": "The controller shall implement appropriate technical and organisational measures for ensuring that, by default, only personal data which are necessary for each specific purpose of the processing are processed.",
+      "similarity": 0.8583,
+      "opening_connective": "and",
+      "opening_connective_operator": "combinator_and",
+      "flagged": false
+    },
+    {
+      "index": 86,
+      "first": "The controller shall implement appropriate technical and organisational measures for ensuring that, by default, only personal data which are necessary for each specific purpose of the processing are processed.",
+      "second": "An approved certification mechanism may be used as an element to demonstrate compliance with these requirements.",
+      "similarity": 0.6299,
+      "opening_connective": null,
+      "opening_connective_operator": null,
+      "flagged": true
+    },
+    {
+      "index": 87,
+      "first": "An approved certification mechanism may be used as an element to demonstrate compliance with these requirements.",
+      "second": "Art.",
+      "similarity": 0.4106,
+      "opening_connective": null,
+      "opening_connective_operator": null,
+      "flagged": true
+    },
+    {
+      "index": 88,
+      "first": "Art.",
+      "second": "35 GDPR",
+      "similarity": 0.4305,
+      "opening_connective": null,
+      "opening_connective_operator": null,
+      "flagged": true
+    },
+    {
+      "index": 89,
+      "first": "35 GDPR",
+      "second": "Data protection impact assessment",
+      "similarity": 0.7403,
+      "opening_connective": null,
+      "opening_connective_operator": null,
+      "flagged": false
+    },
+    {
+      "index": 90,
+      "first": "Data protection impact assessment",
+      "second": "Where a type of processing, in particular using new technologies, is likely to result in a high risk to the rights and freedoms of natural persons, the controller shall, prior to the processing, carry out an assessment of the impact of the envisaged processing operations on the protection of personal data.",
+      "similarity": 0.6832,
+      "opening_connective": "and",
+      "opening_connective_operator": "combinator_and",
+      "flagged": false
+    },
+    {
+      "index": 91,
+      "first": "Where a type of processing, in particular using new technologies, is likely to result in a high risk to the rights and freedoms of natural persons, the controller shall, prior to the processing, carry out an assessment of the impact of the envisaged processing operations on the protection of personal data.",
+      "second": "A data protection impact assessment shall in particular be required in the case of a systematic and extensive evaluation of personal aspects relating to natural persons based on automated processing, processing on a large scale of special categories of data, or systematic monitoring of a publicly accessible area on a large scale.",
+      "similarity": 0.8141,
+      "opening_connective": "and",
+      "opening_connective_operator": "combinator_and",
+      "flagged": false
+    },
+    {
+      "index": 92,
+      "first": "A data protection impact assessment shall in particular be required in the case of a systematic and extensive evaluation of personal aspects relating to natural persons based on automated processing, processing on a large scale of special categories of data, or systematic monitoring of a publicly accessible area on a large scale.",
+      "second": "The assessment shall contain a systematic description of the envisaged processing operations, an assessment of the necessity and proportionality of the processing operations, an assessment of the risks to the rights and freedoms of data subjects, and the measures envisaged to address the risks.",
+      "similarity": 0.8272,
+      "opening_connective": "and",
+      "opening_connective_operator": "combinator_and",
+      "flagged": false
+    },
+    {
+      "index": 93,
+      "first": "The assessment shall contain a systematic description of the envisaged processing operations, an assessment of the necessity and proportionality of the processing operations, an assessment of the risks to the rights and freedoms of data subjects, and the measures envisaged to address the risks.",
+      "second": "The controller shall seek the advice of the data protection officer, where designated, when carrying out a data protection impact assessment.",
+      "similarity": 0.6606,
+      "opening_connective": null,
+      "opening_connective_operator": null,
+      "flagged": false
+    },
+    {
+      "index": 94,
+      "first": "The controller shall seek the advice of the data protection officer, where designated, when carrying out a data protection impact assessment.",
+      "second": "Art.",
+      "similarity": 0.3621,
+      "opening_connective": null,
+      "opening_connective_operator": null,
+      "flagged": true
+    },
+    {
+      "index": 95,
+      "first": "Art.",
+      "second": "83 GDPR",
+      "similarity": 0.4347,
+      "opening_connective": null,
+      "opening_connective_operator": null,
+      "flagged": true
+    },
+    {
+      "index": 96,
+      "first": "83 GDPR",
+      "second": "General conditions for imposing administrative fines",
+      "similarity": 0.5419,
+      "opening_connective": null,
+      "opening_connective_operator": null,
+      "flagged": true
+    },
+    {
+      "index": 97,
+      "first": "General conditions for imposing administrative fines",
+      "second": "Each supervisory authority shall ensure that the imposition of administrative fines shall in each individual case be effective, proportionate and dissuasive.",
+      "similarity": 0.769,
+      "opening_connective": "and",
+      "opening_connective_operator": "combinator_and",
+      "flagged": false
+    },
+    {
+      "index": 98,
+      "first": "Each supervisory authority shall ensure that the imposition of administrative fines shall in each individual case be effective, proportionate and dissuasive.",
+      "second": "Infringements of the controller's and processor's basic obligations shall be subject to administrative fines up to 10000000 EUR, or in the case of an undertaking, up to 2 percent of the total worldwide annual turnover of the preceding financial year, whichever is higher.",
+      "similarity": 0.6609,
+      "opening_connective": "and",
+      "opening_connective_operator": "combinator_and",
+      "flagged": false
+    },
+    {
+      "index": 99,
+      "first": "Infringements of the controller's and processor's basic obligations shall be subject to administrative fines up to 10000000 EUR, or in the case of an undertaking, up to 2 percent of the total worldwide annual turnover of the preceding financial year, whichever is higher.",
+      "second": "Infringements of the basic principles for processing, including conditions for consent, and the data subjects' rights shall be subject to administrative fines up to 20000000 EUR, or in the case of an undertaking, up to 4 percent of the total worldwide annual turnover of the preceding financial year, whichever is higher.",
+      "similarity": 0.8606,
+      "opening_connective": "and",
+      "opening_connective_operator": "combinator_and",
+      "flagged": false
+    },
+    {
+      "index": 100,
+      "first": "Infringements of the basic principles for processing, including conditions for consent, and the data subjects' rights shall be subject to administrative fines up to 20000000 EUR, or in the case of an undertaking, up to 4 percent of the total worldwide annual turnover of the preceding financial year, whichever is higher.",
+      "second": "Non-compliance with an order by the supervisory authority shall be subject to administrative fines up to 20000000 EUR, or in the case of an undertaking, up to 4 percent of the total worldwide annual turnover of the preceding financial year, whichever is higher.",
+      "similarity": 0.8611,
+      "opening_connective": "or",
+      "opening_connective_operator": "combinator_or",
+      "flagged": false
+    },
+    {
+      "index": 101,
+      "first": "Non-compliance with an order by the supervisory authority shall be subject to administrative fines up to 20000000 EUR, or in the case of an undertaking, up to 4 percent of the total worldwide annual turnover of the preceding financial year, whichever is higher.",
+      "second": "The exercise by the supervisory authority of its powers under this Article shall be subject to appropriate procedural safeguards, including effective judicial remedy and due process.",
+      "similarity": 0.5857,
+      "opening_connective": "and",
+      "opening_connective_operator": "combinator_and",
+      "flagged": false
+    }
+  ]
+}

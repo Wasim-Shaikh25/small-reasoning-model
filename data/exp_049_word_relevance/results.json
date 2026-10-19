@@ -1,0 +1,39 @@
+{
+  "id": "EXP-049",
+  "title": "Per-word relevance and grammaticality scoring for the ask pipeline",
+  "status": "closed",
+  "goal": "Score each content word in a candidate sentence for (a) relevance to the ask -- token overlap against the ask's content terms -- and (b) local grammatical well-formedness -- subject/verb intact, not a sentence fragment -- before a sentence is allowed into the shortlist that feeds extraction. The first stage of the word-by-word relevance cascade AGENT.md names.",
+  "method": "lab.common.word_relevance.sentence_admission (new) combines score_words (per content word, fuzzy lexical match against the ask's own content words, the same matching lab.common.textutil.coverage already uses) and grammatical_check (spaCy dependency parse: a ROOT verb with its own subject, rejecting a bare fragment). Four hand-built cases isolating each failure mode, plus every sentence of the real GDPR_TEXT fixture (EXP-081) scored for both judgments.",
+  "metrics": {
+    "hand_built_cases": {
+      "n": 4,
+      "correct": 4,
+      "by_label": {
+        "relevant_and_grammatical": true,
+        "grammatical_but_offtopic": true,
+        "relevant_but_fragment": true,
+        "offtopic_fragment": true
+      }
+    },
+    "gdpr_full_document": {
+      "total_sentences": 103,
+      "well_formed": 63,
+      "admitted_for_this_ask": 54
+    },
+    "all_correct": true
+  },
+  "results_prose": "4/4 hand-built cases correct -- all correct. Each isolates one failure mode: relevant+grammatical admits; grammatical-but-off-topic rejects on relevance (0 relevant words); relevant-but-fragment rejects on grammar (no ROOT verb at all, a bare prepositional phrase); off-topic fragment rejects on both. On the real 103-sentence GDPR text: 63 sentences are grammatically complete clauses, 54 of those are also admitted for this specific consent-related ask.",
+  "conclusion": "Both judgments are independently necessary and independently sufficient to reject a bad candidate: relevance alone would admit the off-topic fragment's grammatical cousin had it been well-formed, and grammar alone would admit the on-topic fragment. Combining them (lab.common.word_relevance.sentence_admission) catches both failure modes a naive single-score relevance check (lab.common.relevance.ask_relevance, which only ever measures a whole candidate's aggregate coverage) would not separate. Run against the real GDPR text, the grammaticality check alone already rejects a real fraction of sentences as non-clausal, before relevance is even considered.",
+  "scale_down": "Relevance is lexical/fuzzy-prefix matching (lab.common.textutil's existing style), not a semantic embedding match -- a true paraphrase with no shared word stems would score 0 relevant words here, the same scale-down lab.common.relevance.ask_relevance already carries. Does not yet wire this as an actual gate inside lab.common.qa's extraction loop -- EXP-051 (sentence role-tagging) is the named next step that consumes this score as one of its own input features, not this exploration.",
+  "referenced_files": [
+    "lab/exp_049_word_relevance/run.py",
+    "lab/common/word_relevance.py",
+    "lab/common/textutil.py",
+    "lab/common/rules.py",
+    "lab/exp_081_real_document_pipeline/run.py"
+  ],
+  "follow_ups": [],
+  "elapsed_sec": 12.7583,
+  "peak_rss_mb": 385.89,
+  "models_used": "spaCy en_core_web_sm dependency parser (lab.common.rules._parser, already a dependency, deterministic) for grammaticality. No new model for relevance -- reuses lab.common.textutil's existing lexical matching. No generative model."
+}

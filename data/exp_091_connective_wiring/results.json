@@ -42,7 +42,7 @@
     "Wire CONCESSION's opposite polarity (holds ANYWAY, never blocks) into check_exceptions/forward_chain -- the next connective class with a well-defined semantics, per EXP-090's own follow_ups.",
     "Give the threshold-rule branch in brain.py the same split_exceptions/check_exceptions call the verb-rule branch now has, for a threshold rule whose consequence carries an exception clause."
   ],
-  "elapsed_sec": 99.4797,
-  "peak_rss_mb": 804.38,
+  "elapsed_sec": 340.3125,
+  "peak_rss_mb": 732.84,
   "models_used": "spaCy en_core_web_sm dependency parser via lab.common.connectives.find_connectives (already built in EXP-090, unchanged here) plus the existing, unmodified MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli NLI call inside check_exception. No new model, no generative model."
 }

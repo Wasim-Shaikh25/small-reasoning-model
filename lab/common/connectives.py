@@ -101,6 +101,39 @@ CONNECTIVE_TABLE: dict[str, tuple[str, str]] = {
 
 COMBINATOR_TABLE: dict[str, str] = {"and": Operator.COMBINATOR_AND, "or": Operator.COMBINATOR_OR}
 
+# Sentence-initial discourse ADVERBIALS (EXP-050): a genuinely different
+# structural category from CONNECTIVE_TABLE's intra-sentential
+# subordinators -- "however"/"therefore" don't attach a dependent clause
+# to a head the way "unless" does; they're their sentence's own ROOT's
+# advmod child, checked empirically (lab/exp_050_neighbor_coherence/
+# run.py): "However"/"Therefore"/"Moreover"/"Nevertheless" each surface as
+# dep_=="advmod", head.dep_=="ROOT", token index 0 -- sentence-initial,
+# never mid-clause, which is exactly what rules out the false-positive
+# case of these same words used as ordinary adverbs elsewhere in a
+# sentence ("the ruling was, however, overturned" is NOT detected here --
+# correctly, since that "however" is not sentence-initial and this
+# module does not claim to handle it). Mapped onto the SAME Operator
+# values CONNECTIVE_TABLE already uses (not a new enum) since their
+# logical role is the same discourse relation, just expressed between two
+# full sentences instead of within one: however/nevertheless contrasts
+# (CONCESSION's role); therefore/thus/consequently/hence names a result
+# (CAUSAL's role, never a gate); moreover/furthermore adds on
+# (COMBINATOR_AND's role).
+DISCOURSE_ADVERBIAL_TABLE: dict[str, tuple[str, str]] = {
+    "however": (Operator.CONCESSION, "Comparison.Concession"),
+    "nevertheless": (Operator.CONCESSION, "Comparison.Concession"),
+    "therefore": (Operator.CAUSAL, "Contingency.Cause"),
+    "thus": (Operator.CAUSAL, "Contingency.Cause"),
+    "consequently": (Operator.CAUSAL, "Contingency.Cause"),
+    "hence": (Operator.CAUSAL, "Contingency.Cause"),
+    "moreover": (Operator.COMBINATOR_AND, "Expansion.Conjunction"),
+    "furthermore": (Operator.COMBINATOR_AND, "Expansion.Conjunction"),
+}
+# "in addition" is the same prep+pobj structural shape as "in case"
+# (below), sentence-initial -- a second idiom for the same "in" token,
+# not a new pattern.
+_IN_IDIOMS: dict[str, tuple[str, str] | None] = {"case": None, "addition": (Operator.COMBINATOR_AND, "Expansion.Conjunction")}
+
 _MARK_HEAD_DEPS = {"advcl", "pcomp", "relcl"}
 # "ccomp" (a verb's own reported-speech/that-clause object, e.g. "demonstrate
 # THAT X", "ascertain WHETHER Y") deliberately excluded -- measured directly
@@ -169,6 +202,21 @@ def find_connectives(text: str) -> list[ConnectiveMatch]:
         if tok.i in consumed:
             continue
 
+        if tok.i == 0 and tok.dep_ == "advmod" and tok.head.dep_ == "ROOT" and tok.lemma_.lower() in DISCOURSE_ADVERBIAL_TABLE:
+            info = DISCOURSE_ADVERBIAL_TABLE[tok.lemma_.lower()]
+            consumed.add(tok.i)
+            matches.append(
+                ConnectiveMatch(
+                    phrase=tok.lemma_.lower(),
+                    operator=info[0],
+                    pdtb_class=info[1],
+                    dep_pattern="advmod+ROOT",
+                    anchor_text=tok.text,
+                    clause_text=_span_text(tok.head),
+                )
+            )
+            continue
+
         if tok.dep_ == "mark" and tok.head.dep_ in _MARK_HEAD_DEPS:
             phrase_tokens = [tok]
             if tok.lemma_.lower() == "as" and tok.i >= 2 and doc[tok.i - 1].lemma_.lower() == "long" and doc[tok.i - 2].lemma_.lower() == "as":
@@ -196,15 +244,15 @@ def find_connectives(text: str) -> list[ConnectiveMatch]:
             phrase_tokens = [tok]
             nxt = doc[tok.i + 1] if tok.i + 1 < len(doc) else None
             if tok.lemma_.lower() == "in":
-                if nxt is None or nxt.lemma_.lower() != "case":
-                    continue  # a plain "in" prepositional phrase, not the "in case" idiom
+                if nxt is None or nxt.lemma_.lower() not in _IN_IDIOMS:
+                    continue  # a plain "in" prepositional phrase, not a recognized "in <word>" idiom
                 phrase_tokens.append(nxt)
             elif tok.lemma_.lower() in ("except", "provide") and nxt is not None and nxt.lemma_.lower() == "that":
                 phrase_tokens.append(nxt)
             phrase = " ".join(t.lemma_.lower() for t in phrase_tokens)
             consumed.update(t.i for t in phrase_tokens)
             clause_text, dep_detail = _clause_text_for_prep(tok)
-            info = CONNECTIVE_TABLE.get(phrase) or CONNECTIVE_TABLE.get(tok.lemma_.lower())
+            info = CONNECTIVE_TABLE.get(phrase) or CONNECTIVE_TABLE.get(tok.lemma_.lower()) or (_IN_IDIOMS.get(nxt.lemma_.lower()) if nxt is not None else None)
             matches.append(
                 ConnectiveMatch(
                     phrase=phrase,

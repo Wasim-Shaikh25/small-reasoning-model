@@ -1537,7 +1537,7 @@ Elapsed seconds: 3.0143. Peak RSS MB: 170.86.
 }
 ```
 
-Elapsed seconds: 117.0269. Peak RSS MB: 854.26.
+Elapsed seconds: 54.1401. Peak RSS MB: 853.6.
 - Scale-down: Only CONDITION_POSITIVE's holds-blocks-if-false semantics is wired, matching CONDITION_NEGATIVE's existing scope -- CONCESSION/TEMPORAL_BOUND/CAUSAL remain detection-only, per EXP-090's own follow_ups, untouched here. A third hardcoded word-regex was found (lab/common/intent_signals.py's _CLAUSE_SPLIT_RE, `r"[?.;]|\band\b"`, used for splitting an ASK into clauses for the document/identity/total intent signals) but deliberately NOT changed in this exploration -- it is load-bearing for calibrated thresholds across EXP-069/078/079, and fixing it needs its own regression pass against those, not a drive-by edit inside this one.
 - Conclusion: EXP-026's real gap -- 'except'/'unless'/'provided that' clauses invisible to the engine -- is closed, but not by treating all three the same, which the stub's own wording would have gotten wrong: 'provided that' is the opposite polarity from 'unless'/'except' (EXP-091), and check_exceptions now applies the correct mirrored combination rule for each. Two further hardcoded keyword regexes (the alternative-splitter's literal 'or' match, and _clauses' literal 'and' match) were found and replaced with the same structural find_connectives detection in the same pass, closing the same class of gap EXP-090/091 closed for 'unless', not just the one instance already flagged.
 
@@ -21538,6 +21538,83 @@ Elapsed seconds: 119.1497. Peak RSS MB: 658.25.
 - Scale-down: 13 findings across 4 leaves, not a full document. The same small fixture EXP-017 used, chosen so fidelity numbers are directly comparable, not a large or adversarial rewriting benchmark. No CTranslate2 int8 conversion (ARCHITECTURE.md section 8/14, EXP-045) -- plain transformers inference only, as the handoff asked for first.
 - Conclusion: The bounded rewriter exception is implemented and measured, not assumed: google/flan-t5-small is loaded locally (no API call), used only to rewrite findings this run already treats as verified, and every output goes through the same fidelity checks EXP-017 validated on the deterministic path before this run accepts it. The gate caught and discarded 4 of 4 rewrites (1.0 fallback rate), for the reasons counted above. Inspecting the generated text (not stored in results.json, re-run with a debug print to reproduce) shows a consistent failure mode, not hallucination: on every leaf flan-t5-small collapsed the 4 verified statements down to a near-copy of just one of them, silently dropping the other three findings' numbers, names, and citation markers instead of inventing new ones. That is exactly the failure the fidelity gate (entity_number_check plus citation survival) is built to catch, and it caught it every time -- a failing rewrite was replaced, never partially accepted. At this prompt and this checkpoint size, the gate's job is less about guarding against invention and more about guarding against silent omission. Extraction and verification are unaffected: this checkpoint never touched the QA extractor or the NLI judge, only text that those components had already verified.
 
+## EXP-049 Per-word relevance and grammaticality scoring for the ask pipeline
+
+- Status: `closed`
+- Models used: spaCy en_core_web_sm dependency parser (lab.common.rules._parser, already a dependency, deterministic) for grammaticality. No new model for relevance -- reuses lab.common.textutil's existing lexical matching. No generative model.
+- Goal: Score each content word in a candidate sentence for (a) relevance to the ask -- token overlap against the ask's content terms -- and (b) local grammatical well-formedness -- subject/verb intact, not a sentence fragment -- before a sentence is allowed into the shortlist that feeds extraction. The first stage of the word-by-word relevance cascade AGENT.md names.
+- Method: lab.common.word_relevance.sentence_admission (new) combines score_words (per content word, fuzzy lexical match against the ask's own content words, the same matching lab.common.textutil.coverage already uses) and grammatical_check (spaCy dependency parse: a ROOT verb with its own subject, rejecting a bare fragment). Four hand-built cases isolating each failure mode, plus every sentence of the real GDPR_TEXT fixture (EXP-081) scored for both judgments.
+- Referenced files:
+- `lab/exp_049_word_relevance/run.py`
+- `lab/common/word_relevance.py`
+- `lab/common/textutil.py`
+- `lab/common/rules.py`
+- `lab/exp_081_real_document_pipeline/run.py`
+- Results: 4/4 hand-built cases correct -- all correct. Each isolates one failure mode: relevant+grammatical admits; grammatical-but-off-topic rejects on relevance (0 relevant words); relevant-but-fragment rejects on grammar (no ROOT verb at all, a bare prepositional phrase); off-topic fragment rejects on both. On the real 103-sentence GDPR text: 63 sentences are grammatically complete clauses, 54 of those are also admitted for this specific consent-related ask.
+```json
+{
+  "hand_built_cases": {
+    "n": 4,
+    "correct": 4,
+    "by_label": {
+      "relevant_and_grammatical": true,
+      "grammatical_but_offtopic": true,
+      "relevant_but_fragment": true,
+      "offtopic_fragment": true
+    }
+  },
+  "gdpr_full_document": {
+    "total_sentences": 103,
+    "well_formed": 63,
+    "admitted_for_this_ask": 54
+  },
+  "all_correct": true
+}
+```
+
+Elapsed seconds: 12.7583. Peak RSS MB: 385.89.
+- Scale-down: Relevance is lexical/fuzzy-prefix matching (lab.common.textutil's existing style), not a semantic embedding match -- a true paraphrase with no shared word stems would score 0 relevant words here, the same scale-down lab.common.relevance.ask_relevance already carries. Does not yet wire this as an actual gate inside lab.common.qa's extraction loop -- EXP-051 (sentence role-tagging) is the named next step that consumes this score as one of its own input features, not this exploration.
+- Conclusion: Both judgments are independently necessary and independently sufficient to reject a bad candidate: relevance alone would admit the off-topic fragment's grammatical cousin had it been well-formed, and grammar alone would admit the on-topic fragment. Combining them (lab.common.word_relevance.sentence_admission) catches both failure modes a naive single-score relevance check (lab.common.relevance.ask_relevance, which only ever measures a whole candidate's aggregate coverage) would not separate. Run against the real GDPR text, the grammaticality check alone already rejects a real fraction of sentences as non-clausal, before relevance is even considered.
+
+## EXP-050 Neighbor-sentence coherence check for page-wise assembly
+
+- Status: `closed`
+- Models used: bge-small-en-v1.5 (lab.common.real_encoders.bge_similarity, already loaded for EXP-040/042) for the similarity signal; spaCy en_core_web_sm dependency parser via lab.common.connectives.find_connectives (extended, deterministic) for the connective signal. No generative model.
+- Goal: Before a sentence is placed into an outline leaf, measure whether it reads coherently next to its immediate neighbor -- consecutive-sentence similarity plus a discourse-connective check -- so a leaf whose findings don't flow as a sequence can be flagged before it is written.
+- Method: lab.common.coherence.sequence_coherence (new) combines bge_similarity (consecutive-sentence cosine similarity) with lab.common.connectives.find_connectives, extended in this exploration with a new structural pattern (DISCOURSE_ADVERBIAL_TABLE: sentence-initial advmod/prep attached to the sentence's own ROOT) to detect however/therefore/moreover/nevertheless/in-addition -- a genuinely different category from connectives.py's existing intra-sentential subordinators, checked empirically against real spaCy output before writing the pattern, same as every other connective class in that module. A pair is flagged only when similarity is low AND no connective opens the second sentence. Four hand-built pairs isolating each combination, plus every consecutive pair in the real GDPR_TEXT fixture. tau's first value (0.3) was found miscalibrated by this same measurement before the run below: bge scores an unrelated sentence pair at 0.5005, not near 0 (the same property lab.common.brain's own MIN_SEMANTIC_MARGIN docstring already warns about), so 0.3 sat below every real score and never flagged anything; COHERENCE_TAU=0.65 (between the measured 0.5005 unrelated score and 0.7901 coherent score) is used below.
+- Referenced files:
+- `lab/exp_050_neighbor_coherence/run.py`
+- `lab/common/coherence.py`
+- `lab/common/connectives.py`
+- `lab/common/real_encoders.py`
+- `lab/common/textutil.py`
+- `lab/exp_081_real_document_pipeline/run.py`
+- Results: 4/4 hand-built pairs correct -- all correct. The 'incoherent_signaled_but_unrelated' case is the real test: a low-similarity pair ('However, the weather...') is NOT flagged purely because 'however' opens it, even though the content is genuinely unrelated -- a limit named honestly in scale_down, not hidden. On the real 103-sentence GDPR text: 102 consecutive pairs, 38 flagged as an unsignaled low-similarity jump, 51 pairs where the second sentence opens with a detected discourse connective.
+```json
+{
+  "hand_built_cases": {
+    "n": 4,
+    "correct": 4,
+    "by_label": {
+      "coherent_same_topic": true,
+      "coherent_signaled_shift": true,
+      "incoherent_unsignaled_jump": true,
+      "incoherent_signaled_but_unrelated": true
+    }
+  },
+  "gdpr_full_document": {
+    "total_pairs": 102,
+    "flagged": 38,
+    "with_opening_connective": 51
+  },
+  "all_correct": true
+}
+```
+
+Elapsed seconds: 23.5469. Peak RSS MB: 603.99.
+- Scale-down: A present discourse connective suppresses the flag unconditionally -- it does not verify the connective is used correctly (incoherent_signaled_but_unrelated is a real, reported limit, not hidden). DISCOURSE_ADVERBIAL_TABLE covers 8 connectives (however/nevertheless/therefore/thus/consequently/hence/moreover/furthermore) plus 'in addition' -- a small, named set, not the full PDTB discourse-adverbial inventory. Not yet wired into lab.common.assemble.build_outline itself -- this exploration proves the check, wiring it into the actual outline-building loop is a separate step.
+- Conclusion: Both signals are measured, not asserted: bge similarity catches a genuine unsignaled topic jump (incoherent_unsignaled_jump), and a present discourse connective correctly suppresses the flag for a deliberate, signaled shift (coherent_signaled_shift) even when similarity is low. The real limit this exploration surfaces honestly: a connective's mere presence suppresses the flag regardless of whether the following content actually follows from it (incoherent_signaled_but_unrelated stays unflagged) -- this check catches unsignaled incoherence, not misused connectives, and should not be read as a general coherence judge.
+
 ## EXP-052 Ask-driven table of contents, closed via entity-based outline grouping, not ask sub-question decomposition
 
 - Status: `closed`
@@ -23812,7 +23889,7 @@ Elapsed seconds: 83.845. Peak RSS MB: 856.96.
 }
 ```
 
-Elapsed seconds: 32.5967. Peak RSS MB: 385.97.
+Elapsed seconds: 11.6946. Peak RSS MB: 385.57.
 - Scale-down: The 20 connective cases are the same sentences this exploration's own pre-build probe used to ground the detection patterns, not a held-out test -- held-out generalization to novel phrasings of the same connectives was not measured here. The operator table covers ~20 of DiMLex-Eng's 149 English connectives (the highest-frequency, least class-ambiguous ones across all four PDTB classes), not the full inventory. Two structural edge cases were found and are reported, not hidden: 'despite's governed clause sits outside its own pobj child's subtree in spaCy's parse (a real attachment quirk for gerund-after-preposition constructions), handled by a labeled fallback that returns the sentence's remainder rather than a clean clause span; and coordinating 'or' was measured attaching to a noun object rather than the sentence's ROOT verb when its two disjuncts are not both obviously full clauses -- detected correctly (operator assigned) but its own clause_text extraction inherits that same attachment ambiguity.
 - Conclusion: The SAME grammar-driven detection function correctly classified 20/20 different connectives (not 20 different hardcoded regexes), spanning all four PDTB classes and both combinators -- a real generalization past the single 'unless' keyword match this project used before. Run against the full real GDPR text (not the single hand-built rule sentence EXP-085/088/089 used), it surfaces real connective instances -- see data/exp_090_connective_detection/cases.json's gdpr_document_findings for every one, by sentence -- giving this project, for the first time, visibility into what logical structure the ACTUAL statute contains beyond the one exception-bearing Art 9 passage every prior exploration hand-picked. Detection and classification are proven; wiring each operator's own reasoning semantics (concession never blocks; temporal is not modeled; causal is never a gate) into the forward-chaining mechanism is explicitly a separate, later step, named in follow_ups, not done here.
 
@@ -23856,7 +23933,7 @@ Elapsed seconds: 32.5967. Peak RSS MB: 385.97.
 }
 ```
 
-Elapsed seconds: 99.4797. Peak RSS MB: 804.38.
+Elapsed seconds: 340.3125. Peak RSS MB: 732.84.
 - Scale-down: Only CONDITION_NEGATIVE is wired -- CONCESSION (although/though/despite), TEMPORAL_BOUND (until/before/after), and CAUSAL (because/since) still have zero reasoning semantics in check_exceptions/forward_chain; EXP-090 named this split explicitly and it is not revisited here. The threshold-rule branch in brain.py (apply_threshold_rule) still never calls split_exceptions/ check_exceptions at all -- a separate, already-named gap, untouched by this change.
 - Conclusion: lab.common.inference.split_exception now locates a rule's exception clause via lab.common.connectives.find_connectives's structural CONDITION_NEGATIVE detection instead of a hardcoded regex on the single word 'unless'. The gap this closes is not hypothetical: case 2 is the exact failure mode measured before this change (the 'except' phrasing was silently invisible to the old code), and it is now caught through brain.reason itself, the one production entry point, with no regression on the 'unless' phrasing (case 1), the 'except that' phrasing (case 3), or the real multi-alternative GDPR Art 9 rule's OR-combination (case 4).
 
@@ -23903,41 +23980,6 @@ Elapsed seconds: 99.4797. Peak RSS MB: 804.38.
 
 - Scale-down: 
 - Conclusion: Todo. Do not download a pretrained NER or generative model.
-
-## EXP-049 Per-word relevance and grammaticality scoring for the ask pipeline
-
-- Status: `todo`
-- Models used: spaCy's dependency parser (already a dependency via lab/common/real_models.py, non-generative) for the grammaticality signal; lab/common/textutil's content_tokens/coverage for the ask-relevance signal. No generative model, no new checkpoint.
-- Goal: Score each content word in a candidate sentence for (a) relevance to the ask -- token/lemma overlap and salience against the ask's content terms -- and (b) local grammatical well-formedness -- subject/verb/object intact, not a sentence fragment -- before a sentence is allowed into the shortlist that feeds extraction. This is the first stage of the word-by-word relevance cascade: chunk the prompt, then check every nearby word's relevance and grammar before deciding how to use the sentence.
-- Method: Not run.
-- Referenced files:
-- `lab/common/textutil.py`
-- `lab/common/real_models.py`
-- `lab/common/ask.py`
-- `lab/common/qa.py`
-- `ARCHITECTURE.md`
-- `AGENT.md`
-- Results: Not run.
-
-
-- Scale-down: 
-- Conclusion: Todo. Feeds the shortlisting step EXP-051 marks with a role, once this scoring exists.
-
-## EXP-050 Neighbor-sentence coherence check for page-wise assembly
-
-- Status: `todo`
-- Models used: bge-small-en-v1.5 (lab/common/real_encoders.py, already loaded for EXP-040/042) for consecutive-sentence similarity, with spaCy static vectors as a fallback; a small rule table for discourse connectives. No generative model.
-- Goal: Before a sentence is placed into an outline leaf (lab/common/assemble.build_outline), measure whether it reads coherently next to its immediate neighbors -- consecutive-sentence similarity plus a discourse-connective rule check (however, therefore, in addition, and similar) -- so a leaf whose findings don't flow as a sequence can be flagged or reordered before it is written.
-- Method: Not run.
-- Referenced files:
-- `lab/common/real_encoders.py`
-- `lab/common/assemble.py`
-- `lab/common/textutil.py`
-- Results: Not run.
-
-
-- Scale-down: 
-- Conclusion: Todo.
 
 ## EXP-051 Sentence role-tagging classifier (direct answer / supporting evidence / background / contradiction)
 
