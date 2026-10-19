@@ -466,34 +466,28 @@ TODOS = [
         "scale_down": "",
     },
     {
-        "id": "EXP-087",
-        "title": "Flint-style legal role extraction and deontic modal classification",
+        "id": "EXP-093",
+        "title": "Flint-style Actor/Activation-Condition/Act/Object legal role extraction",
         "status": "todo",
         "goal": (
-            "Replace generic subject/verb/object extraction with legal-SRL's own Actor / Activation Condition "
-            "/ Act / Object roles (the 'Flint framework', measured in a 2025 Artificial Intelligence and Law "
-            "comparison to outperform generic SRL for legal normative text) for rule/fact extraction, and "
-            "classify each extracted act's modal (shall/must/may/shall not) into an explicit deontic operator "
-            "(obligation/permission/prohibition) instead of lab/common/textutil.py's modals()'s current "
-            "'preserve this word unchanged' treatment -- so lab/common/inference.py can eventually tell 'X "
-            "may disclose' apart from 'X shall disclose' when deciding whether and how to chain a "
-            "consequence, not just whether the same word survived a rewrite."
+            "The remaining, still-unscoped half of EXP-087's original goal (deontic modal classification "
+            "closed under EXP-087 itself): replace generic subject/verb/object extraction with legal-SRL's "
+            "own Actor / Activation Condition / Act / Object roles (the 'Flint framework', measured in a 2025 "
+            "Artificial Intelligence and Law comparison to outperform generic SRL for legal normative text)."
         ),
-        "method": "Not run. The largest, least-scoped of these four todos -- likely needs its own narrower sub-exploration for role extraction alone before combining with deontic classification.",
+        "method": "Not run. EXP-087's own conclusion: determine first whether a fine-tuned Flint-role model/dataset is actually downloadable, or whether this must be built heuristically from dependency labels alone, before scoping the rest of this todo.",
         "models_used": (
-            "spaCy dependency parser (role/modal extraction, deterministic) -- no openly-released pretrained "
-            "Flint-role model was confirmed available during this session's research; the 2025 AI&Law paper's "
-            "model/dataset release status was not confirmed. This todo may need to build the role mapping "
-            "heuristically from dependency labels rather than load an existing checkpoint. No generative "
-            "model, under any version of this todo."
+            "spaCy dependency parser (role extraction, deterministic) -- no openly-released pretrained "
+            "Flint-role model was confirmed available during EXP-087's research; the 2025 AI&Law paper's "
+            "model/dataset release status was not confirmed. May need to build the role mapping heuristically "
+            "from dependency labels rather than load an existing checkpoint. No generative model."
         ),
         "referenced_files": [
             "lab/common/rules.py",
-            "lab/common/inference.py",
-            "lab/common/textutil.py",
+            "lab/common/deontic.py",
         ],
         "results_prose": "Not run.",
-        "conclusion": "Todo. Whether a fine-tuned Flint-role model/dataset is actually downloadable, or this must be built heuristically from dependency labels alone, should be determined before scoping the rest of this todo, not after starting to build it.",
+        "conclusion": "Todo. Whether a fine-tuned Flint-role model/dataset is actually downloadable, or this must be built heuristically from dependency labels alone, should be determined before scoping this further, not after starting to build it.",
         "scale_down": "",
     },
     {

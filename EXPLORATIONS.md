@@ -23896,6 +23896,50 @@ Elapsed seconds: 2425.8234. Peak RSS MB: 264.66.
 - Scale-down: One hand-composed rule sentence (parse_conditional_rule's one supported shape), not an automatic parse of GDPR Art 9's own real multi-sentence prohibition+exception wording -- that would need a genuinely different rule-sentence parser (closer to EXP-087's Flint-role scope), a separate and much larger piece of work, not required to prove the OR-combination mechanism itself. The repo's own GDPR_TEXT fixture has 3 listed exceptions for Art 9, not the 4 this project's own prior EXP-085 todo entry claimed (real GDPR Art 9 has a 4th paragraph, covering non-profit-body members' data, that this fixture does not include) -- measured against the fixture that actually exists in this repo, corrected here rather than restated uncritically. Four hand-built cases proving each named combination state, not a broad benchmark across many multi-exception rules.
 - Conclusion: Multi-exception OR-combination works on GDPR Art 9's own real exception text, not just a restated single-exception toy rule: any one of several listed alternatives blocks the consequence when it holds (proven on two different alternatives, not only the first), the consequence still derives -- visibly flagged conditional -- when every alternative is genuinely unresolved, and it derives cleanly once none holds and at least one alternative is confidently ruled out, without needing every alternative individually ruled out first. check_exception's own per-exception judgment is unchanged; check_exceptions only combines its existing three-way verdict across more than one condition, split on ';' so that a single alternative's own internal commas and 'or's (common in real statutory text) are never mistaken for a boundary between alternatives.
 
+## EXP-087 Deontic modal classification (scoped to the well-defined half of this todo; Flint role extraction remains a separate, unscoped follow-up)
+
+- Status: `closed`
+- Models used: spaCy en_core_web_sm dependency parser (lab.common.rules._parser, already a dependency, deterministic). No generative model, no new dependency.
+- Goal: Classify a sentence's own modal (shall/must/may/can/should/will) into an explicit deontic operator (obligation/permission/prohibition), checked structurally against negation -- the part of EXP-087's original goal that is well-defined and buildable now, per that todo's own conclusion that the full Flint Actor/Activation-Condition/Act/Object role extraction 'likely needs its own narrower sub-exploration' and has no confirmed openly-released pretrained model.
+- Method: lab.common.deontic.classify_deontic (new): finds a modal token (dep_=='aux', lemma in a small 6-word table) and checks its governing verb's own children for a 'neg' dependency -- the exact structural pattern spaCy uses for 'shall not'/'may not' (verified empirically before writing the classifier: 'not' attaches to the main verb, never to the modal token itself). Six hand-built cases covering every operator and both negation collapses, plus every sentence of the real GDPR_TEXT fixture (EXP-081), reporting every detected modal and operator honestly.
+- Referenced files:
+- `lab/exp_087_deontic_classification/run.py`
+- `lab/common/deontic.py`
+- `lab/common/rules.py`
+- `lab/common/textutil.py`
+- `lab/exp_081_real_document_pipeline/run.py`
+- Results: 6/6 hand-built cases correct -- all correct. Both negation collapses verified: 'shall not' (negated obligation) and 'may not' (negated permission) both correctly classify as prohibition, not two different things. On the real 103-sentence GDPR text: 56 sentences contain a recognized modal, classified as {'permission': 7, 'obligation': 43, 'prohibition': 6}.
+```json
+{
+  "hand_built_cases": {
+    "n": 6,
+    "correct": 6,
+    "by_label": {
+      "obligation_shall": true,
+      "obligation_must": true,
+      "permission_may": true,
+      "permission_can": true,
+      "prohibition_shall_not": true,
+      "prohibition_may_not": true
+    }
+  },
+  "gdpr_full_document": {
+    "total_sentences": 103,
+    "sentences_with_a_modal": 56,
+    "operator_counts": {
+      "permission": 7,
+      "obligation": 43,
+      "prohibition": 6
+    }
+  },
+  "all_correct": true
+}
+```
+
+Elapsed seconds: 41.465. Peak RSS MB: 385.25.
+- Scale-down: 'should' is mapped to the same 'obligation' bucket as 'shall'/'must' even though it is genuinely weaker (advisory, not strict) -- a real simplification, not a distinction this module makes. DEONTIC_TABLE covers 6 modals, not every English modal auxiliary (e.g. 'ought to', 'is required to' as a periphrastic alternative to 'must' are not recognized at all -- correctly returns operator=None, not guessed). The full Flint Actor/Activation-Condition/Act/Object role framework is NOT attempted -- this module says nothing about who the actor is or what act is governed, only the modal's own polarity.
+- Conclusion: Deontic classification alone -- the well-defined half of this todo, per its own stated uncertainty about the Flint role-extraction half -- works cleanly on both hand-built cases and the real GDPR text: 'shall'/'must' obligations, 'may'/'can' permissions, and both negated forms collapsing correctly to prohibition, all checked structurally against spaCy's own negation attachment, not a literal keyword scan. The full Flint Actor/Act/Object role extraction this todo also named remains genuinely unscoped and is not attempted here, consistent with the todo's own conclusion that it 'likely needs its own narrower sub-exploration' first.
+
 ## EXP-088 Real-world validation of multi-exception scoping against authoritative GDPR Art 9 scenarios, no tuning
 
 - Status: `closed`
@@ -24208,21 +24252,20 @@ Elapsed seconds: 407.3452. Peak RSS MB: 814.32.
 - Scale-down: 
 - Conclusion: Todo, deliberately abandoned rather than retried. The real, demonstrated risk -- a single `pip install` for one todo item took down every module in this repository that imports spacy, recovered only through hands-on dependency surgery -- outweighs this todo's own value next to the coreference gap it targets (the project owner's own motivating Rohan/Arun example does not hit this gap at all, per this todo's own goal). If revisited, do it in an isolated virtual environment or container first, never directly in the working environment every other exploration depends on.
 
-## EXP-087 Flint-style legal role extraction and deontic modal classification
+## EXP-093 Flint-style Actor/Activation-Condition/Act/Object legal role extraction
 
 - Status: `todo`
-- Models used: spaCy dependency parser (role/modal extraction, deterministic) -- no openly-released pretrained Flint-role model was confirmed available during this session's research; the 2025 AI&Law paper's model/dataset release status was not confirmed. This todo may need to build the role mapping heuristically from dependency labels rather than load an existing checkpoint. No generative model, under any version of this todo.
-- Goal: Replace generic subject/verb/object extraction with legal-SRL's own Actor / Activation Condition / Act / Object roles (the 'Flint framework', measured in a 2025 Artificial Intelligence and Law comparison to outperform generic SRL for legal normative text) for rule/fact extraction, and classify each extracted act's modal (shall/must/may/shall not) into an explicit deontic operator (obligation/permission/prohibition) instead of lab/common/textutil.py's modals()'s current 'preserve this word unchanged' treatment -- so lab/common/inference.py can eventually tell 'X may disclose' apart from 'X shall disclose' when deciding whether and how to chain a consequence, not just whether the same word survived a rewrite.
-- Method: Not run. The largest, least-scoped of these four todos -- likely needs its own narrower sub-exploration for role extraction alone before combining with deontic classification.
+- Models used: spaCy dependency parser (role extraction, deterministic) -- no openly-released pretrained Flint-role model was confirmed available during EXP-087's research; the 2025 AI&Law paper's model/dataset release status was not confirmed. May need to build the role mapping heuristically from dependency labels rather than load an existing checkpoint. No generative model.
+- Goal: The remaining, still-unscoped half of EXP-087's original goal (deontic modal classification closed under EXP-087 itself): replace generic subject/verb/object extraction with legal-SRL's own Actor / Activation Condition / Act / Object roles (the 'Flint framework', measured in a 2025 Artificial Intelligence and Law comparison to outperform generic SRL for legal normative text).
+- Method: Not run. EXP-087's own conclusion: determine first whether a fine-tuned Flint-role model/dataset is actually downloadable, or whether this must be built heuristically from dependency labels alone, before scoping the rest of this todo.
 - Referenced files:
 - `lab/common/rules.py`
-- `lab/common/inference.py`
-- `lab/common/textutil.py`
+- `lab/common/deontic.py`
 - Results: Not run.
 
 
 - Scale-down: 
-- Conclusion: Todo. Whether a fine-tuned Flint-role model/dataset is actually downloadable, or this must be built heuristically from dependency labels alone, should be determined before scoping the rest of this todo, not after starting to build it.
+- Conclusion: Todo. Whether a fine-tuned Flint-role model/dataset is actually downloadable, or this must be built heuristically from dependency labels alone, should be determined before scoping this further, not after starting to build it.
 
 ## EXP-092 Replace intent_signals.py's hardcoded _CLAUSE_SPLIT_RE (r"[?.;]|\band\b") with grammar-driven clause splitting
 
