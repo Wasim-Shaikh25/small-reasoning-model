@@ -71,7 +71,7 @@
   "follow_ups": [
     "Measure against a real document's actual shortlisted sentences (not generated-by-construction labels) once a labeled real-document fixture exists, to check whether accuracy holds outside this generated set's narrow phrasing."
   ],
-  "elapsed_sec": 0.0776,
-  "peak_rss_mb": 130.52,
+  "elapsed_sec": 0.0738,
+  "peak_rss_mb": 130.03,
   "models_used": "Multinomial logistic regression (sklearn), the same head shape as EXP-011's next_action_head. Features come from lab.common.nli.judge (lexical, deterministic) and lab.common.relevance.ask_relevance (lexical, deterministic). No generative model, no neural encoder."
 }

@@ -33,7 +33,7 @@
     "lab/exp_081_real_document_pipeline/run.py"
   ],
   "follow_ups": [],
-  "elapsed_sec": 12.7583,
-  "peak_rss_mb": 385.89,
+  "elapsed_sec": 46.336,
+  "peak_rss_mb": 385.41,
   "models_used": "spaCy en_core_web_sm dependency parser (lab.common.rules._parser, already a dependency, deterministic) for grammaticality. No new model for relevance -- reuses lab.common.textutil's existing lexical matching. No generative model."
 }
