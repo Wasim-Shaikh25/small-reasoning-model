@@ -1,0 +1,319 @@
+{
+  "case1_multistep_chain": {
+    "plan": {
+      "stages": [
+        "graph_expand",
+        "rule_application"
+      ],
+      "signals": {
+        "document": {
+          "fires": false,
+          "score": 0.466,
+          "tau": 0.75
+        },
+        "identity": {
+          "fires": false,
+          "score": 0.5706,
+          "tau": 0.5971
+        },
+        "total": {
+          "fires": false,
+          "score": 0.4769,
+          "tau": 0.6084
+        },
+        "rule_application": {
+          "fires": true,
+          "score": 0.7598,
+          "tau": 0.62
+        }
+      },
+      "rule_application_method": "forward_chain"
+    },
+    "result": {
+      "ask": "Does Rohan's conduct comply with the law, or is it allowed?",
+      "decision": "supported",
+      "text": "Rohan killed Arun. [fact-rohan] matches the rule's trigger (kill): If anyone kills another person, it is a crime and he will go to jail. [rule-crime] Therefore, it is a crime and he will go to jail.. Furthermore, Rohan suspend their license.",
+      "citations": [
+        "fact-rohan",
+        "rule-crime"
+      ],
+      "facts": {},
+      "trace": [
+        {
+          "step": "plan",
+          "stages": [
+            "graph_expand",
+            "rule_application"
+          ],
+          "signals": {
+            "document": {
+              "fires": false,
+              "score": 0.466,
+              "tau": 0.75
+            },
+            "identity": {
+              "fires": false,
+              "score": 0.5706,
+              "tau": 0.5971
+            },
+            "total": {
+              "fires": false,
+              "score": 0.4769,
+              "tau": 0.6084
+            },
+            "rule_application": {
+              "fires": true,
+              "score": 0.7598,
+              "tau": 0.62
+            }
+          },
+          "rule_application_method": "forward_chain"
+        },
+        {
+          "step": "analyze_ask",
+          "task_type": "lookup",
+          "subquestions": [
+            "Does Rohan's conduct comply with the law, or is it allowed?"
+          ]
+        },
+        {
+          "step": "intent_signal",
+          "signal": "document",
+          "fires": false,
+          "score": 0.466,
+          "tau": 0.75
+        },
+        {
+          "step": "intent_signal",
+          "signal": "identity",
+          "fires": false,
+          "score": 0.5706,
+          "tau": 0.5971
+        },
+        {
+          "step": "intent_signal",
+          "signal": "total",
+          "fires": false,
+          "score": 0.4769,
+          "tau": 0.6084
+        },
+        {
+          "step": "find_rule",
+          "kind": "verb",
+          "rule": "If anyone kills another person, it is a crime and he will go to jail."
+        },
+        {
+          "step": "apply_rule",
+          "kind": "verb",
+          "result": {
+            "matched": true,
+            "trigger_lemma": "kill",
+            "fact_verb_lemma": "kill",
+            "consequence": "it is a crime and he will go to jail"
+          },
+          "fact_passage": "fact-rohan"
+        },
+        {
+          "step": "check_exception",
+          "result": {
+            "status": "no_exception",
+            "per_exception": []
+          },
+          "polarity": null
+        },
+        {
+          "step": "forward_chain",
+          "extra_facts": [
+            {
+              "subject": "Rohan",
+              "verb_lemma": "suspend",
+              "object": "their license",
+              "raw": "their license will be suspended",
+              "conditional": false,
+              "derivation": {
+                "rule": "If anyone goes to jail, their license will be suspended.",
+                "fact": "he will go to jail",
+                "exception_check": {
+                  "status": "no_exception",
+                  "per_exception": []
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "case2_single_step_regression": {
+    "plan": {
+      "stages": [
+        "rule_application"
+      ],
+      "signals": {
+        "document": {
+          "fires": false,
+          "score": 0.5397,
+          "tau": 0.75
+        },
+        "identity": {
+          "fires": false,
+          "score": 0.5776,
+          "tau": 0.5971
+        },
+        "total": {
+          "fires": false,
+          "score": 0.5,
+          "tau": 0.6084
+        },
+        "rule_application": {
+          "fires": true,
+          "score": 0.6843,
+          "tau": 0.62
+        }
+      },
+      "rule_application_method": "single_step"
+    },
+    "result": {
+      "ask": "Does MedCorp's processing of Aisha's data comply with the rule, or does an exception apply?",
+      "decision": "supported_with_flags",
+      "text": "MedCorp processed Aisha. [fact-1] matches the rule's trigger (process): If anyone processes special category data, it is unlawful, unless the data subject has given explicit consent to the processing of those personal data for one or more specified purposes; processing is necessary to protect the vital interests of the data subject or of another natural person where the data subject is physically or legally incapable of giving consent; or processing is necessary for the establishment, exercise or defence of legal claims or whenever courts are acting in their judicial capacity. [rule-1] Therefore, it is unlawful, unless the data subject has given explicit consent to the processing of those personal data for one or more specified purposes; processing is necessary to protect the vital interests of the data subject or of another natural person where the data subject is physically or legally incapable of giving consent; or processing is necessary for the establishment, exercise or defence of legal claims or whenever courts are acting in their judicial capacity (the rule's exception is unresolved -- not confirmed either way)..",
+      "citations": [
+        "fact-1",
+        "rule-1"
+      ],
+      "facts": {},
+      "trace": [
+        {
+          "step": "plan",
+          "stages": [
+            "rule_application"
+          ],
+          "signals": {
+            "document": {
+              "fires": false,
+              "score": 0.5397,
+              "tau": 0.75
+            },
+            "identity": {
+              "fires": false,
+              "score": 0.5776,
+              "tau": 0.5971
+            },
+            "total": {
+              "fires": false,
+              "score": 0.5,
+              "tau": 0.6084
+            },
+            "rule_application": {
+              "fires": true,
+              "score": 0.6843,
+              "tau": 0.62
+            }
+          },
+          "rule_application_method": "single_step"
+        },
+        {
+          "step": "analyze_ask",
+          "task_type": "lookup",
+          "subquestions": [
+            "Does MedCorp's processing of Aisha's data comply with the rule, or does an exception apply?"
+          ]
+        },
+        {
+          "step": "intent_signal",
+          "signal": "document",
+          "fires": false,
+          "score": 0.5397,
+          "tau": 0.75
+        },
+        {
+          "step": "intent_signal",
+          "signal": "identity",
+          "fires": false,
+          "score": 0.5776,
+          "tau": 0.5971
+        },
+        {
+          "step": "intent_signal",
+          "signal": "total",
+          "fires": false,
+          "score": 0.5,
+          "tau": 0.6084
+        },
+        {
+          "step": "find_rule",
+          "kind": "verb",
+          "rule": "If anyone processes special category data, it is unlawful, unless the data subject has given explicit consent to the processing of those personal data for one or more specified purposes; processing is necessary to protect the vital interests of the data subject or of another natural person where the data subject is physically or legally incapable of giving consent; or processing is necessary for the establishment, exercise or defence of legal claims or whenever courts are acting in their judicial capacity."
+        },
+        {
+          "step": "apply_rule",
+          "kind": "verb",
+          "result": {
+            "matched": true,
+            "trigger_lemma": "process",
+            "fact_verb_lemma": "process",
+            "consequence": "it is unlawful, unless the data subject has given explicit consent to the processing of those personal data for one or more specified purposes; processing is necessary to protect the vital interests of the data subject or of another natural person where the data subject is physically or legally incapable of giving consent; or processing is necessary for the establishment, exercise or defence of legal claims or whenever courts are acting in their judicial capacity"
+          },
+          "fact_passage": "fact-1"
+        },
+        {
+          "step": "check_exception",
+          "result": {
+            "status": "unknown",
+            "per_exception": [
+              {
+                "status": "unknown",
+                "best_entail": 0.0,
+                "best_contradict": 0.0,
+                "best_context": null
+              },
+              {
+                "status": "unknown",
+                "best_entail": 0.0,
+                "best_contradict": 0.0,
+                "best_context": null
+              },
+              {
+                "status": "unknown",
+                "best_entail": 0.0,
+                "best_contradict": 0.0,
+                "best_context": null
+              }
+            ]
+          },
+          "polarity": "negative"
+        }
+      ]
+    }
+  },
+  "case3_lookup_no_rule": {
+    "plan": {
+      "stages": [
+        "lookup_fallback"
+      ],
+      "signals": {
+        "document": {
+          "fires": false,
+          "score": 0.5282,
+          "tau": 0.75
+        },
+        "identity": {
+          "fires": false,
+          "score": 0.5783,
+          "tau": 0.5971
+        },
+        "total": {
+          "fires": false,
+          "score": 0.5495,
+          "tau": 0.6084
+        },
+        "rule_application": {
+          "fires": false,
+          "score": 0.6039,
+          "tau": 0.62
+        }
+      },
+      "rule_application_method": null
+    }
+  }
+}

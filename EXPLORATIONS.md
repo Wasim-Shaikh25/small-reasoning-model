@@ -1537,7 +1537,7 @@ Elapsed seconds: 3.0143. Peak RSS MB: 170.86.
 }
 ```
 
-Elapsed seconds: 133.8243. Peak RSS MB: 852.61.
+Elapsed seconds: 117.0269. Peak RSS MB: 854.26.
 - Scale-down: Only CONDITION_POSITIVE's holds-blocks-if-false semantics is wired, matching CONDITION_NEGATIVE's existing scope -- CONCESSION/TEMPORAL_BOUND/CAUSAL remain detection-only, per EXP-090's own follow_ups, untouched here. A third hardcoded word-regex was found (lab/common/intent_signals.py's _CLAUSE_SPLIT_RE, `r"[?.;]|\band\b"`, used for splitting an ASK into clauses for the document/identity/total intent signals) but deliberately NOT changed in this exploration -- it is load-bearing for calibrated thresholds across EXP-069/078/079, and fixing it needs its own regression pass against those, not a drive-by edit inside this one.
 - Conclusion: EXP-026's real gap -- 'except'/'unless'/'provided that' clauses invisible to the engine -- is closed, but not by treating all three the same, which the stub's own wording would have gotten wrong: 'provided that' is the opposite polarity from 'unless'/'except' (EXP-091), and check_exceptions now applies the correct mirrored combination rule for each. Two further hardcoded keyword regexes (the alternative-splitter's literal 'or' match, and _clauses' literal 'and' match) were found and replaced with the same structural find_connectives detection in the same pass, closing the same class of gap EXP-090/091 closed for 'unless', not just the one instance already flagged.
 
@@ -23179,7 +23179,7 @@ Elapsed seconds: 54.321. Peak RSS MB: 774.41.
 }
 ```
 
-Elapsed seconds: 158.6865. Peak RSS MB: 739.25.
+Elapsed seconds: 23.7. Peak RSS MB: 879.23.
 - Scale-down: 7 asks total -- enough to prove the wiring and its most important regression boundary, not an exhaustive sweep of every existing exploration's asks.
 - Conclusion: The long-form signal is now reachable through the same single entry point (lab.common.brain.reason) every other capability in this repo goes through, not a standalone function -- and, more importantly, wiring it in did not disturb any existing short-answer behavior: every lookup ask already measured by an earlier exploration still resolves exactly as it did before this signal existed. EXP-052/053's named gaps are closed end to end, not just as isolated modules.
 
@@ -23474,9 +23474,60 @@ Elapsed seconds: 54.0473. Peak RSS MB: 890.23.
 }
 ```
 
-Elapsed seconds: 164.5735. Peak RSS MB: 631.11.
+Elapsed seconds: 136.5676. Peak RSS MB: 723.82.
 - Scale-down: Five hand-built cases proving each named mechanism works, not a broad benchmark across many rules or a real multi-exception statute (GDPR Art 9's four exceptions) -- that combination is a named follow-up, not covered here.
 - Conclusion: Multi-step symbolic inference -- converting a stated rule and a stated fact into predicate form, unifying the trigger, binding the consequence's subject to the actual named entity, and chaining a derived fact into further rules until nothing new follows -- works as a real mechanism, not just on the single-hop case this project already had (EXP-057/059/061), but genuinely across multiple steps. The exception handling is the part that matters most for trust: an exception whose truth the given context never actually states is never silently treated as false, only as unresolved and visibly flagged, and a rule with no stated exception at all is never confused with one whose exception just happens to not apply here. Every step runs through spaCy's dependency parser or the real DeBERTa-v3 NLI classifier -- no generative model anywhere in the conversion from language to rule/fact form, the project owner's own explicit requirement, so nothing in this chain can hallucinate a predicate that was never actually stated.
+
+## EXP-084 Plan-then-execute layer for brain.reason, with a genuinely second branch (forward_chain) proving it
+
+- Status: `closed`
+- Models used: bge-small-en-v1.5 (lab.common.real_encoders.bge_embed) for wants_rule_application, the same embedding-similarity mechanism intent_signals.py already uses for wants_document/wants_identity/wants_total. spaCy dependency parser (unchanged) for forward_chain/instantiate_consequence. No generative model -- the plan is always a selection among STAGE_REGISTRY's fixed names, never freely generated text.
+- Goal: Separate planning from execution in lab.common.brain: compute an explicit, inspectable list of pipeline stage names, chosen from a fixed registry, based on which closed-set signals fire -- before any stage executes -- and prove it with a second, genuinely different branch (wants_rule_application -> forward_chain), not just wants_document's existing single path.
+- Method: lab.common.brain.plan_stages (new) computes the full stage list from the same signal functions reason() itself needs (document/identity/total via lab.common.intent_signals, plus a new wants_rule_application), logged as the first entry in reason()'s trace. When wants_rule_application fires AND more than one verb-trigger rule exists among the given passages, the rule-application branch additively calls lab.common.inference.forward_chain for genuine multi-step derivation; otherwise (the entire existing regression suite) it keeps today's exact single-step behavior. Three cases through reason()/plan_stages directly, plus a full rerun of the existing EXP-083/085/088/089/091/026/079 regression suite to confirm zero behavior change.
+- Referenced files:
+- `lab/exp_084_plan_then_execute/run.py`
+- `lab/common/brain.py`
+- `lab/common/intent_signals.py`
+- `lab/common/inference.py`
+- `lab/exp_083_symbolic_inference/run.py`
+- `lab/exp_085_multi_exception_scoping/run.py`
+- `lab/exp_089_brain_integration/run.py`
+- `data/exp_089_brain_integration/results.json`
+- Results: Case 1 (Rohan/Arun, 2 rules -- kill->crime+jail, jail->license_suspended): plan named stages=['graph_expand', 'rule_application'], method='forward_chain' -- method_correct=True. reason()'s own text: "Rohan killed Arun. [fact-rohan] matches the rule's trigger (kill): If anyone kills another person, it is a crime and he will go to jail. [rule-crime] Therefore, it is a crime and he will go to jail.. Furthermore, Rohan suspend their license." -- the second-hop 'license suspended' consequence is present (chain_correct=True), derived through reason() itself, not a standalone forward_chain() call. Case 2 (EXP-089's own single-rule GDPR fixture): plan named method='single_step' -- method_correct=True; reason()'s text is unchanged from EXP-089's own already-recorded result, no 'Furthermore' sentence appended (unchanged=True). Case 3 (plain lookup, no rule in the passages): plan named stages=['lookup_fallback'] -- correct=True, confirming rule_application never appears when no rule actually exists.
+```json
+{
+  "case1_multistep_chain": {
+    "plan_stages": [
+      "graph_expand",
+      "rule_application"
+    ],
+    "method": "forward_chain",
+    "text": "Rohan killed Arun. [fact-rohan] matches the rule's trigger (kill): If anyone kills another person, it is a crime and he will go to jail. [rule-crime] Therefore, it is a crime and he will go to jail.. Furthermore, Rohan suspend their license.",
+    "method_correct": true,
+    "chain_correct": true
+  },
+  "case2_single_step_regression": {
+    "plan_stages": [
+      "rule_application"
+    ],
+    "method": "single_step",
+    "text": "MedCorp processed Aisha. [fact-1] matches the rule's trigger (process): If anyone processes special category data, it is unlawful, unless the data subject has given explicit consent to the processing of those personal data for one or more specified purposes; processing is necessary to protect the vital interests of the data subject or of another natural person where the data subject is physically or legally incapable of giving consent; or processing is necessary for the establishment, exercise or defence of legal claims or whenever courts are acting in their judicial capacity. [rule-1] Therefore, it is unlawful, unless the data subject has given explicit consent to the processing of those personal data for one or more specified purposes; processing is necessary to protect the vital interests of the data subject or of another natural person where the data subject is physically or legally incapable of giving consent; or processing is necessary for the establishment, exercise or defence of legal claims or whenever courts are acting in their judicial capacity (the rule's exception is unresolved -- not confirmed either way)..",
+    "method_correct": true,
+    "unchanged": true
+  },
+  "case3_lookup_no_rule": {
+    "plan_stages": [
+      "lookup_fallback"
+    ],
+    "correct": true
+  },
+  "all_correct": true
+}
+```
+
+Elapsed seconds: 31.3657. Peak RSS MB: 592.63.
+- Scale-down: The plan's stage names describe WHAT will run, not a full execution DAG with dependencies -- reason()'s actual control flow (disambiguate before identity/total/rule, document exclusive) is still hardcoded in reason() itself, not driven by iterating over the plan's stage list. Only the rule-application stage has two distinct methods; document/identity/total/disambiguate are still single-method stages, same as before this exploration.
+- Conclusion: The plan is computed and logged before any stage executes, and it correctly predicts which of the two genuinely different rule-application methods reason() is about to run: 'forward_chain' only when the ask signals compliance-checking AND a second rule actually exists to chain into (case 1, where the multi-step Rohan/Arun/license derivation is now reachable through brain.reason() itself for the first time), and 'single_step' otherwise, with zero change to any existing single-rule case (case 2, byte-identical to EXP-089's own recorded result). Case 3 confirms the plan doesn't name a stage that doesn't apply.
 
 ## EXP-085 Multi-exception (OR-combined) rule scoping, measured on GDPR Art 9's actual three exceptions
 
@@ -23526,7 +23577,7 @@ Elapsed seconds: 164.5735. Peak RSS MB: 631.11.
 }
 ```
 
-Elapsed seconds: 619.8212. Peak RSS MB: 683.29.
+Elapsed seconds: 169.2711. Peak RSS MB: 738.75.
 - Scale-down: One hand-composed rule sentence (parse_conditional_rule's one supported shape), not an automatic parse of GDPR Art 9's own real multi-sentence prohibition+exception wording -- that would need a genuinely different rule-sentence parser (closer to EXP-087's Flint-role scope), a separate and much larger piece of work, not required to prove the OR-combination mechanism itself. The repo's own GDPR_TEXT fixture has 3 listed exceptions for Art 9, not the 4 this project's own prior EXP-085 todo entry claimed (real GDPR Art 9 has a 4th paragraph, covering non-profit-body members' data, that this fixture does not include) -- measured against the fixture that actually exists in this repo, corrected here rather than restated uncritically. Four hand-built cases proving each named combination state, not a broad benchmark across many multi-exception rules.
 - Conclusion: Multi-exception OR-combination works on GDPR Art 9's own real exception text, not just a restated single-exception toy rule: any one of several listed alternatives blocks the consequence when it holds (proven on two different alternatives, not only the first), the consequence still derives -- visibly flagged conditional -- when every alternative is genuinely unresolved, and it derives cleanly once none holds and at least one alternative is confidently ruled out, without needing every alternative individually ruled out first. check_exception's own per-exception judgment is unchanged; check_exceptions only combines its existing three-way verdict across more than one condition, split on ';' so that a single alternative's own internal commas and 'or's (common in real statutory text) are never mistaken for a boundary between alternatives.
 
@@ -23636,7 +23687,7 @@ Elapsed seconds: 619.8212. Peak RSS MB: 683.29.
 }
 ```
 
-Elapsed seconds: 1201.8657. Peak RSS MB: 739.8.
+Elapsed seconds: 282.4764. Peak RSS MB: 740.23.
 - Scale-down: Four real scenarios (three ICO worked examples plus one enforcement decision), not a broad corpus of case law -- a real validation of the mechanism's entailment gate against authoritative, unmodified source language, not a comprehensive legal benchmark. Each ICO scenario is restated as a short declarative summary close to the source's own wording rather than quoted at full length -- reproducing the full guidance page verbatim was neither necessary nor appropriate to copy at length.
 - Conclusion: On real worked examples fetched from the UK ICO's own published guidance and a real AEPD enforcement decision -- never reworded to mirror GDPR Art 9's own clause phrasing, never tuned against the model's score -- 3/4 cases matched the expected real-world conclusion. At least one real-world scenario did not match the expected conclusion -- see metrics.per_exception for the exact entailment/contradiction scores measured. This is the honest finding EXP-085's hand-tuned validation could not surface: check_exception's entailment gate may not generalize past text engineered to closely mirror the exception clause's own wording, which is exactly the brittleness EXP-085's own follow-ups already flagged as a real risk on natural (not hand-tuned) context text.
 
@@ -23674,7 +23725,7 @@ Elapsed seconds: 1201.8657. Peak RSS MB: 739.8.
 }
 ```
 
-Elapsed seconds: 340.2117. Peak RSS MB: 856.3.
+Elapsed seconds: 83.845. Peak RSS MB: 856.96.
 - Scale-down: Only the verb-trigger rule shape (parse_conditional_rule) is wired -- the threshold-rule branch (parse_threshold_rule/apply_threshold_rule) does not go through split_exceptions/check_exceptions at all and is unaffected by this exploration, a real and separate gap if a threshold rule's own consequence ever carries an 'unless' clause. Three hand-built cases through reason(), not a broad test across many rule/passage combinations.
 - Conclusion: The exception-aware rule-application path is now reachable from lab.common.brain.reason itself, not only from a standalone forward_chain call: an unresolved exception derives the consequence but flags the overall decision (supported_with_flags), a confirmed exception suppresses the consequence entirely and returns an explanatory non-applicability line instead of asserting it, and a confidently ruled-out exception derives cleanly with no flag -- all three reachable by passing plain passages through the one entry point every other capability already goes through, with no hand-assembled call sequence.
 
@@ -23805,7 +23856,7 @@ Elapsed seconds: 32.5967. Peak RSS MB: 385.97.
 }
 ```
 
-Elapsed seconds: 175.2834. Peak RSS MB: 856.15.
+Elapsed seconds: 99.4797. Peak RSS MB: 804.38.
 - Scale-down: Only CONDITION_NEGATIVE is wired -- CONCESSION (although/though/despite), TEMPORAL_BOUND (until/before/after), and CAUSAL (because/since) still have zero reasoning semantics in check_exceptions/forward_chain; EXP-090 named this split explicitly and it is not revisited here. The threshold-rule branch in brain.py (apply_threshold_rule) still never calls split_exceptions/ check_exceptions at all -- a separate, already-named gap, untouched by this change.
 - Conclusion: lab.common.inference.split_exception now locates a rule's exception clause via lab.common.connectives.find_connectives's structural CONDITION_NEGATIVE detection instead of a hardcoded regex on the single word 'unless'. The gap this closes is not hypothetical: case 2 is the exact failure mode measured before this change (the 'except' phrasing was silently invisible to the old code), and it is now caught through brain.reason itself, the one production entry point, with no regression on the 'unless' phrasing (case 1), the 'except that' phrasing (case 3), or the real multi-alternative GDPR Art 9 rule's OR-combination (case 4).
 
@@ -23904,24 +23955,6 @@ Elapsed seconds: 175.2834. Peak RSS MB: 856.15.
 
 - Scale-down: 
 - Conclusion: Todo. Depends on EXP-049's relevance score as one input feature.
-
-## EXP-084 Plan-then-execute layer for brain.reason
-
-- Status: `todo`
-- Models used: bge-small-en-v1.5 (lab/common/real_encoders.py), the same embedding-similarity mechanism lab/common/intent_signals.py already uses for wants_document/wants_identity/wants_total. The plan itself is always a selection among a fixed set of named stages, never a freely generated plan -- this introduces no new generative or hallucination risk beyond what wants_document already carries. No generative model.
-- Goal: Separate planning from execution in lab/common/brain.py: compute an explicit, inspectable list of pipeline stage names -- chosen from a fixed, named registry, never freely generated text -- based on which closed-set signals fire (wants_document, wants_identity, wants_total, and a new wants_rule_application feeding lab/common/inference.py), before any stage actually executes. The project owner's own proposal, verbatim: 'give one simple prompt and system have to perform multistep work so it should first create full plan and than execute that... it will keep it in control.' A single real branch (wants_document's existing path) is not enough to prove this generalizes, so a second, genuinely different branch (wants_rule_application -> forward_chain) must exist in this same step, not deferred to a later todo.
-- Method: Not run.
-- Referenced files:
-- `lab/common/brain.py`
-- `lab/common/intent_signals.py`
-- `lab/common/inference.py`
-- `lab/exp_079_longform_signal/run.py`
-- `lab/exp_083_symbolic_inference/run.py`
-- Results: Not run.
-
-
-- Scale-down: 
-- Conclusion: Todo. Needs its own wants_rule_application signal built in this same step (not borrowed from elsewhere) to have two genuinely different plan branches to prove the pattern against.
 
 ## EXP-086 Cross-sentence coreference resolution (fastcoref) feeding fact/rule extraction
 

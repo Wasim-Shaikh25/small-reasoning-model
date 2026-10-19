@@ -1,0 +1,54 @@
+{
+  "id": "EXP-084",
+  "title": "Plan-then-execute layer for brain.reason, with a genuinely second branch (forward_chain) proving it",
+  "status": "closed",
+  "goal": "Separate planning from execution in lab.common.brain: compute an explicit, inspectable list of pipeline stage names, chosen from a fixed registry, based on which closed-set signals fire -- before any stage executes -- and prove it with a second, genuinely different branch (wants_rule_application -> forward_chain), not just wants_document's existing single path.",
+  "method": "lab.common.brain.plan_stages (new) computes the full stage list from the same signal functions reason() itself needs (document/identity/total via lab.common.intent_signals, plus a new wants_rule_application), logged as the first entry in reason()'s trace. When wants_rule_application fires AND more than one verb-trigger rule exists among the given passages, the rule-application branch additively calls lab.common.inference.forward_chain for genuine multi-step derivation; otherwise (the entire existing regression suite) it keeps today's exact single-step behavior. Three cases through reason()/plan_stages directly, plus a full rerun of the existing EXP-083/085/088/089/091/026/079 regression suite to confirm zero behavior change.",
+  "metrics": {
+    "case1_multistep_chain": {
+      "plan_stages": [
+        "graph_expand",
+        "rule_application"
+      ],
+      "method": "forward_chain",
+      "text": "Rohan killed Arun. [fact-rohan] matches the rule's trigger (kill): If anyone kills another person, it is a crime and he will go to jail. [rule-crime] Therefore, it is a crime and he will go to jail.. Furthermore, Rohan suspend their license.",
+      "method_correct": true,
+      "chain_correct": true
+    },
+    "case2_single_step_regression": {
+      "plan_stages": [
+        "rule_application"
+      ],
+      "method": "single_step",
+      "text": "MedCorp processed Aisha. [fact-1] matches the rule's trigger (process): If anyone processes special category data, it is unlawful, unless the data subject has given explicit consent to the processing of those personal data for one or more specified purposes; processing is necessary to protect the vital interests of the data subject or of another natural person where the data subject is physically or legally incapable of giving consent; or processing is necessary for the establishment, exercise or defence of legal claims or whenever courts are acting in their judicial capacity. [rule-1] Therefore, it is unlawful, unless the data subject has given explicit consent to the processing of those personal data for one or more specified purposes; processing is necessary to protect the vital interests of the data subject or of another natural person where the data subject is physically or legally incapable of giving consent; or processing is necessary for the establishment, exercise or defence of legal claims or whenever courts are acting in their judicial capacity (the rule's exception is unresolved -- not confirmed either way)..",
+      "method_correct": true,
+      "unchanged": true
+    },
+    "case3_lookup_no_rule": {
+      "plan_stages": [
+        "lookup_fallback"
+      ],
+      "correct": true
+    },
+    "all_correct": true
+  },
+  "results_prose": "Case 1 (Rohan/Arun, 2 rules -- kill->crime+jail, jail->license_suspended): plan named stages=['graph_expand', 'rule_application'], method='forward_chain' -- method_correct=True. reason()'s own text: \"Rohan killed Arun. [fact-rohan] matches the rule's trigger (kill): If anyone kills another person, it is a crime and he will go to jail. [rule-crime] Therefore, it is a crime and he will go to jail.. Furthermore, Rohan suspend their license.\" -- the second-hop 'license suspended' consequence is present (chain_correct=True), derived through reason() itself, not a standalone forward_chain() call. Case 2 (EXP-089's own single-rule GDPR fixture): plan named method='single_step' -- method_correct=True; reason()'s text is unchanged from EXP-089's own already-recorded result, no 'Furthermore' sentence appended (unchanged=True). Case 3 (plain lookup, no rule in the passages): plan named stages=['lookup_fallback'] -- correct=True, confirming rule_application never appears when no rule actually exists.",
+  "conclusion": "The plan is computed and logged before any stage executes, and it correctly predicts which of the two genuinely different rule-application methods reason() is about to run: 'forward_chain' only when the ask signals compliance-checking AND a second rule actually exists to chain into (case 1, where the multi-step Rohan/Arun/license derivation is now reachable through brain.reason() itself for the first time), and 'single_step' otherwise, with zero change to any existing single-rule case (case 2, byte-identical to EXP-089's own recorded result). Case 3 confirms the plan doesn't name a stage that doesn't apply.",
+  "scale_down": "The plan's stage names describe WHAT will run, not a full execution DAG with dependencies -- reason()'s actual control flow (disambiguate before identity/total/rule, document exclusive) is still hardcoded in reason() itself, not driven by iterating over the plan's stage list. Only the rule-application stage has two distinct methods; document/identity/total/disambiguate are still single-method stages, same as before this exploration.",
+  "referenced_files": [
+    "lab/exp_084_plan_then_execute/run.py",
+    "lab/common/brain.py",
+    "lab/common/intent_signals.py",
+    "lab/common/inference.py",
+    "lab/exp_083_symbolic_inference/run.py",
+    "lab/exp_085_multi_exception_scoping/run.py",
+    "lab/exp_089_brain_integration/run.py",
+    "data/exp_089_brain_integration/results.json"
+  ],
+  "follow_ups": [
+    "reason()'s control flow could be refactored to literally iterate over stage_plan['stages'] and dispatch to a per-stage function, rather than the plan being computed and logged but the execution order still hardcoded separately -- not done here to avoid rewriting already-measured, passing code paths in the same step that introduced the plan."
+  ],
+  "elapsed_sec": 31.3657,
+  "peak_rss_mb": 592.63,
+  "models_used": "bge-small-en-v1.5 (lab.common.real_encoders.bge_embed) for wants_rule_application, the same embedding-similarity mechanism intent_signals.py already uses for wants_document/wants_identity/wants_total. spaCy dependency parser (unchanged) for forward_chain/instantiate_consequence. No generative model -- the plan is always a selection among STAGE_REGISTRY's fixed names, never freely generated text."
+}

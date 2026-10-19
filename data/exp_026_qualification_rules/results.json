@@ -40,7 +40,7 @@
   "follow_ups": [
     "lab/common/intent_signals.py's _CLAUSE_SPLIT_RE has the identical hardcoded `\\band\\b` pattern -- a real, named instance of the same gap, left open because changing it requires reverifying EXP-069's calibrated MIN_DENSE_SCORE/MIN_SEMANTIC_MARGIN thresholds and EXP-078/079's document-signal scores, not just the split logic itself."
   ],
-  "elapsed_sec": 133.8243,
-  "peak_rss_mb": 852.61,
+  "elapsed_sec": 117.0269,
+  "peak_rss_mb": 854.26,
   "models_used": "spaCy en_core_web_sm dependency parser via lab.common.connectives.find_connectives (already built in EXP-090, unchanged here) plus the existing, unmodified MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli NLI call inside check_exception. No new model, no generative model."
 }

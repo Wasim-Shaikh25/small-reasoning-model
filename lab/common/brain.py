@@ -81,8 +81,8 @@ from lab.common.calc import sum_amounts
 from lab.common.entities import AMOUNT_RE, detect_primary, parse_address
 from lab.common.graph_index import build_entity_graph, expand_from_entity
 from lab.common.index import Index
-from lab.common.inference import check_exceptions, split_exceptions
-from lab.common.intent_signals import wants_document, wants_identity, wants_total
+from lab.common.inference import check_exceptions, forward_chain, instantiate_consequence, split_exceptions
+from lab.common.intent_signals import wants_document, wants_identity, wants_rule_application, wants_total
 from lab.common.nested_index import MIN_DENSE_SCORE, build_nested_index
 from lab.common.qa import answer_with_agreement
 from lab.common.rules import apply_rule, apply_threshold_rule, extract_fact_triple, parse_conditional_rule, parse_threshold_rule
@@ -106,6 +106,107 @@ def _find_rule(passages: list[dict]):
         if rule:
             return "threshold", rule, passage
     return None
+
+
+def _find_verb_rules(passages: list[dict]) -> list[dict]:
+    """Every verb-trigger rule (not just the first, unlike _find_rule) --
+    EXP-084's forward_chain dispatch needs the full rule set to chain a
+    derived fact into a SECOND rule, which a single-rule scan can never
+    see.
+    """
+    rules = []
+    for passage in passages:
+        rule = parse_conditional_rule(passage.get("text", ""))
+        if rule:
+            rules.append(rule)
+    return rules
+
+
+STAGE_REGISTRY = (
+    "no_context_fallback",
+    "document_write",
+    "hierarchical_navigate",
+    "disambiguate",
+    "graph_expand",
+    "identity_extraction",
+    "total_computation",
+    "rule_application",
+    "lookup_fallback",
+)
+
+
+def plan_stages(ask: str, passages: list[dict], use_real_ner: bool = False) -> dict:
+    """The explicit, inspectable list of pipeline stages this reason()
+    call will run, computed from a fixed, named registry (STAGE_REGISTRY
+    above) BEFORE any stage actually executes -- the project owner's own
+    proposal, verbatim: "give one simple prompt and system have to
+    perform multistep work so it should first create full plan and than
+    execute that... it will keep it in control." Every stage name is
+    chosen from that fixed registry, never freely generated text, so this
+    introduces no new hallucination risk beyond what wants_document
+    already carried as a signal.
+
+    This computes the SAME signals reason() itself checks (document/
+    identity/total, plus the new wants_rule_application), in the same
+    order, so the plan accurately predicts what reason() is actually
+    about to do -- not a second, independent guess that could disagree
+    with the real execution.
+
+    rule_application has two distinct methods, not one: "single_step"
+    (today's existing apply_rule-based derivation, unchanged, used
+    whenever a rule is structurally present regardless of the ask's own
+    wording -- exactly as reason() already behaved before this
+    exploration) and "forward_chain" (EXP-084's actual new capability:
+    additionally chains a derived fact into a SECOND rule found among the
+    other given passages, reachable through reason() itself for the first
+    time, not just through a standalone forward_chain() call in an
+    exploration script) -- only when wants_rule_application's own signal
+    fires, so an ask that never asked about compliance at all keeps
+    exactly today's single-step behavior, zero regression.
+    """
+    if not passages:
+        return {"stages": ["no_context_fallback"], "signals": {}, "rule_application_method": None}
+
+    document_signal = wants_document(ask)
+    if document_signal["fires"]:
+        return {"stages": ["document_write"], "signals": {"document": document_signal}, "rule_application_method": None}
+
+    stages = []
+    groups = {p.get("group") for p in passages if p.get("group")}
+    hierarchical = any(p.get("hierarchy") for p in passages)
+    if hierarchical:
+        stages.append("hierarchical_navigate")
+    elif len(groups) > 1:
+        stages.append("disambiguate")
+
+    ask_entities = [m["text"] for m in detect_primary(ask, use_real_ner=use_real_ner) if m["label"] in ("person", "organization")]
+    if ask_entities:
+        stages.append("graph_expand")
+
+    identity_signal = wants_identity(ask)
+    if identity_signal["fires"]:
+        stages.append("identity_extraction")
+
+    total_signal = wants_total(ask)
+    if total_signal["fires"]:
+        stages.append("total_computation")
+
+    rule_signal = wants_rule_application(ask)
+    verb_rules = _find_verb_rules(passages)
+    rule_hit = _find_rule(passages)
+    rule_application_method = None
+    if rule_hit:
+        stages.append("rule_application")
+        rule_application_method = "forward_chain" if (rule_signal["fires"] and len(verb_rules) > 1) else "single_step"
+
+    if not stages:
+        stages.append("lookup_fallback")
+
+    return {
+        "stages": stages,
+        "signals": {"document": document_signal, "identity": identity_signal, "total": total_signal, "rule_application": rule_signal},
+        "rule_application_method": rule_application_method,
+    }
 
 
 def _role_matches(rule: dict, passages: list[dict]) -> bool:
@@ -155,6 +256,8 @@ def reason(ask: str, passages: list[dict], use_real_ner: bool = False) -> dict:
     unless it explicitly opts in.
     """
     trace = []
+    stage_plan = plan_stages(ask, passages, use_real_ner=use_real_ner)
+    trace.append({"step": "plan", **stage_plan})
     if not passages:
         # FORBIDDEN.md's narrow exception, recorded 2026-10-16: literally no
         # passages at all (not "retrieval found nothing" -- that is a
@@ -182,7 +285,7 @@ def reason(ask: str, passages: list[dict], use_real_ner: bool = False) -> dict:
     # real cross-page contradiction -- calling a self-contradictory
     # document "supported" would hide exactly the thing this signal exists
     # to catch.
-    document_signal = wants_document(ask)
+    document_signal = stage_plan["signals"]["document"]
     trace.append({"step": "intent_signal", "signal": "document", **document_signal})
     if document_signal["fires"]:
         from lab.common.ingest import findings_from_chunks
@@ -361,7 +464,7 @@ def reason(ask: str, passages: list[dict], use_real_ner: bool = False) -> dict:
                     citations.add(cross_ref["passage_id"])
                     trace.append({"step": "graph_expand_lookup", "entity": entity_text, "span": cross_ref["span"], "passage_id": cross_ref.get("passage_id")})
 
-    identity_signal = wants_identity(ask)
+    identity_signal = stage_plan["signals"]["identity"]
     trace.append({"step": "intent_signal", "signal": "identity", **identity_signal})
     if identity_signal["fires"]:
         full_text = " ".join(p["text"] for p in scoped)
@@ -387,7 +490,7 @@ def reason(ask: str, passages: list[dict], use_real_ner: bool = False) -> dict:
             road = address.get("road")
             answer_parts.append(f"{facts['name']}" + (f", {road}" if road else "") + (f" [{name_cite}]" if name_cite else ""))
 
-    total_signal = wants_total(ask)
+    total_signal = stage_plan["signals"]["total"]
     trace.append({"step": "intent_signal", "signal": "total", **total_signal})
     if total_signal["fires"]:
         spans, sources = [], []
@@ -422,7 +525,19 @@ def reason(ask: str, passages: list[dict], use_real_ner: bool = False) -> dict:
                     else f"policy does not apply (threshold not exceeded) [{rule_passage['id']}]"
                 )
         else:
-            fact_passage = next((p for p in scoped if extract_fact_triple(p["text"])), None)
+            # Excludes any passage that is itself a rule (verb or threshold
+            # shape), not just rule_passage -- found by EXP-084's own
+            # multi-rule fixture: extract_fact_triple doesn't reject every
+            # rule-shaped sentence (e.g. "If anyone goes to jail, their
+            # license will be suspended." parses as a spurious triple,
+            # subject="their license"/verb="suspend"), so a SECOND rule
+            # among the passages was silently picked as "the fact" instead
+            # of the real fact passage whenever it happened to sort before
+            # it -- a latent bug no single-rule fixture could ever surface.
+            fact_passage = next(
+                (p for p in scoped if not parse_conditional_rule(p.get("text", "")) and not parse_threshold_rule(p.get("text", "")) and extract_fact_triple(p["text"])),
+                None,
+            )
             if fact_passage:
                 fact = extract_fact_triple(fact_passage["text"])
                 applied = apply_rule(rule, fact)
@@ -462,6 +577,36 @@ def reason(ask: str, passages: list[dict], use_real_ner: bool = False) -> dict:
                             f"{fact_passage['text']} [{fact_passage['id']}] matches the rule's trigger ({applied['trigger_lemma']}): "
                             f"{rule['raw']} [{rule_passage['id']}] Therefore, {applied['consequence']}{suffix}."
                         )
+
+                        if stage_plan["rule_application_method"] == "forward_chain":
+                            # EXP-084's actual new capability: a derived fact
+                            # can itself trigger a SECOND rule among the
+                            # other given passages -- forward_chain's own
+                            # multi-step fixpoint loop (EXP-083), reachable
+                            # through reason() itself for the first time, not
+                            # just through a standalone forward_chain() call
+                            # in an exploration script. Purely additive: the
+                            # primary single-step sentence above is
+                            # untouched, and a rule set with only one usable
+                            # rule (today's entire existing regression suite)
+                            # never reaches this branch at all (plan_stages
+                            # only chooses "forward_chain" when more than one
+                            # verb rule exists), so no existing case changes.
+                            primary_signatures = {(d["subject"], d["verb_lemma"], d.get("object")) for d in instantiate_consequence(rule, fact)}
+                            seed_signature = (fact["subject"], fact["verb_lemma"], fact.get("object"))
+                            chain_result = forward_chain([fact], _find_verb_rules(passages), context_texts=exception_context)
+                            extra_facts = [
+                                d
+                                for d in chain_result["facts"]
+                                if (d["subject"], d["verb_lemma"], d.get("object")) not in primary_signatures
+                                and (d["subject"], d["verb_lemma"], d.get("object")) != seed_signature
+                            ]
+                            trace.append({"step": "forward_chain", "extra_facts": extra_facts})
+                            for extra in extra_facts:
+                                if extra.get("conditional"):
+                                    rule_conditional = True
+                                extra_suffix = " (unresolved -- not confirmed either way)" if extra.get("conditional") else ""
+                                answer_parts.append(f"Furthermore, {extra['subject']} {extra['verb_lemma']} {extra['object']}{extra_suffix}")
 
     if not answer_parts:
         # No identity/total/rule signal fired -- this is a plain lookup ask.

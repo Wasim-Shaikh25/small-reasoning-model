@@ -512,40 +512,6 @@ TODOS = [
         "scale_down": "",
     },
     {
-        "id": "EXP-084",
-        "title": "Plan-then-execute layer for brain.reason",
-        "status": "todo",
-        "goal": (
-            "Separate planning from execution in lab/common/brain.py: compute an explicit, inspectable list "
-            "of pipeline stage names -- chosen from a fixed, named registry, never freely generated text -- "
-            "based on which closed-set signals fire (wants_document, wants_identity, wants_total, and a new "
-            "wants_rule_application feeding lab/common/inference.py), before any stage actually executes. "
-            "The project owner's own proposal, verbatim: 'give one simple prompt and system have to perform "
-            "multistep work so it should first create full plan and than execute that... it will keep it in "
-            "control.' A single real branch (wants_document's existing path) is not enough to prove this "
-            "generalizes, so a second, genuinely different branch (wants_rule_application -> forward_chain) "
-            "must exist in this same step, not deferred to a later todo."
-        ),
-        "method": "Not run.",
-        "models_used": (
-            "bge-small-en-v1.5 (lab/common/real_encoders.py), the same embedding-similarity mechanism lab/"
-            "common/intent_signals.py already uses for wants_document/wants_identity/wants_total. The plan "
-            "itself is always a selection among a fixed set of named stages, never a freely generated plan -- "
-            "this introduces no new generative or hallucination risk beyond what wants_document already "
-            "carries. No generative model."
-        ),
-        "referenced_files": [
-            "lab/common/brain.py",
-            "lab/common/intent_signals.py",
-            "lab/common/inference.py",
-            "lab/exp_079_longform_signal/run.py",
-            "lab/exp_083_symbolic_inference/run.py",
-        ],
-        "results_prose": "Not run.",
-        "conclusion": "Todo. Needs its own wants_rule_application signal built in this same step (not borrowed from elsewhere) to have two genuinely different plan branches to prove the pattern against.",
-        "scale_down": "",
-    },
-    {
         "id": "EXP-086",
         "title": "Cross-sentence coreference resolution (fastcoref) feeding fact/rule extraction",
         "status": "todo",

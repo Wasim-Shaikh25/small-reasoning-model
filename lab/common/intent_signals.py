@@ -70,6 +70,13 @@ DOCUMENT_EXEMPLARS = (
     "Produce a long-form summary document.",
 )
 
+RULE_EXEMPLARS = (
+    "Does this comply with the rule?",
+    "Is this action allowed under the policy?",
+    "Does an exception apply to this prohibition?",
+    "Is the conduct permitted or prohibited by this regulation?",
+)
+
 IDENTITY_TAU = 0.5971
 TOTAL_TAU = 0.6084
 # First measured value (lab.common.longform's wiring into brain.reason),
@@ -83,6 +90,13 @@ TOTAL_TAU = 0.6084
 # a naive midpoint guess would have placed the floor, so this sits with a
 # real margin on both sides rather than splitting the two clusters evenly.
 DOCUMENT_TAU = 0.75
+# EXP-084: first measured value, same caveat as DOCUMENT_TAU -- a starting
+# point, not swept across domains the way IDENTITY_TAU/TOTAL_TAU were.
+# Measured range: 4 genuine rule-compliance asks scored 0.6275-0.7443; 5
+# non-rule asks (identity/total/document/plain-lookup, drawn from
+# existing fixtures) scored 0.525-0.6039 -- a real gap between clusters
+# (0.6039 vs 0.6275), not a coin-flip midpoint.
+RULE_TAU = 0.62
 
 
 def _best_similarity(text: str, exemplars: tuple[str, ...]) -> float:
@@ -104,4 +118,9 @@ def wants_total(ask: str, tau: float = TOTAL_TAU) -> dict:
 
 def wants_document(ask: str, tau: float = DOCUMENT_TAU) -> dict:
     score = _best_similarity(ask, DOCUMENT_EXEMPLARS)
+    return {"fires": score >= tau, "score": round(score, 4), "tau": tau}
+
+
+def wants_rule_application(ask: str, tau: float = RULE_TAU) -> dict:
+    score = _best_similarity(ask, RULE_EXEMPLARS)
     return {"fires": score >= tau, "score": round(score, 4), "tau": tau}

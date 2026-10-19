@@ -108,7 +108,7 @@
     "If any case's measured status did not match its expected real-world conclusion (see metrics), the real next step is NOT to reword that case's context text to force a match -- that would repeat exactly the tuning this exploration exists to avoid. It is either accepting check_exception's current entailment gate as genuinely limited to lexically-close evidence, or testing whether a different NLI checkpoint / a sentence-splitting preprocessing step (EXP-083's own named follow-up) closes the gap -- a separate, measured exploration either way.",
     "Only one real-world sentence was tested per exception; a single sentence is also EXP-083's and EXP-085's own known scale-down (check_exception reads one premise at a time) -- a longer real passage with the relevant evidence buried among unrelated sentences was not tested here either."
   ],
-  "elapsed_sec": 1201.8657,
-  "peak_rss_mb": 739.8,
+  "elapsed_sec": 282.4764,
+  "peak_rss_mb": 740.23,
   "models_used": "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli (per-exception entailment via the existing, unmodified check_exception/check_exceptions). No generative model. No new dependency."
 }

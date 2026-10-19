@@ -10,6 +10,35 @@
     "facts": {},
     "trace": [
       {
+        "step": "plan",
+        "stages": [
+          "rule_application"
+        ],
+        "signals": {
+          "document": {
+            "fires": false,
+            "score": 0.5489,
+            "tau": 0.75
+          },
+          "identity": {
+            "fires": false,
+            "score": 0.5658,
+            "tau": 0.5971
+          },
+          "total": {
+            "fires": false,
+            "score": 0.501,
+            "tau": 0.6084
+          },
+          "rule_application": {
+            "fires": true,
+            "score": 0.7119,
+            "tau": 0.62
+          }
+        },
+        "rule_application_method": "single_step"
+      },
+      {
         "step": "analyze_ask",
         "task_type": "lookup",
         "subquestions": [
@@ -77,6 +106,35 @@
     "citations": [],
     "facts": {},
     "trace": [
+      {
+        "step": "plan",
+        "stages": [
+          "rule_application"
+        ],
+        "signals": {
+          "document": {
+            "fires": false,
+            "score": 0.5489,
+            "tau": 0.75
+          },
+          "identity": {
+            "fires": false,
+            "score": 0.5658,
+            "tau": 0.5971
+          },
+          "total": {
+            "fires": false,
+            "score": 0.501,
+            "tau": 0.6084
+          },
+          "rule_application": {
+            "fires": true,
+            "score": 0.7119,
+            "tau": 0.62
+          }
+        },
+        "rule_application_method": "single_step"
+      },
       {
         "step": "analyze_ask",
         "task_type": "lookup",
@@ -148,6 +206,35 @@
     ],
     "facts": {},
     "trace": [
+      {
+        "step": "plan",
+        "stages": [
+          "rule_application"
+        ],
+        "signals": {
+          "document": {
+            "fires": false,
+            "score": 0.5489,
+            "tau": 0.75
+          },
+          "identity": {
+            "fires": false,
+            "score": 0.5658,
+            "tau": 0.5971
+          },
+          "total": {
+            "fires": false,
+            "score": 0.501,
+            "tau": 0.6084
+          },
+          "rule_application": {
+            "fires": true,
+            "score": 0.7119,
+            "tau": 0.62
+          }
+        },
+        "rule_application_method": "single_step"
+      },
       {
         "step": "analyze_ask",
         "task_type": "lookup",

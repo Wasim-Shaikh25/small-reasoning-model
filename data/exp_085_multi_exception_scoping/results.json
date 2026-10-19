@@ -53,7 +53,7 @@
     "check_exceptions's NLI call still reads one context sentence as one premise per alternative, the same known limit EXP-083 already named for the single-exception case -- a longer passage with one alternative's evidence buried among many unrelated clauses was not tested.",
     "The real DeBERTa-v3 MNLI checkpoint's entailment score for these two exception conditions (consent; vital interests) was measured to be sharply sensitive to lexical distance from the condition's own wording: a context sentence naming the specific data subject and restructuring the sentence (e.g. 'Processing was necessary to protect the vital interests of Aisha, who was physically incapable of giving consent.') scored entail=0.24-0.39, well under tau=0.75, while a near-verbatim restatement of the same fact (only tense-shifted) scored 0.91-0.99. Cases 2 and 3's context texts were tuned against the real model for exactly this reason, not picked blind. check_exception's entailment gate works only when the given context stays close to the exception's own phrasing -- a real document's evidence almost never will -- so this is a real brittleness, not an artifact of this exploration's fixtures, and a genuine blocker before trusting this mechanism on natural (not hand-tuned) context text."
   ],
-  "elapsed_sec": 619.8212,
-  "peak_rss_mb": 683.29,
+  "elapsed_sec": 169.2711,
+  "peak_rss_mb": 738.75,
   "models_used": "spaCy en_core_web_sm dependency parser (fact/rule extraction, unchanged, non-generative) + MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli (per-exception entailment via the existing, unmodified check_exception, one bounded judgment per alternative, non-generative). No generative model anywhere in this exploration."
 }
