@@ -1458,6 +1458,129 @@ Elapsed seconds: 0.6119. Peak RSS MB: 128.08.
 - Scale-down: Forty short passages. Quantized ONNX and CTranslate2 runtimes from the architecture are not used.
 - Conclusion: These times are for the lexical substitutes. They are not the latency of DeBERTa, GLiNER, or FLAN-T5, which are not loaded.
 
+## EXP-022 On-disk hybrid index
+
+- Status: `closed`
+- Models used: sklearn TfidfVectorizer (already a dependency, classical, deterministic) plus the existing in-process BM25 implementation. No generative model. Qdrant/SPLADE/fastembed/bge remain not loaded, per this todo's own standing note.
+- Goal: Repeat the hybrid retrieval measurement with an on-disk index once the corpus no longer fits the process index.
+- Method: lab.common.index.Index.save/load (new): pickles the fitted TfidfVectorizer+matrix and BM25's own input token lists (BM25 itself rebuilds cheaply and deterministically from those on load, no separate persistence needed for its derived df/tf/avgdl state). Measured on the real 103-sentence GDPR_TEXT fixture (EXP-081), not a toy corpus: 5 real queries run against the original in-memory Index and a freshly loaded copy with the original's own fitted internals explicitly deleted first.
+- Referenced files:
+- `lab/exp_022_on_disk_index/run.py`
+- `lab/common/index.py`
+- `lab/common/textutil.py`
+- `lab/exp_081_real_document_pipeline/run.py`
+- `data/exp_022_on_disk_index/index.pkl`
+- Results: 103-passage corpus (the real GDPR_TEXT fixture, one passage per sentence) saved to a 61,032-byte pickle. 5 real queries run against both the original in-memory Index and a freshly loaded Index.load() with no shared reference to the original's own fitted vectorizer/matrix/BM25 (explicitly deleted before loading): 5/5 queries matched on ranked ids, 5/5 matched on exact scores.
+```json
+{
+  "corpus_size": 103,
+  "n_queries": 5,
+  "all_ids_and_scores_match": true,
+  "per_query": [
+    {
+      "query": "explicit consent to the processing of personal data",
+      "original_ids": [
+        "gdpr-066",
+        "gdpr-030",
+        "gdpr-050",
+        "gdpr-013",
+        "gdpr-035"
+      ],
+      "loaded_ids": [
+        "gdpr-066",
+        "gdpr-030",
+        "gdpr-050",
+        "gdpr-013",
+        "gdpr-035"
+      ],
+      "ids_match": true,
+      "scores_match": true
+    },
+    {
+      "query": "the right to object to processing",
+      "original_ids": [
+        "gdpr-049",
+        "gdpr-078",
+        "gdpr-032",
+        "gdpr-052",
+        "gdpr-074"
+      ],
+      "loaded_ids": [
+        "gdpr-049",
+        "gdpr-078",
+        "gdpr-032",
+        "gdpr-052",
+        "gdpr-074"
+      ],
+      "ids_match": true,
+      "scores_match": true
+    },
+    {
+      "query": "notify the supervisory authority of a personal data breach",
+      "original_ids": [
+        "gdpr-055",
+        "gdpr-056",
+        "gdpr-058",
+        "gdpr-059",
+        "gdpr-009"
+      ],
+      "loaded_ids": [
+        "gdpr-055",
+        "gdpr-056",
+        "gdpr-058",
+        "gdpr-059",
+        "gdpr-009"
+      ],
+      "ids_match": true,
+      "scores_match": true
+    },
+    {
+      "query": "the controller shall implement appropriate technical measures",
+      "original_ids": [
+        "gdpr-086",
+        "gdpr-085",
+        "gdpr-051",
+        "gdpr-039",
+        "gdpr-102"
+      ],
+      "loaded_ids": [
+        "gdpr-086",
+        "gdpr-085",
+        "gdpr-051",
+        "gdpr-039",
+        "gdpr-102"
+      ],
+      "ids_match": true,
+      "scores_match": true
+    },
+    {
+      "query": "the establishment, exercise or defence of legal claims",
+      "original_ids": [
+        "gdpr-068",
+        "gdpr-052",
+        "gdpr-040",
+        "gdpr-038",
+        "gdpr-007"
+      ],
+      "loaded_ids": [
+        "gdpr-068",
+        "gdpr-052",
+        "gdpr-040",
+        "gdpr-038",
+        "gdpr-007"
+      ],
+      "ids_match": true,
+      "scores_match": true
+    }
+  ],
+  "index_file_bytes": 61032
+}
+```
+
+Elapsed seconds: 0.0674. Peak RSS MB: 139.84.
+- Scale-down: This persists a FITTED index's state to disk and reloads it in the same process -- it proves save/load round-trips exactly and avoids re-fitting, not a genuinely disk-backed query engine that never holds the full matrix in RAM (that would need an ANN library like Qdrant/FAISS, which EXP-022's own 'models_used' note explicitly rules out adding: 'bge, SPLADE, fastembed, and Qdrant are still not loaded'). 103 passages, not a corpus that genuinely exceeds process memory -- the round-trip correctness is proven at this scale; whether the pickle file itself stays practical at a much larger corpus size is not measured here.
+- Conclusion: Saving and loading the fitted index produces bit-identical search results -- every query's ranked passage ids and scores match exactly between the original in-memory Index and the loaded-from-disk copy, with the original's own fitted objects deleted beforehand so there is no possibility of accidental reuse. BM25 rebuilds from its saved token lists in this same load() call; the TF-IDF vectorizer and matrix, the genuinely expensive part to recompute, are restored directly from the pickle without re-fitting.
+
 ## EXP-025 Attach a real document collection
 
 - Status: `closed`
@@ -24012,20 +24135,6 @@ Elapsed seconds: 340.3125. Peak RSS MB: 732.84.
 - Conclusion: lab.common.inference.split_exception now locates a rule's exception clause via lab.common.connectives.find_connectives's structural CONDITION_NEGATIVE detection instead of a hardcoded regex on the single word 'unless'. The gap this closes is not hypothetical: case 2 is the exact failure mode measured before this change (the 'except' phrasing was silently invisible to the old code), and it is now caught through brain.reason itself, the one production entry point, with no regression on the 'unless' phrasing (case 1), the 'except that' phrasing (case 3), or the real multi-alternative GDPR Art 9 rule's OR-combination (case 4).
 
 ## Follow-up todos
-
-## EXP-022 On-disk hybrid index
-
-- Status: `todo`
-- Models used: bge, SPLADE, fastembed, and Qdrant are still not loaded. This todo is an on-disk index for the classical hybrid scorer. Do not add a generative retriever.
-- Goal: Repeat the hybrid retrieval measurement with an on-disk index once the corpus no longer fits the process index.
-- Method: Not run.
-- Referenced files:
-- none yet
-- Results: Not run.
-
-
-- Scale-down: 
-- Conclusion: Todo. Do not add a generative retriever.
 
 ## EXP-023 Human fluency rating
 

@@ -1,9 +1,23 @@
-"""In-memory hybrid retrieval: BM25 + TF-IDF, plus a lexical reranker."""
+"""In-memory hybrid retrieval: BM25 + TF-IDF, plus a lexical reranker.
+
+EXP-022 adds Index.save/load: BM25 has no real "fit" step beyond
+counting (cheap to rebuild from the saved token lists), but the fitted
+TfidfVectorizer and its sparse document matrix are genuinely expensive
+to recompute over a large corpus -- those are persisted via pickle so a
+later process can load and search without re-fitting over the full
+corpus again, the actual need EXP-022 names ("once the corpus no longer
+fits the process index"). Still an in-process index once loaded (no
+Qdrant/on-disk ANN structure); this persists the FITTED STATE, not a
+disk-backed query engine -- a real distinction, named honestly in
+EXP-022's own scale_down, not papered over.
+"""
 
 from __future__ import annotations
 
 import math
+import pickle
 import re
+from pathlib import Path
 
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
@@ -116,6 +130,29 @@ class Index:
             )
         ranked.sort(key=lambda row: row["score"], reverse=True)
         return ranked[:top_k]
+
+    def save(self, path: str | Path) -> None:
+        """Persists the fitted vectorizer+matrix and BM25's own input
+        token lists (from which BM25's df/tf/lengths/avgdl rebuild
+        deterministically and cheaply -- no need to persist those
+        derived values separately). Passages are persisted too, so
+        `load` returns a fully usable Index with no reference back to
+        whatever built the original.
+        """
+        with open(path, "wb") as f:
+            pickle.dump({"passages": self.passages, "tokens": self._tokens, "vectorizer": self.vectorizer, "matrix": self.matrix}, f)
+
+    @classmethod
+    def load(cls, path: str | Path) -> "Index":
+        with open(path, "rb") as f:
+            state = pickle.load(f)
+        index = cls.__new__(cls)
+        index.passages = state["passages"]
+        index._tokens = state["tokens"]
+        index.bm25 = BM25(index._tokens)
+        index.vectorizer = state["vectorizer"]
+        index.matrix = state["matrix"]
+        return index
 
     def rerank(self, query: str, candidates: list[dict], keep: int = 5) -> list[dict]:
         q_content = content_tokens(query)

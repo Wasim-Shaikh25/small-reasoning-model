@@ -1,0 +1,99 @@
+{
+  "per_query": [
+    {
+      "query": "explicit consent to the processing of personal data",
+      "original_ids": [
+        "gdpr-066",
+        "gdpr-030",
+        "gdpr-050",
+        "gdpr-013",
+        "gdpr-035"
+      ],
+      "loaded_ids": [
+        "gdpr-066",
+        "gdpr-030",
+        "gdpr-050",
+        "gdpr-013",
+        "gdpr-035"
+      ],
+      "ids_match": true,
+      "scores_match": true
+    },
+    {
+      "query": "the right to object to processing",
+      "original_ids": [
+        "gdpr-049",
+        "gdpr-078",
+        "gdpr-032",
+        "gdpr-052",
+        "gdpr-074"
+      ],
+      "loaded_ids": [
+        "gdpr-049",
+        "gdpr-078",
+        "gdpr-032",
+        "gdpr-052",
+        "gdpr-074"
+      ],
+      "ids_match": true,
+      "scores_match": true
+    },
+    {
+      "query": "notify the supervisory authority of a personal data breach",
+      "original_ids": [
+        "gdpr-055",
+        "gdpr-056",
+        "gdpr-058",
+        "gdpr-059",
+        "gdpr-009"
+      ],
+      "loaded_ids": [
+        "gdpr-055",
+        "gdpr-056",
+        "gdpr-058",
+        "gdpr-059",
+        "gdpr-009"
+      ],
+      "ids_match": true,
+      "scores_match": true
+    },
+    {
+      "query": "the controller shall implement appropriate technical measures",
+      "original_ids": [
+        "gdpr-086",
+        "gdpr-085",
+        "gdpr-051",
+        "gdpr-039",
+        "gdpr-102"
+      ],
+      "loaded_ids": [
+        "gdpr-086",
+        "gdpr-085",
+        "gdpr-051",
+        "gdpr-039",
+        "gdpr-102"
+      ],
+      "ids_match": true,
+      "scores_match": true
+    },
+    {
+      "query": "the establishment, exercise or defence of legal claims",
+      "original_ids": [
+        "gdpr-068",
+        "gdpr-052",
+        "gdpr-040",
+        "gdpr-038",
+        "gdpr-007"
+      ],
+      "loaded_ids": [
+        "gdpr-068",
+        "gdpr-052",
+        "gdpr-040",
+        "gdpr-038",
+        "gdpr-007"
+      ],
+      "ids_match": true,
+      "scores_match": true
+    }
+  ]
+}

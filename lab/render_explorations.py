@@ -393,18 +393,6 @@ def _todo(exp_id, title, goal, method, models_used, files, conclusion) -> dict:
 
 TODOS = [
     {
-        "id": "EXP-022",
-        "title": "On-disk hybrid index",
-        "status": "todo",
-        "goal": "Repeat the hybrid retrieval measurement with an on-disk index once the corpus no longer fits the process index.",
-        "method": "Not run.",
-        "models_used": "bge, SPLADE, fastembed, and Qdrant are still not loaded. This todo is an on-disk index for the classical hybrid scorer. Do not add a generative retriever.",
-        "referenced_files": [],
-        "results_prose": "Not run.",
-        "conclusion": "Todo. Do not add a generative retriever.",
-        "scale_down": "",
-    },
-    {
         "id": "EXP-023",
         "title": "Human fluency rating",
         "status": "todo",
