@@ -1,0 +1,176 @@
+{
+  "hard_predictions": [
+    {
+      "text": "Infosys bid for the work.",
+      "gold": [
+        [
+          0,
+          7,
+          "organization"
+        ]
+      ],
+      "pred": [
+        [
+          0,
+          7,
+          "person"
+        ]
+      ]
+    },
+    {
+      "text": "Please pay fifty thousand rupees.",
+      "gold": [
+        [
+          11,
+          32,
+          "amount"
+        ]
+      ],
+      "pred": [
+        [
+          11,
+          25,
+          "amount"
+        ]
+      ]
+    },
+    {
+      "text": "Contact R. Sharma about the keys.",
+      "gold": [
+        [
+          8,
+          17,
+          "person"
+        ]
+      ],
+      "pred": [
+        [
+          0,
+          7,
+          "person"
+        ],
+        [
+          8,
+          10,
+          "organization"
+        ],
+        [
+          11,
+          17,
+          "person"
+        ]
+      ]
+    },
+    {
+      "text": "Mr. Sharma called twice.",
+      "gold": [
+        [
+          0,
+          10,
+          "person"
+        ]
+      ],
+      "pred": [
+        [
+          0,
+          10,
+          "person"
+        ]
+      ]
+    },
+    {
+      "text": "The flat is at Plot 14, Sector 5.",
+      "gold": [
+        [
+          15,
+          32,
+          "address"
+        ]
+      ],
+      "pred": [
+        [
+          15,
+          19,
+          "person"
+        ],
+        [
+          20,
+          22,
+          "date"
+        ],
+        [
+          31,
+          32,
+          "date"
+        ]
+      ]
+    },
+    {
+      "text": "ravi sharma sent the scan.",
+      "gold": [
+        [
+          0,
+          11,
+          "person"
+        ]
+      ],
+      "pred": []
+    },
+    {
+      "text": "New Delhi High Court dismissed the appeal.",
+      "gold": [
+        [
+          0,
+          20,
+          "organization"
+        ]
+      ],
+      "pred": [
+        [
+          0,
+          20,
+          "person"
+        ]
+      ]
+    },
+    {
+      "text": "The said premises include a parking slot.",
+      "gold": [],
+      "pred": []
+    },
+    {
+      "text": "May Sharma join the call?",
+      "gold": [
+        [
+          4,
+          10,
+          "person"
+        ]
+      ],
+      "pred": [
+        [
+          0,
+          10,
+          "person"
+        ]
+      ]
+    },
+    {
+      "text": "Notice period is thirty days in words only.",
+      "gold": [
+        [
+          17,
+          28,
+          "amount"
+        ]
+      ],
+      "pred": [
+        [
+          17,
+          23,
+          "amount"
+        ]
+      ]
+    }
+  ]
+}

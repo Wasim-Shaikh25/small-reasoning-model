@@ -1,0 +1,42 @@
+{
+  "id": "EXP-024",
+  "title": "Local span tagger, measured against both the rule tagger and a real pretrained NER on the exact fixture that motivated this todo",
+  "status": "closed",
+  "goal": "If rule-tagger hard-slice F1 is too low, train a span tagger only on locally labeled spans. Verify the trigger condition still holds (it does: a real pretrained NER model does not fix it either, F1=0.4138 vs the rule tagger's 0.4615) before training anything, then measure whether a token-level classifier trained only on this repo's own labels actually helps.",
+  "method": "Per-token multinomial logistic regression (sklearn), features from spaCy POS tags/token shape only (lab.common.rules._parser, never doc.ents -- no pretrained NER model used anywhere in this exploration). Trained on EXP-008's own EASY+HARD lines (every gold span already stored in this repository). Sentence-grouped GroupKFold cross-validation so no sentence's tokens appear in both train and test within a fold. Predicted spans reconstructed from contiguous same-label token runs, scored with EXP-008's own exact-span prf(), broken out by slice.",
+  "metrics": {
+    "n_sentences": 52,
+    "n_tokens": 335,
+    "cv_folds": 5,
+    "hard_slice": {
+      "precision": 0.0833,
+      "recall": 0.1111,
+      "f1": 0.0952,
+      "tp": 1
+    },
+    "easy_slice": {
+      "precision": 0.197,
+      "recall": 0.3023,
+      "f1": 0.2385,
+      "tp": 13
+    },
+    "rule_tagger_hard_f1_baseline": 0.4615,
+    "real_pretrained_ner_hard_f1_baseline": 0.4138,
+    "improved_over_both_baselines": false
+  },
+  "results_prose": "Sentence-grouped 5-fold cross-validated local span tagger on 335 tokens from 52 sentences (EXP-008's own EASY+HARD fixture, nothing newly labeled): hard-slice exact-span F1=0.0952 (precision=0.0833, recall=0.1111), easy-slice F1=0.2385. Baselines on the same hard sentences: rule tagger F1=0.4615 (EXP-008), real pretrained NER (dslim/bert-base-NER) F1=0.4138 (EXP-080) -- the local tagger does not improve on both.",
+  "conclusion": "The local tagger did not clear both baselines on this fixture -- see metrics for the exact numbers, reported as measured rather than assumed to work. The fixture is tiny (10 hard sentences); a token-level classifier with only 5-fold sentence-grouped CV has very little signal to learn from.",
+  "scale_down": "10 hard sentences, 19 gold hard-slice spans total -- a genuinely small fixture for a trained classifier; this result should not be read as a general claim about span tagging, only about this specific repository's own fixture. Per-token classification with contiguous-run span reconstruction, not a true BIO/CRF sequence tagger -- adjacent same-label entities would merge into one span, a real limit not exercised by this particular fixture (no two adjacent gold spans share a label here) but not proven absent either.",
+  "referenced_files": [
+    "lab/exp_024_local_span_tagger/run.py",
+    "lab/common/rules.py",
+    "lab/exp_008_entity_detect/run.py",
+    "lab/exp_080_real_ner_rerun/run.py",
+    "data/exp_008_entity_detect/results.json",
+    "data/exp_080_real_ner_rerun/results.json"
+  ],
+  "follow_ups": [],
+  "elapsed_sec": 44.5372,
+  "peak_rss_mb": 385.23,
+  "models_used": "Multinomial logistic regression (sklearn) trained only on labels already stored in this repository. spaCy en_core_web_sm's POS tagger (lab.common.rules._parser, already a dependency) for features -- its NER component is never read. No pretrained NER model, no generative model."
+}

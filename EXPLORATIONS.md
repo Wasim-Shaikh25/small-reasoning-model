@@ -1581,6 +1581,47 @@ Elapsed seconds: 0.0674. Peak RSS MB: 139.84.
 - Scale-down: This persists a FITTED index's state to disk and reloads it in the same process -- it proves save/load round-trips exactly and avoids re-fitting, not a genuinely disk-backed query engine that never holds the full matrix in RAM (that would need an ANN library like Qdrant/FAISS, which EXP-022's own 'models_used' note explicitly rules out adding: 'bge, SPLADE, fastembed, and Qdrant are still not loaded'). 103 passages, not a corpus that genuinely exceeds process memory -- the round-trip correctness is proven at this scale; whether the pickle file itself stays practical at a much larger corpus size is not measured here.
 - Conclusion: Saving and loading the fitted index produces bit-identical search results -- every query's ranked passage ids and scores match exactly between the original in-memory Index and the loaded-from-disk copy, with the original's own fitted objects deleted beforehand so there is no possibility of accidental reuse. BM25 rebuilds from its saved token lists in this same load() call; the TF-IDF vectorizer and matrix, the genuinely expensive part to recompute, are restored directly from the pickle without re-fitting.
 
+## EXP-024 Local span tagger, measured against both the rule tagger and a real pretrained NER on the exact fixture that motivated this todo
+
+- Status: `closed`
+- Models used: Multinomial logistic regression (sklearn) trained only on labels already stored in this repository. spaCy en_core_web_sm's POS tagger (lab.common.rules._parser, already a dependency) for features -- its NER component is never read. No pretrained NER model, no generative model.
+- Goal: If rule-tagger hard-slice F1 is too low, train a span tagger only on locally labeled spans. Verify the trigger condition still holds (it does: a real pretrained NER model does not fix it either, F1=0.4138 vs the rule tagger's 0.4615) before training anything, then measure whether a token-level classifier trained only on this repo's own labels actually helps.
+- Method: Per-token multinomial logistic regression (sklearn), features from spaCy POS tags/token shape only (lab.common.rules._parser, never doc.ents -- no pretrained NER model used anywhere in this exploration). Trained on EXP-008's own EASY+HARD lines (every gold span already stored in this repository). Sentence-grouped GroupKFold cross-validation so no sentence's tokens appear in both train and test within a fold. Predicted spans reconstructed from contiguous same-label token runs, scored with EXP-008's own exact-span prf(), broken out by slice.
+- Referenced files:
+- `lab/exp_024_local_span_tagger/run.py`
+- `lab/common/rules.py`
+- `lab/exp_008_entity_detect/run.py`
+- `lab/exp_080_real_ner_rerun/run.py`
+- `data/exp_008_entity_detect/results.json`
+- `data/exp_080_real_ner_rerun/results.json`
+- Results: Sentence-grouped 5-fold cross-validated local span tagger on 335 tokens from 52 sentences (EXP-008's own EASY+HARD fixture, nothing newly labeled): hard-slice exact-span F1=0.0952 (precision=0.0833, recall=0.1111), easy-slice F1=0.2385. Baselines on the same hard sentences: rule tagger F1=0.4615 (EXP-008), real pretrained NER (dslim/bert-base-NER) F1=0.4138 (EXP-080) -- the local tagger does not improve on both.
+```json
+{
+  "n_sentences": 52,
+  "n_tokens": 335,
+  "cv_folds": 5,
+  "hard_slice": {
+    "precision": 0.0833,
+    "recall": 0.1111,
+    "f1": 0.0952,
+    "tp": 1
+  },
+  "easy_slice": {
+    "precision": 0.197,
+    "recall": 0.3023,
+    "f1": 0.2385,
+    "tp": 13
+  },
+  "rule_tagger_hard_f1_baseline": 0.4615,
+  "real_pretrained_ner_hard_f1_baseline": 0.4138,
+  "improved_over_both_baselines": false
+}
+```
+
+Elapsed seconds: 44.5372. Peak RSS MB: 385.23.
+- Scale-down: 10 hard sentences, 19 gold hard-slice spans total -- a genuinely small fixture for a trained classifier; this result should not be read as a general claim about span tagging, only about this specific repository's own fixture. Per-token classification with contiguous-run span reconstruction, not a true BIO/CRF sequence tagger -- adjacent same-label entities would merge into one span, a real limit not exercised by this particular fixture (no two adjacent gold spans share a label here) but not proven absent either.
+- Conclusion: The local tagger did not clear both baselines on this fixture -- see metrics for the exact numbers, reported as measured rather than assumed to work. The fixture is tiny (10 hard sentences); a token-level classifier with only 5-fold sentence-grouped CV has very little signal to learn from.
+
 ## EXP-025 Attach a real document collection
 
 - Status: `closed`
@@ -24149,20 +24190,6 @@ Elapsed seconds: 340.3125. Peak RSS MB: 732.84.
 
 - Scale-down: 
 - Conclusion: Todo.
-
-## EXP-024 Local span tagger
-
-- Status: `todo`
-- Models used: This todo trains a span tagger on labels stored in the repository. It is separate from the GLiNER and dslim/bert-base-NER rerun (EXP-033). Do not download a generative model.
-- Goal: If rule-tagger hard-slice F1 is too low, train a span tagger only on locally labeled spans.
-- Method: Not run.
-- Referenced files:
-- none yet
-- Results: Not run.
-
-
-- Scale-down: 
-- Conclusion: Todo. Do not download a pretrained NER or generative model.
 
 ## EXP-086 Cross-sentence coreference resolution (fastcoref) feeding fact/rule extraction
 

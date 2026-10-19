@@ -405,18 +405,6 @@ TODOS = [
         "scale_down": "",
     },
     {
-        "id": "EXP-024",
-        "title": "Local span tagger",
-        "status": "todo",
-        "goal": "If rule-tagger hard-slice F1 is too low, train a span tagger only on locally labeled spans.",
-        "method": "Not run.",
-        "models_used": "This todo trains a span tagger on labels stored in the repository. It is separate from the GLiNER and dslim/bert-base-NER rerun (EXP-033). Do not download a generative model.",
-        "referenced_files": [],
-        "results_prose": "Not run.",
-        "conclusion": "Todo. Do not download a pretrained NER or generative model.",
-        "scale_down": "",
-    },
-    {
         "id": "EXP-086",
         "title": "Cross-sentence coreference resolution (fastcoref) feeding fact/rule extraction",
         "status": "todo",
