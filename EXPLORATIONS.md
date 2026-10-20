@@ -23793,7 +23793,7 @@ Elapsed seconds: 54.0473. Peak RSS MB: 890.23.
 }
 ```
 
-Elapsed seconds: 994.2465. Peak RSS MB: 548.21.
+Elapsed seconds: 332.2167. Peak RSS MB: 475.58.
 - Scale-down: Five hand-built cases proving each named mechanism works, not a broad benchmark across many rules or a real multi-exception statute (GDPR Art 9's four exceptions) -- that combination is a named follow-up, not covered here.
 - Conclusion: Multi-step symbolic inference -- converting a stated rule and a stated fact into predicate form, unifying the trigger, binding the consequence's subject to the actual named entity, and chaining a derived fact into further rules until nothing new follows -- works as a real mechanism, not just on the single-hop case this project already had (EXP-057/059/061), but genuinely across multiple steps. The exception handling is the part that matters most for trust: an exception whose truth the given context never actually states is never silently treated as false, only as unresolved and visibly flagged, and a rule with no stated exception at all is never confused with one whose exception just happens to not apply here. Every step runs through spaCy's dependency parser or the real DeBERTa-v3 NLI classifier -- no generative model anywhere in the conversion from language to rule/fact form, the project owner's own explicit requirement, so nothing in this chain can hallucinate a predicate that was never actually stated.
 
@@ -24260,6 +24260,34 @@ Elapsed seconds: 407.3452. Peak RSS MB: 814.32.
 Elapsed seconds: 1138.4335. Peak RSS MB: 273.8.
 - Scale-down: Only verified against one hand-built threshold-rule-with-exception fixture, not a sweep across many threshold-rule phrasings. _role_matches's own role-mismatch check still runs first and is unaffected by this change -- a role mismatch still short-circuits before any exception check, same as before.
 - Conclusion: The threshold-rule branch now checks exceptions/conditions exactly like the verb-rule branch already did, closing the gap EXP-089 named as a separate, un-fixed limit. Purely additive: every existing threshold-rule fixture (reran EXP-060/066/068/070, the explorations that actually exercise this branch through brain.reason) produced byte-identical output, since check_exceptions correctly returns 'no_exception' when there is nothing to check.
+
+## EXP-095 Verifying CONCESSION already behaves correctly by omission (never a gate, consequence always proceeds)
+
+- Status: `closed`
+- Models used: spaCy en_core_web_sm dependency parser via lab.common.connectives.find_connectives (unchanged). No NLI call needed -- no exception check ever fires for a CONCESSION clause, which is exactly the point being verified. No generative model.
+- Goal: Confirm, rather than assume, that CONCESSION's absence from lab.common.inference's condition-detection produces the CORRECT behavior (consequence always proceeds regardless of the concession clause's truth) and not some other silent failure mode.
+- Method: Same rule+fact through lab.common.brain.reason, varying only the context passage: affirms the concession clause, contradicts it, or omits it entirely. If CONCESSION is truly never a gate, all three must produce byte-identical output with no 'unresolved' flag.
+- Referenced files:
+- `lab/exp_095_concession_verification/run.py`
+- `lab/common/brain.py`
+- `lab/common/inference.py`
+- `lab/common/connectives.py`
+- Results: Three contexts (concession clause affirmed, contradicted, absent) produce identical output: True. All three derive the consequence cleanly with no 'unresolved' flag and no blocking: True. Case 1 (affirmed): "MedCorp processed Aisha. [fact-1] matches the rule's trigger (process): If anyone processes special category data, it is unlawful although the data subject has given explicit consent. [rule-1] Therefore, it is unlawful although the data subject has given explicit consent..". Case 2 (contradicted): "MedCorp processed Aisha. [fact-1] matches the rule's trigger (process): If anyone processes special category data, it is unlawful although the data subject has given explicit consent. [rule-1] Therefore, it is unlawful although the data subject has given explicit consent..". Case 3 (no context): "MedCorp processed Aisha. [fact-1] matches the rule's trigger (process): If anyone processes special category data, it is unlawful although the data subject has given explicit consent. [rule-1] Therefore, it is unlawful although the data subject has given explicit consent..".
+```json
+{
+  "identical_across_all_three_contexts": true,
+  "all_clean_no_unresolved_flag": true,
+  "all_derive_the_consequence": true,
+  "case1_text": "MedCorp processed Aisha. [fact-1] matches the rule's trigger (process): If anyone processes special category data, it is unlawful although the data subject has given explicit consent. [rule-1] Therefore, it is unlawful although the data subject has given explicit consent..",
+  "case2_text": "MedCorp processed Aisha. [fact-1] matches the rule's trigger (process): If anyone processes special category data, it is unlawful although the data subject has given explicit consent. [rule-1] Therefore, it is unlawful although the data subject has given explicit consent..",
+  "case3_text": "MedCorp processed Aisha. [fact-1] matches the rule's trigger (process): If anyone processes special category data, it is unlawful although the data subject has given explicit consent. [rule-1] Therefore, it is unlawful although the data subject has given explicit consent..",
+  "all_correct": true
+}
+```
+
+Elapsed seconds: 121.0938. Peak RSS MB: 592.39.
+- Scale-down: Only one hand-built rule/fact pair tested, with 'although' specifically -- not swept across 'though'/'even though'/'even if'/'despite', though all five share the same CONCESSION operator and the same _find_condition_match omission, so the same reasoning applies to each.
+- Conclusion: CONCESSION's omission from lab.common.inference's condition-detection (_find_condition_match only recognizes CONDITION_NEGATIVE/POSITIVE) was already the CORRECT behavior, not an unfixed gap: a concession clause's own truth value genuinely cannot affect whether the consequence proceeds, by definition (that is what 'holds anyway' means), so never checking it against any context is exactly right -- the three cases above are identical because nothing about the context should ever change the outcome. No code change was needed; this exploration exists to verify that claim empirically rather than assume it, the same way EXP-094 verified CAUSAL's omission was already safe before adding its justification field.
 
 ## Follow-up todos
 

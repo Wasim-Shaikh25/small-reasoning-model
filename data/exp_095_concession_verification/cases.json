@@ -1,0 +1,281 @@
+{
+  "context_affirmed": {
+    "ask": "Does MedCorp's processing of Aisha's data comply with the rule?",
+    "decision": "supported",
+    "text": "MedCorp processed Aisha. [fact-1] matches the rule's trigger (process): If anyone processes special category data, it is unlawful although the data subject has given explicit consent. [rule-1] Therefore, it is unlawful although the data subject has given explicit consent..",
+    "citations": [
+      "fact-1",
+      "rule-1"
+    ],
+    "facts": {},
+    "trace": [
+      {
+        "step": "plan",
+        "stages": [
+          "rule_application"
+        ],
+        "signals": {
+          "document": {
+            "fires": false,
+            "score": 0.5489,
+            "tau": 0.75
+          },
+          "identity": {
+            "fires": false,
+            "score": 0.5658,
+            "tau": 0.5971
+          },
+          "total": {
+            "fires": false,
+            "score": 0.501,
+            "tau": 0.6084
+          },
+          "rule_application": {
+            "fires": true,
+            "score": 0.7119,
+            "tau": 0.62
+          }
+        },
+        "rule_application_method": "single_step"
+      },
+      {
+        "step": "analyze_ask",
+        "task_type": "lookup",
+        "subquestions": [
+          "Does MedCorp's processing of Aisha's data comply with the rule?"
+        ]
+      },
+      {
+        "step": "intent_signal",
+        "signal": "document",
+        "fires": false,
+        "score": 0.5489,
+        "tau": 0.75
+      },
+      {
+        "step": "intent_signal",
+        "signal": "identity",
+        "fires": false,
+        "score": 0.5658,
+        "tau": 0.5971
+      },
+      {
+        "step": "intent_signal",
+        "signal": "total",
+        "fires": false,
+        "score": 0.501,
+        "tau": 0.6084
+      },
+      {
+        "step": "find_rule",
+        "kind": "verb",
+        "rule": "If anyone processes special category data, it is unlawful although the data subject has given explicit consent."
+      },
+      {
+        "step": "apply_rule",
+        "kind": "verb",
+        "result": {
+          "matched": true,
+          "trigger_lemma": "process",
+          "fact_verb_lemma": "process",
+          "consequence": "it is unlawful although the data subject has given explicit consent"
+        },
+        "fact_passage": "fact-1"
+      },
+      {
+        "step": "check_exception",
+        "result": {
+          "status": "no_exception",
+          "per_exception": []
+        },
+        "polarity": null
+      }
+    ]
+  },
+  "context_contradicted": {
+    "ask": "Does MedCorp's processing of Aisha's data comply with the rule?",
+    "decision": "supported",
+    "text": "MedCorp processed Aisha. [fact-1] matches the rule's trigger (process): If anyone processes special category data, it is unlawful although the data subject has given explicit consent. [rule-1] Therefore, it is unlawful although the data subject has given explicit consent..",
+    "citations": [
+      "fact-1",
+      "rule-1"
+    ],
+    "facts": {},
+    "trace": [
+      {
+        "step": "plan",
+        "stages": [
+          "rule_application"
+        ],
+        "signals": {
+          "document": {
+            "fires": false,
+            "score": 0.5489,
+            "tau": 0.75
+          },
+          "identity": {
+            "fires": false,
+            "score": 0.5658,
+            "tau": 0.5971
+          },
+          "total": {
+            "fires": false,
+            "score": 0.501,
+            "tau": 0.6084
+          },
+          "rule_application": {
+            "fires": true,
+            "score": 0.7119,
+            "tau": 0.62
+          }
+        },
+        "rule_application_method": "single_step"
+      },
+      {
+        "step": "analyze_ask",
+        "task_type": "lookup",
+        "subquestions": [
+          "Does MedCorp's processing of Aisha's data comply with the rule?"
+        ]
+      },
+      {
+        "step": "intent_signal",
+        "signal": "document",
+        "fires": false,
+        "score": 0.5489,
+        "tau": 0.75
+      },
+      {
+        "step": "intent_signal",
+        "signal": "identity",
+        "fires": false,
+        "score": 0.5658,
+        "tau": 0.5971
+      },
+      {
+        "step": "intent_signal",
+        "signal": "total",
+        "fires": false,
+        "score": 0.501,
+        "tau": 0.6084
+      },
+      {
+        "step": "find_rule",
+        "kind": "verb",
+        "rule": "If anyone processes special category data, it is unlawful although the data subject has given explicit consent."
+      },
+      {
+        "step": "apply_rule",
+        "kind": "verb",
+        "result": {
+          "matched": true,
+          "trigger_lemma": "process",
+          "fact_verb_lemma": "process",
+          "consequence": "it is unlawful although the data subject has given explicit consent"
+        },
+        "fact_passage": "fact-1"
+      },
+      {
+        "step": "check_exception",
+        "result": {
+          "status": "no_exception",
+          "per_exception": []
+        },
+        "polarity": null
+      }
+    ]
+  },
+  "no_context": {
+    "ask": "Does MedCorp's processing of Aisha's data comply with the rule?",
+    "decision": "supported",
+    "text": "MedCorp processed Aisha. [fact-1] matches the rule's trigger (process): If anyone processes special category data, it is unlawful although the data subject has given explicit consent. [rule-1] Therefore, it is unlawful although the data subject has given explicit consent..",
+    "citations": [
+      "fact-1",
+      "rule-1"
+    ],
+    "facts": {},
+    "trace": [
+      {
+        "step": "plan",
+        "stages": [
+          "rule_application"
+        ],
+        "signals": {
+          "document": {
+            "fires": false,
+            "score": 0.5489,
+            "tau": 0.75
+          },
+          "identity": {
+            "fires": false,
+            "score": 0.5658,
+            "tau": 0.5971
+          },
+          "total": {
+            "fires": false,
+            "score": 0.501,
+            "tau": 0.6084
+          },
+          "rule_application": {
+            "fires": true,
+            "score": 0.7119,
+            "tau": 0.62
+          }
+        },
+        "rule_application_method": "single_step"
+      },
+      {
+        "step": "analyze_ask",
+        "task_type": "lookup",
+        "subquestions": [
+          "Does MedCorp's processing of Aisha's data comply with the rule?"
+        ]
+      },
+      {
+        "step": "intent_signal",
+        "signal": "document",
+        "fires": false,
+        "score": 0.5489,
+        "tau": 0.75
+      },
+      {
+        "step": "intent_signal",
+        "signal": "identity",
+        "fires": false,
+        "score": 0.5658,
+        "tau": 0.5971
+      },
+      {
+        "step": "intent_signal",
+        "signal": "total",
+        "fires": false,
+        "score": 0.501,
+        "tau": 0.6084
+      },
+      {
+        "step": "find_rule",
+        "kind": "verb",
+        "rule": "If anyone processes special category data, it is unlawful although the data subject has given explicit consent."
+      },
+      {
+        "step": "apply_rule",
+        "kind": "verb",
+        "result": {
+          "matched": true,
+          "trigger_lemma": "process",
+          "fact_verb_lemma": "process",
+          "consequence": "it is unlawful although the data subject has given explicit consent"
+        },
+        "fact_passage": "fact-1"
+      },
+      {
+        "step": "check_exception",
+        "result": {
+          "status": "no_exception",
+          "per_exception": []
+        },
+        "polarity": null
+      }
+    ]
+  }
+}
