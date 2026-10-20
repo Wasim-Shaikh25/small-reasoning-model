@@ -116,10 +116,11 @@
         {
           "step": "check_exception",
           "result": {
+            "kind": "none",
+            "polarity": null,
             "status": "no_exception",
-            "per_exception": []
-          },
-          "polarity": null
+            "detail": null
+          }
         },
         {
           "step": "forward_chain",
@@ -260,29 +261,33 @@
         {
           "step": "check_exception",
           "result": {
+            "kind": "condition",
+            "polarity": "negative",
             "status": "unknown",
-            "per_exception": [
-              {
-                "status": "unknown",
-                "best_entail": 0.0,
-                "best_contradict": 0.0,
-                "best_context": null
-              },
-              {
-                "status": "unknown",
-                "best_entail": 0.0,
-                "best_contradict": 0.0,
-                "best_context": null
-              },
-              {
-                "status": "unknown",
-                "best_entail": 0.0,
-                "best_contradict": 0.0,
-                "best_context": null
-              }
-            ]
-          },
-          "polarity": "negative"
+            "detail": {
+              "status": "unknown",
+              "per_exception": [
+                {
+                  "status": "unknown",
+                  "best_entail": 0.0,
+                  "best_contradict": 0.0,
+                  "best_context": null
+                },
+                {
+                  "status": "unknown",
+                  "best_entail": 0.0,
+                  "best_contradict": 0.0,
+                  "best_context": null
+                },
+                {
+                  "status": "unknown",
+                  "best_entail": 0.0,
+                  "best_contradict": 0.0,
+                  "best_context": null
+                }
+              ]
+            }
+          }
         }
       ]
     }

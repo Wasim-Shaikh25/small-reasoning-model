@@ -87,6 +87,7 @@ from lab.common.nested_index import MIN_DENSE_SCORE, build_nested_index
 from lab.common.qa import answer_with_agreement
 from lab.common.rules import apply_rule, apply_threshold_rule, extract_fact_triple, parse_conditional_rule, parse_threshold_rule
 from lab.common.semantic_index import MIN_LEXICAL_MARGIN, MIN_SEMANTIC_MARGIN, SemanticIndex, navigate_dual
+from lab.common.temporal import check_temporal_bound, find_temporal_bound
 from lab.common.textutil import normalize
 from lab.common.verify import quote_check
 
@@ -207,6 +208,36 @@ def plan_stages(ask: str, passages: list[dict], use_real_ner: bool = False) -> d
         "signals": {"document": document_signal, "identity": identity_signal, "total": total_signal, "rule_application": rule_signal},
         "rule_application_method": rule_application_method,
     }
+
+
+def _check_rule_gate(rule: dict, context_texts: list[str]) -> dict:
+    """Which gate (if any) governs this matched rule's consequence, and
+    its current status -- condition/exception (EXP-026/091) checked
+    first; a temporal bound (EXP-097, until/before/after/once) only
+    when NO condition connective is present at all. A consequence is
+    assumed to carry at most one gate, never both in the same step.
+
+    Returns status in holds/not_holds/unknown/no_exception regardless
+    of which underlying mechanism produced it -- "holds" always means
+    "block the consequence", "not_holds" always means "proceed
+    cleanly" -- so every existing caller keeps checking status==
+    "holds"/"unknown" exactly as it already did; this function absorbs
+    the difference between a truth-gate and a timing-gate internally,
+    the same way check_exceptions already absorbs negative-vs-positive
+    polarity.
+    """
+    _, exception_conditions, polarity = split_exceptions(rule["consequence"])
+    if exception_conditions:
+        result = check_exceptions(exception_conditions, context_texts, polarity or "negative")
+        return {"kind": "condition", "polarity": polarity, "status": result["status"], "detail": result}
+
+    temporal_bound = find_temporal_bound(rule["consequence"])
+    if temporal_bound:
+        result = check_temporal_bound(temporal_bound["bound_clause"], context_texts, temporal_bound["direction"])
+        status = {"not_in_effect": "holds", "in_effect": "not_holds", "unknown": "unknown"}[result["status"]]
+        return {"kind": "temporal", "polarity": None, "status": status, "detail": result, "phrase": temporal_bound["phrase"]}
+
+    return {"kind": "none", "polarity": None, "status": "no_exception", "detail": None}
 
 
 def _role_matches(rule: dict, passages: list[dict]) -> bool:
@@ -519,24 +550,26 @@ def reason(ask: str, passages: list[dict], use_real_ner: bool = False) -> dict:
                 applied = apply_threshold_rule(rule, facts["total"])
                 trace.append({"step": "apply_rule", "kind": "threshold", "result": applied})
                 if applied["matched"]:
-                    # Same exception/condition check the verb-rule branch
-                    # already has (EXP-089/026) -- a threshold rule's own
-                    # consequence can carry a trailing "unless"/"provided
-                    # that" clause exactly like the verb-rule shape, and
-                    # nothing checked it until now, a real, named gap.
-                    _, exception_conditions, polarity = split_exceptions(rule["consequence"])
-                    exception_context = [p["text"] for p in passages if p["id"] != rule_passage["id"]]
-                    exception_result = check_exceptions(exception_conditions, exception_context, polarity or "negative")
-                    trace.append({"step": "check_exception", "result": exception_result, "polarity": polarity})
-                    if exception_result["status"] == "holds":
-                        reason_phrase = "the rule's exception holds" if polarity == "negative" else "the rule's condition is not satisfied"
+                    # Same gate check the verb-rule branch already has
+                    # (EXP-089/026, now EXP-097 for temporal bounds) -- a
+                    # threshold rule's own consequence can carry a
+                    # trailing "unless"/"provided that"/"until" clause
+                    # exactly like the verb-rule shape.
+                    gate_context = [p["text"] for p in passages if p["id"] != rule_passage["id"]]
+                    gate_result = _check_rule_gate(rule, gate_context)
+                    trace.append({"step": "check_exception", "result": gate_result})
+                    if gate_result["status"] == "holds":
+                        if gate_result["kind"] == "temporal":
+                            reason_phrase = f"the rule's temporal bound ({gate_result['phrase']!r}) is not currently satisfied"
+                        else:
+                            reason_phrase = "the rule's exception holds" if gate_result["polarity"] == "negative" else "the rule's condition is not satisfied"
                         answer_parts.append(f"policy does not apply: {reason_phrase} ({rule['raw']!r}) [{rule_passage['id']}]")
                     else:
                         citations.add(rule_passage["id"])
-                        conditional = exception_result["status"] == "unknown"
+                        conditional = gate_result["status"] == "unknown"
                         if conditional:
                             rule_conditional = True
-                        unresolved_phrase = "the rule's exception is unresolved" if polarity == "negative" else "the rule's condition is unresolved"
+                        unresolved_phrase = "the rule's temporal bound is unresolved" if gate_result["kind"] == "temporal" else ("the rule's exception is unresolved" if gate_result["polarity"] == "negative" else "the rule's condition is unresolved")
                         suffix = f" ({unresolved_phrase} -- not confirmed either way)" if conditional else ""
                         answer_parts.append(f"policy applies: {applied['consequence']}{suffix} [{rule_passage['id']}]")
                 else:
@@ -562,33 +595,38 @@ def reason(ask: str, passages: list[dict], use_real_ner: bool = False) -> dict:
                 if applied["matched"]:
                     # apply_rule's own lemma-match check has no idea the
                     # rule's consequence might carry a trailing exception/
-                    # condition clause -- EXP-083/085 proved split_exceptions/
-                    # check_exceptions standalone, but until this call
-                    # existed, reason() itself never checked a matched
-                    # rule's own condition at all (EXP-089). EXP-026
-                    # generalized the mechanism beyond "unless"-style
-                    # negative exceptions to also recognize "provided that"-
-                    # style positive conditions (the opposite polarity: they
-                    # block the consequence if FALSE, not if true), so
-                    # polarity is threaded through here too. Every OTHER
-                    # given passage is the context a condition is checked
+                    # condition/temporal clause -- EXP-083/085 proved
+                    # split_exceptions/check_exceptions standalone, but
+                    # until this call existed, reason() itself never
+                    # checked a matched rule's own gate at all (EXP-089).
+                    # EXP-026 generalized the mechanism beyond "unless"-
+                    # style negative exceptions to also recognize
+                    # "provided that"-style positive conditions, and
+                    # EXP-097 added a genuinely different gate kind
+                    # (temporal bounds -- until/before/after/once answer
+                    # a WHEN question, not a WHETHER question), both
+                    # unified behind _check_rule_gate so this call site
+                    # doesn't need to know which kind it got. Every OTHER
+                    # given passage is the context a gate is checked
                     # against -- the same "exceptions are global policy
                     # text, not scoped to one story" principle _find_rule
                     # already applies when it scans every passage, not just
                     # `scoped`.
-                    _, exception_conditions, polarity = split_exceptions(rule["consequence"])
                     exception_context = [p["text"] for p in passages if p["id"] not in (rule_passage["id"], fact_passage["id"])]
-                    exception_result = check_exceptions(exception_conditions, exception_context, polarity or "negative")
-                    trace.append({"step": "check_exception", "result": exception_result, "polarity": polarity})
-                    if exception_result["status"] == "holds":
-                        reason_phrase = "the rule's exception holds" if polarity == "negative" else "the rule's condition is not satisfied"
+                    gate_result = _check_rule_gate(rule, exception_context)
+                    trace.append({"step": "check_exception", "result": gate_result})
+                    if gate_result["status"] == "holds":
+                        if gate_result["kind"] == "temporal":
+                            reason_phrase = f"the rule's temporal bound ({gate_result['phrase']!r}) is not currently satisfied"
+                        else:
+                            reason_phrase = "the rule's exception holds" if gate_result["polarity"] == "negative" else "the rule's condition is not satisfied"
                         answer_parts.append(f"policy does not apply: {reason_phrase} ({rule['raw']!r}) [{rule_passage['id']}]")
                     else:
                         citations.update([rule_passage["id"], fact_passage["id"]])
-                        conditional = exception_result["status"] == "unknown"
+                        conditional = gate_result["status"] == "unknown"
                         if conditional:
                             rule_conditional = True
-                        unresolved_phrase = "the rule's exception is unresolved" if polarity == "negative" else "the rule's condition is unresolved"
+                        unresolved_phrase = "the rule's temporal bound is unresolved" if gate_result["kind"] == "temporal" else ("the rule's exception is unresolved" if gate_result["polarity"] == "negative" else "the rule's condition is unresolved")
                         suffix = f" ({unresolved_phrase} -- not confirmed either way)" if conditional else ""
                         answer_parts.append(
                             f"{fact_passage['text']} [{fact_passage['id']}] matches the rule's trigger ({applied['trigger_lemma']}): "

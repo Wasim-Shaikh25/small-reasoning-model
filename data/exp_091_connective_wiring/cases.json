@@ -82,17 +82,21 @@
       {
         "step": "check_exception",
         "result": {
+          "kind": "condition",
+          "polarity": "negative",
           "status": "holds",
-          "per_exception": [
-            {
-              "status": "holds",
-              "best_entail": 0.9941,
-              "best_contradict": 0.0008,
-              "best_context": "The data subject has given explicit consent to the processing of those personal data for one or more specified purposes."
-            }
-          ]
-        },
-        "polarity": "negative"
+          "detail": {
+            "status": "holds",
+            "per_exception": [
+              {
+                "status": "holds",
+                "best_entail": 0.9941,
+                "best_contradict": 0.0008,
+                "best_context": "The data subject has given explicit consent to the processing of those personal data for one or more specified purposes."
+              }
+            ]
+          }
+        }
       }
     ]
   },
@@ -179,17 +183,21 @@
       {
         "step": "check_exception",
         "result": {
+          "kind": "condition",
+          "polarity": "negative",
           "status": "holds",
-          "per_exception": [
-            {
-              "status": "holds",
-              "best_entail": 0.9941,
-              "best_contradict": 0.0008,
-              "best_context": "The data subject has given explicit consent to the processing of those personal data for one or more specified purposes."
-            }
-          ]
-        },
-        "polarity": "negative"
+          "detail": {
+            "status": "holds",
+            "per_exception": [
+              {
+                "status": "holds",
+                "best_entail": 0.9941,
+                "best_contradict": 0.0008,
+                "best_context": "The data subject has given explicit consent to the processing of those personal data for one or more specified purposes."
+              }
+            ]
+          }
+        }
       }
     ]
   },
@@ -279,17 +287,21 @@
       {
         "step": "check_exception",
         "result": {
+          "kind": "condition",
+          "polarity": "negative",
           "status": "not_holds",
-          "per_exception": [
-            {
-              "status": "not_holds",
-              "best_entail": 0.0001,
-              "best_contradict": 0.9982,
-              "best_context": "Aisha never gave any consent at all for this processing."
-            }
-          ]
-        },
-        "polarity": "negative"
+          "detail": {
+            "status": "not_holds",
+            "per_exception": [
+              {
+                "status": "not_holds",
+                "best_entail": 0.0001,
+                "best_contradict": 0.9982,
+                "best_context": "Aisha never gave any consent at all for this processing."
+              }
+            ]
+          }
+        }
       }
     ]
   },

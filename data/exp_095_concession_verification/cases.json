@@ -85,10 +85,11 @@
       {
         "step": "check_exception",
         "result": {
+          "kind": "none",
+          "polarity": null,
           "status": "no_exception",
-          "per_exception": []
-        },
-        "polarity": null
+          "detail": null
+        }
       }
     ]
   },
@@ -178,10 +179,11 @@
       {
         "step": "check_exception",
         "result": {
+          "kind": "none",
+          "polarity": null,
           "status": "no_exception",
-          "per_exception": []
-        },
-        "polarity": null
+          "detail": null
+        }
       }
     ]
   },
@@ -271,10 +273,11 @@
       {
         "step": "check_exception",
         "result": {
+          "kind": "none",
+          "polarity": null,
           "status": "no_exception",
-          "per_exception": []
-        },
-        "polarity": null
+          "detail": null
+        }
       }
     ]
   }

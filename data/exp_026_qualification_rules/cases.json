@@ -85,17 +85,21 @@
       {
         "step": "check_exception",
         "result": {
+          "kind": "condition",
+          "polarity": "positive",
           "status": "not_holds",
-          "per_exception": [
-            {
-              "status": "holds",
-              "best_entail": 0.9941,
-              "best_contradict": 0.0008,
-              "best_context": "The data subject has given explicit consent to the processing of those personal data for one or more specified purposes."
-            }
-          ]
-        },
-        "polarity": "positive"
+          "detail": {
+            "status": "not_holds",
+            "per_exception": [
+              {
+                "status": "holds",
+                "best_entail": 0.9941,
+                "best_contradict": 0.0008,
+                "best_context": "The data subject has given explicit consent to the processing of those personal data for one or more specified purposes."
+              }
+            ]
+          }
+        }
       }
     ]
   },
@@ -182,17 +186,21 @@
       {
         "step": "check_exception",
         "result": {
+          "kind": "condition",
+          "polarity": "positive",
           "status": "holds",
-          "per_exception": [
-            {
-              "status": "not_holds",
-              "best_entail": 0.0002,
-              "best_contradict": 0.998,
-              "best_context": "Aisha never gave any consent at all for this processing."
-            }
-          ]
-        },
-        "polarity": "positive"
+          "detail": {
+            "status": "holds",
+            "per_exception": [
+              {
+                "status": "not_holds",
+                "best_entail": 0.0002,
+                "best_contradict": 0.998,
+                "best_context": "Aisha never gave any consent at all for this processing."
+              }
+            ]
+          }
+        }
       }
     ]
   },
@@ -282,17 +290,21 @@
       {
         "step": "check_exception",
         "result": {
+          "kind": "condition",
+          "polarity": "positive",
           "status": "unknown",
-          "per_exception": [
-            {
-              "status": "unknown",
-              "best_entail": 0.0,
-              "best_contradict": 0.0,
-              "best_context": null
-            }
-          ]
-        },
-        "polarity": "positive"
+          "detail": {
+            "status": "unknown",
+            "per_exception": [
+              {
+                "status": "unknown",
+                "best_entail": 0.0,
+                "best_contradict": 0.0,
+                "best_context": null
+              }
+            ]
+          }
+        }
       }
     ]
   },

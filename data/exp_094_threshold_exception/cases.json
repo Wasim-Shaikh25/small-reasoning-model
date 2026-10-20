@@ -110,17 +110,21 @@
       {
         "step": "check_exception",
         "result": {
+          "kind": "condition",
+          "polarity": "negative",
           "status": "holds",
-          "per_exception": [
-            {
-              "status": "holds",
-              "best_entail": 0.9964,
-              "best_contradict": 0.0005,
-              "best_context": "The finance head has pre-approved the vendor in writing."
-            }
-          ]
-        },
-        "polarity": "negative"
+          "detail": {
+            "status": "holds",
+            "per_exception": [
+              {
+                "status": "holds",
+                "best_entail": 0.9964,
+                "best_contradict": 0.0005,
+                "best_context": "The finance head has pre-approved the vendor in writing."
+              }
+            ]
+          }
+        }
       }
     ]
   },
@@ -235,17 +239,21 @@
       {
         "step": "check_exception",
         "result": {
+          "kind": "condition",
+          "polarity": "negative",
           "status": "not_holds",
-          "per_exception": [
-            {
-              "status": "not_holds",
-              "best_entail": 0.0003,
-              "best_contradict": 0.999,
-              "best_context": "Priya Nair (a contractor) billed INR 40000 this quarter."
-            }
-          ]
-        },
-        "polarity": "negative"
+          "detail": {
+            "status": "not_holds",
+            "per_exception": [
+              {
+                "status": "not_holds",
+                "best_entail": 0.0003,
+                "best_contradict": 0.999,
+                "best_context": "Priya Nair (a contractor) billed INR 40000 this quarter."
+              }
+            ]
+          }
+        }
       }
     ]
   },
@@ -360,17 +368,21 @@
       {
         "step": "check_exception",
         "result": {
+          "kind": "condition",
+          "polarity": "negative",
           "status": "unknown",
-          "per_exception": [
-            {
-              "status": "unknown",
-              "best_entail": 0.0003,
-              "best_contradict": 0.0002,
-              "best_context": "Priya Nair (a contractor) billed INR 40000 this quarter."
-            }
-          ]
-        },
-        "polarity": "negative"
+          "detail": {
+            "status": "unknown",
+            "per_exception": [
+              {
+                "status": "unknown",
+                "best_entail": 0.0003,
+                "best_contradict": 0.0002,
+                "best_context": "Priya Nair (a contractor) billed INR 40000 this quarter."
+              }
+            ]
+          }
+        }
       }
     ]
   }
