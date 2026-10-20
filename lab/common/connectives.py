@@ -97,6 +97,10 @@ CONNECTIVE_TABLE: dict[str, tuple[str, str]] = {
     "because": (Operator.CAUSAL, "Contingency.Cause"),
     "since": (Operator.CAUSAL, "Contingency.Cause"),  # class-ambiguous with Temporal; see module docstring
     "as": (Operator.CAUSAL, "Contingency.Cause"),  # highly polysemous; only reached when dep_=="mark" (see below)
+    # EXP-096: verified via the same mark+advcl pattern as "although" (checked
+    # directly against spaCy output before adding, same as every entry above).
+    "while": (Operator.CONCESSION, "Comparison.Concession"),
+    "whereas": (Operator.CONCESSION, "Comparison.Concession"),
 }
 
 COMBINATOR_TABLE: dict[str, str] = {"and": Operator.COMBINATOR_AND, "or": Operator.COMBINATOR_OR}
@@ -128,6 +132,15 @@ DISCOURSE_ADVERBIAL_TABLE: dict[str, tuple[str, str]] = {
     "hence": (Operator.CAUSAL, "Contingency.Cause"),
     "moreover": (Operator.COMBINATOR_AND, "Expansion.Conjunction"),
     "furthermore": (Operator.COMBINATOR_AND, "Expansion.Conjunction"),
+    # EXP-096: verified via the same sentence-initial advmod+ROOT pattern,
+    # checked directly before adding, same as every entry above.
+    "meanwhile": (Operator.TEMPORAL_BOUND, "Temporal"),
+    "subsequently": (Operator.TEMPORAL_BOUND, "Temporal"),
+    "accordingly": (Operator.CAUSAL, "Contingency.Cause"),
+    "additionally": (Operator.COMBINATOR_AND, "Expansion.Conjunction"),
+    "similarly": (Operator.COMBINATOR_AND, "Expansion.Conjunction"),
+    "likewise": (Operator.COMBINATOR_AND, "Expansion.Conjunction"),
+    "conversely": (Operator.CONCESSION, "Comparison.Concession"),
 }
 # "in addition" is the same prep+pobj structural shape as "in case"
 # (below), sentence-initial -- a second idiom for the same "in" token,

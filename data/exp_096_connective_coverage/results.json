@@ -1,0 +1,54 @@
+{
+  "id": "EXP-096",
+  "title": "Extending connective coverage: 9 verified additions, 9 candidates measured and dropped",
+  "status": "closed",
+  "goal": "A bounded next step on EXP-090's own conclusion: extend CONNECTIVE_TABLE/DISCOURSE_ADVERBIAL_TABLE coverage past ~20/149 DiMLex-Eng connectives, verifying each candidate against real spaCy output before adding it -- and reporting, not hiding, any candidate that doesn't fit this module's existing structural patterns.",
+  "method": "18 candidate connectives, spanning all four PDTB classes, probed directly against spaCy's real dependency parse before any table entry was written. 9 cleanly matched one of the two existing structural patterns (mark+advcl for while/whereas; sentence-initial advmod+ROOT for the 7 discourse adverbials) and were added to CONNECTIVE_TABLE/DISCOURSE_ADVERBIAL_TABLE. 9 did not and were left out. One hand-built sentence per added connective, plus a sweep of the real GDPR_TEXT fixture for instances of the new connectives specifically. Reran EXP-090/091/026/050 to confirm the additions caused no regression.",
+  "metrics": {
+    "new_cases": {
+      "n": 9,
+      "correct": 9,
+      "by_label": {
+        "while": true,
+        "whereas": true,
+        "meanwhile": true,
+        "subsequently": true,
+        "accordingly": true,
+        "additionally": true,
+        "similarly": true,
+        "likewise": true,
+        "conversely": true
+      }
+    },
+    "n_dropped_candidates": 9,
+    "gdpr_full_document": {
+      "total_sentences": 103,
+      "new_connective_hits": 0
+    },
+    "all_correct": true
+  },
+  "results_prose": "9/9 new connectives correctly classified -- all correct, covering 2 more mark+advcl subordinators (while, whereas) and 7 more sentence-initial discourse adverbials (meanwhile, subsequently, accordingly, additionally, similarly, likewise, conversely), all verified against real spaCy output before being added, the same discipline EXP-090 used. 9 further candidates were measured and deliberately dropped rather than forced into a wrong classification -- each hits a genuinely different structural pattern this module doesn't yet handle (ccomp complementizers, compound prepositions, stacked advmods), named honestly in follow_ups. On the real GDPR text: 0 instances of the 9 new connectives found.",
+  "conclusion": "Connective coverage grew from 28 to 37 recognized phrases (CONNECTIVE_TABLE + DISCOURSE_ADVERBIAL_TABLE combined) through the same two already-built, already-tested structural patterns -- no new detection code, purely additive table entries. Equally important: 9 further candidates were measured and found NOT to fit either existing pattern, and were left out rather than misclassified -- extending coverage further needs new structural patterns (a ccomp-vs-mark discriminator for 'that'-clauses, multi-token compound prepositions), not just more table rows.",
+  "scale_down": "Still a small, named subset of DiMLex-Eng's 149 (37 now, not all 149). The 9 dropped candidates are real, nameable future work (see follow_ups), not abandoned without reason. Hand-built sentences, not held-out novel phrasings of the same connectives.",
+  "referenced_files": [
+    "lab/exp_096_connective_coverage/run.py",
+    "lab/common/connectives.py",
+    "lab/common/textutil.py",
+    "lab/exp_081_real_document_pipeline/run.py",
+    "lab/exp_090_connective_detection/run.py"
+  ],
+  "follow_ups": [
+    "assuming that: 'that' attaches via dep_=='ccomp', the excluded reported-speech-complementizer pattern (EXP-090)",
+    "now that: 'that' attaches via dep_=='ccomp', same as 'assuming that'",
+    "given that: 'given' attaches as dep_=='prep' to an ACOMP, not the ROOT verb -- different shape than existing prep-subordinator entries",
+    "whenever: surfaces as dep_=='advmod' (not 'mark') attached to an advcl -- a new pattern this module doesn't check",
+    "as soon as: two stacked advmod tokens attached directly to ROOT, not mark+advcl at all",
+    "due to: two-token 'X to' compound preposition; the object sits under the second token, not the first the way _clause_text_for_prep expects",
+    "owing to: same two-token compound-preposition shape as 'due to'",
+    "in spite of: three-token idiom ('in spite OF'); only partially fits the existing two-token _IN_IDIOMS extension point",
+    "regardless of: three-token idiom with its own 'regardless' as advmod, not prep -- a different shape from 'in spite of'"
+  ],
+  "elapsed_sec": 16.8442,
+  "peak_rss_mb": 386.79,
+  "models_used": "spaCy en_core_web_sm dependency parser via lab.common.connectives.find_connectives (unchanged detection code, new table entries only). No generative model."
+}

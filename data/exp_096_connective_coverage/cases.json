@@ -1,0 +1,106 @@
+{
+  "new_connective_cases": [
+    {
+      "label": "while",
+      "sentence": "While the controller must notify the authority, the processor need not.",
+      "expected_operator": "concession",
+      "correct": true,
+      "dep_pattern": "mark+advcl"
+    },
+    {
+      "label": "whereas",
+      "sentence": "Whereas the controller bears responsibility, the processor does not.",
+      "expected_operator": "concession",
+      "correct": true,
+      "dep_pattern": "mark+advcl"
+    },
+    {
+      "label": "meanwhile",
+      "sentence": "Meanwhile, the processor must retain the records.",
+      "expected_operator": "temporal_bound",
+      "correct": true,
+      "dep_pattern": "advmod+ROOT"
+    },
+    {
+      "label": "subsequently",
+      "sentence": "Subsequently, the processor deleted the data.",
+      "expected_operator": "temporal_bound",
+      "correct": true,
+      "dep_pattern": "advmod+ROOT"
+    },
+    {
+      "label": "accordingly",
+      "sentence": "Accordingly, the controller must notify the authority.",
+      "expected_operator": "causal",
+      "correct": true,
+      "dep_pattern": "advmod+ROOT"
+    },
+    {
+      "label": "additionally",
+      "sentence": "Additionally, the controller must document the breach.",
+      "expected_operator": "combinator_and",
+      "correct": true,
+      "dep_pattern": "advmod+ROOT"
+    },
+    {
+      "label": "similarly",
+      "sentence": "Similarly, the processor must comply.",
+      "expected_operator": "combinator_and",
+      "correct": true,
+      "dep_pattern": "advmod+ROOT"
+    },
+    {
+      "label": "likewise",
+      "sentence": "Likewise, the processor must comply.",
+      "expected_operator": "combinator_and",
+      "correct": true,
+      "dep_pattern": "advmod+ROOT"
+    },
+    {
+      "label": "conversely",
+      "sentence": "Conversely, the processor bears no liability.",
+      "expected_operator": "concession",
+      "correct": true,
+      "dep_pattern": "advmod+ROOT"
+    }
+  ],
+  "dropped_candidates": [
+    {
+      "phrase": "assuming that",
+      "reason": "'that' attaches via dep_=='ccomp', the excluded reported-speech-complementizer pattern (EXP-090)"
+    },
+    {
+      "phrase": "now that",
+      "reason": "'that' attaches via dep_=='ccomp', same as 'assuming that'"
+    },
+    {
+      "phrase": "given that",
+      "reason": "'given' attaches as dep_=='prep' to an ACOMP, not the ROOT verb -- different shape than existing prep-subordinator entries"
+    },
+    {
+      "phrase": "whenever",
+      "reason": "surfaces as dep_=='advmod' (not 'mark') attached to an advcl -- a new pattern this module doesn't check"
+    },
+    {
+      "phrase": "as soon as",
+      "reason": "two stacked advmod tokens attached directly to ROOT, not mark+advcl at all"
+    },
+    {
+      "phrase": "due to",
+      "reason": "two-token 'X to' compound preposition; the object sits under the second token, not the first the way _clause_text_for_prep expects"
+    },
+    {
+      "phrase": "owing to",
+      "reason": "same two-token compound-preposition shape as 'due to'"
+    },
+    {
+      "phrase": "in spite of",
+      "reason": "three-token idiom ('in spite OF'); only partially fits the existing two-token _IN_IDIOMS extension point"
+    },
+    {
+      "phrase": "regardless of",
+      "reason": "three-token idiom with its own 'regardless' as advmod, not prep -- a different shape from 'in spite of'"
+    }
+  ],
+  "gdpr_hits": []
+}
