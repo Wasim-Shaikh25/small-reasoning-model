@@ -680,6 +680,17 @@
       ]
     },
     {
+      "sentence": "The withdrawal of consent shall not affect the lawfulness of processing based on consent before its withdrawal.",
+      "connectives": [
+        {
+          "phrase": "before",
+          "operator": "temporal_bound",
+          "pdtb_class": "Temporal",
+          "dep_pattern": "prep+pobj+fallback_remainder"
+        }
+      ]
+    },
+    {
       "sentence": "It shall be as easy to withdraw as to give consent.",
       "connectives": [
         {
@@ -863,6 +874,12 @@
           "dep_pattern": "cc"
         },
         {
+          "phrase": "after",
+          "operator": "temporal_bound",
+          "pdtb_class": "Temporal",
+          "dep_pattern": "prep+pcomp"
+        },
+        {
           "phrase": "unless",
           "operator": "condition_negative",
           "pdtb_class": "Contingency.Condition",
@@ -873,6 +890,17 @@
           "operator": "combinator_and",
           "pdtb_class": "Expansion.Conjunction",
           "dep_pattern": "cc"
+        }
+      ]
+    },
+    {
+      "sentence": "The processor shall notify the controller without undue delay after becoming aware of a personal data breach.",
+      "connectives": [
+        {
+          "phrase": "after",
+          "operator": "temporal_bound",
+          "pdtb_class": "Temporal",
+          "dep_pattern": "prep+pcomp"
         }
       ]
     },

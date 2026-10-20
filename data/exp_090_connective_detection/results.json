@@ -34,15 +34,17 @@
     },
     "gdpr_full_document": {
       "total_sentences": 103,
-      "sentences_with_a_connective": 53,
-      "connectives_recognized": 118,
+      "sentences_with_a_connective": 55,
+      "connectives_recognized": 121,
       "connectives_unrecognized": 4,
       "recognized_phrase_counts": {
         "or": 62,
         "and": 48,
         "if": 5,
+        "before": 1,
         "as": 1,
-        "unless": 2
+        "unless": 2,
+        "after": 2
       },
       "unrecognized_instances": [
         {
@@ -72,7 +74,7 @@
       ]
     }
   },
-  "results_prose": "20/20 hand-built connective sentences correctly classified through the SAME detection function (accuracy=1.0), covering all 7 operators -- all correct. On the full real 103-sentence GDPR text (13 articles, not just Art 9): 53 sentences contained at least one detected connective, 118 recognized by phrase: {'or': 62, 'and': 48, 'if': 5, 'as': 1, 'unless': 2}. Two genuine 'unless' exception clauses were found OUTSIDE Art 9 -- in Art 12 ('...shall not refuse to act on the request of the data subject...unless the controller demonstrates that it is not in a position to identify the data subject') and Art 33 ('...notify the personal data breach to the supervisory authority, unless the personal data breach is unlikely to result in a risk...') -- found by the SAME detector that classified the hand-built cases, not a second hand-built fixture; neither was ever reachable by EXP-085/088/089's single hand-composed Art-9 sentence. 4 connective-shaped tokens were detected structurally but not in the operator table, flagged rather than dropped or guessed: [('than', 'mark+advcl'), ('whether', 'mark+pcomp'), ('whether', 'mark+pcomp'), ('for', 'mark+advcl')] -- 'than' (comparative degree, 'no longer THAN is necessary'), 'for' (a purpose clause, 'measures FOR ensuring...'), and 'whether' x2 (an embedded question as a preposition's object, not a discourse relation) -- none of these are PDTB discourse connectives at all, and none were misclassified into the wrong operator; they were correctly left unrecognized.",
+  "results_prose": "20/20 hand-built connective sentences correctly classified through the SAME detection function (accuracy=1.0), covering all 7 operators -- all correct. On the full real 103-sentence GDPR text (13 articles, not just Art 9): 55 sentences contained at least one detected connective, 121 recognized by phrase: {'or': 62, 'and': 48, 'if': 5, 'before': 1, 'as': 1, 'unless': 2, 'after': 2}. Two genuine 'unless' exception clauses were found OUTSIDE Art 9 -- in Art 12 ('...shall not refuse to act on the request of the data subject...unless the controller demonstrates that it is not in a position to identify the data subject') and Art 33 ('...notify the personal data breach to the supervisory authority, unless the personal data breach is unlikely to result in a risk...') -- found by the SAME detector that classified the hand-built cases, not a second hand-built fixture; neither was ever reachable by EXP-085/088/089's single hand-composed Art-9 sentence. 4 connective-shaped tokens were detected structurally but not in the operator table, flagged rather than dropped or guessed: [('than', 'mark+advcl'), ('whether', 'mark+pcomp'), ('whether', 'mark+pcomp'), ('for', 'mark+advcl')] -- 'than' (comparative degree, 'no longer THAN is necessary'), 'for' (a purpose clause, 'measures FOR ensuring...'), and 'whether' x2 (an embedded question as a preposition's object, not a discourse relation) -- none of these are PDTB discourse connectives at all, and none were misclassified into the wrong operator; they were correctly left unrecognized.",
   "conclusion": "The SAME grammar-driven detection function correctly classified 20/20 different connectives (not 20 different hardcoded regexes), spanning all four PDTB classes and both combinators -- a real generalization past the single 'unless' keyword match this project used before. Run against the full real GDPR text (not the single hand-built rule sentence EXP-085/088/089 used), it surfaces real connective instances -- see data/exp_090_connective_detection/cases.json's gdpr_document_findings for every one, by sentence -- giving this project, for the first time, visibility into what logical structure the ACTUAL statute contains beyond the one exception-bearing Art 9 passage every prior exploration hand-picked. Detection and classification are proven; wiring each operator's own reasoning semantics (concession never blocks; temporal is not modeled; causal is never a gate) into the forward-chaining mechanism is explicitly a separate, later step, named in follow_ups, not done here.",
   "scale_down": "The 20 connective cases are the same sentences this exploration's own pre-build probe used to ground the detection patterns, not a held-out test -- held-out generalization to novel phrasings of the same connectives was not measured here. The operator table covers ~20 of DiMLex-Eng's 149 English connectives (the highest-frequency, least class-ambiguous ones across all four PDTB classes), not the full inventory. Two structural edge cases were found and are reported, not hidden: 'despite's governed clause sits outside its own pobj child's subtree in spaCy's parse (a real attachment quirk for gerund-after-preposition constructions), handled by a labeled fallback that returns the sentence's remainder rather than a clean clause span; and coordinating 'or' was measured attaching to a noun object rather than the sentence's ROOT verb when its two disjuncts are not both obviously full clauses -- detected correctly (operator assigned) but its own clause_text extraction inherits that same attachment ambiguity.",
   "referenced_files": [
@@ -86,7 +88,7 @@
     "The operator table covers ~20 of 149 DiMLex-Eng connectives -- extending coverage (and testing whether the same three structural patterns hold for the remaining ~129) is a real, boundable next step, not an open-ended one, since the full inventory is already catalogued externally.",
     "find_connectives has not been tested on a sentence with more than one connective interacting (e.g. 'unless A, provided that B, until C') -- the real GDPR document run above may or may not contain such a sentence; check gdpr_document_findings for any sentence with multiple connectives before assuming single-connective-per-sentence is the common case."
   ],
-  "elapsed_sec": 14.5041,
-  "peak_rss_mb": 386.05,
+  "elapsed_sec": 15.2674,
+  "peak_rss_mb": 385.95,
   "models_used": "spaCy en_core_web_sm dependency parser (structural connective detection, deterministic) plus a small, documented, closed-class lemma/phrase-to-operator lookup table grounded in DiMLex-Eng/PDTB. No generative model, no new dependency, no NLI call in this exploration -- detection and classification only, no truth-judgment over any clause's content."
 }

@@ -343,8 +343,8 @@
       "first": "The data subject shall have the right to withdraw his or her consent at any time.",
       "second": "The withdrawal of consent shall not affect the lawfulness of processing based on consent before its withdrawal.",
       "similarity": 0.7359,
-      "opening_connective": null,
-      "opening_connective_operator": null,
+      "opening_connective": "before",
+      "opening_connective_operator": "temporal_bound",
       "flagged": false
     },
     {
@@ -568,9 +568,9 @@
       "first": "Where the notification to the supervisory authority is not made within 72 hours, it shall be accompanied by reasons for the delay.",
       "second": "The processor shall notify the controller without undue delay after becoming aware of a personal data breach.",
       "similarity": 0.6184,
-      "opening_connective": null,
-      "opening_connective_operator": null,
-      "flagged": true
+      "opening_connective": "after",
+      "opening_connective_operator": "temporal_bound",
+      "flagged": false
     },
     {
       "index": 58,

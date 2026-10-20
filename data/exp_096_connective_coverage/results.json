@@ -48,7 +48,7 @@
     "in spite of: three-token idiom ('in spite OF'); only partially fits the existing two-token _IN_IDIOMS extension point",
     "regardless of: three-token idiom with its own 'regardless' as advmod, not prep -- a different shape from 'in spite of'"
   ],
-  "elapsed_sec": 16.8442,
-  "peak_rss_mb": 386.79,
+  "elapsed_sec": 13.7346,
+  "peak_rss_mb": 386.26,
   "models_used": "spaCy en_core_web_sm dependency parser via lab.common.connectives.find_connectives (unchanged detection code, new table entries only). No generative model."
 }

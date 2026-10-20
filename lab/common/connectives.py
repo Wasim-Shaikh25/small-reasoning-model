@@ -157,7 +157,19 @@ _MARK_HEAD_DEPS = {"advcl", "pcomp", "relcl"}
 # with head.dep_=="ccomp". A reported-speech complementizer is a different
 # grammatical category from an adverbial discourse relation, not an unknown
 # instance of one.
-_PREP_SUBORDINATORS = {"except", "despite", "provide", "in"}  # "provide": spaCy's lemma for "provided" (VERB)
+_PREP_SUBORDINATORS = {"except", "despite", "provide", "in", "until", "before", "after"}  # "provide": spaCy's lemma for "provided" (VERB)
+# "until"/"before"/"after" (EXP-097's own bug, not a new finding at design
+# time): these three surface as dep_=="mark" ONLY when their object is a
+# clause with its own verb ("until the data subject withdraws consent").
+# When the object is a bare date/noun phrase instead ("until 1 January
+# 2020"), spaCy attaches them as an ordinary dep_=="prep" with a pobj
+# child -- the SAME prep+pobj shape "except"/"despite" already use, not a
+# new pattern, just never extended to this table until the gap surfaced:
+# find_temporal_bound silently returned None for every absolute-date rule
+# (mark+advcl was the only branch checked), so EXP-097's own case 1 went
+# through un-gated. "once" deliberately excluded: "once <NP>" with no verb
+# is not an attested English construction, so there is no prep-shaped gap
+# to close for it.
 _EMPHASIS_PREFIXES = {"even", "only"}
 
 

@@ -17,12 +17,12 @@
     },
     "gdpr_full_document": {
       "total_pairs": 102,
-      "flagged": 38,
-      "with_opening_connective": 51
+      "flagged": 37,
+      "with_opening_connective": 53
     },
     "all_correct": true
   },
-  "results_prose": "4/4 hand-built pairs correct -- all correct. The 'incoherent_signaled_but_unrelated' case is the real test: a low-similarity pair ('However, the weather...') is NOT flagged purely because 'however' opens it, even though the content is genuinely unrelated -- a limit named honestly in scale_down, not hidden. On the real 103-sentence GDPR text: 102 consecutive pairs, 38 flagged as an unsignaled low-similarity jump, 51 pairs where the second sentence opens with a detected discourse connective.",
+  "results_prose": "4/4 hand-built pairs correct -- all correct. The 'incoherent_signaled_but_unrelated' case is the real test: a low-similarity pair ('However, the weather...') is NOT flagged purely because 'however' opens it, even though the content is genuinely unrelated -- a limit named honestly in scale_down, not hidden. On the real 103-sentence GDPR text: 102 consecutive pairs, 37 flagged as an unsignaled low-similarity jump, 53 pairs where the second sentence opens with a detected discourse connective.",
   "conclusion": "Both signals are measured, not asserted: bge similarity catches a genuine unsignaled topic jump (incoherent_unsignaled_jump), and a present discourse connective correctly suppresses the flag for a deliberate, signaled shift (coherent_signaled_shift) even when similarity is low. The real limit this exploration surfaces honestly: a connective's mere presence suppresses the flag regardless of whether the following content actually follows from it (incoherent_signaled_but_unrelated stays unflagged) -- this check catches unsignaled incoherence, not misused connectives, and should not be read as a general coherence judge.",
   "scale_down": "A present discourse connective suppresses the flag unconditionally -- it does not verify the connective is used correctly (incoherent_signaled_but_unrelated is a real, reported limit, not hidden). DISCOURSE_ADVERBIAL_TABLE covers 8 connectives (however/nevertheless/therefore/thus/consequently/hence/moreover/furthermore) plus 'in addition' -- a small, named set, not the full PDTB discourse-adverbial inventory. Not yet wired into lab.common.assemble.build_outline itself -- this exploration proves the check, wiring it into the actual outline-building loop is a separate step.",
   "referenced_files": [
@@ -36,7 +36,7 @@
   "follow_ups": [
     "Wire sequence_coherence into lab.common.assemble.build_outline itself so a flagged leaf is actually reordered or surfaced during real document assembly, not just measured standalone."
   ],
-  "elapsed_sec": 50.6089,
-  "peak_rss_mb": 606.09,
+  "elapsed_sec": 51.7669,
+  "peak_rss_mb": 604.01,
   "models_used": "bge-small-en-v1.5 (lab.common.real_encoders.bge_similarity, already loaded for EXP-040/042) for the similarity signal; spaCy en_core_web_sm dependency parser via lab.common.connectives.find_connectives (extended, deterministic) for the connective signal. No generative model."
 }

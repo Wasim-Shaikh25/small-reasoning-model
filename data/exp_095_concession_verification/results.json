@@ -23,7 +23,7 @@
     "lab/common/connectives.py"
   ],
   "follow_ups": [],
-  "elapsed_sec": 27.23,
-  "peak_rss_mb": 592.77,
+  "elapsed_sec": 26.7645,
+  "peak_rss_mb": 592.59,
   "models_used": "spaCy en_core_web_sm dependency parser via lab.common.connectives.find_connectives (unchanged). No NLI call needed -- no exception check ever fires for a CONCESSION clause, which is exactly the point being verified. No generative model."
 }
