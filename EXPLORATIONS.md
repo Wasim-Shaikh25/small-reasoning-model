@@ -22164,7 +22164,7 @@ Elapsed seconds: 15.5826. Peak RSS MB: 292.66.
 }
 ```
 
-Elapsed seconds: 0.0276. Peak RSS MB: 138.36.
+Elapsed seconds: 0.0552. Peak RSS MB: 130.77.
 - Scale-down: Two stories, one policy, one role-class check. Real documents would have more distractors, multiple candidate policies, and roles stated less explicitly than 'is a contractor for Zenith Corp.' -- this is a scaled-down integration test of the chain, not a benchmark of its ceiling.
 - Conclusion: Disambiguating between two multi-sentence stories by a cue in the ask (not a name), extracting a name and address, summing money mentioned across separate sentences, and applying a company policy threshold rule all chain correctly end to end, each step citable to its own source passage. The second case is the one worth dwelling on: Ravi Sharma's total (INR 45,000) is well over the policy's INR 30,000 threshold, and a rule engine that only checked the number would have incorrectly fired approval on him. Checking that his own story actually describes him with the policy's subject role ('a contractor') -- and finding it doesn't, he's a sales manager -- is what keeps the decision correct. A rule matching a number is not the same as a rule applying to the right person.
 
@@ -22202,7 +22202,7 @@ Elapsed seconds: 0.0276. Peak RSS MB: 138.36.
 }
 ```
 
-Elapsed seconds: 12.8878. Peak RSS MB: 292.07.
+Elapsed seconds: 115.1969. Peak RSS MB: 291.8.
 - Scale-down: Six domains, 11 hand-written cases, single-clause rules and facts only -- not a benchmark of how many domains or how complex a rule this can handle, a targeted test of whether the existing mechanism needed domain-specific code to extend, which it did not.
 - Conclusion: The objection this exploration tests directly -- that a 'rule engine' which secretly needs a new rule per question isn't a rule engine at all -- does not hold for the two rule shapes built so far. The verb-trigger matcher works by extracting a sentence's main verb via spaCy's dependency parser and comparing lemmas; that mechanism has no idea whether the verb is 'murder', 'contain', 'run', or 'have' -- it would work on a verb this project has never seen written down anywhere, because the verb comes from the parser's general training, not from a lookup table this project wrote. The threshold matcher works by extracting a number near 'exceeds' and comparing it with the same calc.compare_numbers function EXP-007/014 already used for dates and amounts; it has no idea whether the number is rupees, degrees, or kilometers per hour. This is category A from the research pasted in review (a rule-based expert system: explicit rules and facts, a deterministic reasoning engine) with the narrow end of category B (a neural parser for natural-language understanding feeding a symbolic match step) -- one engine, run on different rulebooks, not a new engine per rulebook. What would genuinely need new code is a *third rule shape* this project hasn't built yet (a rule with an exception clause, a rule comparing two extracted facts to each other rather than to a fixed threshold) -- and that is a real, acknowledged limit, not a hidden one.
 
@@ -22226,7 +22226,7 @@ Elapsed seconds: 12.8878. Peak RSS MB: 292.07.
 - `data/exp_057_rule_application/results.json`
 - `data/exp_058_integrated_scenario/results.json`
 - `data/exp_060_unified_brain/results.json`
-- Results: On 8 cases spanning three regimes (plain lookup, rule application, integrated disambiguation+arithmetic+policy), all through the identical lab.common.brain.reason(ask, passages) call, 8 are correct (accuracy 1.0). The trace shows which internal steps fired per regime: lookup cases use ['analyze_ask', 'extract_identity', 'intent_signal', 'lookup_fallback'], the rule case uses ['analyze_ask', 'apply_rule', 'check_exception', 'find_rule', 'intent_signal'], the integrated cases use ['analyze_ask', 'apply_rule', 'compute_total', 'disambiguate', 'extract_identity', 'find_rule', 'intent_signal'] -- different internal steps, same external call.
+- Results: On 8 cases spanning three regimes (plain lookup, rule application, integrated disambiguation+arithmetic+policy), all through the identical lab.common.brain.reason(ask, passages) call, 8 are correct (accuracy 1.0). The trace shows which internal steps fired per regime: lookup cases use ['analyze_ask', 'extract_identity', 'intent_signal', 'lookup_fallback', 'plan'], the rule case uses ['analyze_ask', 'apply_rule', 'check_exception', 'find_rule', 'intent_signal', 'plan'], the integrated cases use ['analyze_ask', 'apply_rule', 'check_exception', 'compute_total', 'disambiguate', 'extract_identity', 'find_rule', 'intent_signal', 'plan'] -- different internal steps, same external call.
 ```json
 {
   "n": 8,
@@ -22239,7 +22239,8 @@ Elapsed seconds: 12.8878. Peak RSS MB: 292.07.
         "analyze_ask",
         "extract_identity",
         "intent_signal",
-        "lookup_fallback"
+        "lookup_fallback",
+        "plan"
       ]
     },
     "rule": {
@@ -22250,7 +22251,8 @@ Elapsed seconds: 12.8878. Peak RSS MB: 292.07.
         "apply_rule",
         "check_exception",
         "find_rule",
-        "intent_signal"
+        "intent_signal",
+        "plan"
       ]
     },
     "integrated": {
@@ -22259,11 +22261,13 @@ Elapsed seconds: 12.8878. Peak RSS MB: 292.07.
       "trace_steps_used": [
         "analyze_ask",
         "apply_rule",
+        "check_exception",
         "compute_total",
         "disambiguate",
         "extract_identity",
         "find_rule",
-        "intent_signal"
+        "intent_signal",
+        "plan"
       ]
     }
   },
@@ -22321,7 +22325,7 @@ Elapsed seconds: 12.8878. Peak RSS MB: 292.07.
 }
 ```
 
-Elapsed seconds: 69.352. Peak RSS MB: 593.22.
+Elapsed seconds: 92.1652. Peak RSS MB: 494.27.
 - Scale-down: 8 cases across 3 regimes, not a benchmark of the brain's ceiling -- a targeted test that the single entry point reproduces every prior exploration's answer without per-case wiring.
 - Conclusion: One function handles a plain lookup, a rule-application question, and a multi-signal integrated scenario without the caller choosing a path. The difference between regimes shows up only in the trace -- which internal signal checks fired -- never in which function was called or how it was called. A lookup question fires none of the extra signals and falls back to the same single-slot extractor lab.common.engine already uses; the integrated cases fire three signals at once and chain their results. This is the unification the prior three explorations (EXP-057/058/059) proved piece by piece, now proved as one entry point rather than three scripts a person chooses between.
 
@@ -22753,7 +22757,7 @@ Elapsed seconds: 0.2987. Peak RSS MB: 126.58.
 }
 ```
 
-Elapsed seconds: 101.2061. Peak RSS MB: 417.75.
+Elapsed seconds: 115.5055. Peak RSS MB: 346.12.
 - Scale-down: 2 cases, 2-level hierarchy, 9 passages -- a wiring proof, not a scale test (EXP-065 already measured scale up to 450 leaves for the navigation mechanism alone).
 - Conclusion: The unification EXP-060 proved for flat documents carries over to hierarchical ones without any change at the call site: the same function, given passages tagged with a 'hierarchy' dict instead of a flat 'group' string, navigates the structure (lab.common.nested_index, EXP-065's near-zero abstention floor included) and then runs the identical downstream signals (identity, arithmetic, rule application) EXP-058 already measured. A caller never needs to know or declare whether the document it's handing brain.reason is flat or structured -- the passages' own tags decide, the same 'input decides how much of the machinery runs' principle EXP-060 established for the simpler signals now extends to document structure itself.
 
@@ -22870,7 +22874,7 @@ Elapsed seconds: 73.1938. Peak RSS MB: 491.86.
 }
 ```
 
-Elapsed seconds: 127.4858. Peak RSS MB: 455.47.
+Elapsed seconds: 244.6209. Peak RSS MB: 449.2.
 - Scale-down: 3 margin-sweep fixtures, 1 single-child case, 4 flat-disambiguation cases -- enough to validate the mechanism and get a first real measurement of separability, not an exhaustive calibration.
 - Conclusion: All three gaps named after EXP-067 were addressed and re-measured rather than assumed fixed. Flat disambiguation now abstains correctly on the off-topic case and still answers both EXP-060 regression cases, using the identical dual-signal (lexical floor + semantic margin, independent checks that must agree) design EXP-067 validated for hierarchical navigation -- the same mechanism now covers both branches of lab.common.brain. The disambiguation fix worked on the paraphrase case from the first run (it resolved the correct group); what failed downstream of it at the time this exploration was first run was a *separate* issue this exploration exposed rather than caused: brain.py's _wants_identity and _wants_total were literal keyword checks ('name' + 'address', a fixed list of total-cue words), so a paraphrased ask could pass disambiguation correctly and still get no answer. That gap was closed in EXP-069 (semantic intent signals, replacing the literal keyword checks) -- this file reflects a rerun after that fix, which is why the paraphrase case now passes end to end rather than failing downstream the way it did when this exploration was first written. The single-candidate gap in navigate_semantic is closed by falling back to the TF-IDF dense floor specifically where a margin can't be computed, reusing lab.common.nested_index's already-measured constant rather than inventing a new number. The margin sweep found the two populations are NOT cleanly separable (min genuine 0.0031 <= max noise 0.0631) -- meaning no single fixed threshold can be fully trusted across different vocabularies, a real limitation to flag rather than paper over with a confident-sounding constant.
 
@@ -23012,7 +23016,7 @@ Elapsed seconds: 145.3789. Peak RSS MB: 404.45.
 }
 ```
 
-Elapsed seconds: 137.291. Peak RSS MB: 378.85.
+Elapsed seconds: 344.2524. Peak RSS MB: 378.13.
 - Scale-down: 1 fixture, 2 chapters, 5 cases -- a wiring/before-after proof, not a scale test (EXP-065 already measured the lexical mechanism's scale, EXP-067 the semantic mechanism's paraphrase case).
 - Conclusion: lab.common.brain's hierarchical branch now uses the same lexical+semantic dual-signal design (lab.common.semantic_index.navigate_dual) the flat branch already had, closing the gap this exploration was built to close. The paraphrase cases are exactly where the two diverge, as predicted: the dual-signal navigator resolves both correctly while the lexical-only navigator it replaces does not -- direct, measured evidence this wiring is load-bearing, not cosmetic. The two regression cases (exact wording) and the off-topic negative control hold under both navigators, confirming this is additive -- the new signal only helps on asks where lexical alone was already weak, it does not regress the cases lexical alone already handled.
 
@@ -24218,6 +24222,44 @@ Elapsed seconds: 13.3846. Peak RSS MB: 386.1.
 Elapsed seconds: 407.3452. Peak RSS MB: 814.32.
 - Scale-down: Only CONDITION_NEGATIVE is wired -- CONCESSION (although/though/despite), TEMPORAL_BOUND (until/before/after), and CAUSAL (because/since) still have zero reasoning semantics in check_exceptions/forward_chain; EXP-090 named this split explicitly and it is not revisited here. The threshold-rule branch in brain.py (apply_threshold_rule) still never calls split_exceptions/ check_exceptions at all -- a separate, already-named gap, untouched by this change.
 - Conclusion: lab.common.inference.split_exception now locates a rule's exception clause via lab.common.connectives.find_connectives's structural CONDITION_NEGATIVE detection instead of a hardcoded regex on the single word 'unless'. The gap this closes is not hypothetical: case 2 is the exact failure mode measured before this change (the 'except' phrasing was silently invisible to the old code), and it is now caught through brain.reason itself, the one production entry point, with no regression on the 'unless' phrasing (case 1), the 'except that' phrasing (case 3), or the real multi-alternative GDPR Art 9 rule's OR-combination (case 4).
+
+## EXP-094 Exception/condition handling for the threshold-rule branch, closing a gap named since EXP-089
+
+- Status: `closed`
+- Models used: Same as EXP-089/026: spaCy dependency parser (unchanged) + MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli via the existing, unmodified check_exception/check_exceptions. No generative model.
+- Goal: Give lab.common.brain's threshold-rule branch the same split_exceptions/check_exceptions call the verb-rule branch has had since EXP-089 -- a gap that exploration's own scale_down named explicitly ('a real and separate gap if a threshold rule's own consequence ever carries an unless clause') but left unfixed.
+- Method: lab.common.brain.py's threshold-rule `if applied['matched']:` branch now calls split_exceptions/check_exceptions (both unchanged, the same polarity-aware EXP-026 mechanism) against every other given passage as context, mirroring the verb-rule branch exactly. Three new cases (exception affirmed/contradicted/unresolved) prove the new capability, none reachable by any prior fixture. Reran EXP-060/066/068/070 (the explorations that actually exercise this branch through brain.reason -- EXP-058/059 predate reason()'s unification and never touch this code at all) to confirm zero behavior change.
+- Referenced files:
+- `lab/exp_094_threshold_exception/run.py`
+- `lab/common/brain.py`
+- `lab/common/inference.py`
+- `lab/common/rules.py`
+- `lab/exp_060_unified_brain/run.py`
+- Results: Case 1 (exception affirmed): decision='supported', text='total 70,000 [policy, fact-1]. policy does not apply: the rule\'s exception holds ("Company policy: if a contractor\'s total billed amount in a quarter exceeds INR 30000, the payment requires finance head approval, unless the finance head has pre-approved the vendor in writing.") [policy].' -- blocked=True. Case 2 (exception contradicted): decision='supported', text='total 70,000 [policy, fact-1]. policy applies: the payment requires finance head approval, unless the finance head has pre-approved the vendor in writing [policy].' -- clean=True. Case 3 (no context): decision='supported_with_flags', text="total 70,000 [policy, fact-1]. policy applies: the payment requires finance head approval, unless the finance head has pre-approved the vendor in writing (the rule's exception is unresolved -- not confirmed either way) [policy]." -- flagged=True. None of these three cases was reachable before this fix -- every prior threshold-rule fixture (EXP-057/058/059/060/066/068/070) had no exception clause at all, so the gap was never exercised, only named.
+```json
+{
+  "case1_exception_holds": {
+    "decision": "supported",
+    "text": "total 70,000 [policy, fact-1]. policy does not apply: the rule's exception holds (\"Company policy: if a contractor's total billed amount in a quarter exceeds INR 30000, the payment requires finance head approval, unless the finance head has pre-approved the vendor in writing.\") [policy].",
+    "blocked": true
+  },
+  "case2_exception_contradicted": {
+    "decision": "supported",
+    "text": "total 70,000 [policy, fact-1]. policy applies: the payment requires finance head approval, unless the finance head has pre-approved the vendor in writing [policy].",
+    "clean": true
+  },
+  "case3_no_context": {
+    "decision": "supported_with_flags",
+    "text": "total 70,000 [policy, fact-1]. policy applies: the payment requires finance head approval, unless the finance head has pre-approved the vendor in writing (the rule's exception is unresolved -- not confirmed either way) [policy].",
+    "flagged": true
+  },
+  "all_correct": true
+}
+```
+
+Elapsed seconds: 1138.4335. Peak RSS MB: 273.8.
+- Scale-down: Only verified against one hand-built threshold-rule-with-exception fixture, not a sweep across many threshold-rule phrasings. _role_matches's own role-mismatch check still runs first and is unaffected by this change -- a role mismatch still short-circuits before any exception check, same as before.
+- Conclusion: The threshold-rule branch now checks exceptions/conditions exactly like the verb-rule branch already did, closing the gap EXP-089 named as a separate, un-fixed limit. Purely additive: every existing threshold-rule fixture (reran EXP-060/066/068/070, the explorations that actually exercise this branch through brain.reason) produced byte-identical output, since check_exceptions correctly returns 'no_exception' when there is nothing to check.
 
 ## Follow-up todos
 

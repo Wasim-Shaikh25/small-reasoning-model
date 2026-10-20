@@ -1,0 +1,39 @@
+{
+  "id": "EXP-094",
+  "title": "Exception/condition handling for the threshold-rule branch, closing a gap named since EXP-089",
+  "status": "closed",
+  "goal": "Give lab.common.brain's threshold-rule branch the same split_exceptions/check_exceptions call the verb-rule branch has had since EXP-089 -- a gap that exploration's own scale_down named explicitly ('a real and separate gap if a threshold rule's own consequence ever carries an unless clause') but left unfixed.",
+  "method": "lab.common.brain.py's threshold-rule `if applied['matched']:` branch now calls split_exceptions/check_exceptions (both unchanged, the same polarity-aware EXP-026 mechanism) against every other given passage as context, mirroring the verb-rule branch exactly. Three new cases (exception affirmed/contradicted/unresolved) prove the new capability, none reachable by any prior fixture. Reran EXP-060/066/068/070 (the explorations that actually exercise this branch through brain.reason -- EXP-058/059 predate reason()'s unification and never touch this code at all) to confirm zero behavior change.",
+  "metrics": {
+    "case1_exception_holds": {
+      "decision": "supported",
+      "text": "total 70,000 [policy, fact-1]. policy does not apply: the rule's exception holds (\"Company policy: if a contractor's total billed amount in a quarter exceeds INR 30000, the payment requires finance head approval, unless the finance head has pre-approved the vendor in writing.\") [policy].",
+      "blocked": true
+    },
+    "case2_exception_contradicted": {
+      "decision": "supported",
+      "text": "total 70,000 [policy, fact-1]. policy applies: the payment requires finance head approval, unless the finance head has pre-approved the vendor in writing [policy].",
+      "clean": true
+    },
+    "case3_no_context": {
+      "decision": "supported_with_flags",
+      "text": "total 70,000 [policy, fact-1]. policy applies: the payment requires finance head approval, unless the finance head has pre-approved the vendor in writing (the rule's exception is unresolved -- not confirmed either way) [policy].",
+      "flagged": true
+    },
+    "all_correct": true
+  },
+  "results_prose": "Case 1 (exception affirmed): decision='supported', text='total 70,000 [policy, fact-1]. policy does not apply: the rule\\'s exception holds (\"Company policy: if a contractor\\'s total billed amount in a quarter exceeds INR 30000, the payment requires finance head approval, unless the finance head has pre-approved the vendor in writing.\") [policy].' -- blocked=True. Case 2 (exception contradicted): decision='supported', text='total 70,000 [policy, fact-1]. policy applies: the payment requires finance head approval, unless the finance head has pre-approved the vendor in writing [policy].' -- clean=True. Case 3 (no context): decision='supported_with_flags', text=\"total 70,000 [policy, fact-1]. policy applies: the payment requires finance head approval, unless the finance head has pre-approved the vendor in writing (the rule's exception is unresolved -- not confirmed either way) [policy].\" -- flagged=True. None of these three cases was reachable before this fix -- every prior threshold-rule fixture (EXP-057/058/059/060/066/068/070) had no exception clause at all, so the gap was never exercised, only named.",
+  "conclusion": "The threshold-rule branch now checks exceptions/conditions exactly like the verb-rule branch already did, closing the gap EXP-089 named as a separate, un-fixed limit. Purely additive: every existing threshold-rule fixture (reran EXP-060/066/068/070, the explorations that actually exercise this branch through brain.reason) produced byte-identical output, since check_exceptions correctly returns 'no_exception' when there is nothing to check.",
+  "scale_down": "Only verified against one hand-built threshold-rule-with-exception fixture, not a sweep across many threshold-rule phrasings. _role_matches's own role-mismatch check still runs first and is unaffected by this change -- a role mismatch still short-circuits before any exception check, same as before.",
+  "referenced_files": [
+    "lab/exp_094_threshold_exception/run.py",
+    "lab/common/brain.py",
+    "lab/common/inference.py",
+    "lab/common/rules.py",
+    "lab/exp_060_unified_brain/run.py"
+  ],
+  "follow_ups": [],
+  "elapsed_sec": 1138.4335,
+  "peak_rss_mb": 273.8,
+  "models_used": "Same as EXP-089/026: spaCy dependency parser (unchanged) + MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli via the existing, unmodified check_exception/check_exceptions. No generative model."
+}

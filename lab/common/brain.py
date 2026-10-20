@@ -518,12 +518,29 @@ def reason(ask: str, passages: list[dict], use_real_ner: bool = False) -> dict:
             else:
                 applied = apply_threshold_rule(rule, facts["total"])
                 trace.append({"step": "apply_rule", "kind": "threshold", "result": applied})
-                citations.add(rule_passage["id"])
-                answer_parts.append(
-                    f"policy applies: {applied['consequence']} [{rule_passage['id']}]"
-                    if applied["matched"]
-                    else f"policy does not apply (threshold not exceeded) [{rule_passage['id']}]"
-                )
+                if applied["matched"]:
+                    # Same exception/condition check the verb-rule branch
+                    # already has (EXP-089/026) -- a threshold rule's own
+                    # consequence can carry a trailing "unless"/"provided
+                    # that" clause exactly like the verb-rule shape, and
+                    # nothing checked it until now, a real, named gap.
+                    _, exception_conditions, polarity = split_exceptions(rule["consequence"])
+                    exception_context = [p["text"] for p in passages if p["id"] != rule_passage["id"]]
+                    exception_result = check_exceptions(exception_conditions, exception_context, polarity or "negative")
+                    trace.append({"step": "check_exception", "result": exception_result, "polarity": polarity})
+                    if exception_result["status"] == "holds":
+                        reason_phrase = "the rule's exception holds" if polarity == "negative" else "the rule's condition is not satisfied"
+                        answer_parts.append(f"policy does not apply: {reason_phrase} ({rule['raw']!r}) [{rule_passage['id']}]")
+                    else:
+                        citations.add(rule_passage["id"])
+                        conditional = exception_result["status"] == "unknown"
+                        if conditional:
+                            rule_conditional = True
+                        unresolved_phrase = "the rule's exception is unresolved" if polarity == "negative" else "the rule's condition is unresolved"
+                        suffix = f" ({unresolved_phrase} -- not confirmed either way)" if conditional else ""
+                        answer_parts.append(f"policy applies: {applied['consequence']}{suffix} [{rule_passage['id']}]")
+                else:
+                    answer_parts.append(f"policy does not apply (threshold not exceeded) [{rule_passage['id']}]")
         else:
             # Excludes any passage that is itself a rule (verb or threshold
             # shape), not just rule_passage -- found by EXP-084's own

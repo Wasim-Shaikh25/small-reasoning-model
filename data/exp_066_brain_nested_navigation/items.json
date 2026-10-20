@@ -6,6 +6,7 @@
     "text": "Priya Nair, Residency Road [B1]. total 40,000 [B3, B4]. policy applies: the payment requires finance head approval [POLICY].",
     "resolved_section": "Priya",
     "trace_steps": [
+      "plan",
       "analyze_ask",
       "intent_signal",
       "nested_navigate",
@@ -14,7 +15,8 @@
       "intent_signal",
       "compute_total",
       "find_rule",
-      "apply_rule"
+      "apply_rule",
+      "check_exception"
     ],
     "correct_decision": true,
     "correct_content": true,
@@ -27,6 +29,7 @@
     "text": "Insufficient evidence.",
     "resolved_section": null,
     "trace_steps": [
+      "plan",
       "analyze_ask",
       "intent_signal",
       "nested_navigate"

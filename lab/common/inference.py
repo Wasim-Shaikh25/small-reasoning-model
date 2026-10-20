@@ -252,19 +252,47 @@ def _extract_clause_predicate(clause: str, bound_subject: str) -> dict | None:
     }
 
 
+def find_causal_justification(consequence: str) -> str | None:
+    """A rule's consequence may carry its own "because"/"since"/"as"
+    clause (Operator.CAUSAL) -- never a gate (EXP-090's own docstring:
+    "a justification, never a gate that could block anything"), so it is
+    never passed to check_exceptions/check_exception the way CONDITION_
+    NEGATIVE/POSITIVE clauses are. spaCy's own attachment already keeps
+    it from polluting _extract_clause_predicate's object text (a CAUSAL
+    clause's "mark" token attaches to its own advcl verb, a sibling of
+    the main clause's acomp/attr, never inside that complement's own
+    subtree -- verified directly, not assumed), so there was never a
+    correctness bug here. This only SURFACES the clause as its own named
+    field (instead of it riding along silently inside the rule's `raw`
+    text) so a caller can show the reasoning, not just the conclusion.
+    """
+    matches = [m for m in find_connectives(consequence) if m.operator == Operator.CAUSAL]
+    if not matches:
+        return None
+    match = matches[0]
+    idx = consequence.lower().find(match.anchor_text.lower())
+    if idx == -1:
+        return None
+    return consequence[idx + len(match.anchor_text) :].strip().rstrip(".")
+
+
 def instantiate_consequence(rule: dict, fact: dict) -> list[dict]:
     """A matched rule's consequence, turned into one or more new derived
     facts bound to the specific entity the fact named -- not the raw
     consequence string lab.common.rules.apply_rule already returns
     unchanged. One clause can yield zero, one, or more predicates
     (a clause spaCy can't parse into subject+predicate is skipped, not
-    guessed).
+    guessed). Each derived predicate carries the consequence's own
+    CAUSAL justification (find_causal_justification), if any, as a
+    named field -- never used to gate the derivation itself.
     """
     consequence_text, _ = split_exception(rule["consequence"])
+    justification = find_causal_justification(rule["consequence"])
     derived = []
     for clause in _clauses(consequence_text):
         predicate = _extract_clause_predicate(clause, bound_subject=fact["subject"])
         if predicate is not None:
+            predicate["justification"] = justification
             derived.append(predicate)
     return derived
 
