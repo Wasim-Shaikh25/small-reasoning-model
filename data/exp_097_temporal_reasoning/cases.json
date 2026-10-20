@@ -1,0 +1,508 @@
+{
+  "case1_past_date_blocked": {
+    "ask": "Does MedCorp's processing of Aisha's data comply with the rule?",
+    "decision": "supported",
+    "text": "policy does not apply: the rule's temporal bound ('until') is not currently satisfied ('If anyone processes special category data, it is lawful until 1 January 2020.') [rule-past].",
+    "citations": [],
+    "facts": {},
+    "trace": [
+      {
+        "step": "plan",
+        "stages": [
+          "rule_application"
+        ],
+        "signals": {
+          "document": {
+            "fires": false,
+            "score": 0.5489,
+            "tau": 0.75
+          },
+          "identity": {
+            "fires": false,
+            "score": 0.5658,
+            "tau": 0.5971
+          },
+          "total": {
+            "fires": false,
+            "score": 0.501,
+            "tau": 0.6084
+          },
+          "rule_application": {
+            "fires": true,
+            "score": 0.7119,
+            "tau": 0.62
+          }
+        },
+        "rule_application_method": "single_step"
+      },
+      {
+        "step": "analyze_ask",
+        "task_type": "lookup",
+        "subquestions": [
+          "Does MedCorp's processing of Aisha's data comply with the rule?"
+        ]
+      },
+      {
+        "step": "intent_signal",
+        "signal": "document",
+        "fires": false,
+        "score": 0.5489,
+        "tau": 0.75
+      },
+      {
+        "step": "intent_signal",
+        "signal": "identity",
+        "fires": false,
+        "score": 0.5658,
+        "tau": 0.5971
+      },
+      {
+        "step": "intent_signal",
+        "signal": "total",
+        "fires": false,
+        "score": 0.501,
+        "tau": 0.6084
+      },
+      {
+        "step": "find_rule",
+        "kind": "verb",
+        "rule": "If anyone processes special category data, it is lawful until 1 January 2020."
+      },
+      {
+        "step": "apply_rule",
+        "kind": "verb",
+        "result": {
+          "matched": true,
+          "trigger_lemma": "process",
+          "fact_verb_lemma": "process",
+          "consequence": "it is lawful until 1 January 2020"
+        },
+        "fact_passage": "fact-1"
+      },
+      {
+        "step": "check_exception",
+        "result": {
+          "kind": "temporal",
+          "polarity": null,
+          "status": "holds",
+          "detail": {
+            "status": "not_in_effect",
+            "method": "absolute_date",
+            "resolved_date": "2020-01-01T00:00:00",
+            "reference_date": "2026-10-20T23:00:00.056268"
+          },
+          "phrase": "until"
+        }
+      }
+    ]
+  },
+  "case2_future_date_clean": {
+    "ask": "Does MedCorp's processing of Aisha's data comply with the rule?",
+    "decision": "supported",
+    "text": "MedCorp processed Aisha. [fact-1] matches the rule's trigger (process): If anyone processes special category data, it is lawful until 1 January 2030. [rule-future] Therefore, it is lawful until 1 January 2030..",
+    "citations": [
+      "fact-1",
+      "rule-future"
+    ],
+    "facts": {},
+    "trace": [
+      {
+        "step": "plan",
+        "stages": [
+          "rule_application"
+        ],
+        "signals": {
+          "document": {
+            "fires": false,
+            "score": 0.5489,
+            "tau": 0.75
+          },
+          "identity": {
+            "fires": false,
+            "score": 0.5658,
+            "tau": 0.5971
+          },
+          "total": {
+            "fires": false,
+            "score": 0.501,
+            "tau": 0.6084
+          },
+          "rule_application": {
+            "fires": true,
+            "score": 0.7119,
+            "tau": 0.62
+          }
+        },
+        "rule_application_method": "single_step"
+      },
+      {
+        "step": "analyze_ask",
+        "task_type": "lookup",
+        "subquestions": [
+          "Does MedCorp's processing of Aisha's data comply with the rule?"
+        ]
+      },
+      {
+        "step": "intent_signal",
+        "signal": "document",
+        "fires": false,
+        "score": 0.5489,
+        "tau": 0.75
+      },
+      {
+        "step": "intent_signal",
+        "signal": "identity",
+        "fires": false,
+        "score": 0.5658,
+        "tau": 0.5971
+      },
+      {
+        "step": "intent_signal",
+        "signal": "total",
+        "fires": false,
+        "score": 0.501,
+        "tau": 0.6084
+      },
+      {
+        "step": "find_rule",
+        "kind": "verb",
+        "rule": "If anyone processes special category data, it is lawful until 1 January 2030."
+      },
+      {
+        "step": "apply_rule",
+        "kind": "verb",
+        "result": {
+          "matched": true,
+          "trigger_lemma": "process",
+          "fact_verb_lemma": "process",
+          "consequence": "it is lawful until 1 January 2030"
+        },
+        "fact_passage": "fact-1"
+      },
+      {
+        "step": "check_exception",
+        "result": {
+          "kind": "temporal",
+          "polarity": null,
+          "status": "not_holds",
+          "detail": {
+            "status": "in_effect",
+            "method": "absolute_date",
+            "resolved_date": "2030-01-01T00:00:00",
+            "reference_date": "2026-10-20T23:00:00.979875"
+          },
+          "phrase": "until"
+        }
+      }
+    ]
+  },
+  "case3_event_withdrawn_blocked": {
+    "ask": "Does MedCorp's processing of Aisha's data comply with the rule?",
+    "decision": "supported",
+    "text": "policy does not apply: the rule's temporal bound ('until') is not currently satisfied ('If anyone processes special category data, it is lawful until the data subject withdraws consent.') [rule-until-event].",
+    "citations": [],
+    "facts": {},
+    "trace": [
+      {
+        "step": "plan",
+        "stages": [
+          "rule_application"
+        ],
+        "signals": {
+          "document": {
+            "fires": false,
+            "score": 0.5489,
+            "tau": 0.75
+          },
+          "identity": {
+            "fires": false,
+            "score": 0.5658,
+            "tau": 0.5971
+          },
+          "total": {
+            "fires": false,
+            "score": 0.501,
+            "tau": 0.6084
+          },
+          "rule_application": {
+            "fires": true,
+            "score": 0.7119,
+            "tau": 0.62
+          }
+        },
+        "rule_application_method": "single_step"
+      },
+      {
+        "step": "analyze_ask",
+        "task_type": "lookup",
+        "subquestions": [
+          "Does MedCorp's processing of Aisha's data comply with the rule?"
+        ]
+      },
+      {
+        "step": "intent_signal",
+        "signal": "document",
+        "fires": false,
+        "score": 0.5489,
+        "tau": 0.75
+      },
+      {
+        "step": "intent_signal",
+        "signal": "identity",
+        "fires": false,
+        "score": 0.5658,
+        "tau": 0.5971
+      },
+      {
+        "step": "intent_signal",
+        "signal": "total",
+        "fires": false,
+        "score": 0.501,
+        "tau": 0.6084
+      },
+      {
+        "step": "find_rule",
+        "kind": "verb",
+        "rule": "If anyone processes special category data, it is lawful until the data subject withdraws consent."
+      },
+      {
+        "step": "apply_rule",
+        "kind": "verb",
+        "result": {
+          "matched": true,
+          "trigger_lemma": "process",
+          "fact_verb_lemma": "process",
+          "consequence": "it is lawful until the data subject withdraws consent"
+        },
+        "fact_passage": "fact-1"
+      },
+      {
+        "step": "check_exception",
+        "result": {
+          "kind": "temporal",
+          "polarity": null,
+          "status": "holds",
+          "detail": {
+            "status": "not_in_effect",
+            "method": "event_relative",
+            "event_check": {
+              "status": "holds",
+              "best_entail": 0.9761,
+              "best_contradict": 0.0015,
+              "best_context": "Aisha withdrew her consent last month."
+            }
+          },
+          "phrase": "until"
+        }
+      }
+    ]
+  },
+  "case4_event_active_clean": {
+    "ask": "Does MedCorp's processing of Aisha's data comply with the rule?",
+    "decision": "supported",
+    "text": "MedCorp processed Aisha. [fact-1] matches the rule's trigger (process): If anyone processes special category data, it is lawful until the data subject withdraws consent. [rule-until-event] Therefore, it is lawful until the data subject withdraws consent..",
+    "citations": [
+      "fact-1",
+      "rule-until-event"
+    ],
+    "facts": {},
+    "trace": [
+      {
+        "step": "plan",
+        "stages": [
+          "rule_application"
+        ],
+        "signals": {
+          "document": {
+            "fires": false,
+            "score": 0.5489,
+            "tau": 0.75
+          },
+          "identity": {
+            "fires": false,
+            "score": 0.5658,
+            "tau": 0.5971
+          },
+          "total": {
+            "fires": false,
+            "score": 0.501,
+            "tau": 0.6084
+          },
+          "rule_application": {
+            "fires": true,
+            "score": 0.7119,
+            "tau": 0.62
+          }
+        },
+        "rule_application_method": "single_step"
+      },
+      {
+        "step": "analyze_ask",
+        "task_type": "lookup",
+        "subquestions": [
+          "Does MedCorp's processing of Aisha's data comply with the rule?"
+        ]
+      },
+      {
+        "step": "intent_signal",
+        "signal": "document",
+        "fires": false,
+        "score": 0.5489,
+        "tau": 0.75
+      },
+      {
+        "step": "intent_signal",
+        "signal": "identity",
+        "fires": false,
+        "score": 0.5658,
+        "tau": 0.5971
+      },
+      {
+        "step": "intent_signal",
+        "signal": "total",
+        "fires": false,
+        "score": 0.501,
+        "tau": 0.6084
+      },
+      {
+        "step": "find_rule",
+        "kind": "verb",
+        "rule": "If anyone processes special category data, it is lawful until the data subject withdraws consent."
+      },
+      {
+        "step": "apply_rule",
+        "kind": "verb",
+        "result": {
+          "matched": true,
+          "trigger_lemma": "process",
+          "fact_verb_lemma": "process",
+          "consequence": "it is lawful until the data subject withdraws consent"
+        },
+        "fact_passage": "fact-1"
+      },
+      {
+        "step": "check_exception",
+        "result": {
+          "kind": "temporal",
+          "polarity": null,
+          "status": "not_holds",
+          "detail": {
+            "status": "in_effect",
+            "method": "event_relative",
+            "event_check": {
+              "status": "not_holds",
+              "best_entail": 0.0021,
+              "best_contradict": 0.9606,
+              "best_context": "Aisha has never withdrawn her consent."
+            }
+          },
+          "phrase": "until"
+        }
+      }
+    ]
+  },
+  "case5_after_direction_reversed": {
+    "ask": "Does MedCorp's processing of Aisha's data comply with the rule?",
+    "decision": "supported",
+    "text": "MedCorp processed Aisha. [fact-1] matches the rule's trigger (process): If anyone processes special category data, it is lawful after the data subject withdraws consent. [rule-after-event] Therefore, it is lawful after the data subject withdraws consent..",
+    "citations": [
+      "fact-1",
+      "rule-after-event"
+    ],
+    "facts": {},
+    "trace": [
+      {
+        "step": "plan",
+        "stages": [
+          "rule_application"
+        ],
+        "signals": {
+          "document": {
+            "fires": false,
+            "score": 0.5489,
+            "tau": 0.75
+          },
+          "identity": {
+            "fires": false,
+            "score": 0.5658,
+            "tau": 0.5971
+          },
+          "total": {
+            "fires": false,
+            "score": 0.501,
+            "tau": 0.6084
+          },
+          "rule_application": {
+            "fires": true,
+            "score": 0.7119,
+            "tau": 0.62
+          }
+        },
+        "rule_application_method": "single_step"
+      },
+      {
+        "step": "analyze_ask",
+        "task_type": "lookup",
+        "subquestions": [
+          "Does MedCorp's processing of Aisha's data comply with the rule?"
+        ]
+      },
+      {
+        "step": "intent_signal",
+        "signal": "document",
+        "fires": false,
+        "score": 0.5489,
+        "tau": 0.75
+      },
+      {
+        "step": "intent_signal",
+        "signal": "identity",
+        "fires": false,
+        "score": 0.5658,
+        "tau": 0.5971
+      },
+      {
+        "step": "intent_signal",
+        "signal": "total",
+        "fires": false,
+        "score": 0.501,
+        "tau": 0.6084
+      },
+      {
+        "step": "find_rule",
+        "kind": "verb",
+        "rule": "If anyone processes special category data, it is lawful after the data subject withdraws consent."
+      },
+      {
+        "step": "apply_rule",
+        "kind": "verb",
+        "result": {
+          "matched": true,
+          "trigger_lemma": "process",
+          "fact_verb_lemma": "process",
+          "consequence": "it is lawful after the data subject withdraws consent"
+        },
+        "fact_passage": "fact-1"
+      },
+      {
+        "step": "check_exception",
+        "result": {
+          "kind": "temporal",
+          "polarity": null,
+          "status": "not_holds",
+          "detail": {
+            "status": "in_effect",
+            "method": "event_relative",
+            "event_check": {
+              "status": "holds",
+              "best_entail": 0.9761,
+              "best_contradict": 0.0015,
+              "best_context": "Aisha withdrew her consent last month."
+            }
+          },
+          "phrase": "after"
+        }
+      }
+    ]
+  }
+}

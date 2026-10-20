@@ -1701,7 +1701,7 @@ Elapsed seconds: 3.0143. Peak RSS MB: 170.86.
 }
 ```
 
-Elapsed seconds: 164.716. Peak RSS MB: 853.39.
+Elapsed seconds: 157.6773. Peak RSS MB: 853.63.
 - Scale-down: Only CONDITION_POSITIVE's holds-blocks-if-false semantics is wired, matching CONDITION_NEGATIVE's existing scope -- CONCESSION/TEMPORAL_BOUND/CAUSAL remain detection-only, per EXP-090's own follow_ups, untouched here. A third hardcoded word-regex was found (lab/common/intent_signals.py's _CLAUSE_SPLIT_RE, `r"[?.;]|\band\b"`, used for splitting an ASK into clauses for the document/identity/total intent signals) but deliberately NOT changed in this exploration -- it is load-bearing for calibrated thresholds across EXP-069/078/079, and fixing it needs its own regression pass against those, not a drive-by edit inside this one.
 - Conclusion: EXP-026's real gap -- 'except'/'unless'/'provided that' clauses invisible to the engine -- is closed, but not by treating all three the same, which the stub's own wording would have gotten wrong: 'provided that' is the opposite polarity from 'unless'/'except' (EXP-091), and check_exceptions now applies the correct mirrored combination rule for each. Two further hardcoded keyword regexes (the alternative-splitter's literal 'or' match, and _clauses' literal 'and' match) were found and replaced with the same structural find_connectives detection in the same pass, closing the same class of gap EXP-090/091 closed for 'unless', not just the one instance already flagged.
 
@@ -21753,7 +21753,7 @@ Elapsed seconds: 46.336. Peak RSS MB: 385.41.
 - `lab/common/real_encoders.py`
 - `lab/common/textutil.py`
 - `lab/exp_081_real_document_pipeline/run.py`
-- Results: 4/4 hand-built pairs correct -- all correct. The 'incoherent_signaled_but_unrelated' case is the real test: a low-similarity pair ('However, the weather...') is NOT flagged purely because 'however' opens it, even though the content is genuinely unrelated -- a limit named honestly in scale_down, not hidden. On the real 103-sentence GDPR text: 102 consecutive pairs, 38 flagged as an unsignaled low-similarity jump, 51 pairs where the second sentence opens with a detected discourse connective.
+- Results: 4/4 hand-built pairs correct -- all correct. The 'incoherent_signaled_but_unrelated' case is the real test: a low-similarity pair ('However, the weather...') is NOT flagged purely because 'however' opens it, even though the content is genuinely unrelated -- a limit named honestly in scale_down, not hidden. On the real 103-sentence GDPR text: 102 consecutive pairs, 37 flagged as an unsignaled low-similarity jump, 53 pairs where the second sentence opens with a detected discourse connective.
 ```json
 {
   "hand_built_cases": {
@@ -21768,14 +21768,14 @@ Elapsed seconds: 46.336. Peak RSS MB: 385.41.
   },
   "gdpr_full_document": {
     "total_pairs": 102,
-    "flagged": 38,
-    "with_opening_connective": 51
+    "flagged": 37,
+    "with_opening_connective": 53
   },
   "all_correct": true
 }
 ```
 
-Elapsed seconds: 50.6089. Peak RSS MB: 606.09.
+Elapsed seconds: 51.7669. Peak RSS MB: 604.01.
 - Scale-down: A present discourse connective suppresses the flag unconditionally -- it does not verify the connective is used correctly (incoherent_signaled_but_unrelated is a real, reported limit, not hidden). DISCOURSE_ADVERBIAL_TABLE covers 8 connectives (however/nevertheless/therefore/thus/consequently/hence/moreover/furthermore) plus 'in addition' -- a small, named set, not the full PDTB discourse-adverbial inventory. Not yet wired into lab.common.assemble.build_outline itself -- this exploration proves the check, wiring it into the actual outline-building loop is a separate step.
 - Conclusion: Both signals are measured, not asserted: bge similarity catches a genuine unsignaled topic jump (incoherent_unsignaled_jump), and a present discourse connective correctly suppresses the flag for a deliberate, signaled shift (coherent_signaled_shift) even when similarity is low. The real limit this exploration surfaces honestly: a connective's mere presence suppresses the flag regardless of whether the following content actually follows from it (incoherent_signaled_but_unrelated stays unflagged) -- this check catches unsignaled incoherence, not misused connectives, and should not be read as a general coherence judge.
 
@@ -23793,7 +23793,7 @@ Elapsed seconds: 54.0473. Peak RSS MB: 890.23.
 }
 ```
 
-Elapsed seconds: 332.2167. Peak RSS MB: 475.58.
+Elapsed seconds: 192.1814. Peak RSS MB: 723.55.
 - Scale-down: Five hand-built cases proving each named mechanism works, not a broad benchmark across many rules or a real multi-exception statute (GDPR Art 9's four exceptions) -- that combination is a named follow-up, not covered here.
 - Conclusion: Multi-step symbolic inference -- converting a stated rule and a stated fact into predicate form, unifying the trigger, binding the consequence's subject to the actual named entity, and chaining a derived fact into further rules until nothing new follows -- works as a real mechanism, not just on the single-hop case this project already had (EXP-057/059/061), but genuinely across multiple steps. The exception handling is the part that matters most for trust: an exception whose truth the given context never actually states is never silently treated as false, only as unresolved and visibly flagged, and a rule with no stated exception at all is never confused with one whose exception just happens to not apply here. Every step runs through spaCy's dependency parser or the real DeBERTa-v3 NLI classifier -- no generative model anywhere in the conversion from language to rule/fact form, the project owner's own explicit requirement, so nothing in this chain can hallucinate a predicate that was never actually stated.
 
@@ -23844,7 +23844,7 @@ Elapsed seconds: 332.2167. Peak RSS MB: 475.58.
 }
 ```
 
-Elapsed seconds: 129.8342. Peak RSS MB: 565.79.
+Elapsed seconds: 31.4515. Peak RSS MB: 593.3.
 - Scale-down: The plan's stage names describe WHAT will run, not a full execution DAG with dependencies -- reason()'s actual control flow (disambiguate before identity/total/rule, document exclusive) is still hardcoded in reason() itself, not driven by iterating over the plan's stage list. Only the rule-application stage has two distinct methods; document/identity/total/disambiguate are still single-method stages, same as before this exploration.
 - Conclusion: The plan is computed and logged before any stage executes, and it correctly predicts which of the two genuinely different rule-application methods reason() is about to run: 'forward_chain' only when the ask signals compliance-checking AND a second rule actually exists to chain into (case 1, where the multi-step Rohan/Arun/license derivation is now reachable through brain.reason() itself for the first time), and 'single_step' otherwise, with zero change to any existing single-rule case (case 2, byte-identical to EXP-089's own recorded result). Case 3 confirms the plan doesn't name a stage that doesn't apply.
 
@@ -23896,7 +23896,7 @@ Elapsed seconds: 129.8342. Peak RSS MB: 565.79.
 }
 ```
 
-Elapsed seconds: 2509.6837. Peak RSS MB: 584.23.
+Elapsed seconds: 832.8949. Peak RSS MB: 735.31.
 - Scale-down: One hand-composed rule sentence (parse_conditional_rule's one supported shape), not an automatic parse of GDPR Art 9's own real multi-sentence prohibition+exception wording -- that would need a genuinely different rule-sentence parser (closer to EXP-087's Flint-role scope), a separate and much larger piece of work, not required to prove the OR-combination mechanism itself. The repo's own GDPR_TEXT fixture has 3 listed exceptions for Art 9, not the 4 this project's own prior EXP-085 todo entry claimed (real GDPR Art 9 has a 4th paragraph, covering non-profit-body members' data, that this fixture does not include) -- measured against the fixture that actually exists in this repo, corrected here rather than restated uncritically. Four hand-built cases proving each named combination state, not a broad benchmark across many multi-exception rules.
 - Conclusion: Multi-exception OR-combination works on GDPR Art 9's own real exception text, not just a restated single-exception toy rule: any one of several listed alternatives blocks the consequence when it holds (proven on two different alternatives, not only the first), the consequence still derives -- visibly flagged conditional -- when every alternative is genuinely unresolved, and it derives cleanly once none holds and at least one alternative is confidently ruled out, without needing every alternative individually ruled out first. check_exception's own per-exception judgment is unchanged; check_exceptions only combines its existing three-way verdict across more than one condition, split on ';' so that a single alternative's own internal commas and 'or's (common in real statutory text) are never mistaken for a boundary between alternatives.
 
@@ -24088,7 +24088,7 @@ Elapsed seconds: 1447.2341. Peak RSS MB: 736.13.
 }
 ```
 
-Elapsed seconds: 1563.511. Peak RSS MB: 483.55.
+Elapsed seconds: 413.2341. Peak RSS MB: 856.07.
 - Scale-down: Only the verb-trigger rule shape (parse_conditional_rule) is wired -- the threshold-rule branch (parse_threshold_rule/apply_threshold_rule) does not go through split_exceptions/check_exceptions at all and is unaffected by this exploration, a real and separate gap if a threshold rule's own consequence ever carries an 'unless' clause. Three hand-built cases through reason(), not a broad test across many rule/passage combinations.
 - Conclusion: The exception-aware rule-application path is now reachable from lab.common.brain.reason itself, not only from a standalone forward_chain call: an unresolved exception derives the consequence but flags the overall decision (supported_with_flags), a confirmed exception suppresses the consequence entirely and returns an explanatory non-applicability line instead of asserting it, and a confidently ruled-out exception derives cleanly with no flag -- all three reachable by passing plain passages through the one entry point every other capability already goes through, with no hand-assembled call sequence.
 
@@ -24103,7 +24103,7 @@ Elapsed seconds: 1563.511. Peak RSS MB: 483.55.
 - `lab/common/connectives.py`
 - `lab/common/textutil.py`
 - `lab/exp_081_real_document_pipeline/run.py`
-- Results: 20/20 hand-built connective sentences correctly classified through the SAME detection function (accuracy=1.0), covering all 7 operators -- all correct. On the full real 103-sentence GDPR text (13 articles, not just Art 9): 53 sentences contained at least one detected connective, 118 recognized by phrase: {'or': 62, 'and': 48, 'if': 5, 'as': 1, 'unless': 2}. Two genuine 'unless' exception clauses were found OUTSIDE Art 9 -- in Art 12 ('...shall not refuse to act on the request of the data subject...unless the controller demonstrates that it is not in a position to identify the data subject') and Art 33 ('...notify the personal data breach to the supervisory authority, unless the personal data breach is unlikely to result in a risk...') -- found by the SAME detector that classified the hand-built cases, not a second hand-built fixture; neither was ever reachable by EXP-085/088/089's single hand-composed Art-9 sentence. 4 connective-shaped tokens were detected structurally but not in the operator table, flagged rather than dropped or guessed: [('than', 'mark+advcl'), ('whether', 'mark+pcomp'), ('whether', 'mark+pcomp'), ('for', 'mark+advcl')] -- 'than' (comparative degree, 'no longer THAN is necessary'), 'for' (a purpose clause, 'measures FOR ensuring...'), and 'whether' x2 (an embedded question as a preposition's object, not a discourse relation) -- none of these are PDTB discourse connectives at all, and none were misclassified into the wrong operator; they were correctly left unrecognized.
+- Results: 20/20 hand-built connective sentences correctly classified through the SAME detection function (accuracy=1.0), covering all 7 operators -- all correct. On the full real 103-sentence GDPR text (13 articles, not just Art 9): 55 sentences contained at least one detected connective, 121 recognized by phrase: {'or': 62, 'and': 48, 'if': 5, 'before': 1, 'as': 1, 'unless': 2, 'after': 2}. Two genuine 'unless' exception clauses were found OUTSIDE Art 9 -- in Art 12 ('...shall not refuse to act on the request of the data subject...unless the controller demonstrates that it is not in a position to identify the data subject') and Art 33 ('...notify the personal data breach to the supervisory authority, unless the personal data breach is unlikely to result in a risk...') -- found by the SAME detector that classified the hand-built cases, not a second hand-built fixture; neither was ever reachable by EXP-085/088/089's single hand-composed Art-9 sentence. 4 connective-shaped tokens were detected structurally but not in the operator table, flagged rather than dropped or guessed: [('than', 'mark+advcl'), ('whether', 'mark+pcomp'), ('whether', 'mark+pcomp'), ('for', 'mark+advcl')] -- 'than' (comparative degree, 'no longer THAN is necessary'), 'for' (a purpose clause, 'measures FOR ensuring...'), and 'whether' x2 (an embedded question as a preposition's object, not a discourse relation) -- none of these are PDTB discourse connectives at all, and none were misclassified into the wrong operator; they were correctly left unrecognized.
 ```json
 {
   "connective_cases": {
@@ -24135,15 +24135,17 @@ Elapsed seconds: 1563.511. Peak RSS MB: 483.55.
   },
   "gdpr_full_document": {
     "total_sentences": 103,
-    "sentences_with_a_connective": 53,
-    "connectives_recognized": 118,
+    "sentences_with_a_connective": 55,
+    "connectives_recognized": 121,
     "connectives_unrecognized": 4,
     "recognized_phrase_counts": {
       "or": 62,
       "and": 48,
       "if": 5,
+      "before": 1,
       "as": 1,
-      "unless": 2
+      "unless": 2,
+      "after": 2
     },
     "unrecognized_instances": [
       {
@@ -24175,7 +24177,7 @@ Elapsed seconds: 1563.511. Peak RSS MB: 483.55.
 }
 ```
 
-Elapsed seconds: 14.5041. Peak RSS MB: 386.05.
+Elapsed seconds: 15.2674. Peak RSS MB: 385.95.
 - Scale-down: The 20 connective cases are the same sentences this exploration's own pre-build probe used to ground the detection patterns, not a held-out test -- held-out generalization to novel phrasings of the same connectives was not measured here. The operator table covers ~20 of DiMLex-Eng's 149 English connectives (the highest-frequency, least class-ambiguous ones across all four PDTB classes), not the full inventory. Two structural edge cases were found and are reported, not hidden: 'despite's governed clause sits outside its own pobj child's subtree in spaCy's parse (a real attachment quirk for gerund-after-preposition constructions), handled by a labeled fallback that returns the sentence's remainder rather than a clean clause span; and coordinating 'or' was measured attaching to a noun object rather than the sentence's ROOT verb when its two disjuncts are not both obviously full clauses -- detected correctly (operator assigned) but its own clause_text extraction inherits that same attachment ambiguity.
 - Conclusion: The SAME grammar-driven detection function correctly classified 20/20 different connectives (not 20 different hardcoded regexes), spanning all four PDTB classes and both combinators -- a real generalization past the single 'unless' keyword match this project used before. Run against the full real GDPR text (not the single hand-built rule sentence EXP-085/088/089 used), it surfaces real connective instances -- see data/exp_090_connective_detection/cases.json's gdpr_document_findings for every one, by sentence -- giving this project, for the first time, visibility into what logical structure the ACTUAL statute contains beyond the one exception-bearing Art 9 passage every prior exploration hand-picked. Detection and classification are proven; wiring each operator's own reasoning semantics (concession never blocks; temporal is not modeled; causal is never a gate) into the forward-chaining mechanism is explicitly a separate, later step, named in follow_ups, not done here.
 
@@ -24219,7 +24221,7 @@ Elapsed seconds: 14.5041. Peak RSS MB: 386.05.
 }
 ```
 
-Elapsed seconds: 230.5011. Peak RSS MB: 856.44.
+Elapsed seconds: 228.8055. Peak RSS MB: 856.02.
 - Scale-down: Only CONDITION_NEGATIVE is wired -- CONCESSION (although/though/despite), TEMPORAL_BOUND (until/before/after), and CAUSAL (because/since) still have zero reasoning semantics in check_exceptions/forward_chain; EXP-090 named this split explicitly and it is not revisited here. The threshold-rule branch in brain.py (apply_threshold_rule) still never calls split_exceptions/ check_exceptions at all -- a separate, already-named gap, untouched by this change.
 - Conclusion: lab.common.inference.split_exception now locates a rule's exception clause via lab.common.connectives.find_connectives's structural CONDITION_NEGATIVE detection instead of a hardcoded regex on the single word 'unless'. The gap this closes is not hypothetical: case 2 is the exact failure mode measured before this change (the 'except' phrasing was silently invisible to the old code), and it is now caught through brain.reason itself, the one production entry point, with no regression on the 'unless' phrasing (case 1), the 'except that' phrasing (case 3), or the real multi-alternative GDPR Art 9 rule's OR-combination (case 4).
 
@@ -24257,7 +24259,7 @@ Elapsed seconds: 230.5011. Peak RSS MB: 856.44.
 }
 ```
 
-Elapsed seconds: 1138.4335. Peak RSS MB: 273.8.
+Elapsed seconds: 327.6423. Peak RSS MB: 851.69.
 - Scale-down: Only verified against one hand-built threshold-rule-with-exception fixture, not a sweep across many threshold-rule phrasings. _role_matches's own role-mismatch check still runs first and is unaffected by this change -- a role mismatch still short-circuits before any exception check, same as before.
 - Conclusion: The threshold-rule branch now checks exceptions/conditions exactly like the verb-rule branch already did, closing the gap EXP-089 named as a separate, un-fixed limit. Purely additive: every existing threshold-rule fixture (reran EXP-060/066/068/070, the explorations that actually exercise this branch through brain.reason) produced byte-identical output, since check_exceptions correctly returns 'no_exception' when there is nothing to check.
 
@@ -24285,7 +24287,7 @@ Elapsed seconds: 1138.4335. Peak RSS MB: 273.8.
 }
 ```
 
-Elapsed seconds: 121.0938. Peak RSS MB: 592.39.
+Elapsed seconds: 26.7645. Peak RSS MB: 592.59.
 - Scale-down: Only one hand-built rule/fact pair tested, with 'although' specifically -- not swept across 'though'/'even though'/'even if'/'despite', though all five share the same CONCESSION operator and the same _find_condition_match omission, so the same reasoning applies to each.
 - Conclusion: CONCESSION's omission from lab.common.inference's condition-detection (_find_condition_match only recognizes CONDITION_NEGATIVE/POSITIVE) was already the CORRECT behavior, not an unfixed gap: a concession clause's own truth value genuinely cannot affect whether the consequence proceeds, by definition (that is what 'holds anyway' means), so never checking it against any context is exactly right -- the three cases above are identical because nothing about the context should ever change the outcome. No code change was needed; this exploration exists to verify that claim empirically rather than assume it, the same way EXP-094 verified CAUSAL's omission was already safe before adding its justification field.
 
@@ -24328,9 +24330,53 @@ Elapsed seconds: 121.0938. Peak RSS MB: 592.39.
 }
 ```
 
-Elapsed seconds: 16.8442. Peak RSS MB: 386.79.
+Elapsed seconds: 13.7346. Peak RSS MB: 386.26.
 - Scale-down: Still a small, named subset of DiMLex-Eng's 149 (37 now, not all 149). The 9 dropped candidates are real, nameable future work (see follow_ups), not abandoned without reason. Hand-built sentences, not held-out novel phrasings of the same connectives.
 - Conclusion: Connective coverage grew from 28 to 37 recognized phrases (CONNECTIVE_TABLE + DISCOURSE_ADVERBIAL_TABLE combined) through the same two already-built, already-tested structural patterns -- no new detection code, purely additive table entries. Equally important: 9 further candidates were measured and found NOT to fit either existing pattern, and were left out rather than misclassified -- extending coverage further needs new structural patterns (a ccomp-vs-mark discriminator for 'that'-clauses, multi-token compound prepositions), not just more table rows.
+
+## EXP-097 Temporal bound reasoning (until/before/after/once): a genuinely new primitive, not a lookup-table entry
+
+- Status: `closed`
+- Models used: MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli via the existing, unmodified check_exception, for event-relative bounds only. dateparser (already a dependency, lab.common.calc.parse_date, deterministic) for absolute dates. No generative model.
+- Goal: Build the reasoning TEMPORAL_BOUND connectives actually need -- an ordering/timing judgment, not the truth judgment check_exception already provides -- and wire it into brain.reason() through the same production path condition/exception checking already uses, so a rule's 'until'/'before'/'after'/'once' clause is no longer silently ignored.
+- Method: lab.common.temporal.find_temporal_bound/check_temporal_bound (new): splits a rule's consequence at its TEMPORAL_BOUND connective, then resolves the bound clause either deterministically (a literal date via lab.common.calc.parse_date, already used elsewhere) or via one bounded NLI judgment (reusing check_exception unchanged) when the clause names an event instead. lab.common.brain._check_rule_gate (new) unifies this with the existing condition/exception gate behind one interface so both rule-application branches get it automatically. Five cases through reason() itself, including a direction-reversal case (same context, opposite connective direction, opposite outcome) as the real proof the mechanism reasons about timing, not just detects words.
+- Referenced files:
+- `lab/exp_097_temporal_reasoning/run.py`
+- `lab/common/temporal.py`
+- `lab/common/brain.py`
+- `lab/common/inference.py`
+- `lab/common/calc.py`
+- `lab/common/connectives.py`
+- Results: Case 1 (absolute date in the past): blocked=True, text="policy does not apply: the rule's temporal bound ('until') is not currently satisfied ('If anyone processes special category data, it is lawful until 1 January 2020.') [rule-past].". Case 2 (absolute date in the future): clean=True, text="MedCorp processed Aisha. [fact-1] matches the rule's trigger (process): If anyone processes special category data, it is lawful until 1 January 2030. [rule-future] Therefore, it is lawful until 1 January 2030..". Case 3 ('until' + context affirming the event): blocked=True, text="policy does not apply: the rule's temporal bound ('until') is not currently satisfied ('If anyone processes special category data, it is lawful until the data subject withdraws consent.') [rule-until-event].". Case 4 ('until' + context contradicting the event): clean=True, text="MedCorp processed Aisha. [fact-1] matches the rule's trigger (process): If anyone processes special category data, it is lawful until the data subject withdraws consent. [rule-until-event] Therefore, it is lawful until the data subject withdraws consent..". Case 5 ('after' + the SAME context that blocked case 3): clean=True, text="MedCorp processed Aisha. [fact-1] matches the rule's trigger (process): If anyone processes special category data, it is lawful after the data subject withdraws consent. [rule-after-event] Therefore, it is lawful after the data subject withdraws consent.." -- the identical 'withdrew consent' context blocks an 'until' rule but clears an 'after' rule, proving direction genuinely changes the reasoning outcome, not just a detection label.
+```json
+{
+  "case1_past_date_blocked": {
+    "text": "policy does not apply: the rule's temporal bound ('until') is not currently satisfied ('If anyone processes special category data, it is lawful until 1 January 2020.') [rule-past].",
+    "blocked": true
+  },
+  "case2_future_date_clean": {
+    "text": "MedCorp processed Aisha. [fact-1] matches the rule's trigger (process): If anyone processes special category data, it is lawful until 1 January 2030. [rule-future] Therefore, it is lawful until 1 January 2030..",
+    "clean": true
+  },
+  "case3_event_withdrawn_blocked": {
+    "text": "policy does not apply: the rule's temporal bound ('until') is not currently satisfied ('If anyone processes special category data, it is lawful until the data subject withdraws consent.') [rule-until-event].",
+    "blocked": true
+  },
+  "case4_event_active_clean": {
+    "text": "MedCorp processed Aisha. [fact-1] matches the rule's trigger (process): If anyone processes special category data, it is lawful until the data subject withdraws consent. [rule-until-event] Therefore, it is lawful until the data subject withdraws consent..",
+    "clean": true
+  },
+  "case5_after_direction_reversed": {
+    "text": "MedCorp processed Aisha. [fact-1] matches the rule's trigger (process): If anyone processes special category data, it is lawful after the data subject withdraws consent. [rule-after-event] Therefore, it is lawful after the data subject withdraws consent..",
+    "clean": true
+  },
+  "all_correct": true
+}
+```
+
+Elapsed seconds: 197.7885. Peak RSS MB: 888.89.
+- Scale-down: Event-relative resolution depends on the same lexical-NLI-model sensitivity to phrasing every other NLI-based check in this repo already carries (EXP-088 documented a real near-miss; this exploration's own fixture sentences were chosen to score clearly on the right side of tau, not swept across many phrasings). Absolute-date resolution uses real wall-clock 'now' as the default reference point when none is given -- deterministic for any one run, but this exploration's own test dates (2020/2030) were chosen with a wide safety margin rather than measuring exactly how close to 'now' the boundary can get before dateparser's own parsing becomes ambiguous.
+- Conclusion: Temporal bound reasoning is now a real, second reasoning primitive alongside condition/exception checking, reachable through brain.reason() itself: absolute dates resolve deterministically against the real reference time, event-relative bounds resolve via the same bounded NLI judgment check_exception already uses elsewhere (never duplicated), and direction (until/before vs after/once) correctly flips which outcome the same context produces -- case 5 is the real proof, not case 1-4 alone, since it shows the identical context giving the OPPOSITE result for the opposite direction.
 
 ## Follow-up todos
 

@@ -1,0 +1,47 @@
+{
+  "id": "EXP-097",
+  "title": "Temporal bound reasoning (until/before/after/once): a genuinely new primitive, not a lookup-table entry",
+  "status": "closed",
+  "goal": "Build the reasoning TEMPORAL_BOUND connectives actually need -- an ordering/timing judgment, not the truth judgment check_exception already provides -- and wire it into brain.reason() through the same production path condition/exception checking already uses, so a rule's 'until'/'before'/'after'/'once' clause is no longer silently ignored.",
+  "method": "lab.common.temporal.find_temporal_bound/check_temporal_bound (new): splits a rule's consequence at its TEMPORAL_BOUND connective, then resolves the bound clause either deterministically (a literal date via lab.common.calc.parse_date, already used elsewhere) or via one bounded NLI judgment (reusing check_exception unchanged) when the clause names an event instead. lab.common.brain._check_rule_gate (new) unifies this with the existing condition/exception gate behind one interface so both rule-application branches get it automatically. Five cases through reason() itself, including a direction-reversal case (same context, opposite connective direction, opposite outcome) as the real proof the mechanism reasons about timing, not just detects words.",
+  "metrics": {
+    "case1_past_date_blocked": {
+      "text": "policy does not apply: the rule's temporal bound ('until') is not currently satisfied ('If anyone processes special category data, it is lawful until 1 January 2020.') [rule-past].",
+      "blocked": true
+    },
+    "case2_future_date_clean": {
+      "text": "MedCorp processed Aisha. [fact-1] matches the rule's trigger (process): If anyone processes special category data, it is lawful until 1 January 2030. [rule-future] Therefore, it is lawful until 1 January 2030..",
+      "clean": true
+    },
+    "case3_event_withdrawn_blocked": {
+      "text": "policy does not apply: the rule's temporal bound ('until') is not currently satisfied ('If anyone processes special category data, it is lawful until the data subject withdraws consent.') [rule-until-event].",
+      "blocked": true
+    },
+    "case4_event_active_clean": {
+      "text": "MedCorp processed Aisha. [fact-1] matches the rule's trigger (process): If anyone processes special category data, it is lawful until the data subject withdraws consent. [rule-until-event] Therefore, it is lawful until the data subject withdraws consent..",
+      "clean": true
+    },
+    "case5_after_direction_reversed": {
+      "text": "MedCorp processed Aisha. [fact-1] matches the rule's trigger (process): If anyone processes special category data, it is lawful after the data subject withdraws consent. [rule-after-event] Therefore, it is lawful after the data subject withdraws consent..",
+      "clean": true
+    },
+    "all_correct": true
+  },
+  "results_prose": "Case 1 (absolute date in the past): blocked=True, text=\"policy does not apply: the rule's temporal bound ('until') is not currently satisfied ('If anyone processes special category data, it is lawful until 1 January 2020.') [rule-past].\". Case 2 (absolute date in the future): clean=True, text=\"MedCorp processed Aisha. [fact-1] matches the rule's trigger (process): If anyone processes special category data, it is lawful until 1 January 2030. [rule-future] Therefore, it is lawful until 1 January 2030..\". Case 3 ('until' + context affirming the event): blocked=True, text=\"policy does not apply: the rule's temporal bound ('until') is not currently satisfied ('If anyone processes special category data, it is lawful until the data subject withdraws consent.') [rule-until-event].\". Case 4 ('until' + context contradicting the event): clean=True, text=\"MedCorp processed Aisha. [fact-1] matches the rule's trigger (process): If anyone processes special category data, it is lawful until the data subject withdraws consent. [rule-until-event] Therefore, it is lawful until the data subject withdraws consent..\". Case 5 ('after' + the SAME context that blocked case 3): clean=True, text=\"MedCorp processed Aisha. [fact-1] matches the rule's trigger (process): If anyone processes special category data, it is lawful after the data subject withdraws consent. [rule-after-event] Therefore, it is lawful after the data subject withdraws consent..\" -- the identical 'withdrew consent' context blocks an 'until' rule but clears an 'after' rule, proving direction genuinely changes the reasoning outcome, not just a detection label.",
+  "conclusion": "Temporal bound reasoning is now a real, second reasoning primitive alongside condition/exception checking, reachable through brain.reason() itself: absolute dates resolve deterministically against the real reference time, event-relative bounds resolve via the same bounded NLI judgment check_exception already uses elsewhere (never duplicated), and direction (until/before vs after/once) correctly flips which outcome the same context produces -- case 5 is the real proof, not case 1-4 alone, since it shows the identical context giving the OPPOSITE result for the opposite direction.",
+  "scale_down": "Event-relative resolution depends on the same lexical-NLI-model sensitivity to phrasing every other NLI-based check in this repo already carries (EXP-088 documented a real near-miss; this exploration's own fixture sentences were chosen to score clearly on the right side of tau, not swept across many phrasings). Absolute-date resolution uses real wall-clock 'now' as the default reference point when none is given -- deterministic for any one run, but this exploration's own test dates (2020/2030) were chosen with a wide safety margin rather than measuring exactly how close to 'now' the boundary can get before dateparser's own parsing becomes ambiguous.",
+  "referenced_files": [
+    "lab/exp_097_temporal_reasoning/run.py",
+    "lab/common/temporal.py",
+    "lab/common/brain.py",
+    "lab/common/inference.py",
+    "lab/common/calc.py",
+    "lab/common/connectives.py"
+  ],
+  "follow_ups": [
+    "No explicit 'reference_date' is threaded through from brain.reason() -- it always defaults to real wall-clock time. A real document's own 'as of' date (if stated) should override this, not attempted here."
+  ],
+  "elapsed_sec": 197.7885,
+  "peak_rss_mb": 888.89,
+  "models_used": "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli via the existing, unmodified check_exception, for event-relative bounds only. dateparser (already a dependency, lab.common.calc.parse_date, deterministic) for absolute dates. No generative model."
+}
