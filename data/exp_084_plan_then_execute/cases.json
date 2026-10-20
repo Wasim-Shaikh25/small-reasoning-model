@@ -129,6 +129,7 @@
               "verb_lemma": "suspend",
               "object": "their license",
               "raw": "their license will be suspended",
+              "justification": null,
               "conditional": false,
               "derivation": {
                 "rule": "If anyone goes to jail, their license will be suspended.",

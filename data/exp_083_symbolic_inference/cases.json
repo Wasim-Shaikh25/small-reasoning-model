@@ -12,6 +12,7 @@
         "verb_lemma": "be",
         "object": "a crime",
         "raw": "it is a crime",
+        "justification": null,
         "conditional": false,
         "derivation": {
           "rule": "If anyone kills another person, it is a crime and he will go to jail.",
@@ -27,6 +28,7 @@
         "verb_lemma": "go",
         "object": "jail",
         "raw": "he will go to jail",
+        "justification": null,
         "conditional": false,
         "derivation": {
           "rule": "If anyone kills another person, it is a crime and he will go to jail.",
@@ -48,6 +50,7 @@
           "verb_lemma": "be",
           "object": "a crime",
           "raw": "it is a crime",
+          "justification": null,
           "conditional": false,
           "derivation": {
             "rule": "If anyone kills another person, it is a crime and he will go to jail.",
@@ -69,6 +72,7 @@
           "verb_lemma": "go",
           "object": "jail",
           "raw": "he will go to jail",
+          "justification": null,
           "conditional": false,
           "derivation": {
             "rule": "If anyone kills another person, it is a crime and he will go to jail.",
@@ -97,6 +101,7 @@
         "verb_lemma": "be",
         "object": "a crime",
         "raw": "it is a crime",
+        "justification": null,
         "conditional": false,
         "derivation": {
           "rule": "If anyone kills another person, it is a crime and he will go to jail.",
@@ -112,6 +117,7 @@
         "verb_lemma": "go",
         "object": "jail",
         "raw": "he will go to jail",
+        "justification": null,
         "conditional": false,
         "derivation": {
           "rule": "If anyone kills another person, it is a crime and he will go to jail.",
@@ -127,6 +133,7 @@
         "verb_lemma": "suspend",
         "object": "their license",
         "raw": "their license will be suspended",
+        "justification": null,
         "conditional": false,
         "derivation": {
           "rule": "If a person goes to jail, their license will be suspended.",
@@ -148,6 +155,7 @@
           "verb_lemma": "be",
           "object": "a crime",
           "raw": "it is a crime",
+          "justification": null,
           "conditional": false,
           "derivation": {
             "rule": "If anyone kills another person, it is a crime and he will go to jail.",
@@ -169,6 +177,7 @@
           "verb_lemma": "go",
           "object": "jail",
           "raw": "he will go to jail",
+          "justification": null,
           "conditional": false,
           "derivation": {
             "rule": "If anyone kills another person, it is a crime and he will go to jail.",
@@ -190,6 +199,7 @@
           "verb_lemma": "suspend",
           "object": "their license",
           "raw": "their license will be suspended",
+          "justification": null,
           "conditional": false,
           "derivation": {
             "rule": "If a person goes to jail, their license will be suspended.",
@@ -218,6 +228,7 @@
         "verb_lemma": "be",
         "object": "a crime",
         "raw": "it is a crime",
+        "justification": null,
         "conditional": true,
         "derivation": {
           "rule": "If a person kills another person, it is a crime, unless it was self-defense.",
@@ -246,6 +257,7 @@
           "verb_lemma": "be",
           "object": "a crime",
           "raw": "it is a crime",
+          "justification": null,
           "conditional": true,
           "derivation": {
             "rule": "If a person kills another person, it is a crime, unless it was self-defense.",
@@ -311,6 +323,7 @@
         "verb_lemma": "be",
         "object": "a crime",
         "raw": "it is a crime",
+        "justification": null,
         "conditional": false,
         "derivation": {
           "rule": "If a person kills another person, it is a crime, unless it was self-defense.",
@@ -339,6 +352,7 @@
           "verb_lemma": "be",
           "object": "a crime",
           "raw": "it is a crime",
+          "justification": null,
           "conditional": false,
           "derivation": {
             "rule": "If a person kills another person, it is a crime, unless it was self-defense.",
