@@ -4,6 +4,37 @@
   "text": "ABC Pvt Ltd is registered in Mumbai under company number 55021. [R1]. Ravi Sharma, MG Road [E1].",
   "trace": [
     {
+      "step": "plan",
+      "stages": [
+        "hierarchical_navigate",
+        "graph_expand",
+        "identity_extraction"
+      ],
+      "signals": {
+        "document": {
+          "fires": false,
+          "score": 0.5201,
+          "tau": 0.75
+        },
+        "identity": {
+          "fires": true,
+          "score": 0.7248,
+          "tau": 0.5971
+        },
+        "total": {
+          "fires": false,
+          "score": 0.489,
+          "tau": 0.6084
+        },
+        "rule_application": {
+          "fires": false,
+          "score": 0.5433,
+          "tau": 0.62
+        }
+      },
+      "rule_application_method": null
+    },
+    {
       "step": "analyze_ask",
       "task_type": "lookup",
       "subquestions": [

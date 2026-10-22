@@ -48,7 +48,7 @@
   "follow_ups": [
     "reason()'s control flow could be refactored to literally iterate over stage_plan['stages'] and dispatch to a per-stage function, rather than the plan being computed and logged but the execution order still hardcoded separately -- not done here to avoid rewriting already-measured, passing code paths in the same step that introduced the plan."
   ],
-  "elapsed_sec": 31.4515,
-  "peak_rss_mb": 593.3,
+  "elapsed_sec": 140.6136,
+  "peak_rss_mb": 464.25,
   "models_used": "bge-small-en-v1.5 (lab.common.real_encoders.bge_embed) for wants_rule_application, the same embedding-similarity mechanism intent_signals.py already uses for wants_document/wants_identity/wants_total. spaCy dependency parser (unchanged) for forward_chain/instantiate_consequence. No generative model -- the plan is always a selection among STAGE_REGISTRY's fixed names, never freely generated text."
 }

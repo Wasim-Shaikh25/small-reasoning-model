@@ -114,7 +114,7 @@
     "brain.reason's longform dispatch still hardcodes flan-t5-small as write_long_document's default checkpoint -- making the better-measured checkpoint the live default (rather than only reachable via a direct write_long_document call) is a separate, deliberate decision, not made in this exploration.",
     "The cross-page consistency checker's false-positive rate on repetitive legal text (same generic subject, many unrelated clauses) was not measured here, only observed qualitatively -- a dedicated precision measurement is a real follow-up before trusting this flag on this kind of document."
   ],
-  "elapsed_sec": 984.1598,
-  "peak_rss_mb": 2780.28,
+  "elapsed_sec": 3372.2094,
+  "peak_rss_mb": 1987.95,
   "models_used": "dslim/bert-base-NER (entity detection, live via use_real_ner=True, not generative) + flan-t5-small and Qwen/Qwen2.5-0.5B-Instruct (bounded rewriter role, fidelity-gated, each run on the identical 19-leaf fixture for a controlled comparison) via lab.common.rewriter_backends."
 }

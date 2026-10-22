@@ -289,7 +289,17 @@ def reason(ask: str, passages: list[dict], use_real_ner: bool = False) -> dict:
     trace = []
     stage_plan = plan_stages(ask, passages, use_real_ner=use_real_ner)
     trace.append({"step": "plan", **stage_plan})
-    if not passages:
+    # From here on, whether a block below EXECUTES is always decided by
+    # membership in stage_plan["stages"] -- the plan computed above, once,
+    # before anything ran -- never by a fresh, independently re-derived
+    # condition that merely happens to currently agree with it. Each block
+    # still computes its own local value (the hierarchical passage list,
+    # ask_entities, rule_hit, ...) because it needs that VALUE to do its
+    # work, not just a yes/no; plan_stages() calls the same deterministic
+    # functions over the same inputs to decide the gate, so the two can
+    # never disagree. lookup_fallback is the one deliberate exception
+    # (search its name below for why).
+    if "no_context_fallback" in stage_plan["stages"]:
         # FORBIDDEN.md's narrow exception, recorded 2026-10-16: literally no
         # passages at all (not "retrieval found nothing" -- that is a
         # different, later case, and still abstains the existing way). The
@@ -318,7 +328,7 @@ def reason(ask: str, passages: list[dict], use_real_ner: bool = False) -> dict:
     # to catch.
     document_signal = stage_plan["signals"]["document"]
     trace.append({"step": "intent_signal", "signal": "document", **document_signal})
-    if document_signal["fires"]:
+    if "document_write" in stage_plan["stages"]:
         from lab.common.ingest import findings_from_chunks
         from lab.common.longform import write_long_document
 
@@ -345,12 +355,11 @@ def reason(ask: str, passages: list[dict], use_real_ner: bool = False) -> dict:
         decision = "supported_with_flags" if doc_result["consistency_flags"] else "supported"
         return _finish(ask, trace, decision, doc_result["document"], set(doc_result["working_memory"]["citations"]))
 
-    groups = sorted({p.get("group") for p in passages if p.get("group")})
     citations: set[str] = set()
     scoped = passages
 
     hierarchical = [p for p in passages if p.get("hierarchy")]
-    if hierarchical:
+    if "hierarchical_navigate" in stage_plan["stages"]:
         # A structured document (chapter/section/... tags) navigates level by
         # level (lab.common.nested_index, EXP-065) instead of the flat
         # single-level search below. A passage with no "hierarchy" tag (a
@@ -373,7 +382,7 @@ def reason(ask: str, passages: list[dict], use_real_ner: bool = False) -> dict:
         if nav["leaf"] is None:
             return _finish(ask, trace, "inconclusive", ABSTAIN_TEXT, citations, reason=nav.get("abstain_reason", "navigation failed"))
         scoped = nav["leaf_passages"]
-    elif len(groups) > 1:
+    elif "disambiguate" in stage_plan["stages"]:
         # Only passages tagged with a story group are candidates for "which
         # story is this ask about" -- an ungrouped passage is background
         # rule/policy text, a different category entirely, and must not
@@ -458,7 +467,7 @@ def reason(ask: str, passages: list[dict], use_real_ner: bool = False) -> dict:
     rule_conditional = False
 
     ask_entities = [m["text"] for m in detect_primary(ask, use_real_ner=use_real_ner) if m["label"] in ("person", "organization")]
-    if ask_entities:
+    if "graph_expand" in stage_plan["stages"]:
         graph = build_entity_graph(passages, use_real_ner=use_real_ner)
         passages_by_id = {p["id"]: p for p in passages}
         scoped_ids = {p["id"] for p in scoped}
@@ -497,7 +506,7 @@ def reason(ask: str, passages: list[dict], use_real_ner: bool = False) -> dict:
 
     identity_signal = stage_plan["signals"]["identity"]
     trace.append({"step": "intent_signal", "signal": "identity", **identity_signal})
-    if identity_signal["fires"]:
+    if "identity_extraction" in stage_plan["stages"]:
         full_text = " ".join(p["text"] for p in scoped)
         mentions = detect_primary(full_text, use_real_ner=use_real_ner)
         # Prefer a person mention that is unique to this resolved scope over
@@ -523,7 +532,7 @@ def reason(ask: str, passages: list[dict], use_real_ner: bool = False) -> dict:
 
     total_signal = stage_plan["signals"]["total"]
     trace.append({"step": "intent_signal", "signal": "total", **total_signal})
-    if total_signal["fires"]:
+    if "total_computation" in stage_plan["stages"]:
         spans, sources = [], []
         for p in scoped:
             for found in AMOUNT_RE.findall(p["text"]):
@@ -537,7 +546,7 @@ def reason(ask: str, passages: list[dict], use_real_ner: bool = False) -> dict:
             answer_parts.append(f"total {money['total']:,.0f} [{', '.join(sources)}]")
 
     rule_hit = _find_rule(passages)
-    if rule_hit:
+    if "rule_application" in stage_plan["stages"]:
         kind, rule, rule_passage = rule_hit
         trace.append({"step": "find_rule", "kind": kind, "rule": rule["raw"]})
         if kind == "threshold":
@@ -664,8 +673,17 @@ def reason(ask: str, passages: list[dict], use_real_ner: bool = False) -> dict:
                                 answer_parts.append(f"Furthermore, {extra['subject']} {extra['verb_lemma']} {extra['object']}{extra_suffix}")
 
     if not answer_parts:
-        # No identity/total/rule signal fired -- this is a plain lookup ask.
-        # Fall back to the same single-slot extractor lab.common.engine uses.
+        # Deliberately NOT gated by "lookup_fallback" in stage_plan["stages"]
+        # (unlike every stage above) -- that membership only means "no
+        # signal fired at PLANNING time", a narrower condition than this.
+        # An informative stage can be planned and still produce nothing
+        # (identity fires but no name is found; a rule is present but its
+        # fact_passage never matches) -- something plan_stages cannot know
+        # without actually running extraction, not just checking a signal.
+        # This is the genuinely execution-time question "did everything we
+        # attempted still come back empty", a strict superset of the
+        # planning-time one, so it stays keyed off the real answer_parts
+        # outcome rather than a plan membership check that could under-fire.
         qa = answer_with_agreement(ask, scoped, tau=0.34)
         trace.append({"step": "lookup_fallback", "span": qa["span"], "passage_id": qa.get("passage_id")})
         if not qa["span"] or not quote_check(qa["span"], next((p["text"] for p in scoped if p["id"] == qa.get("passage_id")), "")):
