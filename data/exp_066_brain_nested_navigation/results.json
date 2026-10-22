@@ -40,7 +40,7 @@
     "Extend lab.common.brain's flat ('group') disambiguation branch with the same near-zero abstention floor nested navigation now has, so a flat off-topic ask also abstains instead of guessing (EXP-065's follow-up, not yet carried to the flat path).",
     "Test a 3-level hierarchy (chapter/section/paragraph) through brain.reason, not just the 2-level case here."
   ],
-  "elapsed_sec": 96.2575,
-  "peak_rss_mb": 527.39,
+  "elapsed_sec": 60.7427,
+  "peak_rss_mb": 590.12,
   "models_used": "No generative model. Every step is a previously-measured classical/deterministic primitive; this exploration only chains them through the existing single entry point."
 }

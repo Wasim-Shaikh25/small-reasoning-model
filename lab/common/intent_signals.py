@@ -33,20 +33,72 @@ import re
 import numpy as np
 
 from lab.common.real_encoders import bge_embed
+from lab.common.rules import _parser
 
 # A compound ask ("Who is X, and where do they live? What's their total,
 # and does policy require approval?") scored as one whole string dilutes
 # whichever clause actually carries the signal -- the same problem EXP-056
 # already found for ask-relevance, resurfacing here (EXP-069). Splitting on
-# sentence-ending punctuation and the conjunction "and" and scoring each
-# clause separately, then taking the best clause's score, keeps one
-# unrelated clause from dragging down a real match in another.
-_CLAUSE_SPLIT_RE = re.compile(r"[?.;]|\band\b", re.I)
+# sentence-ending punctuation always (pure punctuation, no word matched)
+# and on the conjunction "and" only when it coordinates two independent
+# clauses -- found structurally, not by a literal `\band\b` match (EXP-092:
+# that old regex was the same class of hardcoding EXP-090/091/026 already
+# removed from lab.common.inference, and wrong on top of it the same way --
+# "What is their name and address?", one of this module's own
+# IDENTITY_EXEMPLARS, is ONE clause with a compound object, and the old
+# regex shredded it into "What is their name" / "address?").
+_SENTENCE_SPLIT_RE = re.compile(r"[?.;]")  # pure punctuation -- no word is matched here
+
+
+def _and_split_points(ask: str, doc) -> list[int]:
+    """Token indices of every "and" that coordinates two independent
+    clauses in `ask`, not a compound noun/noun-phrase sharing one verb --
+    the same structural question lab.common.inference._clauses answers
+    for rule consequences (EXP-026), but checked more permissively than
+    that module needs to: a coordinated clause counts if its own "conj"
+    sibling is itself a verb/auxiliary, OR has its own subject/auxiliary
+    child, even when spaCy's statistical tagger mis-tags that sibling's
+    own POS. Measured directly, not assumed: "What is the total amount,
+    and does company policy require finance head approval?" -- EXP-094's
+    own real ask text -- tags "require" as NOUN (not VERB) after the
+    inverted "does X require Y" question structure, which a pure
+    VERB/AUX-tag check (the rule inference.py's declarative-consequence
+    clauses never needed to work around) would silently fail to split;
+    "require" still carries an "aux" child ("does") and an "nsubj" child
+    ("policy") regardless of its own mistagged POS, so checking for those
+    children catches the real clause structure a tag alone misses.
+    "What is their name and address?" has no such children on "address"
+    at all, so it correctly still does not split.
+    """
+    points = []
+    for tok in doc:
+        if tok.dep_ != "cc" or tok.lemma_.lower() != "and":
+            continue
+        sibling = next((c for c in tok.head.children if c.dep_ == "conj"), None)
+        if sibling is None:
+            continue
+        is_clause = sibling.pos_ in ("VERB", "AUX") or any(c.dep_ in ("nsubj", "nsubjpass", "aux", "auxpass") for c in sibling.children)
+        if is_clause:
+            points.append(tok.i)
+    return points
 
 
 def _clauses(ask: str) -> list[str]:
-    parts = [p.strip() for p in _CLAUSE_SPLIT_RE.split(ask) if p.strip()]
-    return parts or [ask]
+    sentences = [s.strip() for s in _SENTENCE_SPLIT_RE.split(ask) if s.strip()]
+    clauses: list[str] = []
+    for sentence in sentences:
+        doc = _parser()(sentence)
+        split_points = _and_split_points(sentence, doc)
+        if not split_points:
+            clauses.append(sentence)
+            continue
+        start = 0
+        for idx in split_points:
+            clauses.append(doc[start:idx].text.strip())
+            start = idx + 1
+        clauses.append(doc[start:].text.strip())
+    clauses = [c for c in clauses if c]
+    return clauses or [ask]
 
 
 IDENTITY_EXEMPLARS = (

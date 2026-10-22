@@ -2,7 +2,7 @@
   "document_asks": [
     {
       "ask": "Write a full report covering every employee, their address, and their employer.",
-      "score": 0.8835,
+      "score": 0.8766,
       "fired": true,
       "dispatched_to_longform": true,
       "decision": "supported"

@@ -11,7 +11,7 @@
       "rows": [
         {
           "ask": "Write a full report covering every employee, their address, and their employer.",
-          "score": 0.8835,
+          "score": 0.8766,
           "fired": true,
           "dispatched_to_longform": true,
           "decision": "supported"
@@ -67,7 +67,7 @@
       ]
     }
   },
-  "results_prose": "3/3 document-requesting asks correctly fired the signal and dispatched to lab.common.longform (scores [0.8835, 0.8992, 0.9225]). 4/4 short-lookup asks (drawn from EXP-057/069/075, not invented fresh) correctly did NOT fire it (scores [0.5282, 0.6331, None, 0.5201]), including the one compound multi-clause ask that scored closest to the threshold during calibration.",
+  "results_prose": "3/3 document-requesting asks correctly fired the signal and dispatched to lab.common.longform (scores [0.8766, 0.8992, 0.9225]). 4/4 short-lookup asks (drawn from EXP-057/069/075, not invented fresh) correctly did NOT fire it (scores [0.5282, 0.6331, None, 0.5201]), including the one compound multi-clause ask that scored closest to the threshold during calibration.",
   "conclusion": "The long-form signal is now reachable through the same single entry point (lab.common.brain.reason) every other capability in this repo goes through, not a standalone function -- and, more importantly, wiring it in did not disturb any existing short-answer behavior: every lookup ask already measured by an earlier exploration still resolves exactly as it did before this signal existed. EXP-052/053's named gaps are closed end to end, not just as isolated modules.",
   "scale_down": "7 asks total -- enough to prove the wiring and its most important regression boundary, not an exhaustive sweep of every existing exploration's asks.",
   "referenced_files": [
@@ -82,7 +82,7 @@
     "DOCUMENT_TAU=0.75 is a first measured value from a small sample (EXP-069-style multi-domain calibration not yet done for this signal) -- the same caveat every other first-measured threshold in this repo carries.",
     "Not yet tested: an ask that genuinely wants both a short answer AND implies document-length output in the same compound sentence -- which signal should win is not yet a decided, measured case."
   ],
-  "elapsed_sec": 417.9288,
-  "peak_rss_mb": 748.24,
+  "elapsed_sec": 101.0637,
+  "peak_rss_mb": 866.93,
   "models_used": "bge-small-en-v1.5 for the document-intent signal (retrieval-style similarity scoring only); flan-t5-small for the rewriter role inside longform (measured separately, EXP-048 onward). No new generative use."
 }
