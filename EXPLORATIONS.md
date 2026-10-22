@@ -1701,7 +1701,7 @@ Elapsed seconds: 3.0143. Peak RSS MB: 170.86.
 }
 ```
 
-Elapsed seconds: 157.6773. Peak RSS MB: 853.63.
+Elapsed seconds: 166.5751. Peak RSS MB: 854.13.
 - Scale-down: Only CONDITION_POSITIVE's holds-blocks-if-false semantics is wired, matching CONDITION_NEGATIVE's existing scope -- CONCESSION/TEMPORAL_BOUND/CAUSAL remain detection-only, per EXP-090's own follow_ups, untouched here. A third hardcoded word-regex was found (lab/common/intent_signals.py's _CLAUSE_SPLIT_RE, `r"[?.;]|\band\b"`, used for splitting an ASK into clauses for the document/identity/total intent signals) but deliberately NOT changed in this exploration -- it is load-bearing for calibrated thresholds across EXP-069/078/079, and fixing it needs its own regression pass against those, not a drive-by edit inside this one.
 - Conclusion: EXP-026's real gap -- 'except'/'unless'/'provided that' clauses invisible to the engine -- is closed, but not by treating all three the same, which the stub's own wording would have gotten wrong: 'provided that' is the opposite polarity from 'unless'/'except' (EXP-091), and check_exceptions now applies the correct mirrored combination rule for each. Two further hardcoded keyword regexes (the alternative-splitter's literal 'or' match, and _clauses' literal 'and' match) were found and replaced with the same structural find_connectives detection in the same pass, closing the same class of gap EXP-090/091 closed for 'unless', not just the one instance already flagged.
 
@@ -22325,7 +22325,7 @@ Elapsed seconds: 115.1969. Peak RSS MB: 291.8.
 }
 ```
 
-Elapsed seconds: 92.1652. Peak RSS MB: 494.27.
+Elapsed seconds: 31.2349. Peak RSS MB: 594.84.
 - Scale-down: 8 cases across 3 regimes, not a benchmark of the brain's ceiling -- a targeted test that the single entry point reproduces every prior exploration's answer without per-case wiring.
 - Conclusion: One function handles a plain lookup, a rule-application question, and a multi-signal integrated scenario without the caller choosing a path. The difference between regimes shows up only in the trace -- which internal signal checks fired -- never in which function was called or how it was called. A lookup question fires none of the extra signals and falls back to the same single-slot extractor lab.common.engine already uses; the integrated cases fire three signals at once and chain their results. This is the unification the prior three explorations (EXP-057/058/059) proved piece by piece, now proved as one entry point rather than three scripts a person chooses between.
 
@@ -22757,7 +22757,7 @@ Elapsed seconds: 0.2987. Peak RSS MB: 126.58.
 }
 ```
 
-Elapsed seconds: 115.5055. Peak RSS MB: 346.12.
+Elapsed seconds: 96.2575. Peak RSS MB: 527.39.
 - Scale-down: 2 cases, 2-level hierarchy, 9 passages -- a wiring proof, not a scale test (EXP-065 already measured scale up to 450 leaves for the navigation mechanism alone).
 - Conclusion: The unification EXP-060 proved for flat documents carries over to hierarchical ones without any change at the call site: the same function, given passages tagged with a 'hierarchy' dict instead of a flat 'group' string, navigates the structure (lab.common.nested_index, EXP-065's near-zero abstention floor included) and then runs the identical downstream signals (identity, arithmetic, rule application) EXP-058 already measured. A caller never needs to know or declare whether the document it's handing brain.reason is flat or structured -- the passages' own tags decide, the same 'input decides how much of the machinery runs' principle EXP-060 established for the simpler signals now extends to document structure itself.
 
@@ -22874,7 +22874,7 @@ Elapsed seconds: 73.1938. Peak RSS MB: 491.86.
 }
 ```
 
-Elapsed seconds: 244.6209. Peak RSS MB: 449.2.
+Elapsed seconds: 456.0195. Peak RSS MB: 489.19.
 - Scale-down: 3 margin-sweep fixtures, 1 single-child case, 4 flat-disambiguation cases -- enough to validate the mechanism and get a first real measurement of separability, not an exhaustive calibration.
 - Conclusion: All three gaps named after EXP-067 were addressed and re-measured rather than assumed fixed. Flat disambiguation now abstains correctly on the off-topic case and still answers both EXP-060 regression cases, using the identical dual-signal (lexical floor + semantic margin, independent checks that must agree) design EXP-067 validated for hierarchical navigation -- the same mechanism now covers both branches of lab.common.brain. The disambiguation fix worked on the paraphrase case from the first run (it resolved the correct group); what failed downstream of it at the time this exploration was first run was a *separate* issue this exploration exposed rather than caused: brain.py's _wants_identity and _wants_total were literal keyword checks ('name' + 'address', a fixed list of total-cue words), so a paraphrased ask could pass disambiguation correctly and still get no answer. That gap was closed in EXP-069 (semantic intent signals, replacing the literal keyword checks) -- this file reflects a rerun after that fix, which is why the paraphrase case now passes end to end rather than failing downstream the way it did when this exploration was first written. The single-candidate gap in navigate_semantic is closed by falling back to the TF-IDF dense floor specifically where a margin can't be computed, reusing lab.common.nested_index's already-measured constant rather than inventing a new number. The margin sweep found the two populations are NOT cleanly separable (min genuine 0.0031 <= max noise 0.0631) -- meaning no single fixed threshold can be fully trusted across different vocabularies, a real limitation to flag rather than paper over with a confident-sounding constant.
 
@@ -22956,7 +22956,7 @@ Elapsed seconds: 244.6209. Peak RSS MB: 449.2.
 }
 ```
 
-Elapsed seconds: 145.3789. Peak RSS MB: 404.45.
+Elapsed seconds: 115.1667. Peak RSS MB: 456.76.
 - Scale-down: 3 new domains, 1 fixture each, 10+10 calibration asks per signal -- enough to demonstrate removal and generalization, not an exhaustive domain sweep.
 - Conclusion: The literal domain/keyword hardcoding found after EXP-068 -- ask.py's lessee/lessor cues, brain.py's TOTAL_CUES and name+address substring check -- is removed and replaced with lab.common.intent_signals' bge exemplar similarity, which describes question FORM (who/where, how-much/total) rather than any subject vocabulary. Calibration across four domains (including two never used anywhere else in this repo) found real separation for both signals, so the current thresholds rest on a measured gap rather than one lucky guess. All three brand-new domains (medical, insurance, engineering) -- invented for this exploration specifically so nothing in them could match a pre-existing hardcoded word -- pass end to end through the unchanged lab.common.brain.reason entry point: same disambiguation, same identity extraction, same arithmetic, same rule application already proven on lease/contract fixtures, now proven on content the pipeline has genuinely never seen before.
 
@@ -23016,7 +23016,7 @@ Elapsed seconds: 145.3789. Peak RSS MB: 404.45.
 }
 ```
 
-Elapsed seconds: 344.2524. Peak RSS MB: 378.13.
+Elapsed seconds: 441.057. Peak RSS MB: 362.64.
 - Scale-down: 1 fixture, 2 chapters, 5 cases -- a wiring/before-after proof, not a scale test (EXP-065 already measured the lexical mechanism's scale, EXP-067 the semantic mechanism's paraphrase case).
 - Conclusion: lab.common.brain's hierarchical branch now uses the same lexical+semantic dual-signal design (lab.common.semantic_index.navigate_dual) the flat branch already had, closing the gap this exploration was built to close. The paraphrase cases are exactly where the two diverge, as predicted: the dual-signal navigator resolves both correctly while the lexical-only navigator it replaces does not -- direct, measured evidence this wiring is load-bearing, not cosmetic. The two regression cases (exact wording) and the off-topic negative control hold under both navigators, confirming this is additive -- the new signal only helps on asks where lexical alone was already weak, it does not regress the cases lexical alone already handled.
 
@@ -23114,7 +23114,7 @@ Elapsed seconds: 228.6399. Peak RSS MB: 439.11.
 }
 ```
 
-Elapsed seconds: 144.2729. Peak RSS MB: 403.05.
+Elapsed seconds: 93.7736. Peak RSS MB: 415.78.
 - Scale-down: 3 no-context asks, 1 retrieval-miss case, 1 genuine case -- enough to prove the mechanism and its boundary, not a broad open-domain QA benchmark.
 - Conclusion: The no-context fallback works and, critically, stays exactly where FORBIDDEN.md's exception draws the line: a genuinely empty passages list gets an explicitly disclaimed, ungrounded answer, while a real retrieval miss -- passages were given, just none of them relevant -- still abstains exactly as it did before this branch existed. The two cases are structurally distinguished (checked before any retrieval runs, not by a confidence score), so there is no way for a struggling retrieval to slide into the ungrounded path and dodge abstention.
 
@@ -23252,7 +23252,7 @@ Elapsed seconds: 0.1569. Peak RSS MB: 116.74.
 }
 ```
 
-Elapsed seconds: 92.7092. Peak RSS MB: 498.39.
+Elapsed seconds: 96.9379. Peak RSS MB: 395.16.
 - Scale-down: 1 fixture, 1 ask, 2 decoy entities -- a proof the mechanism works and stays scoped, not a stress test of deep multi-hop chains or many simultaneous cross-references.
 - Conclusion: Combining facts about one entity across two different chapters -- something navigate_dual's single-path descent cannot do by construction, proven directly by the counterfactual showing its leaf alone never includes the Company Registry fact -- now works through the identical brain.reason(ask, passages) entry point, via a purely additive graph-expansion step that only adds passages an entity link actually justifies. The Employees/Meera and Company Registry/Zenith passages are untouched decoys proving the expansion is scoped to the entity actually named in the ask, not a blanket merge of every chapter.
 
@@ -23498,7 +23498,7 @@ Elapsed seconds: 54.321. Peak RSS MB: 774.41.
 }
 ```
 
-Elapsed seconds: 591.9372. Peak RSS MB: 682.0.
+Elapsed seconds: 417.9288. Peak RSS MB: 748.24.
 - Scale-down: 7 asks total -- enough to prove the wiring and its most important regression boundary, not an exhaustive sweep of every existing exploration's asks.
 - Conclusion: The long-form signal is now reachable through the same single entry point (lab.common.brain.reason) every other capability in this repo goes through, not a standalone function -- and, more importantly, wiring it in did not disturb any existing short-answer behavior: every lookup ask already measured by an earlier exploration still resolves exactly as it did before this signal existed. EXP-052/053's named gaps are closed end to end, not just as isolated modules.
 
@@ -23673,7 +23673,7 @@ Elapsed seconds: 13.8989. Peak RSS MB: 754.7.
 }
 ```
 
-Elapsed seconds: 984.1598. Peak RSS MB: 2780.28.
+Elapsed seconds: 3372.2094. Peak RSS MB: 1987.95.
 - Scale-down: One real document (69 passages, 19 leaves), two checkpoints -- a genuine end-to-end proof and a real controlled comparison, not a benchmark across many documents, domains, or checkpoints.
 - Conclusion: Qwen2.5-0.5B-Instruct did NOT measurably improve the fidelity pass rate over flan-t5-small on this real document -- see metrics.rewrite_fidelity_by_checkpoint for the exact failure reasons each checkpoint hit. This is evidence that dense modal/numeric regulatory language defeats the fidelity gate's current thresholds somewhat independent of which small checkpoint generates the rewrite, not just a flan-t5-small-specific weakness. Reported as measured, not assumed to improve just because a newer or larger model was substituted. brain.reason itself still defaults to flan-t5-small (write_long_document's own default checkpoint) -- this comparison used direct write_long_document calls with each checkpoint named explicitly; making Qwen2.5-0.5B-Instruct the live default for brain.reason's own dispatch is a separate decision, not made here.
 
@@ -23844,7 +23844,7 @@ Elapsed seconds: 192.1814. Peak RSS MB: 723.55.
 }
 ```
 
-Elapsed seconds: 31.4515. Peak RSS MB: 593.3.
+Elapsed seconds: 140.6136. Peak RSS MB: 464.25.
 - Scale-down: The plan's stage names describe WHAT will run, not a full execution DAG with dependencies -- reason()'s actual control flow (disambiguate before identity/total/rule, document exclusive) is still hardcoded in reason() itself, not driven by iterating over the plan's stage list. Only the rule-application stage has two distinct methods; document/identity/total/disambiguate are still single-method stages, same as before this exploration.
 - Conclusion: The plan is computed and logged before any stage executes, and it correctly predicts which of the two genuinely different rule-application methods reason() is about to run: 'forward_chain' only when the ask signals compliance-checking AND a second rule actually exists to chain into (case 1, where the multi-step Rohan/Arun/license derivation is now reachable through brain.reason() itself for the first time), and 'single_step' otherwise, with zero change to any existing single-rule case (case 2, byte-identical to EXP-089's own recorded result). Case 3 confirms the plan doesn't name a stage that doesn't apply.
 
@@ -24088,7 +24088,7 @@ Elapsed seconds: 1447.2341. Peak RSS MB: 736.13.
 }
 ```
 
-Elapsed seconds: 413.2341. Peak RSS MB: 856.07.
+Elapsed seconds: 2577.0483. Peak RSS MB: 581.77.
 - Scale-down: Only the verb-trigger rule shape (parse_conditional_rule) is wired -- the threshold-rule branch (parse_threshold_rule/apply_threshold_rule) does not go through split_exceptions/check_exceptions at all and is unaffected by this exploration, a real and separate gap if a threshold rule's own consequence ever carries an 'unless' clause. Three hand-built cases through reason(), not a broad test across many rule/passage combinations.
 - Conclusion: The exception-aware rule-application path is now reachable from lab.common.brain.reason itself, not only from a standalone forward_chain call: an unresolved exception derives the consequence but flags the overall decision (supported_with_flags), a confirmed exception suppresses the consequence entirely and returns an explanatory non-applicability line instead of asserting it, and a confidently ruled-out exception derives cleanly with no flag -- all three reachable by passing plain passages through the one entry point every other capability already goes through, with no hand-assembled call sequence.
 
@@ -24221,7 +24221,7 @@ Elapsed seconds: 15.2674. Peak RSS MB: 385.95.
 }
 ```
 
-Elapsed seconds: 228.8055. Peak RSS MB: 856.02.
+Elapsed seconds: 468.289. Peak RSS MB: 498.48.
 - Scale-down: Only CONDITION_NEGATIVE is wired -- CONCESSION (although/though/despite), TEMPORAL_BOUND (until/before/after), and CAUSAL (because/since) still have zero reasoning semantics in check_exceptions/forward_chain; EXP-090 named this split explicitly and it is not revisited here. The threshold-rule branch in brain.py (apply_threshold_rule) still never calls split_exceptions/ check_exceptions at all -- a separate, already-named gap, untouched by this change.
 - Conclusion: lab.common.inference.split_exception now locates a rule's exception clause via lab.common.connectives.find_connectives's structural CONDITION_NEGATIVE detection instead of a hardcoded regex on the single word 'unless'. The gap this closes is not hypothetical: case 2 is the exact failure mode measured before this change (the 'except' phrasing was silently invisible to the old code), and it is now caught through brain.reason itself, the one production entry point, with no regression on the 'unless' phrasing (case 1), the 'except that' phrasing (case 3), or the real multi-alternative GDPR Art 9 rule's OR-combination (case 4).
 
@@ -24259,7 +24259,7 @@ Elapsed seconds: 228.8055. Peak RSS MB: 856.02.
 }
 ```
 
-Elapsed seconds: 327.6423. Peak RSS MB: 851.69.
+Elapsed seconds: 562.1893. Peak RSS MB: 657.62.
 - Scale-down: Only verified against one hand-built threshold-rule-with-exception fixture, not a sweep across many threshold-rule phrasings. _role_matches's own role-mismatch check still runs first and is unaffected by this change -- a role mismatch still short-circuits before any exception check, same as before.
 - Conclusion: The threshold-rule branch now checks exceptions/conditions exactly like the verb-rule branch already did, closing the gap EXP-089 named as a separate, un-fixed limit. Purely additive: every existing threshold-rule fixture (reran EXP-060/066/068/070, the explorations that actually exercise this branch through brain.reason) produced byte-identical output, since check_exceptions correctly returns 'no_exception' when there is nothing to check.
 
@@ -24287,7 +24287,7 @@ Elapsed seconds: 327.6423. Peak RSS MB: 851.69.
 }
 ```
 
-Elapsed seconds: 26.7645. Peak RSS MB: 592.59.
+Elapsed seconds: 85.6403. Peak RSS MB: 463.94.
 - Scale-down: Only one hand-built rule/fact pair tested, with 'although' specifically -- not swept across 'though'/'even though'/'even if'/'despite', though all five share the same CONCESSION operator and the same _find_condition_match omission, so the same reasoning applies to each.
 - Conclusion: CONCESSION's omission from lab.common.inference's condition-detection (_find_condition_match only recognizes CONDITION_NEGATIVE/POSITIVE) was already the CORRECT behavior, not an unfixed gap: a concession clause's own truth value genuinely cannot affect whether the consequence proceeds, by definition (that is what 'holds anyway' means), so never checking it against any context is exactly right -- the three cases above are identical because nothing about the context should ever change the outcome. No code change was needed; this exploration exists to verify that claim empirically rather than assume it, the same way EXP-094 verified CAUSAL's omission was already safe before adding its justification field.
 
@@ -24374,7 +24374,7 @@ Elapsed seconds: 13.7346. Peak RSS MB: 386.26.
 }
 ```
 
-Elapsed seconds: 197.7885. Peak RSS MB: 888.89.
+Elapsed seconds: 237.4161. Peak RSS MB: 884.92.
 - Scale-down: Event-relative resolution depends on the same lexical-NLI-model sensitivity to phrasing every other NLI-based check in this repo already carries (EXP-088 documented a real near-miss; this exploration's own fixture sentences were chosen to score clearly on the right side of tau, not swept across many phrasings). Absolute-date resolution uses real wall-clock 'now' as the default reference point when none is given -- deterministic for any one run, but this exploration's own test dates (2020/2030) were chosen with a wide safety margin rather than measuring exactly how close to 'now' the boundary can get before dateparser's own parsing becomes ambiguous.
 - Conclusion: Temporal bound reasoning is now a real, second reasoning primitive alongside condition/exception checking, reachable through brain.reason() itself: absolute dates resolve deterministically against the real reference time, event-relative bounds resolve via the same bounded NLI judgment check_exception already uses elsewhere (never duplicated), and direction (until/before vs after/once) correctly flips which outcome the same context produces -- case 5 is the real proof, not case 1-4 alone, since it shows the identical context giving the OPPOSITE result for the opposite direction.
 
