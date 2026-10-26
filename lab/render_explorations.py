@@ -494,15 +494,6 @@ TODOS = [
 
 RERUN_TODOS = [
     _todo(
-        "EXP-028",
-        "Rerun the ask analyzer with DeBERTa, KeyBERT, and GLiNER",
-        "Re-measure EXP-002 with a zero-shot DeBERTa-v3 NLI ask classifier, KeyBERT using bge-small-en-v1.5, and GLiNER on the ask.",
-        ENCODER_METHOD,
-        "Not run. Proposed: DeBERTa-v3 NLI, bge-small-en-v1.5, GLiNER. Not generative. Do not call a hosted generative API. Do not use these models to write answer text. FLAN-T5 is not the ask classifier and conflicts with FORBIDDEN.md.",
-        _prior("exp_002_ask_analyzer"),
-        "Todo. The closed EXP-002 scores are rule scores.",
-    ),
-    _todo(
         "EXP-034",
         "Rerun entity resolution on encoder mentions and bge similarity",
         "Re-measure EXP-009 after GLiNER and BERT-NER supply the mentions and bge-small-en-v1.5 supplies a similarity feature. Keep logistic regression and rapidfuzz.",

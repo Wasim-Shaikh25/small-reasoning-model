@@ -1755,6 +1755,75 @@ Elapsed seconds: 199.062. Peak RSS MB: 1193.7.
 - Scale-down: The loop is run on three passages, not a full archive, same as EXP-001.
 - Conclusion: The controller's schema/budget/injection invariants hold with the real encoders loaded, same as EXP-001 found with the lexical substitutes -- those are properties of engine.py's plain control flow (validate_judgment, cap_depth, passages_treated_as_data, render_findings' fixed abstain strings), not of whichever QA/NLI/retrieval model sits underneath. 
 
+## EXP-028 Ask analyzer rerun with zero-shot DeBERTa NLI, bge KeyBERT-style keyphrases, and NER-on-ask
+
+- Status: `closed`
+- Models used: MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli (zero-shot task-type classification), BAAI/bge-small-en-v1.5 (KeyBERT-style keyphrase similarity), dslim/bert-base-NER (NER-on-ask, substituting for GLiNER -- the `gliner` package is not installed in this shared environment). All local checkpoints, not API calls. Not generative.
+- Goal: Re-measure EXP-002 with a zero-shot DeBERTa-v3 NLI ask classifier, KeyBERT using bge-small-en-v1.5, and GLiNER on the ask.
+- Method: Identical 60 hand-labeled asks as EXP-002. Task type is picked by the highest entailment score among six candidate hypotheses scored by MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli (zero-shot classification). Fact coverage replaces EXP-002's token-overlap proxy with KeyBERT-style scoring: unigram/bigram candidates from the ask are embedded with bge-small-en-v1.5 and compared by cosine similarity to each gold fact phrase (threshold 0.72). dslim/bert-base-NER runs on each entity-type ask alone, substituting for GLiNER (package not installed in this environment, same gap lab.common.real_encoders documents). Depth and the sub-question templates are unchanged rule code, not named by this rerun's proposed model list.
+- Referenced files:
+- `lab/exp_028_real_ask_analyzer/run.py`
+- `lab/common/ask.py`
+- `lab/common/real_encoders.py`
+- `lab/common/textutil.py`
+- `lab/common/harness.py`
+- `data/exp_002_ask_analyzer/results.json`
+- `data/exp_028_real_ask_analyzer/asks.json`
+- `data/exp_028_real_ask_analyzer/results.json`
+- Results: On the same 60 hand-labeled asks, zero-shot MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli task-type accuracy is 0.6333 (EXP-002's rule cues scored 0.95). Depth is unchanged, carried over from lab.common.ask.analyze's rule budget (accuracy 0.9167). Mean gold-fact coverage via BAAI/bge-small-en-v1.5 KeyBERT-style keyphrase similarity is 1.0 (EXP-002's token-overlap proxy scored 0.8667). dslim/bert-base-NER (substituting for GLiNER, which is not installed) found at least one entity on 3 of 10 entity-type asks taken alone, with no passage context. Misses: F01, F02, F03, F04, F06, F07, F08, F09, F10, F11, F12, F13, F14, F16, F17, F18, F19, F20, F23, F30, F32, F33, F36, F38, F39, F48.
+```json
+{
+  "n": 60,
+  "task_type_accuracy": 0.6333,
+  "depth_accuracy": 0.9167,
+  "mean_fact_coverage": 1.0,
+  "decomposition_failure_rate": 0.0,
+  "multi_fact_count": 19,
+  "multi_fact_full_coverage_rate": 1.0,
+  "ner_on_ask_entity_type_asks": 10,
+  "ner_on_ask_any_entity_found": 3,
+  "ner_on_ask_hit_rate": 0.3,
+  "misses": [
+    "F01",
+    "F02",
+    "F03",
+    "F04",
+    "F06",
+    "F07",
+    "F08",
+    "F09",
+    "F10",
+    "F11",
+    "F12",
+    "F13",
+    "F14",
+    "F16",
+    "F17",
+    "F18",
+    "F19",
+    "F20",
+    "F23",
+    "F30",
+    "F32",
+    "F33",
+    "F36",
+    "F38",
+    "F39",
+    "F48"
+  ],
+  "vs_exp_002_rules": {
+    "exp_002_task_type_accuracy": 0.95,
+    "exp_028_task_type_accuracy": 0.6333,
+    "exp_002_mean_fact_coverage": 0.8667,
+    "exp_028_mean_fact_coverage": 1.0
+  }
+}
+```
+
+Elapsed seconds: 17513.7491. Peak RSS MB: 769.16.
+- Scale-down: Same 60 original asks as EXP-002, not a larger labeled set. No human 1-to-5 rating was collected here either.
+- Conclusion: Zero-shot NLI task classification (0.6333) does not beat EXP-002's hand-written rule cues (0.95) on this label set -- the six task types here are an architecture-specific taxonomy (lookup/rewrite/compare/chronology/entity/reason), not one of MNLI/FEVER/ANLI's natural entailment categories, so phrasing each type as a single entailment hypothesis is a weaker fit than rules written against these exact labels. The bge keyphrase fact-coverage proxy is the more interesting result: it requires no hand-written template at all and still tracks EXP-002's coverage number, because a short gold fact phrase and a semantically matching ask fragment land close in embedding space even with different wording. GLiNER is not installed in this shared environment; dslim/bert-base-NER on the bare ask text (no passage) finds little, which is expected -- entity extraction needs a sentence with the entity actually present, and an ask like 'Who is the Lessee?' never states the name itself.
+
 ## EXP-029 Hybrid retrieval with a real pretrained dense model, on real documents
 
 - Status: `closed`
@@ -24479,24 +24548,6 @@ Elapsed seconds: 353.8295. Peak RSS MB: 888.31.
 ## Proposed-model reruns
 
 These entries are `todo`. None of them has been run. A blocked entry must stay blocked.
-
-## EXP-028 Rerun the ask analyzer with DeBERTa, KeyBERT, and GLiNER
-
-- Status: `todo`
-- Models used: Not run. Proposed: DeBERTa-v3 NLI, bge-small-en-v1.5, GLiNER. Not generative. Do not call a hosted generative API. Do not use these models to write answer text. FLAN-T5 is not the ask classifier and conflicts with FORBIDDEN.md.
-- Goal: Re-measure EXP-002 with a zero-shot DeBERTa-v3 NLI ask classifier, KeyBERT using bge-small-en-v1.5, and GLiNER on the ask.
-- Method: Not run. When this is picked up, load the named checkpoint locally and measure again. Not a generative model. Do not call a hosted generative API. Do not use the checkpoint to write answer text. Write a new results.json only after the checkpoint actually runs. Do not copy the closed lexical scores forward.
-- Referenced files:
-- `lab/exp_002_ask_analyzer/run.py`
-- `data/exp_002_ask_analyzer/results.json`
-- `lab/config/models.json`
-- `FORBIDDEN.md`
-- `ARCHITECTURE.md`
-- Results: Not run.
-
-
-- Scale-down: 
-- Conclusion: Todo. The closed EXP-002 scores are rule scores.
 
 ## EXP-034 Rerun entity resolution on encoder mentions and bge similarity
 
