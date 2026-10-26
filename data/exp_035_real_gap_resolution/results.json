@@ -1,0 +1,179 @@
+{
+  "id": "EXP-035",
+  "title": "Gap resolution loop rerun with real DeBERTa QA and NLI",
+  "status": "closed",
+  "goal": "Re-measure EXP-010 with DeBERTa SQuAD2 spans and DeBERTa NLI support checks.",
+  "method": "Identical 12 items and 3-round budget as EXP-010. The hybrid BM25+TF-IDF Index (classical, not named by this rerun's proposed checkpoint list) is unchanged. lab.common.qa.answer_question is replaced by real_qa (deepset/deberta-v3-base-squad2) and lab.common.nli.judge by real_nli (MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli) for the support check.",
+  "metrics": {
+    "n": 12,
+    "accuracy": 0.9167,
+    "by_gap": {
+      "unknown_term": 1.0,
+      "ambiguous_reference": 0.6667,
+      "missing_premise": 1.0,
+      "conflicting_values": 1.0,
+      "vague_criterion": 1.0
+    },
+    "max_rounds": 3,
+    "rows": [
+      {
+        "id": "G01",
+        "gap": "unknown_term",
+        "gold_status": "resolved",
+        "status": "resolved",
+        "span": "a refund issued after 14 days.",
+        "round": 0,
+        "evidence_id": "P0",
+        "correct": true
+      },
+      {
+        "id": "G02",
+        "gap": "unknown_term",
+        "gold_status": "unresolved",
+        "status": "unresolved",
+        "span": null,
+        "alternatives": [],
+        "correct": true
+      },
+      {
+        "id": "G03",
+        "gap": "unknown_term",
+        "gold_status": "resolved",
+        "status": "resolved",
+        "span": "30 days.",
+        "round": 0,
+        "evidence_id": "P0",
+        "correct": true
+      },
+      {
+        "id": "G04",
+        "gap": "ambiguous_reference",
+        "gold_status": "resolved",
+        "status": "ambiguous",
+        "span": null,
+        "alternatives": [
+          "a parking slot.",
+          "the flat at plot 14, sector 5.",
+          "a parking slot.",
+          "the flat at plot 14, sector 5.",
+          "a parking slot.",
+          "the flat at plot 14, sector 5."
+        ],
+        "correct": false
+      },
+      {
+        "id": "G05",
+        "gap": "ambiguous_reference",
+        "gold_status": "resolved",
+        "status": "resolved",
+        "span": "Kapil Iyer.",
+        "round": 0,
+        "evidence_id": "P0",
+        "correct": true
+      },
+      {
+        "id": "G06",
+        "gap": "ambiguous_reference",
+        "gold_status": "unresolved",
+        "status": "unresolved",
+        "span": null,
+        "alternatives": [],
+        "correct": true
+      },
+      {
+        "id": "G07",
+        "gap": "missing_premise",
+        "gold_status": "unresolved",
+        "status": "unresolved",
+        "span": null,
+        "alternatives": [],
+        "correct": true
+      },
+      {
+        "id": "G08",
+        "gap": "missing_premise",
+        "gold_status": "resolved",
+        "status": "resolved",
+        "span": "10 days.",
+        "round": 0,
+        "evidence_id": "P1",
+        "correct": true
+      },
+      {
+        "id": "G09",
+        "gap": "conflicting_values",
+        "gold_status": "ambiguous",
+        "status": "ambiguous",
+        "span": null,
+        "alternatives": [
+          "30 days.",
+          "45 days.",
+          "30 days.",
+          "45 days.",
+          "30 days.",
+          "45 days."
+        ],
+        "correct": true
+      },
+      {
+        "id": "G10",
+        "gap": "conflicting_values",
+        "gold_status": "ambiguous",
+        "status": "ambiguous",
+        "span": null,
+        "alternatives": [
+          "inr 50000.",
+          "inr 75000.",
+          "inr 50000.",
+          "inr 75000.",
+          "inr 50000.",
+          "inr 75000."
+        ],
+        "correct": true
+      },
+      {
+        "id": "G11",
+        "gap": "vague_criterion",
+        "gold_status": "ambiguous",
+        "status": "ambiguous",
+        "span": null,
+        "alternatives": [],
+        "correct": true
+      },
+      {
+        "id": "G12",
+        "gap": "vague_criterion",
+        "gold_status": "ambiguous",
+        "status": "ambiguous",
+        "span": null,
+        "alternatives": [
+          "The tenant shall give prompt notice of damage.",
+          "The tenant shall give prompt notice of damage.",
+          "The tenant shall give prompt notice of damage."
+        ],
+        "correct": true
+      }
+    ],
+    "vs_exp_010_lexical": {
+      "exp_010_accuracy": 0.8333,
+      "exp_035_accuracy": 0.9167
+    }
+  },
+  "results_prose": "With deepset/deberta-v3-base-squad2 and MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli loaded in place of the lexical extractor and NLI judge, gap resolution accuracy on 12 items is 0.9167 (EXP-010's lexical loop scored 0.8333). By type: {'unknown_term': 1.0, 'ambiguous_reference': 0.6667, 'missing_premise': 1.0, 'conflicting_values': 1.0, 'vague_criterion': 1.0}.",
+  "conclusion": "The real checkpoints resolve the same gap types EXP-010's lexical loop could: a gap closes only when some passage actually states the missing piece, and conflicting or vague cases are still refused a single answer rather than guessed, regardless of which extractor/judge pair sits underneath the retrieval-and-round control flow.",
+  "scale_down": "Same 12 items as EXP-010, two or three per gap type. Context is pasted, which is the Phase 0 setup.",
+  "referenced_files": [
+    "lab/exp_035_real_gap_resolution/run.py",
+    "lab/common/index.py",
+    "lab/common/real_encoders.py",
+    "lab/common/textutil.py",
+    "lab/common/harness.py",
+    "data/exp_010_gap_resolution/results.json",
+    "data/exp_035_real_gap_resolution/items.json",
+    "data/exp_035_real_gap_resolution/results.json"
+  ],
+  "follow_ups": [],
+  "elapsed_sec": 203.9522,
+  "peak_rss_mb": 1028.94,
+  "models_used": "deepset/deberta-v3-base-squad2 (extractive QA), MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli (NLI support check). Local checkpoints, not API calls. Not generative."
+}

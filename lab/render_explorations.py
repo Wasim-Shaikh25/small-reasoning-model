@@ -494,15 +494,6 @@ TODOS = [
 
 RERUN_TODOS = [
     _todo(
-        "EXP-035",
-        "Rerun gap resolution with DeBERTa QA and NLI",
-        "Re-measure EXP-010 with DeBERTa SQuAD2 spans and DeBERTa NLI support checks.",
-        ENCODER_METHOD,
-        "Not run. Proposed: deepset/deberta-v3-base-squad2 and MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli. Not generative.",
-        _prior("exp_010_gap_resolution"),
-        "Todo. The closed EXP-010 accuracy is a lexical-loop score.",
-    ),
-    _todo(
         "EXP-036",
         "Rerun the decision heads on encoder features",
         "Re-measure EXP-011 with features taken from the real DeBERTa QA and NLI pipeline. The head may stay logistic regression.",

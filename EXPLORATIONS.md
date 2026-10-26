@@ -2221,6 +2221,184 @@ Elapsed seconds: 21.7426. Peak RSS MB: 837.4.
 - Scale-down: Same six short documents as EXP-009, not 20 documents of 5 to 30 pages.
 - Conclusion: Logistic regression and rapidfuzz stay, as the todo specifies; only the mention source and one added feature changed. The wrong-resolution rate on this fixture rose from EXP-009's 0.0 to 0.1667, and most outcomes came back null rather than wrong -- checked directly (not assumed): dslim/bert-base-NER's own WordPiece tokenizer sometimes splits a name across a sub-word boundary ('Amit' -> 'Am' + '##it') and the model tags the first piece and the continuation as two separate B-PER groups instead of one B-PER/I-PER pair, so the HF pipeline's aggregation_strategy='simple' emits 'Am' and '##it Sharma' as two distinct mentions rather than one 'Amit Sharma' span. _find()'s exact-normalized-text lookup (carried over unchanged from EXP-009, written for the regex tagger's always-whole-name spans) then finds no mention whose text equals the gold name at all, so the resolution reads as null, not as a wrong but recognizable guess. This is the real checkpoint's output granularity, confirmed by printing its raw pipeline() output on this exact fixture -- not a regression in this environment: EXP-080's own 19-span fixture reproduces its committed F1 (0.8085) exactly when rerun just now, and that exploration's scoring already works around the same fragmentation with text-containment matching instead of exact equality. EXP-034's resolution loop inherited EXP-009's exact-match evaluation code unchanged, which is the wrong comparison for this checkpoint's granularity, not a sign the checkpoint failed to find the person at all.
 
+## EXP-035 Gap resolution loop rerun with real DeBERTa QA and NLI
+
+- Status: `closed`
+- Models used: deepset/deberta-v3-base-squad2 (extractive QA), MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli (NLI support check). Local checkpoints, not API calls. Not generative.
+- Goal: Re-measure EXP-010 with DeBERTa SQuAD2 spans and DeBERTa NLI support checks.
+- Method: Identical 12 items and 3-round budget as EXP-010. The hybrid BM25+TF-IDF Index (classical, not named by this rerun's proposed checkpoint list) is unchanged. lab.common.qa.answer_question is replaced by real_qa (deepset/deberta-v3-base-squad2) and lab.common.nli.judge by real_nli (MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli) for the support check.
+- Referenced files:
+- `lab/exp_035_real_gap_resolution/run.py`
+- `lab/common/index.py`
+- `lab/common/real_encoders.py`
+- `lab/common/textutil.py`
+- `lab/common/harness.py`
+- `data/exp_010_gap_resolution/results.json`
+- `data/exp_035_real_gap_resolution/items.json`
+- `data/exp_035_real_gap_resolution/results.json`
+- Results: With deepset/deberta-v3-base-squad2 and MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli loaded in place of the lexical extractor and NLI judge, gap resolution accuracy on 12 items is 0.9167 (EXP-010's lexical loop scored 0.8333). By type: {'unknown_term': 1.0, 'ambiguous_reference': 0.6667, 'missing_premise': 1.0, 'conflicting_values': 1.0, 'vague_criterion': 1.0}.
+```json
+{
+  "n": 12,
+  "accuracy": 0.9167,
+  "by_gap": {
+    "unknown_term": 1.0,
+    "ambiguous_reference": 0.6667,
+    "missing_premise": 1.0,
+    "conflicting_values": 1.0,
+    "vague_criterion": 1.0
+  },
+  "max_rounds": 3,
+  "rows": [
+    {
+      "id": "G01",
+      "gap": "unknown_term",
+      "gold_status": "resolved",
+      "status": "resolved",
+      "span": "a refund issued after 14 days.",
+      "round": 0,
+      "evidence_id": "P0",
+      "correct": true
+    },
+    {
+      "id": "G02",
+      "gap": "unknown_term",
+      "gold_status": "unresolved",
+      "status": "unresolved",
+      "span": null,
+      "alternatives": [],
+      "correct": true
+    },
+    {
+      "id": "G03",
+      "gap": "unknown_term",
+      "gold_status": "resolved",
+      "status": "resolved",
+      "span": "30 days.",
+      "round": 0,
+      "evidence_id": "P0",
+      "correct": true
+    },
+    {
+      "id": "G04",
+      "gap": "ambiguous_reference",
+      "gold_status": "resolved",
+      "status": "ambiguous",
+      "span": null,
+      "alternatives": [
+        "a parking slot.",
+        "the flat at plot 14, sector 5.",
+        "a parking slot.",
+        "the flat at plot 14, sector 5.",
+        "a parking slot.",
+        "the flat at plot 14, sector 5."
+      ],
+      "correct": false
+    },
+    {
+      "id": "G05",
+      "gap": "ambiguous_reference",
+      "gold_status": "resolved",
+      "status": "resolved",
+      "span": "Kapil Iyer.",
+      "round": 0,
+      "evidence_id": "P0",
+      "correct": true
+    },
+    {
+      "id": "G06",
+      "gap": "ambiguous_reference",
+      "gold_status": "unresolved",
+      "status": "unresolved",
+      "span": null,
+      "alternatives": [],
+      "correct": true
+    },
+    {
+      "id": "G07",
+      "gap": "missing_premise",
+      "gold_status": "unresolved",
+      "status": "unresolved",
+      "span": null,
+      "alternatives": [],
+      "correct": true
+    },
+    {
+      "id": "G08",
+      "gap": "missing_premise",
+      "gold_status": "resolved",
+      "status": "resolved",
+      "span": "10 days.",
+      "round": 0,
+      "evidence_id": "P1",
+      "correct": true
+    },
+    {
+      "id": "G09",
+      "gap": "conflicting_values",
+      "gold_status": "ambiguous",
+      "status": "ambiguous",
+      "span": null,
+      "alternatives": [
+        "30 days.",
+        "45 days.",
+        "30 days.",
+        "45 days.",
+        "30 days.",
+        "45 days."
+      ],
+      "correct": true
+    },
+    {
+      "id": "G10",
+      "gap": "conflicting_values",
+      "gold_status": "ambiguous",
+      "status": "ambiguous",
+      "span": null,
+      "alternatives": [
+        "inr 50000.",
+        "inr 75000.",
+        "inr 50000.",
+        "inr 75000.",
+        "inr 50000.",
+        "inr 75000."
+      ],
+      "correct": true
+    },
+    {
+      "id": "G11",
+      "gap": "vague_criterion",
+      "gold_status": "ambiguous",
+      "status": "ambiguous",
+      "span": null,
+      "alternatives": [],
+      "correct": true
+    },
+    {
+      "id": "G12",
+      "gap": "vague_criterion",
+      "gold_status": "ambiguous",
+      "status": "ambiguous",
+      "span": null,
+      "alternatives": [
+        "The tenant shall give prompt notice of damage.",
+        "The tenant shall give prompt notice of damage.",
+        "The tenant shall give prompt notice of damage."
+      ],
+      "correct": true
+    }
+  ],
+  "vs_exp_010_lexical": {
+    "exp_010_accuracy": 0.8333,
+    "exp_035_accuracy": 0.9167
+  }
+}
+```
+
+Elapsed seconds: 203.9522. Peak RSS MB: 1028.94.
+- Scale-down: Same 12 items as EXP-010, two or three per gap type. Context is pasted, which is the Phase 0 setup.
+- Conclusion: The real checkpoints resolve the same gap types EXP-010's lexical loop could: a gap closes only when some passage actually states the missing piece, and conflicting or vague cases are still refused a single answer rather than guessed, regardless of which extractor/judge pair sits underneath the retrieval-and-round control flow.
+
 ## EXP-038 Provenance and context faithfulness rerun with the real DeBERTa-v3 SQuAD2 checkpoint
 
 - Status: `closed`
@@ -24635,24 +24813,6 @@ Elapsed seconds: 353.8295. Peak RSS MB: 888.31.
 ## Proposed-model reruns
 
 These entries are `todo`. None of them has been run. A blocked entry must stay blocked.
-
-## EXP-035 Rerun gap resolution with DeBERTa QA and NLI
-
-- Status: `todo`
-- Models used: Not run. Proposed: deepset/deberta-v3-base-squad2 and MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli. Not generative.
-- Goal: Re-measure EXP-010 with DeBERTa SQuAD2 spans and DeBERTa NLI support checks.
-- Method: Not run. When this is picked up, load the named checkpoint locally and measure again. Not a generative model. Do not call a hosted generative API. Do not use the checkpoint to write answer text. Write a new results.json only after the checkpoint actually runs. Do not copy the closed lexical scores forward.
-- Referenced files:
-- `lab/exp_010_gap_resolution/run.py`
-- `data/exp_010_gap_resolution/results.json`
-- `lab/config/models.json`
-- `FORBIDDEN.md`
-- `ARCHITECTURE.md`
-- Results: Not run.
-
-
-- Scale-down: 
-- Conclusion: Todo. The closed EXP-010 accuracy is a lexical-loop score.
 
 ## EXP-036 Rerun the decision heads on encoder features
 
