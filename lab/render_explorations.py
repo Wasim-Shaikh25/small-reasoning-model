@@ -494,15 +494,6 @@ TODOS = [
 
 RERUN_TODOS = [
     _todo(
-        "EXP-034",
-        "Rerun entity resolution on encoder mentions and bge similarity",
-        "Re-measure EXP-009 after GLiNER and BERT-NER supply the mentions and bge-small-en-v1.5 supplies a similarity feature. Keep logistic regression and rapidfuzz.",
-        ENCODER_METHOD + " Do not swap the head to a generative model. LightGBM remains optional.",
-        "Not run. Proposed taggers and embedder: GLiNER, dslim/bert-base-NER, bge-small-en-v1.5. Logistic regression stays. Not generative.",
-        _prior("exp_009_entity_resolve"),
-        "Todo. The closed pair-matcher accuracy is a logistic-regression score on rule features.",
-    ),
-    _todo(
         "EXP-035",
         "Rerun gap resolution with DeBERTa QA and NLI",
         "Re-measure EXP-010 with DeBERTa SQuAD2 spans and DeBERTa NLI support checks.",

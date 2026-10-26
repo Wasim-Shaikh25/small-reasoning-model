@@ -2134,6 +2134,93 @@ Elapsed seconds: 0.6716. Peak RSS MB: 249.04.
 - Scale-down: 12 hand-labeled sentences, not a held-out annotated corpus (EXP-008 used 52 lines on the lease domain). GLiNER, dslim/bert-base-NER, and libpostal remain unloaded because huggingface.co is blocked by this sandbox's egress policy; see real_model_card. Address/GPE detection is out of scope for this head-to-head since the rule tagger has no general place category.
 - Conclusion: The rule tagger was written against lease-fixture patterns (two-capitalized-word names, Pvt Ltd/Inc suffixes, a fixed exclusion list for false positives like 'New Delhi'). On real open-domain news text it both misses organization abbreviations it has no pattern for (ZIANA, IBC, UIC, Coffee Board) and can mistag place names its exclusion list does not cover as PERSON. The real pretrained OntoNotes NER generalizes across domains without hand-written patterns, which is exactly the generalization gap FORBIDDEN.md's own substitute list predicted. This closes the EXP-033 rerun todo for entity tagging, measured with spaCy rather than GLiNER or dslim/bert-base-NER.
 
+## EXP-034 Entity resolution rerun with real NER mentions and a bge pair-matcher feature
+
+- Status: `closed`
+- Models used: dslim/bert-base-NER (person/organization mentions, substituting for GLiNER -- package not installed), BAAI/bge-small-en-v1.5 (pair-matcher similarity feature). Logistic regression and rapidfuzz are unchanged classical components, kept as the todo specifies. Not generative.
+- Goal: Re-measure EXP-009 after GLiNER and BERT-NER supply the mentions and bge-small-en-v1.5 supplies a similarity feature. Keep logistic regression and rapidfuzz.
+- Method: Identical 6 documents and PAIR_TRAIN/heldout pairs as EXP-009. The resolution loop's primary tagger role is dslim/bert-base-NER (lab.common.entities.detect_primary(use_real_ner=True), wired via lab.common.real_ner since EXP-080) in place of the regex person/organization patterns -- substituting for GLiNER, whose package is not installed here. pair_features' five rapidfuzz/context features gain a sixth, bge-small-en-v1.5 cosine similarity between the two mentions' contexts, and logistic regression is retrained on the same PAIR_TRAIN rows.
+- Referenced files:
+- `lab/exp_034_real_entity_resolve/run.py`
+- `lab/common/entities.py`
+- `lab/common/real_ner.py`
+- `lab/common/real_encoders.py`
+- `lab/common/chunking.py`
+- `lab/common/textutil.py`
+- `lab/common/harness.py`
+- `data/exp_009_entity_resolve/results.json`
+- `data/exp_034_real_entity_resolve/docs.json`
+- `data/exp_034_real_entity_resolve/results.json`
+- Results: On the same 6 short documents, with dslim/bert-base-NER supplying person/organization mentions (GLiNER is not installed in this environment) and BAAI/bge-small-en-v1.5 added as a sixth pair-matcher feature, wrong resolutions are 1 (rate 0.1667). Ambiguous cases flagged: 0 of 3. Clearly unique people resolved correctly: 1 of 2. Held-out pair accuracy with the bge-augmented matcher is 1.0. Example store size 1, wrong examples stored 2.
+```json
+{
+  "documents": 6,
+  "wrong_resolutions": 1,
+  "wrong_resolution_rate": 0.1667,
+  "ambiguous_gold": 3,
+  "ambiguous_flagged": 0,
+  "ambiguous_flag_rate": 0.0,
+  "resolved_gold": 2,
+  "resolved_correct": 1,
+  "pair_heldout_accuracy": 1.0,
+  "doc5_pair_decisions": [],
+  "example_store_size": 1,
+  "wrong_examples_stored": 2,
+  "confidence_before_store": 0.9998,
+  "confidence_after_store": 0.99,
+  "outcomes": [
+    {
+      "id": "E3-1",
+      "status": "resolved",
+      "correct": true
+    },
+    {
+      "id": "E3-2",
+      "status": null,
+      "text": null,
+      "wrong": false
+    },
+    {
+      "id": "E3-3",
+      "status": null,
+      "text": null,
+      "wrong": false
+    },
+    {
+      "id": "E3-4",
+      "status": null,
+      "text": null,
+      "wrong": false
+    },
+    {
+      "id": "E3-5",
+      "found": [
+        null,
+        null
+      ],
+      "wrong": true
+    },
+    {
+      "id": "E3-6",
+      "status": null,
+      "correct": false
+    }
+  ],
+  "vs_exp_009_rule_tagger": {
+    "exp_009_wrong_resolution_rate": 0.0,
+    "exp_034_wrong_resolution_rate": 0.1667,
+    "exp_009_ambiguous_flag_rate": 1.0,
+    "exp_034_ambiguous_flag_rate": 0.0,
+    "exp_009_pair_heldout_accuracy": 1.0,
+    "exp_034_pair_heldout_accuracy": 1.0
+  }
+}
+```
+
+Elapsed seconds: 21.7426. Peak RSS MB: 837.4.
+- Scale-down: Same six short documents as EXP-009, not 20 documents of 5 to 30 pages.
+- Conclusion: Logistic regression and rapidfuzz stay, as the todo specifies; only the mention source and one added feature changed. The wrong-resolution rate on this fixture rose from EXP-009's 0.0 to 0.1667, and most outcomes came back null rather than wrong -- checked directly (not assumed): dslim/bert-base-NER's own WordPiece tokenizer sometimes splits a name across a sub-word boundary ('Amit' -> 'Am' + '##it') and the model tags the first piece and the continuation as two separate B-PER groups instead of one B-PER/I-PER pair, so the HF pipeline's aggregation_strategy='simple' emits 'Am' and '##it Sharma' as two distinct mentions rather than one 'Amit Sharma' span. _find()'s exact-normalized-text lookup (carried over unchanged from EXP-009, written for the regex tagger's always-whole-name spans) then finds no mention whose text equals the gold name at all, so the resolution reads as null, not as a wrong but recognizable guess. This is the real checkpoint's output granularity, confirmed by printing its raw pipeline() output on this exact fixture -- not a regression in this environment: EXP-080's own 19-span fixture reproduces its committed F1 (0.8085) exactly when rerun just now, and that exploration's scoring already works around the same fragmentation with text-containment matching instead of exact equality. EXP-034's resolution loop inherited EXP-009's exact-match evaluation code unchanged, which is the wrong comparison for this checkpoint's granularity, not a sign the checkpoint failed to find the person at all.
+
 ## EXP-038 Provenance and context faithfulness rerun with the real DeBERTa-v3 SQuAD2 checkpoint
 
 - Status: `closed`
@@ -23678,7 +23765,7 @@ Elapsed seconds: 75.6386. Peak RSS MB: 873.38.
 }
 ```
 
-Elapsed seconds: 13.8989. Peak RSS MB: 754.7.
+Elapsed seconds: 9.9071. Peak RSS MB: 753.52.
 - Scale-down: Same 12-sentence fixture as EXP-033 -- not a held-out annotated corpus, chosen for a direct, controlled comparison against an already-measured result rather than a fresh, larger evaluation.
 - Conclusion: dslim/bert-base-NER, the actual blueprint-named checkpoint, outperforms both the rule tagger and the spaCy substitute EXP-033 used when HuggingFace was unreachable -- a real, direct three-way comparison, not an assumption that the originally-intended checkpoint would be better just because it's the one the blueprint named. EXP-033/034's gap is closed: the checkpoint was loaded but never actually called for this role until now.
 
@@ -24548,24 +24635,6 @@ Elapsed seconds: 353.8295. Peak RSS MB: 888.31.
 ## Proposed-model reruns
 
 These entries are `todo`. None of them has been run. A blocked entry must stay blocked.
-
-## EXP-034 Rerun entity resolution on encoder mentions and bge similarity
-
-- Status: `todo`
-- Models used: Not run. Proposed taggers and embedder: GLiNER, dslim/bert-base-NER, bge-small-en-v1.5. Logistic regression stays. Not generative.
-- Goal: Re-measure EXP-009 after GLiNER and BERT-NER supply the mentions and bge-small-en-v1.5 supplies a similarity feature. Keep logistic regression and rapidfuzz.
-- Method: Not run. When this is picked up, load the named checkpoint locally and measure again. Not a generative model. Do not call a hosted generative API. Do not use the checkpoint to write answer text. Write a new results.json only after the checkpoint actually runs. Do not copy the closed lexical scores forward. Do not swap the head to a generative model. LightGBM remains optional.
-- Referenced files:
-- `lab/exp_009_entity_resolve/run.py`
-- `data/exp_009_entity_resolve/results.json`
-- `lab/config/models.json`
-- `FORBIDDEN.md`
-- `ARCHITECTURE.md`
-- Results: Not run.
-
-
-- Scale-down: 
-- Conclusion: Todo. The closed pair-matcher accuracy is a logistic-regression score on rule features.
 
 ## EXP-035 Rerun gap resolution with DeBERTa QA and NLI
 

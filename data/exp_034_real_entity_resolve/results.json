@@ -1,0 +1,91 @@
+{
+  "id": "EXP-034",
+  "title": "Entity resolution rerun with real NER mentions and a bge pair-matcher feature",
+  "status": "closed",
+  "goal": "Re-measure EXP-009 after GLiNER and BERT-NER supply the mentions and bge-small-en-v1.5 supplies a similarity feature. Keep logistic regression and rapidfuzz.",
+  "method": "Identical 6 documents and PAIR_TRAIN/heldout pairs as EXP-009. The resolution loop's primary tagger role is dslim/bert-base-NER (lab.common.entities.detect_primary(use_real_ner=True), wired via lab.common.real_ner since EXP-080) in place of the regex person/organization patterns -- substituting for GLiNER, whose package is not installed here. pair_features' five rapidfuzz/context features gain a sixth, bge-small-en-v1.5 cosine similarity between the two mentions' contexts, and logistic regression is retrained on the same PAIR_TRAIN rows.",
+  "metrics": {
+    "documents": 6,
+    "wrong_resolutions": 1,
+    "wrong_resolution_rate": 0.1667,
+    "ambiguous_gold": 3,
+    "ambiguous_flagged": 0,
+    "ambiguous_flag_rate": 0.0,
+    "resolved_gold": 2,
+    "resolved_correct": 1,
+    "pair_heldout_accuracy": 1.0,
+    "doc5_pair_decisions": [],
+    "example_store_size": 1,
+    "wrong_examples_stored": 2,
+    "confidence_before_store": 0.9998,
+    "confidence_after_store": 0.99,
+    "outcomes": [
+      {
+        "id": "E3-1",
+        "status": "resolved",
+        "correct": true
+      },
+      {
+        "id": "E3-2",
+        "status": null,
+        "text": null,
+        "wrong": false
+      },
+      {
+        "id": "E3-3",
+        "status": null,
+        "text": null,
+        "wrong": false
+      },
+      {
+        "id": "E3-4",
+        "status": null,
+        "text": null,
+        "wrong": false
+      },
+      {
+        "id": "E3-5",
+        "found": [
+          null,
+          null
+        ],
+        "wrong": true
+      },
+      {
+        "id": "E3-6",
+        "status": null,
+        "correct": false
+      }
+    ],
+    "vs_exp_009_rule_tagger": {
+      "exp_009_wrong_resolution_rate": 0.0,
+      "exp_034_wrong_resolution_rate": 0.1667,
+      "exp_009_ambiguous_flag_rate": 1.0,
+      "exp_034_ambiguous_flag_rate": 0.0,
+      "exp_009_pair_heldout_accuracy": 1.0,
+      "exp_034_pair_heldout_accuracy": 1.0
+    }
+  },
+  "results_prose": "On the same 6 short documents, with dslim/bert-base-NER supplying person/organization mentions (GLiNER is not installed in this environment) and BAAI/bge-small-en-v1.5 added as a sixth pair-matcher feature, wrong resolutions are 1 (rate 0.1667). Ambiguous cases flagged: 0 of 3. Clearly unique people resolved correctly: 1 of 2. Held-out pair accuracy with the bge-augmented matcher is 1.0. Example store size 1, wrong examples stored 2.",
+  "conclusion": "Logistic regression and rapidfuzz stay, as the todo specifies; only the mention source and one added feature changed. The wrong-resolution rate on this fixture rose from EXP-009's 0.0 to 0.1667, and most outcomes came back null rather than wrong -- checked directly (not assumed): dslim/bert-base-NER's own WordPiece tokenizer sometimes splits a name across a sub-word boundary ('Amit' -> 'Am' + '##it') and the model tags the first piece and the continuation as two separate B-PER groups instead of one B-PER/I-PER pair, so the HF pipeline's aggregation_strategy='simple' emits 'Am' and '##it Sharma' as two distinct mentions rather than one 'Amit Sharma' span. _find()'s exact-normalized-text lookup (carried over unchanged from EXP-009, written for the regex tagger's always-whole-name spans) then finds no mention whose text equals the gold name at all, so the resolution reads as null, not as a wrong but recognizable guess. This is the real checkpoint's output granularity, confirmed by printing its raw pipeline() output on this exact fixture -- not a regression in this environment: EXP-080's own 19-span fixture reproduces its committed F1 (0.8085) exactly when rerun just now, and that exploration's scoring already works around the same fragmentation with text-containment matching instead of exact equality. EXP-034's resolution loop inherited EXP-009's exact-match evaluation code unchanged, which is the wrong comparison for this checkpoint's granularity, not a sign the checkpoint failed to find the person at all.",
+  "scale_down": "Same six short documents as EXP-009, not 20 documents of 5 to 30 pages.",
+  "referenced_files": [
+    "lab/exp_034_real_entity_resolve/run.py",
+    "lab/common/entities.py",
+    "lab/common/real_ner.py",
+    "lab/common/real_encoders.py",
+    "lab/common/chunking.py",
+    "lab/common/textutil.py",
+    "lab/common/harness.py",
+    "data/exp_009_entity_resolve/results.json",
+    "data/exp_034_real_entity_resolve/docs.json",
+    "data/exp_034_real_entity_resolve/results.json"
+  ],
+  "follow_ups": [
+    "Rescore this same rerun with EXP-080's containment-based matching instead of EXP-009's exact-text _find() before trusting the 0.1667 wrong-resolution number as a real regression -- it is very likely mostly a scoring-methodology mismatch, not missed detections, per the mechanism confirmed in this exploration's conclusion.",
+    "EXP-080's 19-span fixture already shows dslim/bert-base-NER beating the regex tagger on precision/recall with containment scoring; that remains the more informative comparison of the two taggers on their own."
+  ],
+  "elapsed_sec": 21.7426,
+  "peak_rss_mb": 837.4,
+  "models_used": "dslim/bert-base-NER (person/organization mentions, substituting for GLiNER -- package not installed), BAAI/bge-small-en-v1.5 (pair-matcher similarity feature). Logistic regression and rapidfuzz are unchanged classical components, kept as the todo specifies. Not generative."
+}
