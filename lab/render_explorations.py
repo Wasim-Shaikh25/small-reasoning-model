@@ -494,15 +494,6 @@ TODOS = [
 
 RERUN_TODOS = [
     _todo(
-        "EXP-027",
-        "Rerun the controller with the proposed encoders",
-        "Re-measure EXP-001 once DeBERTa extractive QA, DeBERTa NLI, and bge retrieval are actually loaded. Keep FLAN-T5 out of the controller.",
-        ENCODER_METHOD,
-        "Not run. Proposed: deepset/deberta-v3-base-squad2, MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli, bge-small-en-v1.5. These are encoders. FLAN-T5 conflicts with FORBIDDEN.md and must not be added.",
-        _prior("exp_001_controller"),
-        "Todo. Replace the EXP-001 numbers only after a real encoder run.",
-    ),
-    _todo(
         "EXP-028",
         "Rerun the ask analyzer with DeBERTa, KeyBERT, and GLiNER",
         "Re-measure EXP-002 with a zero-shot DeBERTa-v3 NLI ask classifier, KeyBERT using bge-small-en-v1.5, and GLiNER on the ask.",
