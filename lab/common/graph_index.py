@@ -23,7 +23,9 @@ capped at max_hops, returning every passage touched along the way.
 
 from __future__ import annotations
 
+import pickle
 from collections import defaultdict
+from pathlib import Path
 
 from lab.common.entities import detect_primary
 from lab.common.textutil import normalize
@@ -103,3 +105,24 @@ def expand_from_entity(entity_text: str, graph: dict, passages_by_id: dict, max_
 
     passages = [passages_by_id[pid] for pid in touched_passage_ids if pid in passages_by_id]
     return {"passages": passages, "path": path}
+
+
+def save_entity_graph(graph: dict, passages: list[dict], path: str | Path) -> None:
+    """Same EXP-022 persistence pattern as lab.common.index.Index.save,
+    applied to build_entity_graph's output: `graph`'s nodes/edges are
+    already the cheap-to-rebuild part (one pass of detect_primary over
+    `passages`), but `passages` is pickled alongside it so a later
+    load_entity_graph call can resolve expand_from_entity's passage ids
+    straight back to full passage dicts without the caller re-supplying
+    the original passage list.
+    """
+    with open(path, "wb") as f:
+        pickle.dump({"graph": graph, "passages": list(passages)}, f)
+
+
+def load_entity_graph(path: str | Path) -> dict:
+    """Returns `{"graph": ..., "passages": [...]}` as saved by
+    save_entity_graph.
+    """
+    with open(path, "rb") as f:
+        return pickle.load(f)

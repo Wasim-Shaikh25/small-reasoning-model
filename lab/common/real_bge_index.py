@@ -8,6 +8,9 @@ blueprint embedder named in ARCHITECTURE.md section 8, not a substitute.
 
 from __future__ import annotations
 
+import pickle
+from pathlib import Path
+
 import numpy as np
 
 from lab.common.index import BM25, tokenize
@@ -76,3 +79,26 @@ class RealBgeIndex:
             )
         ranked.sort(key=lambda row: row["score"], reverse=True)
         return ranked[:top_k]
+
+    def save(self, path: str | Path) -> None:
+        """Same EXP-022 persistence pattern as lab.common.index.Index.save:
+        the already-computed unit_vectors are the expensive-to-recompute
+        state (one bge_embed call per passage), so those are pickled
+        alongside the passages/tokens; the bge model itself is never
+        pickled -- it reloads lazily, as a process-wide singleton, via
+        lab.common.real_encoders.bge_model the first time any caller in
+        the loading process needs it.
+        """
+        with open(path, "wb") as f:
+            pickle.dump({"passages": self.passages, "tokens": self._tokens, "unit_vectors": self.unit_vectors}, f)
+
+    @classmethod
+    def load(cls, path: str | Path) -> "RealBgeIndex":
+        with open(path, "rb") as f:
+            state = pickle.load(f)
+        index = cls.__new__(cls)
+        index.passages = state["passages"]
+        index._tokens = state["tokens"]
+        index.bm25 = BM25(index._tokens)
+        index.unit_vectors = state["unit_vectors"]
+        return index
