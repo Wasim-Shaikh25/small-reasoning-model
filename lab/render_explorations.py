@@ -494,15 +494,6 @@ TODOS = [
 
 RERUN_TODOS = [
     _todo(
-        "EXP-036",
-        "Rerun the decision heads on encoder features",
-        "Re-measure EXP-011 with features taken from the real DeBERTa QA and NLI pipeline. The head may stay logistic regression.",
-        ENCODER_METHOD + " Do not add a generative model. LightGBM and a small MLP are optional alternatives to logistic regression, not a reason to drop the measured head before a new run.",
-        "Not run. Proposed feature source: DeBERTa QA and DeBERTa NLI. The head used here was already logistic regression, which the blueprint allows. Not generative.",
-        _prior("exp_011_decision_heads"),
-        "Todo. The closed test accuracy is on templated lexical features, not on MNLI or SQuAD features.",
-    ),
-    _todo(
         "EXP-043",
         "Blocked: do not rerun the proposer with FLAN-T5",
         "The blueprint assigns FLAN-T5 to the proposer (section 3.2.1, Experiment P). That rerun is not allowed. The grounding filter from EXP-019 stays.",

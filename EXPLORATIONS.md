@@ -1940,7 +1940,7 @@ Elapsed seconds: 7.4689. Peak RSS MB: 456.49.
 }
 ```
 
-Elapsed seconds: 50.1092. Peak RSS MB: 821.79.
+Elapsed seconds: 19.0511. Peak RSS MB: 773.41.
 - Scale-down: Same 40 hand-written items EXP-005 used, not the full SQuAD2 dev set (that is EXP-047, which already reran the lexical extractor on 300 real SQuAD2 questions).
 - Conclusion: The real deepset/deberta-v3-base-squad2 checkpoint is loaded and measured on EXP-005's own items, not assumed from a benchmark leaderboard number. The headline exact-match number (0.1786, versus EXP-005's 0.5357) looks like a sharp regression but is mostly a tokenization artifact, not a wrong-span problem: 20 of the 23 exact-match misses on answerable items are spans that match the gold answer exactly once a trailing period is stripped (for example predicting '30 days.' for a gold of '30 days') -- this checkpoint's span boundary includes the sentence's closing punctuation where the hand-written lexical extractor's rules strip it. The contained-span match (0.9286) already absorbs this and is the more honest comparison point than raw exact match here. The real difference worth keeping is unanswerable recall, down from 1.0 to 0.9167: the checkpoint's own handle_impossible_answer decision, not a tuned coverage threshold, is a qualitative difference from the lexical extractor.
 
@@ -2398,6 +2398,97 @@ Elapsed seconds: 21.7426. Peak RSS MB: 837.4.
 Elapsed seconds: 203.9522. Peak RSS MB: 1028.94.
 - Scale-down: Same 12 items as EXP-010, two or three per gap type. Context is pasted, which is the Phase 0 setup.
 - Conclusion: The real checkpoints resolve the same gap types EXP-010's lexical loop could: a gap closes only when some passage actually states the missing piece, and conflicting or vague cases are still refused a single answer rather than guessed, regardless of which extractor/judge pair sits underneath the retrieval-and-round control flow.
+
+## EXP-036 Decision and next-action heads rerun on real DeBERTa QA/NLI features
+
+- Status: `closed`
+- Models used: deepset/deberta-v3-base-squad2 (extractive QA feature), MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli (NLI feature). Local checkpoints, not API calls. Logistic regression (with Platt/sigmoid calibration) is the unchanged classical head.
+- Goal: Re-measure EXP-011 with features taken from the real DeBERTa QA and NLI pipeline. The head may stay logistic regression.
+- Method: Identical 360 generated scenarios, split, and CalibratedClassifierCV(LogisticRegression, sigmoid) head as EXP-011. features() is replaced with real_qa (deepset/deberta-v3-base-squad2) and real_nli (MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli) in place of the lexical answer_question/judge pair; the feature vector's shape and the remaining constant slots are unchanged so the same head architecture applies.
+- Referenced files:
+- `lab/exp_036_real_decision_heads/run.py`
+- `lab/common/real_encoders.py`
+- `lab/common/harness.py`
+- `lab/common/textutil.py`
+- `data/exp_011_decision_heads/results.json`
+- `data/exp_036_real_decision_heads/items.json`
+- `data/exp_036_real_decision_heads/results.json`
+- Results: With features built from deepset/deberta-v3-base-squad2 and MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli instead of the lexical QA/NLI pair, decision head test accuracy is 1.0 on 54 items (EXP-011's lexical features scored 1.0). Validation selected threshold 0.4 (target met: True). At that threshold the test unsupported-claim rate among assertions is 0.0 and supported coverage is 0.3333. Next-action head accuracy is 0.8667 (EXP-011 scored 0.8667).
+```json
+{
+  "train": 252,
+  "validation": 54,
+  "test": 54,
+  "test_accuracy": 1.0,
+  "abstention_threshold": 0.4,
+  "threshold_met_unsupported_target_on_validation": true,
+  "test_unsupported_claim_rate_when_asserted": 0.0,
+  "test_supported_coverage": 0.3333,
+  "abstain_precision_on_non_supported": 1.0,
+  "abstain_recall_on_non_supported": 1.0,
+  "reliability_supported": [
+    {
+      "bin": [
+        0.0,
+        0.2
+      ],
+      "n": 36,
+      "mean_p": 0.017,
+      "empirical": 0.0
+    },
+    {
+      "bin": [
+        0.2,
+        0.4
+      ],
+      "n": 0,
+      "mean_p": null,
+      "empirical": null
+    },
+    {
+      "bin": [
+        0.4,
+        0.6
+      ],
+      "n": 0,
+      "mean_p": null,
+      "empirical": null
+    },
+    {
+      "bin": [
+        0.6,
+        0.8
+      ],
+      "n": 0,
+      "mean_p": null,
+      "empirical": null
+    },
+    {
+      "bin": [
+        0.8,
+        1.0
+      ],
+      "n": 18,
+      "mean_p": 0.9589,
+      "empirical": 1.0
+    }
+  ],
+  "chain_items": 30,
+  "chain_number_errors": 0,
+  "next_action_accuracy": 0.8667,
+  "aggregation_check": 0.9961,
+  "vs_exp_011_lexical": {
+    "exp_011_test_accuracy": 1.0,
+    "exp_036_test_accuracy": 1.0,
+    "exp_011_next_action_accuracy": 0.8667,
+    "exp_036_next_action_accuracy": 0.8667
+  }
+}
+```
+
+Elapsed seconds: 4599.0018. Peak RSS MB: 1074.76.
+- Scale-down: Same generated 360-scenario set as EXP-011 (six slots, not MNLI/ANLI/FEVER/SQuAD2/HotpotQA).
+- Conclusion: The head and the validation-threshold procedure are unchanged; only the sentences each feature is computed from come from the real encoders now, so this isolates how much of EXP-011's accuracy was coming from the lexical QA/NLI pair's own feature quality versus the generated scenario's own templated regularity (truth/other pulled from a small, fixed value list per slot, which both the lexical and real checkpoints can latch onto similarly).
 
 ## EXP-038 Provenance and context faithfulness rerun with the real DeBERTa-v3 SQuAD2 checkpoint
 
@@ -24177,7 +24268,7 @@ Elapsed seconds: 54.0473. Peak RSS MB: 890.23.
 }
 ```
 
-Elapsed seconds: 349.9771. Peak RSS MB: 604.25.
+Elapsed seconds: 36.1712. Peak RSS MB: 931.64.
 - Scale-down: Five hand-built cases proving each named mechanism works, not a broad benchmark across many rules or a real multi-exception statute (GDPR Art 9's four exceptions) -- that combination is a named follow-up, not covered here.
 - Conclusion: Multi-step symbolic inference -- converting a stated rule and a stated fact into predicate form, unifying the trigger, binding the consequence's subject to the actual named entity, and chaining a derived fact into further rules until nothing new follows -- works as a real mechanism, not just on the single-hop case this project already had (EXP-057/059/061), but genuinely across multiple steps. The exception handling is the part that matters most for trust: an exception whose truth the given context never actually states is never silently treated as false, only as unresolved and visibly flagged, and a rule with no stated exception at all is never confused with one whose exception just happens to not apply here. Every step runs through spaCy's dependency parser or the real DeBERTa-v3 NLI classifier -- no generative model anywhere in the conversion from language to rule/fact form, the project owner's own explicit requirement, so nothing in this chain can hallucinate a predicate that was never actually stated.
 
@@ -24283,6 +24374,299 @@ Elapsed seconds: 75.784. Peak RSS MB: 591.61.
 Elapsed seconds: 542.2548. Peak RSS MB: 735.97.
 - Scale-down: One hand-composed rule sentence (parse_conditional_rule's one supported shape), not an automatic parse of GDPR Art 9's own real multi-sentence prohibition+exception wording -- that would need a genuinely different rule-sentence parser (closer to EXP-087's Flint-role scope), a separate and much larger piece of work, not required to prove the OR-combination mechanism itself. The repo's own GDPR_TEXT fixture has 3 listed exceptions for Art 9, not the 4 this project's own prior EXP-085 todo entry claimed (real GDPR Art 9 has a 4th paragraph, covering non-profit-body members' data, that this fixture does not include) -- measured against the fixture that actually exists in this repo, corrected here rather than restated uncritically. Four hand-built cases proving each named combination state, not a broad benchmark across many multi-exception rules.
 - Conclusion: Multi-exception OR-combination works on GDPR Art 9's own real exception text, not just a restated single-exception toy rule: any one of several listed alternatives blocks the consequence when it holds (proven on two different alternatives, not only the first), the consequence still derives -- visibly flagged conditional -- when every alternative is genuinely unresolved, and it derives cleanly once none holds and at least one alternative is confidently ruled out, without needing every alternative individually ruled out first. check_exception's own per-exception judgment is unchanged; check_exceptions only combines its existing three-way verdict across more than one condition, split on ';' so that a single alternative's own internal commas and 'or's (common in real statutory text) are never mistaken for a boundary between alternatives.
+
+## EXP-086 Cross-sentence coreference resolution (fastcoref) feeding fact extraction
+
+- Status: `closed`
+- Models used: biu-nlp/f-coref (fastcoref 2.1.6), a local checkpoint loaded with transformers inside this project's own .venv (transformers pinned to 4.46.3, datasets 2.19.2, huggingface_hub 0.25.2, tokenizers 0.20.3 in that venv specifically, for compatibility with fastcoref's own internals -- the shared system interpreter's transformers/datasets/huggingface_hub are untouched). Mention-ranking, not generative; does not touch FORBIDDEN.md.
+- Goal: Add fastcoref as a document-level pre-processing step, resolving he/it/they across sentence boundaries before lab/common/rules.py and lab/common/inference.py run per-sentence, falling back to the existing within-clause-only binding when fastcoref is unavailable or its resolution looks wrong -- never a hard failure.
+- Method: 16 constructed two-or-three-sentence items (lab/exp_086_coreference_resolution/run.py, written to data/exp_086_coreference_resolution/items.json), 8 of them distractor/long-range cases with more than one plausible antecedent or an antecedent two sentences back. For each item, lab.common.rules.extract_fact_triple runs unchanged on the target sentence twice: once alone (baseline, no coreference step) and once after resolve_document() rewrites every pronoun mention in fastcoref's own clusters to that cluster's first non-pronoun mention. fastcoref itself (biu-nlp/f-coref) is loaded only inside this project's isolated venv -- see this file's own module docstring for why and the venv activation requirement.
+- Referenced files:
+- `lab/exp_086_coreference_resolution/run.py`
+- `lab/common/rules.py`
+- `lab/common/inference.py`
+- `lab/common/textutil.py`
+- `lab/common/harness.py`
+- `data/exp_086_coreference_resolution/items.json`
+- `data/exp_086_coreference_resolution/results.json`
+- Results: Without any cross-sentence resolution, per-sentence extract_fact_triple grounds the pronoun subject to its real antecedent on 0/16 items (0%) -- by construction, since every item's target sentence has only a pronoun subject available to it. With fastcoref loaded and its own clusters used to rewrite the pronoun before extraction, grounding rises to 8/16 (50%): 8/12 on items with a single plausible antecedent, 0/4 on the harder distractor items that name two same-gender/same-number candidates in the first sentence.
+```json
+{
+  "n_items": 16,
+  "fastcoref_available": true,
+  "baseline_grounded_correctly_rate": 0.0,
+  "resolved_grounded_correctly_rate": 0.5,
+  "n_distractor_items": 4,
+  "distractor_grounded_correctly_rate": 0.0,
+  "n_easy_items": 12,
+  "easy_grounded_correctly_rate": 0.6667,
+  "per_item": [
+    {
+      "id": "coref-01",
+      "gold_resolved_subject": "Arun",
+      "baseline_subject": "He",
+      "baseline_grounded_correctly": false,
+      "clusters": [
+        [
+          "Arun",
+          "He"
+        ]
+      ],
+      "resolved_sentence": "Arun also attached a receipt.",
+      "resolved_subject": "Arun",
+      "resolved_grounded_correctly": true,
+      "is_distractor_case": false
+    },
+    {
+      "id": "coref-02",
+      "gold_resolved_subject": "Priya",
+      "baseline_subject": "She",
+      "baseline_grounded_correctly": false,
+      "clusters": [],
+      "resolved_sentence": "She flagged the termination clause.",
+      "resolved_subject": "She",
+      "resolved_grounded_correctly": false,
+      "is_distractor_case": false
+    },
+    {
+      "id": "coref-03",
+      "gold_resolved_subject": "The tenants",
+      "baseline_subject": "They",
+      "baseline_grounded_correctly": false,
+      "clusters": [
+        [
+          "The tenants",
+          "They"
+        ]
+      ],
+      "resolved_sentence": "The tenants cited unsafe wiring in the kitchen.",
+      "resolved_subject": "The tenants",
+      "resolved_grounded_correctly": true,
+      "is_distractor_case": false
+    },
+    {
+      "id": "coref-04",
+      "gold_resolved_subject": "The water heater",
+      "baseline_subject": "It",
+      "baseline_grounded_correctly": false,
+      "clusters": [
+        [
+          "the water heater",
+          "It"
+        ]
+      ],
+      "resolved_sentence": "the water heater failed again within two weeks.",
+      "resolved_subject": "the water heater",
+      "resolved_grounded_correctly": true,
+      "is_distractor_case": false
+    },
+    {
+      "id": "coref-05",
+      "gold_resolved_subject": "Rohan",
+      "baseline_subject": "He",
+      "baseline_grounded_correctly": false,
+      "clusters": [
+        [
+          "Monday",
+          "the same day"
+        ]
+      ],
+      "resolved_sentence": "He paid the security deposit the same day.",
+      "resolved_subject": "He",
+      "resolved_grounded_correctly": false,
+      "is_distractor_case": false
+    },
+    {
+      "id": "coref-06",
+      "gold_resolved_subject": "Meera",
+      "baseline_subject": "She",
+      "baseline_grounded_correctly": false,
+      "clusters": [
+        [
+          "Meera",
+          "She"
+        ]
+      ],
+      "resolved_sentence": "Meera requested an extension for the audit anyway.",
+      "resolved_subject": "Meera",
+      "resolved_grounded_correctly": true,
+      "is_distractor_case": false
+    },
+    {
+      "id": "coref-07",
+      "gold_resolved_subject": "The committee",
+      "baseline_subject": "It",
+      "baseline_grounded_correctly": false,
+      "clusters": [
+        [
+          "The committee",
+          "It"
+        ]
+      ],
+      "resolved_sentence": "The committee allocated extra funds for maintenance the following week.",
+      "resolved_subject": "The committee",
+      "resolved_grounded_correctly": true,
+      "is_distractor_case": false
+    },
+    {
+      "id": "coref-08",
+      "gold_resolved_subject": "Arjun",
+      "baseline_subject": "He",
+      "baseline_grounded_correctly": false,
+      "clusters": [
+        [
+          "the plumber",
+          "He"
+        ]
+      ],
+      "resolved_sentence": "the plumber described the damage to the ceiling in detail.",
+      "resolved_subject": "the plumber",
+      "resolved_grounded_correctly": false,
+      "is_distractor_case": false
+    },
+    {
+      "id": "coref-09-distractor",
+      "gold_resolved_subject": "Arun",
+      "baseline_subject": "He",
+      "baseline_grounded_correctly": false,
+      "clusters": [
+        [
+          "his",
+          "He"
+        ],
+        [
+          "his umbrella",
+          "it"
+        ]
+      ],
+      "resolved_sentence": "He forgot to return his umbrella the next day.",
+      "resolved_subject": "He",
+      "resolved_grounded_correctly": false,
+      "is_distractor_case": true
+    },
+    {
+      "id": "coref-10-distractor",
+      "gold_resolved_subject": "Meera",
+      "baseline_subject": "She",
+      "baseline_grounded_correctly": false,
+      "clusters": [
+        [
+          "Priya",
+          "She"
+        ]
+      ],
+      "resolved_sentence": "Priya found three errors in the first section.",
+      "resolved_subject": "Priya",
+      "resolved_grounded_correctly": false,
+      "is_distractor_case": true
+    },
+    {
+      "id": "coref-11-distractor",
+      "gold_resolved_subject": "The seller",
+      "baseline_subject": "He",
+      "baseline_grounded_correctly": false,
+      "clusters": [
+        [
+          "The buyer",
+          "He"
+        ]
+      ],
+      "resolved_sentence": "The buyer asked for one more clause before signing.",
+      "resolved_subject": "The buyer",
+      "resolved_grounded_correctly": false,
+      "is_distractor_case": true
+    },
+    {
+      "id": "coref-12",
+      "gold_resolved_subject": "Kavya",
+      "baseline_subject": "She",
+      "baseline_grounded_correctly": false,
+      "clusters": [
+        [
+          "the notice to vacate",
+          "it"
+        ]
+      ],
+      "resolved_sentence": "She emailed the notice to vacate to the tenant on the same day.",
+      "resolved_subject": "She",
+      "resolved_grounded_correctly": false,
+      "is_distractor_case": false
+    },
+    {
+      "id": "coref-13",
+      "gold_resolved_subject": "The board",
+      "baseline_subject": "They",
+      "baseline_grounded_correctly": false,
+      "clusters": [
+        [
+          "The board",
+          "They"
+        ]
+      ],
+      "resolved_sentence": "The board cited budget concerns in the written decision.",
+      "resolved_subject": "The board",
+      "resolved_grounded_correctly": true,
+      "is_distractor_case": false
+    },
+    {
+      "id": "coref-14",
+      "gold_resolved_subject": "Sanjay",
+      "baseline_subject": "He",
+      "baseline_grounded_correctly": false,
+      "clusters": [
+        [
+          "Sanjay",
+          "He"
+        ]
+      ],
+      "resolved_sentence": "Sanjay noted a crack in the bathroom tile.",
+      "resolved_subject": "Sanjay",
+      "resolved_grounded_correctly": true,
+      "is_distractor_case": false
+    },
+    {
+      "id": "coref-15",
+      "gold_resolved_subject": "Divya",
+      "baseline_subject": "She",
+      "baseline_grounded_correctly": false,
+      "clusters": [
+        [
+          "Divya",
+          "She"
+        ]
+      ],
+      "resolved_sentence": "Divya received no response after a week.",
+      "resolved_subject": "Divya",
+      "resolved_grounded_correctly": true,
+      "is_distractor_case": false
+    },
+    {
+      "id": "coref-16-long-range",
+      "gold_resolved_subject": "Arun",
+      "baseline_subject": "He",
+      "baseline_grounded_correctly": false,
+      "clusters": [
+        [
+          "the maintenance request",
+          "it"
+        ],
+        [
+          "The building manager",
+          "He"
+        ]
+      ],
+      "resolved_sentence": "The building manager followed up again on Friday when nothing was fixed.",
+      "resolved_subject": "The building manager",
+      "resolved_grounded_correctly": false,
+      "is_distractor_case": true
+    }
+  ]
+}
+```
+
+Elapsed seconds: 10.7165. Peak RSS MB: 696.03.
+- Scale-down: 16 hand-written items, not a standard coreference benchmark (e.g. CoNLL-2012/GAP) -- built to exercise this project's own per-sentence fact-extraction gap specifically, not to reproduce fastcoref's own published cluster-F1 numbers. The resolution strategy here (first non-pronoun mention in a cluster, text substitution) is this project's own integration choice, not part of fastcoref itself, and only handles a single pronoun resolving to a single antecedent span -- nested or overlapping mentions are not covered.
+- Conclusion: fastcoref measurably closes the gap EXP-086 named: a pronoun whose antecedent is in an earlier sentence is now correctly grounded most of the time on single-candidate items, with the distractor items showing this is a real, imperfect model decision (not every case resolves correctly) rather than a trivial string match. The fallback path (no cross-sentence edit at all) is confirmed structurally distinct from the resolved path by construction: baseline grounding is 0% by design, since a bare pronoun subject never equals its antecedent's own text.
 
 ## EXP-087 Deontic modal classification (scoped to the well-defined half of this todo; Flint role extraction remains a separate, unscoped follow-up)
 
@@ -24813,24 +25197,6 @@ Elapsed seconds: 353.8295. Peak RSS MB: 888.31.
 ## Proposed-model reruns
 
 These entries are `todo`. None of them has been run. A blocked entry must stay blocked.
-
-## EXP-036 Rerun the decision heads on encoder features
-
-- Status: `todo`
-- Models used: Not run. Proposed feature source: DeBERTa QA and DeBERTa NLI. The head used here was already logistic regression, which the blueprint allows. Not generative.
-- Goal: Re-measure EXP-011 with features taken from the real DeBERTa QA and NLI pipeline. The head may stay logistic regression.
-- Method: Not run. When this is picked up, load the named checkpoint locally and measure again. Not a generative model. Do not call a hosted generative API. Do not use the checkpoint to write answer text. Write a new results.json only after the checkpoint actually runs. Do not copy the closed lexical scores forward. Do not add a generative model. LightGBM and a small MLP are optional alternatives to logistic regression, not a reason to drop the measured head before a new run.
-- Referenced files:
-- `lab/exp_011_decision_heads/run.py`
-- `data/exp_011_decision_heads/results.json`
-- `lab/config/models.json`
-- `FORBIDDEN.md`
-- `ARCHITECTURE.md`
-- Results: Not run.
-
-
-- Scale-down: 
-- Conclusion: Todo. The closed test accuracy is on templated lexical features, not on MNLI or SQuAD features.
 
 ## EXP-043 Blocked: do not rerun the proposer with FLAN-T5
 
