@@ -25320,23 +25320,6 @@ Elapsed seconds: 353.8295. Peak RSS MB: 888.31.
 - Scale-down: 
 - Conclusion: Todo.
 
-## EXP-086 Cross-sentence coreference resolution (fastcoref) feeding fact/rule extraction
-
-- Status: `todo`
-- Models used: fastcoref was never actually installed -- the attempt is recorded above as the measurement this todo's own method field asked for ('check fastcoref actually installs... not assumed compatible'). No generative model at any point.
-- Goal: Add fastcoref (F-COREF, AACL 2022; MIT-licensed, encoder-based mention-ranking, not generative; pip-installable with a spaCy v3 pipeline component) as a document-level pre-processing step, resolving 'he'/'it'/'they' across sentence boundaries before lab/common/rules.py and lab/common/inference.py run per-sentence. The project owner's own motivating example (Rohan/Arun) doesn't hit this gap -- its pronoun is within the same clause as the trigger fact, already handled by lab/common/inference.py's bound_subject substitution -- but a real multi-sentence document will. Falls back to that existing within-clause-only binding if fastcoref is unavailable or a given pronoun's resolution confidence is low; never a hard failure.
-- Method: Attempted: `pip install fastcoref` was run to check installability, per this todo's own stated precondition. Its dependency resolution force-downgraded typer (0.27.x -> 0.4.2) and corrupted typing_extensions.py (a partial file write left old content under new 4.16.0 metadata, missing the `Sentinel` symbol pydantic_core now requires) -- this broke spacy's own import chain entirely (spacy.cli pulls in typer; pydantic/weasel pull in typing_extensions), which every single module in lab/common depends on. fastcoref itself never finished installing -- `pip show fastcoref` confirms it is NOT present after the attempt; the environment broke before the target package landed. Recovered by force-reinstalling typing_extensions and reinstalling typer with `--user` (this environment cannot write to C:\Python311\Scripts\, the real root cause: pip's own uninstall/install dance for console-script entry points fails there with WinError 2, succeeding only for packages installed to the user site-packages instead). Verified clean afterward: all 14 previously-closed explorations touching spacy/bge/NLI (EXP-083/085/088/089/090/091/026/049/050/051/022/024/084/079) were rerun and matched their recorded results exactly, byte-for-byte on every score.
-- Referenced files:
-- `lab/common/inference.py`
-- `lab/common/rules.py`
-- `lab/common/ingest.py`
-- `requirements.txt`
-- Results: fastcoref does not install cleanly in this environment: its dependency resolution broke spacy's entire import chain (typer force-downgraded to 0.4.2, typing_extensions.py corrupted mid-write) before fastcoref itself ever finished installing. The specific root cause is this environment's own permission constraint (no write access to C:\Python311\Scripts\), not fastcoref's code -- a different Python environment with write access to its own Scripts directory might not hit this at all. Recovered fully; all 14 explorations that depend on spacy/bge/NLI were reverified byte-identical to their pre-break results.
-
-
-- Scale-down: 
-- Conclusion: Todo, deliberately abandoned rather than retried. The real, demonstrated risk -- a single `pip install` for one todo item took down every module in this repository that imports spacy, recovered only through hands-on dependency surgery -- outweighs this todo's own value next to the coreference gap it targets (the project owner's own motivating Rohan/Arun example does not hit this gap at all, per this todo's own goal). If revisited, do it in an isolated virtual environment or container first, never directly in the working environment every other exploration depends on.
-
 ## EXP-093 Flint-style Actor/Activation-Condition/Act/Object legal role extraction
 
 - Status: `todo`
