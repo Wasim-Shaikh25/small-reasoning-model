@@ -89,6 +89,22 @@ class WorkingMemory:
                     hits.append({"leaf_id": page["leaf_id"], "triple": triple})
         return hits
 
+    def dependency_tree(self) -> list[dict]:
+        """Same node shape lab.common.brain.reason's own dependency_tree
+        uses (`{"id","kind","summary","depends_on"}`): one
+        "document_leaf" node per page already written, depending on its
+        own citation_ids -- the source findings it was drafted from.
+        lab.common.longform.write_long_document appends one
+        "contradiction_flag" node per cross-page conflict on top of
+        this (it already holds `consistency_flags` locally; this method
+        does not duplicate that list), so the finished tree also shows
+        which leaf's claim conflicts with which earlier leaf's -- the
+        one place this module already connects one page's truth to
+        another's, surfaced explicitly instead of only being inferable
+        from reading `consistency_flags` by hand.
+        """
+        return [{"id": f"leaf:{p['leaf_id']}", "kind": "document_leaf", "summary": f"leaf {p['leaf_id']} ({len(p['triples'])} extracted claims)", "depends_on": list(p["citation_ids"])} for p in self.pages]
+
     def to_dict(self) -> dict:
         return {
             "trace": self.trace,

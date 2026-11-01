@@ -409,7 +409,7 @@ def reason(ask: str, passages: list[dict], use_real_ner: bool = False, connector
             }
         )
         decision = "supported_with_flags" if doc_result["consistency_flags"] else "supported"
-        return _finish(ask, trace, decision, doc_result["document"], set(doc_result["working_memory"]["citations"]), dependency_tree=dep_nodes)
+        return _finish(ask, trace, decision, doc_result["document"], set(doc_result["working_memory"]["citations"]), dependency_tree=dep_nodes + doc_result["dependency_tree"])
 
     citations: set[str] = set()
     scoped = passages

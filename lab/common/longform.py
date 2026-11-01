@@ -224,6 +224,25 @@ def write_long_document(
 
         docx_result = write_docx(title, reader_facing_assembled, findings, task, docx_out_path, leaf_titles=[leaf["title"] for leaf in outline], include_citation_index=False)
 
+    # Same dependency-tree shape lab.common.brain.reason's own signal-
+    # chain stages already build ({"id","kind","summary","depends_on"}):
+    # one "document_leaf" node per leaf (WorkingMemory.dependency_tree,
+    # depending on that leaf's own source findings), plus one
+    # "contradiction_flag" node per cross-page conflict already found
+    # above -- an explicit edge between the two leaves whose claims
+    # disagree, the one place this module already connects one page's
+    # truth to another's.
+    dependency_tree = memory.dependency_tree()
+    for flag in consistency_flags:
+        dependency_tree.append(
+            {
+                "id": f"contradiction:{flag['leaf_id']}:{flag['subject']}:{flag['verb_lemma']}",
+                "kind": "contradiction_flag",
+                "summary": f"{flag['subject']} {flag['verb_lemma']} {flag['new_object']!r} conflicts with leaf {flag['conflicts_with_leaf_id']}'s earlier {flag['prior_object']!r}",
+                "depends_on": [f"leaf:{flag['leaf_id']}", f"leaf:{flag['conflicts_with_leaf_id']}"],
+            }
+        )
+
     return {
         "document": document_text,
         "document_for_reader": reader_facing_document,
@@ -232,4 +251,5 @@ def write_long_document(
         "consistency_flags": consistency_flags,
         "rewrite_diagnostics": rewrite_diagnostics,
         "working_memory": memory.to_dict(),
+        "dependency_tree": dependency_tree,
     }
