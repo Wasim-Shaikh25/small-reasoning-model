@@ -503,15 +503,6 @@ RERUN_TODOS = [
         "Blocked by FORBIDDEN.md. Leave EXP-019 on the deterministic path.",
     ),
     _todo(
-        "EXP-044",
-        "Rerun the red-team loop with the encoder stack",
-        "Re-measure EXP-020 after the encoder reruns above are real. The loop still abstains when support fails.",
-        ENCODER_METHOD + " BLOCKED: do not add FLAN-T5 to the rewrite case or any other case. CONFLICTS WITH FORBIDDEN.md.",
-        "Not run. Proposed stack: DeBERTa QA, DeBERTa NLI, bge retrieval. FLAN-T5 conflicts with FORBIDDEN.md and must stay out.",
-        _prior("exp_020_redteam_e2e"),
-        "Todo. Run this only after the encoder checkpoints have actually been measured. Do not reuse the lexical red-team scores as encoder scores.",
-    ),
-    _todo(
         "EXP-045",
         "Rerun latency after the encoders are loaded",
         "Re-measure EXP-021 stage latency and memory with the encoder checkpoints resident. ONNX Runtime int8 is an allowed encoder runtime for that later measurement.",
