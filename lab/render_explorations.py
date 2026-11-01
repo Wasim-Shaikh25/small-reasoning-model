@@ -502,15 +502,6 @@ RERUN_TODOS = [
         _prior("exp_019_proposal_filter"),
         "Blocked by FORBIDDEN.md. Leave EXP-019 on the deterministic path.",
     ),
-    _todo(
-        "EXP-045",
-        "Rerun latency after the encoders are loaded",
-        "Re-measure EXP-021 stage latency and memory with the encoder checkpoints resident. ONNX Runtime int8 is an allowed encoder runtime for that later measurement.",
-        ENCODER_METHOD + " BLOCKED: do not time CTranslate2 generation and do not load FLAN-T5. CONFLICTS WITH FORBIDDEN.md.",
-        "Not run. ONNX Runtime int8 is an encoder runtime and is allowed once an encoder exists. CTranslate2 generation CONFLICTS WITH FORBIDDEN.md and must not be run.",
-        _prior("exp_021_latency"),
-        "Todo. The closed timings describe the lexical stack, whose models_loaded list is empty.",
-    ),
     {
         "id": "EXP-046",
         "title": "Still blocked: FLAN-T5 proposer, larger FLAN-T5 variants, and CTranslate2 generation",

@@ -22160,6 +22160,69 @@ Elapsed seconds: 285.0168. Peak RSS MB: 1209.93.
 - Scale-down: Eight passages and six asks, same as EXP-020. A controller smoke test, not the full red-team catalog.
 - Conclusion: The injected '1 day' instruction and the conflicting notice-period/fee cases still do not become a supported answer with the real encoders loaded, and the rewrite case still does not fetch -- the same abstain-on-conflict and reject-instruction-injection properties EXP-020 measured on the lexical stack hold with the real checkpoints underneath, because they come from engine.py's control flow (conflict detection, schema validation, the fixed rewrite_only path), not from whichever extractor or judge is loaded.
 
+## EXP-045 Stage latency and memory with the encoder checkpoints resident
+
+- Status: `closed`
+- Models used: deepset/deberta-v3-base-squad2, MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli, BAAI/bge-small-en-v1.5, plain transformers/sentence-transformers (no quantization). Local checkpoints, not API calls. Not generative.
+- Goal: Re-measure EXP-021 stage latency and memory with the encoder checkpoints resident. ONNX Runtime int8 is an allowed encoder runtime for a later measurement, not attempted here.
+- Method: Identical 40 passages and bench() harness as EXP-021 (warm up once, then time repeated calls). ask_analyze/chunk stay rule code (unaffected by the encoder swap). search is RealIndex's bge dense channel; qa/nli are real_qa/real_nli; e2e runs engine.run_task with EXP-027's monkeypatch adapters in place. Peak RSS is the process high-water mark including every model load.
+- Referenced files:
+- `lab/exp_045_real_latency/run.py`
+- `lab/exp_027_real_controller/run.py`
+- `lab/common/ask.py`
+- `lab/common/chunking.py`
+- `lab/common/engine.py`
+- `lab/common/real_encoders.py`
+- `lab/common/harness.py`
+- `data/exp_021_latency/results.json`
+- `data/exp_045_real_latency/results.json`
+- Results: Mean stage times in seconds with the encoder checkpoints resident: ask_analyze_sec 1.9e-05, chunk_sec 0.000401, bge_search_sec 0.013443, qa_sec 0.103709, nli_sec 9.082595, bge_embed_sec 0.015433, e2e_sec 20.898755. Peak RSS 1212.53 MB (EXP-021's lexical stack: 128.08 MB; e2e 0.039917s lexical vs 20.898755s here). deepset/deberta-v3-base-squad2, MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli, and BAAI/bge-small-en-v1.5 are loaded; FLAN-T5/CTranslate2 are not.
+```json
+{
+  "mean_seconds": {
+    "ask_analyze_sec": 1.9e-05,
+    "chunk_sec": 0.000401,
+    "bge_search_sec": 0.013443,
+    "qa_sec": 0.103709,
+    "nli_sec": 9.082595,
+    "bge_embed_sec": 0.015433,
+    "e2e_sec": 20.898755
+  },
+  "peak_rss_mb": 1212.53,
+  "cpu_note": "Measured on this process (CPU only, no GPU). RSS is peak resident set for the whole run, including every model load, not a per-model figure.",
+  "models_loaded": [
+    "deepset/deberta-v3-base-squad2",
+    "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli",
+    "BAAI/bge-small-en-v1.5"
+  ],
+  "real_model_card": {
+    "bge_model": "BAAI/bge-small-en-v1.5",
+    "qa_model": "deepset/deberta-v3-base-squad2",
+    "nli_model": "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli",
+    "ner_model": "dslim/bert-base-NER",
+    "gliner_named_by_blueprint": "urchade/gliner_small-v2.1",
+    "gliner_loaded": false,
+    "gliner_reason": "the `gliner` package is not installed in this environment; dslim/bert-base-NER is the real checkpoint measured for the NER role instead",
+    "huggingface_reachable": true,
+    "all_non_generative": true
+  },
+  "vs_exp_021_lexical": {
+    "exp_021_e2e_sec": 0.039917,
+    "exp_045_e2e_sec": 20.898755,
+    "exp_021_qa_sec": 0.003097,
+    "exp_045_qa_sec": 0.103709,
+    "exp_021_nli_sec": 0.000169,
+    "exp_045_nli_sec": 9.082595,
+    "exp_021_peak_rss_mb": 128.08,
+    "exp_045_peak_rss_mb": 1212.53
+  }
+}
+```
+
+Elapsed seconds: 200.7081. Peak RSS MB: 1212.53.
+- Scale-down: Forty short passages, same as EXP-021. CTranslate2/FLAN-T5 are not timed (FORBIDDEN.md). ONNX Runtime int8 quantization is not applied in this pass.
+- Conclusion: Loading three transformers/sentence-transformers checkpoints is measurably slower and heavier than the lexical substitutes EXP-021 timed -- that is the expected, honest cost of the real encoders on CPU, not a surprise, and quantized ONNX Runtime int8 (named by the todo as the allowed path to close that gap) is a follow-up, not run in this pass.
+
 ## EXP-047 Extractive QA and answerability on the real SQuAD2 dev set
 
 - Status: `closed`
@@ -25310,24 +25373,6 @@ These entries are `todo`. None of them has been run. A blocked entry must stay b
 
 - Scale-down: 
 - Conclusion: Blocked by FORBIDDEN.md. Leave EXP-019 on the deterministic path.
-
-## EXP-045 Rerun latency after the encoders are loaded
-
-- Status: `todo`
-- Models used: Not run. ONNX Runtime int8 is an encoder runtime and is allowed once an encoder exists. CTranslate2 generation CONFLICTS WITH FORBIDDEN.md and must not be run.
-- Goal: Re-measure EXP-021 stage latency and memory with the encoder checkpoints resident. ONNX Runtime int8 is an allowed encoder runtime for that later measurement.
-- Method: Not run. When this is picked up, load the named checkpoint locally and measure again. Not a generative model. Do not call a hosted generative API. Do not use the checkpoint to write answer text. Write a new results.json only after the checkpoint actually runs. Do not copy the closed lexical scores forward. BLOCKED: do not time CTranslate2 generation and do not load FLAN-T5. CONFLICTS WITH FORBIDDEN.md.
-- Referenced files:
-- `lab/exp_021_latency/run.py`
-- `data/exp_021_latency/results.json`
-- `lab/config/models.json`
-- `FORBIDDEN.md`
-- `ARCHITECTURE.md`
-- Results: Not run.
-
-
-- Scale-down: 
-- Conclusion: Todo. The closed timings describe the lexical stack, whose models_loaded list is empty.
 
 ## EXP-046 Still blocked: FLAN-T5 proposer, larger FLAN-T5 variants, and CTranslate2 generation
 
