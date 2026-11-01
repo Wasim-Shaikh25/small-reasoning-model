@@ -78,6 +78,7 @@ from __future__ import annotations
 
 from lab.common.ask import analyze
 from lab.common.calc import sum_amounts
+from lab.common.connectors import fetch_context_passages
 from lab.common.entities import AMOUNT_RE, detect_primary, parse_address
 from lab.common.graph_index import build_entity_graph, expand_from_entity
 from lab.common.index import Index
@@ -278,15 +279,40 @@ def _group_margin(hits: list[dict], score_key: str) -> float:
     return scores[0] - scores[1]
 
 
-def reason(ask: str, passages: list[dict], use_real_ner: bool = False) -> dict:
+def reason(ask: str, passages: list[dict], use_real_ner: bool = False, connector=None, connector_top_k: int = 5) -> dict:
     """`use_real_ner=True` threads through to every lab.common.entities.
     detect_primary call this function makes (identity extraction, graph
     expansion, long-form outlining) -- see that function for why it
     defaults to False: a real transformers model call is real added
     latency, which every existing caller of reason() keeps unchanged
     unless it explicitly opts in.
+
+    `connector` (lab.common.connectors.QdrantConnector or GraphConnector,
+    default None) is the external-data-connector hookup the project
+    owner asked for: when given, its hits are fetched once, up front
+    (lab.common.connectors.fetch_context_passages), deduplicated
+    against `passages` by id, and unioned into `passages` BEFORE
+    plan_stages or anything else below runs -- exactly the same
+    "additional candidate passages" treatment the existing graph_expand
+    stage already gives entity-graph hits, generalized to an external
+    store. Every existing caller (connector=None, the default) takes
+    the exact same code path as before this parameter existed: this is
+    the one and only new branch, and it is a no-op whenever `connector`
+    is not supplied. A connector can also turn a caller-supplied empty
+    `passages` list into a non-empty one -- deliberate, since "no
+    passages given directly" and "no context available at all" are
+    different things once an external connector exists; FORBIDDEN.md's
+    no_context_fallback exception is about the latter.
     """
     trace = []
+    if connector is not None:
+        connector_entities = [m["text"] for m in detect_primary(ask, use_real_ner=use_real_ner) if m["label"] in ("person", "organization")]
+        external_passages = fetch_context_passages(connector, ask, ask_entities=connector_entities, top_k=connector_top_k)
+        existing_ids = {p.get("id") for p in passages}
+        new_passages = [p for p in external_passages if p.get("id") not in existing_ids]
+        if new_passages:
+            passages = passages + new_passages
+            trace.append({"step": "connector_fetch", "added_passage_ids": [p["id"] for p in new_passages]})
     stage_plan = plan_stages(ask, passages, use_real_ner=use_real_ner)
     trace.append({"step": "plan", **stage_plan})
     # From here on, whether a block below EXECUTES is always decided by

@@ -161,3 +161,37 @@ class GraphConnector:
         state = load_entity_graph(self.path)
         passages_by_id = {p.get("id"): p for p in state["passages"]}
         return expand_from_entity(entity_text, state["graph"], passages_by_id, max_hops=max_hops)
+
+
+def fetch_context_passages(connector, ask: str, ask_entities: list[str] | None = None, top_k: int = 5, max_hops: int = 1) -> list[dict]:
+    """Normalizes QdrantConnector.search / GraphConnector.search's two
+    different call shapes into one flat passage list (plain
+    `{"id", "text"}` dicts, no score, no path) -- the exact shape
+    lab.common.brain.reason already expects everywhere else for its
+    own `passages` argument. This is the one function brain.reason
+    calls to fold a connector's hits into its own passage list before
+    its existing signal chain runs; the signal chain itself never
+    needs to know a connector was involved.
+
+    GraphConnector is entity-keyed, not free-text-keyed, so it is
+    queried once per entity already found in the ask (`ask_entities` --
+    the caller already computes this via lab.common.entities.
+    detect_primary for its own graph_expand stage, so it is passed in
+    rather than recomputed here). Any other connector (QdrantConnector,
+    or a future one with the same `search(query, top_k) -> rows` shape)
+    is queried once with `ask` itself, duck-typed rather than
+    isinstance-checked against QdrantConnector specifically, so a new
+    vector-store connector added later needs no change here.
+    """
+    if isinstance(connector, GraphConnector):
+        passages: list[dict] = []
+        seen: set = set()
+        for entity_text in ask_entities or []:
+            expansion = connector.search(entity_text, max_hops=max_hops)
+            for p in expansion.get("passages", []):
+                if p.get("id") not in seen:
+                    seen.add(p.get("id"))
+                    passages.append(p)
+        return passages
+    hits = connector.search(ask, top_k=top_k)
+    return [row["passage"] for row in hits]
