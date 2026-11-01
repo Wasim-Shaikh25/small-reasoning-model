@@ -249,6 +249,20 @@ def _role_matches(rule: dict, passages: list[dict]) -> bool:
     return role_noun in full_text
 
 
+def _add_dependency(dep_nodes: list[dict], node_id: str, kind: str, summary: str, depends_on=()) -> None:
+    """Appends one node to reason()'s dependency tree: `node_id` is a
+    stable, human-readable label derived from data already computed at
+    the call site (a passage id, a rule's own passage id, a fixed stage
+    label) -- never freely generated. `depends_on` names the other node
+    ids (almost always passage ids, or an earlier node this function
+    itself added) this node's truth rests on. Appending in execution
+    order, with no dedup, is deliberate: a tree is read by walking
+    `depends_on` edges backward from whichever node the final answer
+    cites, not by scanning the flat list for uniqueness.
+    """
+    dep_nodes.append({"id": node_id, "kind": kind, "summary": summary, "depends_on": list(depends_on)})
+
+
 def _group_margin(hits: list[dict], score_key: str) -> float:
     """The real top-group-vs-runner-up-group gap, not whatever gap exists
     between the top 2 individual *passages*.
@@ -303,8 +317,22 @@ def reason(ask: str, passages: list[dict], use_real_ner: bool = False, connector
     passages given directly" and "no context available at all" are
     different things once an external connector exists; FORBIDDEN.md's
     no_context_fallback exception is about the latter.
+
+    This function also builds, alongside its existing `trace` (a flat,
+    ordered execution log), an explicit dependency tree: a flat list of
+    nodes under `dependency_tree`, each `{"id", "kind", "summary",
+    "depends_on"}`, where `depends_on` names the other node ids (almost
+    always passage ids) a node's truth rests on -- a resolved scope
+    depends on the passage that resolved it, a rule's consequence
+    depends on the rule passage AND the fact passage AND its own gate
+    check, a forward-chained derived fact depends on the consequence
+    that triggered it, and so on. This is purely additive bookkeeping
+    over data every branch below was already computing for its own
+    prose answer_parts/trace entries -- no new judgment call, no new
+    extraction, nothing here changes `decision`/`text`/`citations`.
     """
     trace = []
+    dep_nodes: list[dict] = []
     if connector is not None:
         connector_entities = [m["text"] for m in detect_primary(ask, use_real_ner=use_real_ner) if m["label"] in ("person", "organization")]
         external_passages = fetch_context_passages(connector, ask, ask_entities=connector_entities, top_k=connector_top_k)
@@ -313,6 +341,8 @@ def reason(ask: str, passages: list[dict], use_real_ner: bool = False, connector
         if new_passages:
             passages = passages + new_passages
             trace.append({"step": "connector_fetch", "added_passage_ids": [p["id"] for p in new_passages]})
+            for p in new_passages:
+                _add_dependency(dep_nodes, p["id"], "connector_evidence", f"fetched from external connector for ask {ask!r}", [])
     stage_plan = plan_stages(ask, passages, use_real_ner=use_real_ner)
     trace.append({"step": "plan", **stage_plan})
     # From here on, whether a block below EXECUTES is always decided by
@@ -336,7 +366,7 @@ def reason(ask: str, passages: list[dict], use_real_ner: bool = False, connector
 
         result = answer_from_general_knowledge(ask)
         trace.append({"step": "no_context_fallback", "fallback_reason": result["fallback_reason"]})
-        return _finish(ask, trace, result["decision"], result["text"], set())
+        return _finish(ask, trace, result["decision"], result["text"], set(), dependency_tree=dep_nodes)
     plan = analyze(ask)
     trace.append({"step": "analyze_ask", "task_type": plan["task_type"], "subquestions": plan["subquestions"]})
 
@@ -379,7 +409,7 @@ def reason(ask: str, passages: list[dict], use_real_ner: bool = False, connector
             }
         )
         decision = "supported_with_flags" if doc_result["consistency_flags"] else "supported"
-        return _finish(ask, trace, decision, doc_result["document"], set(doc_result["working_memory"]["citations"]))
+        return _finish(ask, trace, decision, doc_result["document"], set(doc_result["working_memory"]["citations"]), dependency_tree=dep_nodes)
 
     citations: set[str] = set()
     scoped = passages
@@ -406,8 +436,9 @@ def reason(ask: str, passages: list[dict], use_real_ner: bool = False, connector
         nav = navigate_dual(ask, root)
         trace.append({"step": "nested_navigate", "path": nav["path"], "abstain_reason": nav.get("abstain_reason")})
         if nav["leaf"] is None:
-            return _finish(ask, trace, "inconclusive", ABSTAIN_TEXT, citations, reason=nav.get("abstain_reason", "navigation failed"))
+            return _finish(ask, trace, "inconclusive", ABSTAIN_TEXT, citations, reason=nav.get("abstain_reason", "navigation failed"), dependency_tree=dep_nodes)
         scoped = nav["leaf_passages"]
+        _add_dependency(dep_nodes, "scope", "scope_resolution", f"hierarchical navigation resolved to {nav['path']}", [p["id"] for p in scoped])
     elif "disambiguate" in stage_plan["stages"]:
         # Only passages tagged with a story group are candidates for "which
         # story is this ask about" -- an ungrouped passage is background
@@ -437,7 +468,7 @@ def reason(ask: str, passages: list[dict], use_real_ner: bool = False, connector
         lexical_hits = Index(story_passages).search(ask, top_k=len(story_passages))
         semantic_hits = SemanticIndex(story_passages).search(ask, top_k=len(story_passages))
         if not lexical_hits or not semantic_hits:
-            return _finish(ask, trace, "inconclusive", ABSTAIN_TEXT, citations, reason="no passage matched the ask")
+            return _finish(ask, trace, "inconclusive", ABSTAIN_TEXT, citations, reason="no passage matched the ask", dependency_tree=dep_nodes)
 
         # lexical_abstain also requires a real margin over the runner-up
         # *group*, not just clearing the floor (EXP-071) and not just the
@@ -466,14 +497,15 @@ def reason(ask: str, passages: list[dict], use_real_ner: bool = False, connector
         )
 
         if lexical_abstain and semantic_abstain:
-            return _finish(ask, trace, "inconclusive", ABSTAIN_TEXT, citations, reason="neither lexical nor semantic retrieval found a confident match")
+            return _finish(ask, trace, "inconclusive", ABSTAIN_TEXT, citations, reason="neither lexical nor semantic retrieval found a confident match", dependency_tree=dep_nodes)
         if not lexical_abstain and not semantic_abstain and lexical_group != semantic_group:
-            return _finish(ask, trace, "inconclusive", ABSTAIN_TEXT, citations, reason=f"lexical and semantic retrieval disagree on which story matches ({lexical_group!r} vs {semantic_group!r})")
+            return _finish(ask, trace, "inconclusive", ABSTAIN_TEXT, citations, reason=f"lexical and semantic retrieval disagree on which story matches ({lexical_group!r} vs {semantic_group!r})", dependency_tree=dep_nodes)
 
         matched = semantic_hits[0]["passage"] if lexical_abstain else lexical_hits[0]["passage"]
         resolved_group = matched.get("group")
         citations.add(matched["id"])
         scoped = [p for p in passages if p.get("group") == resolved_group]
+        _add_dependency(dep_nodes, "scope", "scope_resolution", f"disambiguation resolved to group {resolved_group!r} via passage {matched['id']}", [matched["id"]])
 
     # Cross-reference expansion (lab.common.graph_index, EXP-075): the one
     # gap neither the flat nor the hierarchical path above can close by
@@ -504,6 +536,13 @@ def reason(ask: str, passages: list[dict], use_real_ner: bool = False, connector
                 scoped = scoped + new_passages
                 scoped_ids.update(p["id"] for p in new_passages)
                 trace.append({"step": "graph_expand", "entity": entity_text, "added_passage_ids": [p["id"] for p in new_passages], "path": expansion["path"]})
+                prev_hop_id = None
+                for hop in expansion["path"]:
+                    hop_id = f"entity:{entity_text}:{hop['hop']}:{hop['entity']}"
+                    _add_dependency(dep_nodes, hop_id, "entity_link", f"hop {hop['hop']}: {hop['entity']}" + (f" via {hop['via']}" if hop["via"] else " (expansion root)"), [prev_hop_id] if prev_hop_id else [])
+                    prev_hop_id = hop_id
+                for p in new_passages:
+                    _add_dependency(dep_nodes, p["id"], "graph_linked_evidence", f"reached via entity graph expansion from {entity_text!r}", [prev_hop_id] if prev_hop_id else [])
                 # Surfacing, not just widening: a fact in a newly-added
                 # passage otherwise sits in scope but never reaches the
                 # answer unless another signal (identity/total/rule)
@@ -529,6 +568,7 @@ def reason(ask: str, passages: list[dict], use_real_ner: bool = False, connector
                     answer_parts.append(f"{cross_ref['span']} [{cross_ref['passage_id']}]")
                     citations.add(cross_ref["passage_id"])
                     trace.append({"step": "graph_expand_lookup", "entity": entity_text, "span": cross_ref["span"], "passage_id": cross_ref.get("passage_id")})
+                    _add_dependency(dep_nodes, f"fact:graph_expand:{entity_text}", "derived_fact", f"{cross_ref['span']!r}", [cross_ref["passage_id"]])
 
     identity_signal = stage_plan["signals"]["identity"]
     trace.append({"step": "intent_signal", "signal": "identity", **identity_signal})
@@ -555,6 +595,7 @@ def reason(ask: str, passages: list[dict], use_real_ner: bool = False, connector
         if facts["name"]:
             road = address.get("road")
             answer_parts.append(f"{facts['name']}" + (f", {road}" if road else "") + (f" [{name_cite}]" if name_cite else ""))
+            _add_dependency(dep_nodes, "fact:identity", "fact", f"name={facts['name']!r}, address={address}", [name_cite] if name_cite else [])
 
     total_signal = stage_plan["signals"]["total"]
     trace.append({"step": "intent_signal", "signal": "total", **total_signal})
@@ -570,6 +611,7 @@ def reason(ask: str, passages: list[dict], use_real_ner: bool = False, connector
         trace.append({"step": "compute_total", "total": money["total"], "sources": sources})
         if money["ok"]:
             answer_parts.append(f"total {money['total']:,.0f} [{', '.join(sources)}]")
+            _add_dependency(dep_nodes, "fact:total", "fact", f"total={money['total']}", sources)
 
     rule_hit = _find_rule(passages)
     if "rule_application" in stage_plan["stages"]:
@@ -581,9 +623,11 @@ def reason(ask: str, passages: list[dict], use_real_ner: bool = False, connector
             elif not _role_matches(rule, scoped):
                 trace.append({"step": "apply_rule", "skipped": f"role mismatch with {rule['subject_placeholder']!r}"})
                 answer_parts.append(f"policy does not apply (role mismatch with {rule['subject_placeholder']!r}) [{rule_passage['id']}]")
+                _add_dependency(dep_nodes, "conclusion", "conclusion", f"role mismatch with {rule['subject_placeholder']!r}", [rule_passage["id"]])
             else:
                 applied = apply_threshold_rule(rule, facts["total"])
                 trace.append({"step": "apply_rule", "kind": "threshold", "result": applied})
+                _add_dependency(dep_nodes, f"rule:{rule_passage['id']}", "rule", rule["raw"], [rule_passage["id"]])
                 if applied["matched"]:
                     # Same gate check the verb-rule branch already has
                     # (EXP-089/026, now EXP-097 for temporal bounds) -- a
@@ -593,12 +637,15 @@ def reason(ask: str, passages: list[dict], use_real_ner: bool = False, connector
                     gate_context = [p["text"] for p in passages if p["id"] != rule_passage["id"]]
                     gate_result = _check_rule_gate(rule, gate_context)
                     trace.append({"step": "check_exception", "result": gate_result})
+                    gate_node = f"gate:{rule_passage['id']}"
+                    _add_dependency(dep_nodes, gate_node, "gate_check", f"{gate_result['kind']} gate status={gate_result['status']}", ["fact:total", f"rule:{rule_passage['id']}"])
                     if gate_result["status"] == "holds":
                         if gate_result["kind"] == "temporal":
                             reason_phrase = f"the rule's temporal bound ({gate_result['phrase']!r}) is not currently satisfied"
                         else:
                             reason_phrase = "the rule's exception holds" if gate_result["polarity"] == "negative" else "the rule's condition is not satisfied"
                         answer_parts.append(f"policy does not apply: {reason_phrase} ({rule['raw']!r}) [{rule_passage['id']}]")
+                        _add_dependency(dep_nodes, "conclusion", "conclusion", f"policy blocked: {reason_phrase}", [gate_node])
                     else:
                         citations.add(rule_passage["id"])
                         conditional = gate_result["status"] == "unknown"
@@ -607,8 +654,10 @@ def reason(ask: str, passages: list[dict], use_real_ner: bool = False, connector
                         unresolved_phrase = "the rule's temporal bound is unresolved" if gate_result["kind"] == "temporal" else ("the rule's exception is unresolved" if gate_result["polarity"] == "negative" else "the rule's condition is unresolved")
                         suffix = f" ({unresolved_phrase} -- not confirmed either way)" if conditional else ""
                         answer_parts.append(f"policy applies: {applied['consequence']}{suffix} [{rule_passage['id']}]")
+                        _add_dependency(dep_nodes, "conclusion", "conclusion", f"policy applies: {applied['consequence']}{suffix}", ["fact:total", f"rule:{rule_passage['id']}", gate_node])
                 else:
                     answer_parts.append(f"policy does not apply (threshold not exceeded) [{rule_passage['id']}]")
+                    _add_dependency(dep_nodes, "conclusion", "conclusion", "threshold not exceeded", ["fact:total", f"rule:{rule_passage['id']}"])
         else:
             # Excludes any passage that is itself a rule (verb or threshold
             # shape), not just rule_passage -- found by EXP-084's own
@@ -627,6 +676,8 @@ def reason(ask: str, passages: list[dict], use_real_ner: bool = False, connector
                 fact = extract_fact_triple(fact_passage["text"])
                 applied = apply_rule(rule, fact)
                 trace.append({"step": "apply_rule", "kind": "verb", "result": applied, "fact_passage": fact_passage["id"]})
+                _add_dependency(dep_nodes, f"rule:{rule_passage['id']}", "rule", rule["raw"], [rule_passage["id"]])
+                _add_dependency(dep_nodes, f"fact:{fact_passage['id']}", "fact", f"{fact['subject']} {fact['verb_lemma']} {fact.get('object')}", [fact_passage["id"]])
                 if applied["matched"]:
                     # apply_rule's own lemma-match check has no idea the
                     # rule's consequence might carry a trailing exception/
@@ -650,12 +701,15 @@ def reason(ask: str, passages: list[dict], use_real_ner: bool = False, connector
                     exception_context = [p["text"] for p in passages if p["id"] not in (rule_passage["id"], fact_passage["id"])]
                     gate_result = _check_rule_gate(rule, exception_context)
                     trace.append({"step": "check_exception", "result": gate_result})
+                    gate_node = f"gate:{rule_passage['id']}"
+                    _add_dependency(dep_nodes, gate_node, "gate_check", f"{gate_result['kind']} gate status={gate_result['status']}", [f"rule:{rule_passage['id']}", f"fact:{fact_passage['id']}"])
                     if gate_result["status"] == "holds":
                         if gate_result["kind"] == "temporal":
                             reason_phrase = f"the rule's temporal bound ({gate_result['phrase']!r}) is not currently satisfied"
                         else:
                             reason_phrase = "the rule's exception holds" if gate_result["polarity"] == "negative" else "the rule's condition is not satisfied"
                         answer_parts.append(f"policy does not apply: {reason_phrase} ({rule['raw']!r}) [{rule_passage['id']}]")
+                        _add_dependency(dep_nodes, "conclusion", "conclusion", f"policy blocked: {reason_phrase}", [gate_node])
                     else:
                         citations.update([rule_passage["id"], fact_passage["id"]])
                         conditional = gate_result["status"] == "unknown"
@@ -667,6 +721,7 @@ def reason(ask: str, passages: list[dict], use_real_ner: bool = False, connector
                             f"{fact_passage['text']} [{fact_passage['id']}] matches the rule's trigger ({applied['trigger_lemma']}): "
                             f"{rule['raw']} [{rule_passage['id']}] Therefore, {applied['consequence']}{suffix}."
                         )
+                        _add_dependency(dep_nodes, "conclusion", "conclusion", f"policy applies: {applied['consequence']}{suffix}", [f"rule:{rule_passage['id']}", f"fact:{fact_passage['id']}", gate_node])
 
                         if stage_plan["rule_application_method"] == "forward_chain":
                             # EXP-084's actual new capability: a derived fact
@@ -692,11 +747,12 @@ def reason(ask: str, passages: list[dict], use_real_ner: bool = False, connector
                                 and (d["subject"], d["verb_lemma"], d.get("object")) != seed_signature
                             ]
                             trace.append({"step": "forward_chain", "extra_facts": extra_facts})
-                            for extra in extra_facts:
+                            for i, extra in enumerate(extra_facts):
                                 if extra.get("conditional"):
                                     rule_conditional = True
                                 extra_suffix = " (unresolved -- not confirmed either way)" if extra.get("conditional") else ""
                                 answer_parts.append(f"Furthermore, {extra['subject']} {extra['verb_lemma']} {extra['object']}{extra_suffix}")
+                                _add_dependency(dep_nodes, f"derived:{i}:{extra['subject']}:{extra['verb_lemma']}", "derived_fact", f"{extra['subject']} {extra['verb_lemma']} {extra['object']}{extra_suffix}", ["conclusion"])
 
     if not answer_parts:
         # Deliberately NOT gated by "lookup_fallback" in stage_plan["stages"]
@@ -713,15 +769,16 @@ def reason(ask: str, passages: list[dict], use_real_ner: bool = False, connector
         qa = answer_with_agreement(ask, scoped, tau=0.34)
         trace.append({"step": "lookup_fallback", "span": qa["span"], "passage_id": qa.get("passage_id")})
         if not qa["span"] or not quote_check(qa["span"], next((p["text"] for p in scoped if p["id"] == qa.get("passage_id")), "")):
-            return _finish(ask, trace, "inconclusive", ABSTAIN_TEXT, citations, reason="no span found")
+            return _finish(ask, trace, "inconclusive", ABSTAIN_TEXT, citations, reason="no span found", dependency_tree=dep_nodes)
         citations.add(qa["passage_id"])
-        return _finish(ask, trace, "supported", f"{qa['span']} [{qa['passage_id']}]", citations, facts=facts)
+        _add_dependency(dep_nodes, "conclusion", "conclusion", f"{qa['span']!r}", [qa["passage_id"]])
+        return _finish(ask, trace, "supported", f"{qa['span']} [{qa['passage_id']}]", citations, facts=facts, dependency_tree=dep_nodes)
 
     final_decision = "supported_with_flags" if rule_conditional else "supported"
-    return _finish(ask, trace, final_decision, ". ".join(answer_parts) + ".", citations, facts=facts)
+    return _finish(ask, trace, final_decision, ". ".join(answer_parts) + ".", citations, facts=facts, dependency_tree=dep_nodes)
 
 
-def _finish(ask, trace, decision, text, citations, facts=None, reason=None) -> dict:
+def _finish(ask, trace, decision, text, citations, facts=None, reason=None, dependency_tree=None) -> dict:
     result = {
         "ask": ask,
         "decision": decision,
@@ -729,6 +786,7 @@ def _finish(ask, trace, decision, text, citations, facts=None, reason=None) -> d
         "citations": sorted(citations),
         "facts": facts or {},
         "trace": trace,
+        "dependency_tree": dependency_tree or [],
     }
     if reason:
         result["abstain_reason"] = reason
