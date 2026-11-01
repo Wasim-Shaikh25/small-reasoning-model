@@ -1,0 +1,114 @@
+[
+  {
+    "id": "coref-01",
+    "document": "Arun submitted the invoice. He also attached a receipt.",
+    "target_sentence_index": 1,
+    "gold_antecedent": "He",
+    "gold_resolved_subject": "Arun"
+  },
+  {
+    "id": "coref-02",
+    "document": "Priya reviewed the lease agreement. She flagged the termination clause.",
+    "target_sentence_index": 1,
+    "gold_antecedent": "She",
+    "gold_resolved_subject": "Priya"
+  },
+  {
+    "id": "coref-03",
+    "document": "The tenants filed a complaint with the housing board. They cited unsafe wiring in the kitchen.",
+    "target_sentence_index": 1,
+    "gold_antecedent": "They",
+    "gold_resolved_subject": "The tenants"
+  },
+  {
+    "id": "coref-04",
+    "document": "The landlord replaced the water heater last month. It failed again within two weeks.",
+    "target_sentence_index": 1,
+    "gold_antecedent": "It",
+    "gold_resolved_subject": "The water heater"
+  },
+  {
+    "id": "coref-05",
+    "document": "Rohan signed the rental contract on Monday. He paid the security deposit the same day.",
+    "target_sentence_index": 1,
+    "gold_antecedent": "He",
+    "gold_resolved_subject": "Rohan"
+  },
+  {
+    "id": "coref-06",
+    "document": "Meera filed the tax return before the deadline. She requested an extension for the audit anyway.",
+    "target_sentence_index": 1,
+    "gold_antecedent": "She",
+    "gold_resolved_subject": "Meera"
+  },
+  {
+    "id": "coref-07",
+    "document": "The committee approved the budget on Friday. It allocated extra funds for maintenance the following week.",
+    "target_sentence_index": 1,
+    "gold_antecedent": "It",
+    "gold_resolved_subject": "The committee"
+  },
+  {
+    "id": "coref-08",
+    "document": "Arjun called the plumber about the leak. He described the damage to the ceiling in detail.",
+    "target_sentence_index": 1,
+    "gold_antecedent": "He",
+    "gold_resolved_subject": "Arjun"
+  },
+  {
+    "id": "coref-09-distractor",
+    "document": "Rohan lent his umbrella to Arun. He forgot to return it the next day.",
+    "target_sentence_index": 1,
+    "gold_antecedent": "He",
+    "gold_resolved_subject": "Arun"
+  },
+  {
+    "id": "coref-10-distractor",
+    "document": "Priya handed the report to Meera. She found three errors in the first section.",
+    "target_sentence_index": 1,
+    "gold_antecedent": "She",
+    "gold_resolved_subject": "Meera"
+  },
+  {
+    "id": "coref-11-distractor",
+    "document": "The buyer sent the contract to the seller. He asked for one more clause before signing.",
+    "target_sentence_index": 1,
+    "gold_antecedent": "He",
+    "gold_resolved_subject": "The seller"
+  },
+  {
+    "id": "coref-12",
+    "document": "Kavya drafted the notice to vacate. She emailed it to the tenant on the same day.",
+    "target_sentence_index": 1,
+    "gold_antecedent": "She",
+    "gold_resolved_subject": "Kavya"
+  },
+  {
+    "id": "coref-13",
+    "document": "The board rejected the proposed amendment. They cited budget concerns in the written decision.",
+    "target_sentence_index": 1,
+    "gold_antecedent": "They",
+    "gold_resolved_subject": "The board"
+  },
+  {
+    "id": "coref-14",
+    "document": "Sanjay inspected the apartment before move-in. He noted a crack in the bathroom tile.",
+    "target_sentence_index": 1,
+    "gold_antecedent": "He",
+    "gold_resolved_subject": "Sanjay"
+  },
+  {
+    "id": "coref-15",
+    "document": "Divya raised the issue with the building manager. She received no response after a week.",
+    "target_sentence_index": 1,
+    "gold_antecedent": "She",
+    "gold_resolved_subject": "Divya"
+  },
+  {
+    "id": "coref-16-long-range",
+    "document": "Arun filed the maintenance request on Tuesday. The building manager acknowledged it by email. He followed up again on Friday when nothing was fixed.",
+    "target_sentence_index": 2,
+    "gold_antecedent": "He",
+    "gold_resolved_subject": "Arun"
+  }
+]
