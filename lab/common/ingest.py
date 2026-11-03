@@ -7,15 +7,30 @@ What that actually requires, checked against how this repo already
 works rather than assumed: lab.common.index.Index and lab.common.
 semantic_index.SemanticIndex already build their structures on the fly
 from whatever passage list they're given, at query time -- there is no
-separate, persisted "build the index" step anywhere in this project (an
-on-disk index is EXP-022's own still-open todo). Same for the entity
+separate, persisted "build the index" step inside brain.reason() itself
+(lab.common.store.Store/get_or_build, added 2026-11-01, extends EXP-022's
+save/load pattern for a caller who wants that persistence explicitly --
+see that module's own docstring; reason() itself still always builds
+in-process from whatever passages it's given). Same for the entity
 graph (lab.common.graph_index.build_entity_graph): built fresh from a
-passage list each time, not persisted. So the one genuinely missing
-piece, the one this module supplies, is turning raw document text into
-that passage-list shape at all -- chunking -- not a new indexing stage.
-Everything downstream (Index, SemanticIndex, build_entity_graph,
-lab.common.brain.reason) already works the moment a document is in that
-shape; this is what gets it there.
+passage list each time by reason() itself, not persisted (again,
+Store.build(use_graph=True) can persist one if a caller wants it).
+So the one genuinely missing piece, the one this module supplies, is
+turning raw document text into that passage-list shape at all --
+chunking -- not a new indexing stage. Everything downstream (Index,
+SemanticIndex, build_entity_graph, lab.common.brain.reason) already
+works the moment a document is in that shape; this is what gets it
+there.
+
+NAME COLLISION, flagged by the 2026-11-03 reasoning-layer audit
+(AUDIT.md): `chunk_document` below shares a name with
+lab.common.chunking.chunk_document, a structure-aware, overlapping-
+window chunker with a different signature and a much richer per-chunk
+shape -- see that module's own docstring for the full comparison.
+**This is the chunker brain.reason()'s live document_write path
+actually uses** (`findings_from_chunks` below, imported directly by
+brain.py); chunking.py's version is exercised only by standalone
+explorations, never by reason() itself.
 """
 
 from __future__ import annotations

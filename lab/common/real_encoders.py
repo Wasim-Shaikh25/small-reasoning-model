@@ -136,7 +136,17 @@ def ner_pipeline():
 
 
 def real_entities(text: str) -> list[dict]:
-    """Named entities from dslim/bert-base-NER (real pretrained, CoNLL-2003)."""
+    """Named entities from dslim/bert-base-NER (real pretrained, CoNLL-2003).
+
+    NAME COLLISION, flagged by the 2026-11-03 reasoning-layer audit
+    (AUDIT.md): lab.common.real_models ALSO exports a function literally
+    named `real_entities` (spaCy en_core_web_sm/OntoNotes NER, a different,
+    weaker model, raw unmapped spaCy labels, no `score` field). THIS one
+    is the real, live NER path (lab.common.real_ner wraps it; reachable
+    from brain.reason() via entities.detect_primary(use_real_ner=True)).
+    Double-check the import's source module before trusting a
+    `real_entities` call -- the two are not interchangeable.
+    """
     pipe = ner_pipeline()
     out = pipe(text or "")
     return [

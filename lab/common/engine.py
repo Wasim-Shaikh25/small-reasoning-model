@@ -1,4 +1,24 @@
-"""Controller loop. Passages are data. Nothing in a passage is executed."""
+"""Controller loop. Passages are data. Nothing in a passage is executed.
+
+HISTORICAL / FROZEN (recorded 2026-11-03, reasoning-layer audit, AUDIT.md):
+this is a complete, independent "answer a question from passages"
+controller, pre-dating lab.common.brain.reason() (EXP-060, "a single
+unified controller, not a dispatcher to separate engines"). It is still
+exercised directly by several closed explorations (EXP-001/020/021/027/
+044/045, most recently part of this same session's RERUN_TODOS batch) and
+is kept, unmodified, as those explorations' own reproducibility fixture --
+not because it is the project's answer-from-passages path going forward.
+
+**lab.common.brain.reason() is the canonical entry point for any new work.**
+This module has real capabilities reason() does not (a multi-round
+retrieve-more-with-budget loop, state["rounds"]/max_rounds; a distinct
+top-level "contradicted" decision via conflict_across's cross-passage NLI
+check) -- if either is genuinely needed by new work, port it into
+brain.reason() rather than reaching for run_task() here, so the project
+keeps exactly one live reasoning controller rather than two that can
+silently diverge further. Do not delete this file: EXP-001/020/021/027/
+044/045's own `FILES` reproducibility manifests reference it directly.
+"""
 
 from __future__ import annotations
 

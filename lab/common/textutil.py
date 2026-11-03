@@ -14,8 +14,26 @@ STOP = {
 }
 
 NUM_RE = re.compile(r"\b\d[\d,./-]*\b")
+# FIX (2026-11-03 reasoning-layer audit, AUDIT.md): "unless" and "except"
+# used to be listed here as "modals" alongside true deontic modal
+# auxiliaries (shall/may/must) -- but lab.common.connectives.
+# CONNECTIVE_TABLE (the module built specifically to replace ad-hoc
+# keyword regexes for exactly these words) classifies both, as bare
+# single words, as the SAME Operator.CONDITION_NEGATIVE connective, a
+# completely different grammatical category. Concrete failure this
+# caused: modals()-based fidelity checking (verify.bidirectional_nli's
+# sibling check, verify.py:90) saw a rewrite that paraphrased "unless the
+# tenant pays" to "except the tenant pays" -- a change connectives.py
+# itself treats as logically identical -- as a mismatch ({'unless'} vs
+# {'except'}), over-rejecting a faithful rewrite. "only" and "provided"
+# are left in place: neither is an unambiguous bare-word entry in
+# CONNECTIVE_TABLE the way "unless"/"except" are ("only if"/"provided
+# that" are two-word phrases requiring the second word, so a bare "only"
+# or "provided" is not guaranteed to be the same connective by that
+# table's own classification, and this fix only removes the confirmed,
+# unambiguous overlap).
 MODAL_RE = re.compile(
-    r"\b(not|no|shall|may|must|unless|except|only|provided)\b", re.I
+    r"\b(not|no|shall|may|must|only|provided)\b", re.I
 )
 NEG_RE = re.compile(
     r"\b(not|no|never|none|neither|without)\b|\bshall not\b|\bmust not\b|"

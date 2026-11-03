@@ -1,5 +1,12 @@
 """The reasoning brain: one controller, not a dispatcher to separate task-type engines.
 
+THE canonical entry point: `reason()` below, not lab.common.engine.
+run_task() (a pre-dating, independent controller kept only as several
+closed explorations' own reproducibility fixture -- see that module's own
+docstring, recorded 2026-11-03's reasoning-layer audit, AUDIT.md). Any new
+reasoning capability belongs here, even one that resembles something
+engine.py already does differently (e.g. multi-round retrieval).
+
 Everything built across EXP-057/058/059 proved the individual pieces work and
 generalize: rule application, entity/address extraction, arithmetic, hybrid
 retrieval. But each was exercised by its own exploration script calling its
@@ -85,7 +92,7 @@ from lab.common.index import Index
 from lab.common.inference import check_exceptions, forward_chain, instantiate_consequence, split_exceptions
 from lab.common.intent_signals import wants_document, wants_identity, wants_rule_application, wants_total
 from lab.common.nested_index import MIN_DENSE_SCORE, build_nested_index
-from lab.common.qa import answer_with_agreement
+from lab.common.qa import answer_with_agreement, answer_with_real_qa
 from lab.common.rules import apply_rule, apply_threshold_rule, extract_fact_triple, parse_conditional_rule, parse_threshold_rule
 from lab.common.semantic_index import MIN_LEXICAL_MARGIN, MIN_SEMANTIC_MARGIN, SemanticIndex, navigate_dual
 from lab.common.temporal import check_temporal_bound, find_temporal_bound
@@ -122,6 +129,27 @@ def _find_verb_rules(passages: list[dict]) -> list[dict]:
         if rule:
             rules.append(rule)
     return rules
+
+
+def _find_verb_rules_with_passages(passages: list[dict]) -> list[tuple[dict, dict]]:
+    """Same scan as _find_verb_rules, but keeping each rule's source
+    passage alongside it. FIX (audit 2026-11-03): parse_conditional_rule's
+    own return shape has no passage-id field (a rule dict only knows its
+    own raw text), so a plain `_find_verb_rules(passages)` call -- which is
+    what forward_chain actually receives -- structurally cannot say which
+    passage any given rule came from. This function exists only so
+    reason()'s forward_chain call site can build a raw-rule-text ->
+    passage-id lookup for its dependency_tree, without changing
+    _find_verb_rules' own return shape (still a plain list[dict], exactly
+    what forward_chain's `rules` parameter expects, and exactly what
+    plan_stages' count-only usage already relies on).
+    """
+    pairs = []
+    for passage in passages:
+        rule = parse_conditional_rule(passage.get("text", ""))
+        if rule:
+            pairs.append((rule, passage))
+    return pairs
 
 
 STAGE_REGISTRY = (
@@ -199,7 +227,18 @@ def plan_stages(ask: str, passages: list[dict], use_real_ner: bool = False) -> d
     rule_application_method = None
     if rule_hit:
         stages.append("rule_application")
-        rule_application_method = "forward_chain" if (rule_signal["fires"] and len(verb_rules) > 1) else "single_step"
+        # FIX (audit 2026-11-03, Finding 1): forward_chain is a verb-rule-only
+        # mechanism (reason()'s own forward_chain dispatch sits inside the
+        # `kind == "verb"` branch, never the threshold branch). Gating this
+        # choice on `len(verb_rules) > 1` alone, without also checking that
+        # THIS call's rule_hit is itself verb-kind, let the plan predict
+        # "forward_chain" for a call that would actually execute the
+        # threshold branch (whenever a passage set mixes a threshold rule,
+        # sorted first by _find_rule's passage-order scan, with 2+ verb
+        # rules elsewhere) -- a real, confirmed disagreement between this
+        # function's own documented invariant ("accurately predicts what
+        # reason() is actually about to do") and actual execution.
+        rule_application_method = "forward_chain" if (rule_hit[0] == "verb" and rule_signal["fires"] and len(verb_rules) > 1) else "single_step"
 
     if not stages:
         stages.append("lookup_fallback")
@@ -293,13 +332,37 @@ def _group_margin(hits: list[dict], score_key: str) -> float:
     return scores[0] - scores[1]
 
 
-def reason(ask: str, passages: list[dict], use_real_ner: bool = False, connector=None, connector_top_k: int = 5) -> dict:
+def reason(ask: str, passages: list[dict], use_real_ner: bool = False, connector=None, connector_top_k: int = 5, use_real_qa: bool = False, use_real_nli: bool = False, use_repair: bool = False) -> dict:
     """`use_real_ner=True` threads through to every lab.common.entities.
     detect_primary call this function makes (identity extraction, graph
     expansion, long-form outlining) -- see that function for why it
     defaults to False: a real transformers model call is real added
     latency, which every existing caller of reason() keeps unchanged
     unless it explicitly opts in.
+
+    `use_real_qa`/`use_real_nli` (both default False, same opt-in shape
+    as `use_real_ner`): flagged by the 2026-11-03 reasoning-layer audit
+    (AUDIT.md, Top Finding #1) -- this project has repeatedly measured
+    real QA (EXP-030/080) and real bidirectional NLI (EXP-031/041/056)
+    checkpoints that no live caller of reason() ever actually used.
+    `use_real_qa=True` swaps `graph_expand_lookup`'s and
+    `lookup_fallback`'s span extraction from the classical lexical
+    extractor to `qa.answer_with_real_qa` (the real deepset/deberta-v3-
+    base-squad2 checkpoint). `use_real_nli=True` swaps the rewriter's own
+    fidelity check (inside the `document_write` stage only) from the
+    classical judge to `real_encoders.real_bidirectional_nli`. Neither
+    touches the rule-exception/condition/temporal gate's own NLI check
+    (`_check_rule_gate`), which already called the real model
+    unconditionally before this flag existed. `use_real_qa`/`use_real_nli`
+    default False, so every existing caller keeps exactly its already-
+    measured behavior unless it explicitly opts in -- zero regression
+    risk, same discipline `use_real_ner` already established.
+
+    `use_repair` (default False, `document_write` stage only): opt-in use
+    of each rewriter backend's own repair mechanism (flan-t5-small's
+    retry-with-feedback, gemma3:270m's citation-splice) instead of this
+    project's rewriter_backends.rewrite_unit dispatcher bypassing both --
+    same audit finding as above; see that function's own docstring.
 
     `connector` (lab.common.connectors.QdrantConnector or GraphConnector,
     default None) is the external-data-connector hookup the project
@@ -398,7 +461,7 @@ def reason(ask: str, passages: list[dict], use_real_ner: bool = False, connector
         # document whose passages were named "CHUNK0008" -- that string
         # ended up in the final .docx, EXP-081).
         findings = findings_from_chunks([p for p in passages if p.get("text")])
-        doc_result = write_long_document(ask, findings, task=plan["task_type"], use_real_ner=use_real_ner)
+        doc_result = write_long_document(ask, findings, task=plan["task_type"], use_real_ner=use_real_ner, use_real_nli=use_real_nli, use_repair=use_repair)
         trace.append(
             {
                 "step": "longform_write",
@@ -562,7 +625,7 @@ def reason(ask: str, passages: list[dict], use_real_ner: bool = False, connector
                 # score 0.1442, well under 0.34) doesn't mean the content is
                 # off-topic, just that the ask's other half (about a
                 # different fact) dilutes the match.
-                cross_ref = answer_with_agreement(ask, new_passages, tau=0.1)
+                cross_ref = answer_with_real_qa(ask, new_passages) if use_real_qa else answer_with_agreement(ask, new_passages, tau=0.1)
                 cross_ref_text = next((p["text"] for p in new_passages if p["id"] == cross_ref.get("passage_id")), "")
                 if cross_ref["span"] and quote_check(cross_ref["span"], cross_ref_text):
                     answer_parts.append(f"{cross_ref['span']} [{cross_ref['passage_id']}]")
@@ -737,9 +800,11 @@ def reason(ask: str, passages: list[dict], use_real_ner: bool = False, connector
                             # never reaches this branch at all (plan_stages
                             # only chooses "forward_chain" when more than one
                             # verb rule exists), so no existing case changes.
-                            primary_signatures = {(d["subject"], d["verb_lemma"], d.get("object")) for d in instantiate_consequence(rule, fact)}
+                            primary_derived = instantiate_consequence(rule, fact)
+                            primary_signatures = {(d["subject"], d["verb_lemma"], d.get("object")) for d in primary_derived}
                             seed_signature = (fact["subject"], fact["verb_lemma"], fact.get("object"))
-                            chain_result = forward_chain([fact], _find_verb_rules(passages), context_texts=exception_context)
+                            verb_rule_pairs = _find_verb_rules_with_passages(passages)
+                            chain_result = forward_chain([fact], [r for r, _ in verb_rule_pairs], context_texts=exception_context)
                             extra_facts = [
                                 d
                                 for d in chain_result["facts"]
@@ -747,12 +812,41 @@ def reason(ask: str, passages: list[dict], use_real_ner: bool = False, connector
                                 and (d["subject"], d["verb_lemma"], d.get("object")) != seed_signature
                             ]
                             trace.append({"step": "forward_chain", "extra_facts": extra_facts})
+                            # FIX (audit 2026-11-03, extraction-cluster Finding
+                            # 3): every extra fact used to get a hardcoded
+                            # depends_on=["conclusion"], the single node for
+                            # the PRIMARY rule+fact's consequence -- correct
+                            # for a step-1 fact (which really does derive from
+                            # that consequence), but wrong for a step-2+ fact,
+                            # which derives from a SPECIFIC earlier derived
+                            # fact and a SECOND rule neither "conclusion" nor
+                            # the old code ever cited. forward_chain's own
+                            # derivation record (inference.py) already names
+                            # the exact rule/fact raw text that produced each
+                            # derived fact -- this builds a raw-text -> node-id
+                            # lookup (seed fact, every verb rule passage, and
+                            # every primary-step derived fact all resolve to
+                            # the nodes already created for them) and resolves
+                            # each extra fact's real dependencies against it,
+                            # falling back to the old conclusion-only edge
+                            # only if a raw text genuinely can't be resolved
+                            # (should not happen for a well-formed chain).
+                            raw_to_node_id = {fact["raw"]: f"fact:{fact_passage['id']}"}
+                            for r, p in verb_rule_pairs:
+                                raw_to_node_id[r["raw"]] = f"rule:{p['id']}"
+                            for d in primary_derived:
+                                raw_to_node_id[d["raw"]] = "conclusion"
                             for i, extra in enumerate(extra_facts):
                                 if extra.get("conditional"):
                                     rule_conditional = True
                                 extra_suffix = " (unresolved -- not confirmed either way)" if extra.get("conditional") else ""
                                 answer_parts.append(f"Furthermore, {extra['subject']} {extra['verb_lemma']} {extra['object']}{extra_suffix}")
-                                _add_dependency(dep_nodes, f"derived:{i}:{extra['subject']}:{extra['verb_lemma']}", "derived_fact", f"{extra['subject']} {extra['verb_lemma']} {extra['object']}{extra_suffix}", ["conclusion"])
+                                derivation = extra.get("derivation") or {}
+                                rule_node = raw_to_node_id.get(derivation.get("rule"), f"rule:{rule_passage['id']}")
+                                antecedent_node = raw_to_node_id.get(derivation.get("fact"), "conclusion")
+                                derived_node_id = f"derived:{i}:{extra['subject']}:{extra['verb_lemma']}"
+                                _add_dependency(dep_nodes, derived_node_id, "derived_fact", f"{extra['subject']} {extra['verb_lemma']} {extra['object']}{extra_suffix}", [rule_node, antecedent_node])
+                                raw_to_node_id[extra["raw"]] = derived_node_id
 
     if not answer_parts:
         # Deliberately NOT gated by "lookup_fallback" in stage_plan["stages"]
@@ -766,7 +860,7 @@ def reason(ask: str, passages: list[dict], use_real_ner: bool = False, connector
         # attempted still come back empty", a strict superset of the
         # planning-time one, so it stays keyed off the real answer_parts
         # outcome rather than a plan membership check that could under-fire.
-        qa = answer_with_agreement(ask, scoped, tau=0.34)
+        qa = answer_with_real_qa(ask, scoped) if use_real_qa else answer_with_agreement(ask, scoped, tau=0.34)
         trace.append({"step": "lookup_fallback", "span": qa["span"], "passage_id": qa.get("passage_id")})
         if not qa["span"] or not quote_check(qa["span"], next((p["text"] for p in scoped if p["id"] == qa.get("passage_id")), "")):
             return _finish(ask, trace, "inconclusive", ABSTAIN_TEXT, citations, reason="no span found", dependency_tree=dep_nodes)

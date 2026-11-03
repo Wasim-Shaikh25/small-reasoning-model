@@ -25,6 +25,18 @@ from lab.common.index import Index
 from lab.common.nested_index import MIN_DENSE_SCORE
 from lab.common.real_encoders import bge_embed
 
+# MODEL-VERSION GUARD NOTE (2026-11-03 reasoning-layer audit, AUDIT.md):
+# MIN_SEMANTIC_MARGIN and SEMANTIC_SINGLE_FLOOR below were both measured
+# against whatever checkpoint bge_embed loaded AT THE TIME (currently
+# real_encoders.BGE_MODEL_NAME = "BAAI/bge-small-en-v1.5"), with no
+# version pin or runtime check anywhere tying the two together. Changing
+# BGE_MODEL_NAME silently invalidates both with zero warning -- re-run
+# EXP-067/068 (MIN_SEMANTIC_MARGIN) and EXP-070 (SEMANTIC_SINGLE_FLOOR)
+# before trusting either after such a change. Same caveat applies to
+# MIN_LEXICAL_MARGIN below, even though it scores TF-IDF, not bge --
+# it was calibrated against the SAME fixtures these two were, so a model
+# change that shifts what "off-topic" looks like semantically could shift
+# which lexical margin counts as decisive too.
 # First measured value (EXP-067): separated a genuine paraphrase match
 # (margin 0.0403) from an off-topic non-match (margin 0.0146) on one fixture.
 # That gap is narrow enough that this is a starting point, not a validated

@@ -9,30 +9,15 @@ from __future__ import annotations
 
 import numpy as np
 
-from lab.common.index import BM25, tokenize
+# _minmax/_filters_ok used to be copy-pasted here, byte-for-byte identical
+# to index.py's own copies (and real_bge_index.py's third copy) -- a DRY
+# violation flagged by the 2026-11-03 reasoning-layer audit (AUDIT.md).
+# Importing the one definition in index.py instead changes no behavior
+# (same code, same inputs/outputs) -- verified by rerunning EXP-029/032/045,
+# the only explorations that exercise this class, and diffing against
+# their git-committed baselines.
+from lab.common.index import BM25, _filters_ok, _minmax, tokenize
 from lab.common.real_models import real_vector
-
-
-def _minmax(values: list[float]) -> list[float]:
-    if not values:
-        return []
-    lo, hi = min(values), max(values)
-    if hi - lo < 1e-12:
-        return [0.0 for _ in values]
-    return [(v - lo) / (hi - lo) for v in values]
-
-
-def _filters_ok(passage: dict, filters: dict) -> bool:
-    for key, value in filters.items():
-        if value is None:
-            continue
-        current = passage.get(key)
-        if isinstance(value, (list, tuple, set)):
-            if current not in value:
-                return False
-        elif current != value:
-            return False
-    return True
 
 
 class RealIndex:

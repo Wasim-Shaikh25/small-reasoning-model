@@ -129,6 +129,17 @@ RULE_EXEMPLARS = (
     "Is the conduct permitted or prohibited by this regulation?",
 )
 
+# MODEL-VERSION GUARD NOTE (2026-11-03 reasoning-layer audit, AUDIT.md):
+# every threshold below was calibrated against bge_embed's checkpoint AT
+# CALIBRATION TIME -- currently lab.common.real_encoders.BGE_MODEL_NAME =
+# "BAAI/bge-small-en-v1.5". Nothing anywhere in this codebase asserts or
+# logs which checkpoint actually produced a given score; if
+# BGE_MODEL_NAME is ever changed, every one of these four thresholds
+# silently miscalibrates with zero warning, catchable today only by
+# manually rerunning EXP-069 (IDENTITY_TAU/TOTAL_TAU)/EXP-078
+# (DOCUMENT_TAU)/EXP-084 (RULE_TAU)'s own fixtures by hand. Re-measure all
+# four before changing BGE_MODEL_NAME, not just the ones you expect to be
+# affected.
 IDENTITY_TAU = 0.5971
 TOTAL_TAU = 0.6084
 # First measured value (lab.common.longform's wiring into brain.reason),

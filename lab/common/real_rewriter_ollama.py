@@ -201,24 +201,28 @@ def rewrite_unit(
     ask: str | None = None,
     max_new_tokens: int = 160,
     splice_missing_citations: bool = True,
+    use_real_nli: bool = False,
 ) -> dict:
     """Same contract as lab.common.real_rewriter.rewrite_unit: same input shape,
     same fidelity gate, same fallback -- the generation backend differs, and,
     when `splice_missing_citations` is on (the default), a citation-only
     failure is repaired deterministically before falling back. Set it False
     to measure this checkpoint's raw, unrepaired behavior.
+
+    `use_real_nli` (default False) passes straight through to every
+    `fidelity_gate` call made here -- see that function's own docstring.
     """
     deterministic_text = render_unit(leaf, glossary)
     prompt, src_text, cite_ids = build_prompt(leaf, glossary, ask=ask)
     generated = generate(prompt, max_new_tokens)
 
-    checks = fidelity_gate(src_text, generated, cite_ids, ask=ask)
+    checks = fidelity_gate(src_text, generated, cite_ids, ask=ask, use_real_nli=use_real_nli)
     final_text = generated
     repaired = False
     if not checks["ok"] and splice_missing_citations:
         spliced, rechecked = _splice_missing_citations(generated, cite_ids, checks)
         if rechecked is None:
-            rechecked_checks = fidelity_gate(src_text, spliced, cite_ids, ask=ask)
+            rechecked_checks = fidelity_gate(src_text, spliced, cite_ids, ask=ask, use_real_nli=use_real_nli)
             if rechecked_checks["ok"]:
                 final_text, checks, repaired = spliced, rechecked_checks, True
 

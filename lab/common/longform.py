@@ -130,6 +130,8 @@ def write_long_document(
     docx_out_path: Path | None = None,
     use_real_ner: bool = False,
     template_id: str | None = None,
+    use_real_nli: bool = False,
+    use_repair: bool = False,
 ) -> dict:
     """Writes one long document from `findings`, page by page, checking
     cross-page consistency as it goes.
@@ -149,6 +151,17 @@ def write_long_document(
     instead of the generic "combine these findings" prompt every other
     leaf gets. When omitted (the default), behavior is unchanged from
     before this parameter existed.
+
+    `use_real_nli` (default False) passes straight through to every leaf's
+    `rewrite_unit`/`fidelity_gate` call -- opt-in real DeBERTa-v3 MNLI
+    entailment checking instead of the classical lexical judge (2026-11-03
+    reasoning-layer audit, AUDIT.md). `use_repair` (default False) passes
+    through too -- opt-in use of each backend's own repair mechanism
+    (flan-t5-small's retry-with-feedback, gemma3:270m's citation-splice)
+    instead of this project's dispatcher bypassing both (same audit,
+    rewriter_backends.rewrite_unit's own docstring has the full story).
+    Both default False, so every existing measured fidelity-pass rate
+    stays exactly as recorded unless a caller explicitly opts in.
 
     Returns {"document_result", "consistency_flags", "rewrite_diagnostics",
     "working_memory"} -- `consistency_flags` is never empty-by-default-
@@ -181,7 +194,7 @@ def write_long_document(
             rendered_units.append(unit_text)
             continue
 
-        result = rewrite_unit(leaf, glossary, checkpoint=checkpoint, ask=leaf.get("section_instructions"))
+        result = rewrite_unit(leaf, glossary, checkpoint=checkpoint, ask=leaf.get("section_instructions"), use_real_nli=use_real_nli, use_repair=use_repair)
         unit_text = result["text"] if result["text"].startswith(leaf["title"]) else f"{leaf['title']}\n{result['text']}"
         rendered_units.append(unit_text)
         rewrite_diagnostics.append(

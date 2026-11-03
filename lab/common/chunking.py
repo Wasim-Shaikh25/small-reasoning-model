@@ -1,4 +1,20 @@
-"""Structure-aware chunking. Summaries are extractive sentences, never written prose."""
+"""Structure-aware chunking. Summaries are extractive sentences, never written prose.
+
+NAME COLLISION, flagged by the 2026-11-03 reasoning-layer audit
+(AUDIT.md): this module's own `chunk_document(text, doc_id, ...)` and
+lab.common.ingest.chunk_document(raw_text, ...) are two unrelated
+functions sharing a name, with genuinely different behavior (this one:
+heading/page-aware block splitting, 12%-overlap windows, version_hash,
+chunk_type, extractive_summary per chunk; ingest.py's: plain
+paragraph-then-sentence splitting, zero overlap, bare {"id","text"}
+output). **lab.common.brain.reason()'s live document_write path uses
+ingest.chunk_document exclusively** -- this module is exercised only by
+standalone explorations (EXP-003/009/021/025/034/045), each of which
+pins it in its own reproducibility manifest. Judging "does the live
+pipeline preserve heading structure / use overlapping windows" from
+those explorations' own names alone would give a wrong "yes" -- check
+which chunker a given caller actually imports.
+"""
 
 from __future__ import annotations
 

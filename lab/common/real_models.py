@@ -33,11 +33,31 @@ _ner_pipeline = None
 _vector_pipeline = None
 
 
-def ner_pipeline():
+def parser_pipeline():
+    """The cached spaCy pipeline this module's name suggests is "the NER
+    pipeline" (`NER_MODEL_NAME` loads `en_core_web_sm`), but every LIVE
+    caller (lab.common.rules._parser, and everything built on it --
+    inference.py, connectives.py, entities.py's FULL_PERSON check's own
+    dependency-parse fallback) only ever reads `.pos_`/`.dep_`/`.lemma_`/
+    `.children`/`.subtree` off this pipeline's output -- i.e. it is used
+    purely as a general-purpose dependency parser, never for NER tagging
+    (`.ents`). Named `parser_pipeline` for that reason (recorded 2026-11-03,
+    reasoning-layer audit, AUDIT.md). `ner_pipeline` below is kept as a
+    compatibility alias -- same cached object, same loader -- so nothing
+    that already imports the old name breaks.
+    """
     global _ner_pipeline
     if _ner_pipeline is None:
         _ner_pipeline = spacy.load(NER_MODEL_NAME)
     return _ner_pipeline
+
+
+def ner_pipeline():
+    """Deprecated alias for `parser_pipeline` -- kept only for backward
+    compatibility with any existing import of this name. New code should
+    call `parser_pipeline()` instead; see its docstring for why.
+    """
+    return parser_pipeline()
 
 
 def vector_pipeline():
@@ -50,7 +70,20 @@ def vector_pipeline():
 
 
 def real_entities(text: str) -> list[dict]:
-    """Named entities from the real pretrained OntoNotes NER model."""
+    """Named entities from the real pretrained OntoNotes NER model.
+
+    NAME COLLISION, flagged by the 2026-11-03 reasoning-layer audit
+    (AUDIT.md): lab.common.real_encoders ALSO exports a function literally
+    named `real_entities` (dslim/bert-base-NER, different model, CoNLL
+    labels remapped to person/organization, a `score` field this one
+    lacks) -- and that is the one lab.common.real_ner.py/entities.py
+    actually use live, via brain.reason(use_real_ner=True). THIS function
+    is kept only because lab/exp_032_real_multihop/run.py and
+    lab/exp_033_real_entities/run.py import it directly by this exact
+    name as part of their own closed reproducibility record -- do not
+    rename it, and do not import `real_entities` "from the models module"
+    by habit; double-check which module before relying on it for NER.
+    """
     doc = ner_pipeline()(text or "")
     return [
         {"text": ent.text, "label": ent.label_, "start": ent.start_char, "end": ent.end_char}

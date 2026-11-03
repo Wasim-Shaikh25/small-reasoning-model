@@ -151,3 +151,53 @@ def answer_with_agreement(question: str, passages: list[dict], tau: float = 0.34
     first["second_span"] = second.get("span")
     first["second_model_agrees"] = spans_overlap(first.get("span"), second.get("span"))
     return first
+
+
+def answer_with_real_qa(question: str, passages: list[dict], score_floor: float = 0.1) -> dict:
+    """Same return contract as answer_with_agreement -- {"span", "score",
+    "no_answer", "passage_id", "sentence", "abstained", "second_span",
+    "second_model_agrees"} -- but the span and score come from the real
+    deepset/deberta-v3-base-squad2 checkpoint (lab.common.real_encoders.
+    real_qa), one call per passage, best-scoring non-no-answer result
+    wins, rather than this module's classical lexical extractors.
+
+    Opt-in only (lab.common.brain.reason(use_real_qa=True)); flagged by
+    the 2026-11-03 reasoning-layer audit (AUDIT.md, Top Finding #1): this
+    project has repeatedly measured real_qa (EXP-030/080) but no live
+    caller ever actually used it until this function existed. `tau`'s
+    existing calibrated values (0.1/0.34, measured for the classical
+    lexical score distribution) don't transfer to a real QA confidence
+    score, which runs on a different scale -- `score_floor` is this
+    function's OWN first measured value, not swept across fixtures, same
+    caveat every other first-measured threshold in this repo carries.
+    `second_span`/`second_model_agrees` are populated from the classical
+    bigram extractor (the cheapest available second opinion), not a
+    second real-model call -- this function adds one real-model call per
+    passage, not two.
+    """
+    from lab.common.real_encoders import real_qa
+
+    best = {"span": None, "score": 0.0, "no_answer": True, "passage_id": None, "sentence": None, "abstained": True}
+    for passage in passages:
+        text = passage.get("text", "") or ""
+        if not text:
+            continue
+        result = real_qa(question, text)
+        if result["no_answer"] or not result["answer"]:
+            continue
+        if result["score"] > best["score"]:
+            best = {
+                "span": result["answer"],
+                "score": round(result["score"], 4),
+                "no_answer": False,
+                "passage_id": passage.get("id") or passage.get("chunk_id"),
+                "sentence": result["answer"],
+                "abstained": result["score"] < score_floor,
+            }
+    if best["score"] < score_floor:
+        best["span"] = None
+        best["abstained"] = True
+    second = answer_question(question, passages, tau=0.34, mode="bigram")
+    best["second_span"] = second.get("span")
+    best["second_model_agrees"] = spans_overlap(best.get("span"), second.get("span"))
+    return best

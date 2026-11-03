@@ -83,7 +83,7 @@ def build_prompt(leaf: dict, glossary: dict[str, str], ask: str | None = None) -
     return prompt, src_text, cite_ids
 
 
-def fidelity_gate(src_text: str, out_text: str, cite_ids: list[str], ask: str | None = None) -> dict:
+def fidelity_gate(src_text: str, out_text: str, cite_ids: list[str], ask: str | None = None, use_real_nli: bool = False) -> dict:
     """ARCHITECTURE.md section 3.7's fidelity validator, applied to a rewrite candidate.
 
     Checks faithfulness to the source findings (numbers, modals, bidirectional
@@ -92,6 +92,19 @@ def fidelity_gate(src_text: str, out_text: str, cite_ids: list[str], ask: str | 
     A rewrite can stay perfectly faithful to its source and still be useless if
     it no longer serves the ask -- these are two different failure modes, not
     one.
+
+    `use_real_nli=False` (the default) keeps this check exactly as every
+    existing caller already measured it: `verify.bidirectional_nli`'s
+    classical lexical judge. `use_real_nli=True` swaps in
+    `real_encoders.real_bidirectional_nli` (the real DeBERTa-v3 MNLI
+    checkpoint) instead -- same shape, same default tau=0.55, a genuine
+    stronger entailment check this project built and measured (EXP-031/
+    041/056) but which had zero live callers anywhere until this flag
+    (2026-11-03 reasoning-layer audit, AUDIT.md, Top Finding #1: the rule-
+    exception gate already used the real model live; the rewriter's own
+    fidelity check did not, despite the real equivalent existing). Opt-in
+    only, so every existing measured fidelity-pass-rate stays exactly as
+    recorded unless a caller explicitly asks for the real check.
     """
     # Citation markers contain digits too ("[5]"), and lab.common.textutil.
     # numbers() has no way to tell a citation id from a real quantity -- so
@@ -104,7 +117,12 @@ def fidelity_gate(src_text: str, out_text: str, cite_ids: list[str], ask: str | 
     # still runs on the unmodified text, where the markers belong.
     numbers = entity_number_check(strip_citation_markers(src_text), strip_citation_markers(out_text))
     modal_ok = modality_preserved(src_text, out_text)
-    nli = bidirectional_nli(src_text, out_text)
+    if use_real_nli:
+        from lab.common.real_encoders import real_bidirectional_nli
+
+        nli = real_bidirectional_nli(src_text, out_text)
+    else:
+        nli = bidirectional_nli(src_text, out_text)
     found_markers = set(citation_markers(out_text))
     missing_citations = sorted(set(cite_ids) - found_markers)
     broken_citations = sorted(found_markers - set(cite_ids))
@@ -167,6 +185,7 @@ def rewrite_unit(
     max_new_tokens: int = 160,
     ask: str | None = None,
     max_retries: int = 0,
+    use_real_nli: bool = False,
 ) -> dict:
     """Generative counterpart to `assemble.render_unit`. Same input shape, fidelity-gated.
 
@@ -179,6 +198,9 @@ def rewrite_unit(
     attempt, instead of falling back immediately, tell the model exactly what
     its own output dropped (`_missing_feedback`) and regenerate, up to this
     many additional attempts, before falling back to the deterministic text.
+
+    `use_real_nli` (default False) passes straight through to every
+    `fidelity_gate` call made here -- see that function's own docstring.
     """
     deterministic_text = render_unit(leaf, glossary)
     prompt, src_text, cite_ids = build_prompt(leaf, glossary, ask=ask)
@@ -188,7 +210,7 @@ def rewrite_unit(
     current_prompt = prompt
     for attempt_num in range(max_retries + 1):
         generated = _generate(tok, mdl, current_prompt, max_new_tokens)
-        checks = fidelity_gate(src_text, generated, cite_ids, ask=ask)
+        checks = fidelity_gate(src_text, generated, cite_ids, ask=ask, use_real_nli=use_real_nli)
         attempts.append({"attempt": attempt_num, "prompt": current_prompt, "generated": generated, "ok": checks["ok"], "fail_reasons": checks["fail_reasons"]})
         if checks["ok"]:
             return {

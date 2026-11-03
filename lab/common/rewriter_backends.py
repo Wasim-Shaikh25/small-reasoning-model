@@ -68,25 +68,67 @@ def generate(checkpoint: str, prompt: str, max_tokens: int = 160) -> str:
     return BACKENDS[checkpoint](prompt, max_tokens)
 
 
+#  checkpoint -> (module path, repair-capable rewrite_unit name, extra kwargs)
+#  for the two backends that have their own repair layer. Only these two:
+#  qwen/legal-gemma have no repair module of their own (confirmed by the
+#  2026-11-03 reasoning-layer audit, AUDIT.md) -- use_repair is simply a
+#  no-op for them, not an error, since there is genuinely nothing to
+#  dispatch to.
+_REPAIR_BACKENDS = {
+    "flan-t5-small": ("lab.common.real_rewriter", {"max_retries": 2}),
+    "gemma3:270m": ("lab.common.real_rewriter_ollama", {}),
+}
+
+
 def rewrite_unit(
     leaf: dict,
     glossary: dict[str, str],
     checkpoint: str = "flan-t5-small",
     ask: str | None = None,
     max_new_tokens: int = 160,
+    use_real_nli: bool = False,
+    use_repair: bool = False,
 ) -> dict:
     """Same contract every checkpoint-specific rewrite_unit already had:
     same input shape, same fidelity gate, same deterministic fallback.
     `checkpoint` selects the generation backend; nothing else changes with
-    it. Checkpoint-specific repair strategies (gemma3:270m's citation
-    splice, its decoding-constrained variant) stay in their own modules --
-    this is the common path every backend gets for free, not a replacement
-    for those.
+    it.
+
+    `use_real_nli` (default False, see fidelity_gate's own docstring)
+    passes straight through to the fidelity_gate call(s) below -- opt-in,
+    zero change to any existing measured fidelity-pass rate unless a
+    caller explicitly asks for the real DeBERTa-v3 MNLI check.
+
+    `use_repair` (default False): flagged by the 2026-11-03 reasoning-
+    layer audit (AUDIT.md, Top Finding #1) -- this dispatcher used to call
+    each backend's own bare `generate()` plus one `fidelity_gate` check,
+    bypassing flan-t5-small's own retry-with-feedback
+    (lab.common.real_rewriter.rewrite_unit's `max_retries`) and
+    gemma3:270m's own citation-splice repair (lab.common.
+    real_rewriter_ollama.rewrite_unit's `splice_missing_citations`,
+    measured recovering 11/13 otherwise-failed rewrites in EXP-063) --
+    both existed, both were measured, neither was reachable through this
+    dispatcher. `use_repair=True` dispatches to the checkpoint's own
+    repair-capable `rewrite_unit` instead, when one exists (flan-t5-small,
+    gemma3:270m); for a checkpoint with no repair module of its own
+    (qwen, legal-gemma), this flag changes nothing -- the bare path below
+    still runs exactly as it always did. Default False, so every existing
+    measured `used_generative`/fidelity-pass rate stays exactly as
+    recorded unless a caller explicitly opts in.
     """
+    if use_repair and checkpoint in _REPAIR_BACKENDS:
+        module_path, extra_kwargs = _REPAIR_BACKENDS[checkpoint]
+        import importlib
+
+        backend_rewrite_unit = importlib.import_module(module_path).rewrite_unit
+        result = backend_rewrite_unit(leaf, glossary, ask=ask, max_new_tokens=max_new_tokens, use_real_nli=use_real_nli, **extra_kwargs)
+        result.setdefault("checkpoint", checkpoint)
+        return result
+
     deterministic_text = render_unit(leaf, glossary)
     prompt, src_text, cite_ids = build_prompt(leaf, glossary, ask=ask)
     generated = generate(checkpoint, prompt, max_new_tokens)
-    checks = fidelity_gate(src_text, generated, cite_ids, ask=ask)
+    checks = fidelity_gate(src_text, generated, cite_ids, ask=ask, use_real_nli=use_real_nli)
 
     if checks["ok"]:
         return {

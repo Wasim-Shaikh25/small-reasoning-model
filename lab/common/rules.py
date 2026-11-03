@@ -11,7 +11,7 @@ pattern.
 
 Built as AGENT.md's decomposition rule asks: one bounded judgment per step.
 1. Find the rule sentence's trigger verb (via spaCy's dependency parser,
-   already a project dependency -- lab/common/real_models.ner_pipeline).
+   already a project dependency -- lab/common/real_models.parser_pipeline).
 2. Find the fact sentence's own verb, subject, and object the same way.
 3. Compare the two verb lemmas. One equality check. Nothing more is
    "reasoned" here.
@@ -57,9 +57,9 @@ THRESHOLD_RULE_RE = re.compile(
 
 
 def _parser():
-    from lab.common.real_models import ner_pipeline
+    from lab.common.real_models import parser_pipeline
 
-    return ner_pipeline()
+    return parser_pipeline()
 
 
 def _main_verb(doc, within: "range | None" = None):
