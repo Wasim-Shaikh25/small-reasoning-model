@@ -20,6 +20,70 @@ register convention) -- sections get added/filled in, not rewritten away,
 as the audit proceeds across however many passes it takes. Each finding
 cites exact file + line range.
 
+## Fix status (2026-11-03, same-day follow-up, commit `01fd4d6`)
+
+The project owner asked to fix all of the findings below. What actually
+happened, so this stays honest about what's done vs. still open:
+
+**Fixed and verified (full regression rerun, byte-identical except
+EXP-045's own timing fields, which vary with machine load by design):**
+- Finding 1 (brain.py): `plan_stages()`/execution conflict -- now gated
+  on `rule_hit[0] == "verb"` too.
+- Extraction-cluster Finding 3: forward-chained `dependency_tree` edges
+  beyond step 1 now cite the real second rule, via
+  `_find_verb_rules_with_passages` + a raw-text-to-node-id lookup.
+- `engine.py` documented as explicitly historical/frozen; `brain.
+  reason()` stated as canonical, cross-referenced both ways. **Not**
+  done: porting its multi-round retrieve-budget capability into
+  `brain.reason()`, or deleting/retiring it -- left as the project
+  owner's own call, per the two options this file's Top Finding #2
+  originally offered.
+- `real_entities`/`ner_pipeline` naming collision: collision warnings
+  added to both `real_entities` functions; `ner_pipeline` renamed to
+  `parser_pipeline` (old name kept as a compatibility alias).
+- `chunk_document` naming collision: cross-reference warnings added to
+  both `ingest.py` and `chunking.py`.
+- No model-version guard on calibrated thresholds: warning comments
+  added to `intent_signals.py`'s four bge thresholds and
+  `semantic_index.py`'s margin constants (not an automated check --
+  there still isn't a runtime assertion tying a threshold to a model
+  version, only a comment telling a future editor to re-measure).
+- `Index`/`RealIndex`/`RealBgeIndex` DRY violation: `_minmax`/
+  `_filters_ok` consolidated into `index.py`'s one copy.
+- `textutil.MODAL_RE` vs. `connectives.py` disagreement: "unless"/
+  "except" removed from `MODAL_RE` (both are unambiguous bare-word
+  `CONDITION_NEGATIVE` entries in `CONNECTIVE_TABLE`); "only"/"provided"
+  deliberately left alone (their bare-word classification is more
+  ambiguous and wasn't the audit's own confirmed example).
+- Real QA/NLI/rewriter-repair measured-but-unwired gap: added
+  `reason(use_real_qa=True, use_real_nli=True, use_repair=True)` --
+  all three opt-in, default False, verified by direct test to actually
+  route through the real checkpoints/repair mechanisms when enabled,
+  and verified by full regression rerun to change nothing when left at
+  their default.
+
+**Still open (project owner's call, not attempted this pass):**
+- Whether to port `engine.py`'s retrieve-budget loop into
+  `brain.reason()` and retire `engine.py`, or just leave it frozen as
+  now documented.
+- Whether `use_real_qa`/`use_real_nli`/`use_repair` should ever become
+  the DEFAULT rather than opt-in -- doing that would change many
+  closed explorations' own "live-equivalent" status and was
+  deliberately not done without an explicit decision to do so.
+- The five finished-but-never-wired-in capabilities (`deontic.py`,
+  `coherence.py`, `word_relevance.py`, `memory.py`, `proposals.py`) --
+  each needs its own design decision about where/how it would surface
+  in `reason()`'s output; none was wired in during this pass.
+- `entities.py`'s silent-miss diagnostic gap (no specific
+  `abstain_reason` when a bare single name defeats the rule-based
+  tagger) -- not fixed, still produces a generic abstain reason.
+- The `dateparser`/event-relative-clause misroute risk in
+  `temporal.check_temporal_bound` -- flagged, not fixed, no reproducing
+  fixture built.
+- The asymmetric "rule present but doesn't apply" reporting (Finding 2)
+  and the fragile shared `"conclusion"` node id (Finding 3) from the
+  original brain.py read -- flagged, not fixed.
+
 ## How "coverage" is counted
 
 `lab/common/` is 59 files, ~8,570 lines. Coverage below is tracked per
