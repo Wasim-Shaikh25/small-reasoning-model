@@ -73,7 +73,7 @@ Notable from this list alone (full detail below as each is audited):
 
 | File | Lines | Reachable | Status |
 |---|---|---|---|
-| brain.py | 793 | - (root) | not started |
+| brain.py | 793 | - (root) | **done** (3 findings, see below) |
 | ask.py | 176 | yes | not started |
 | assemble.py | 184 | yes | not started |
 | calc.py | 85 | yes | not started |
@@ -131,7 +131,7 @@ Notable from this list alone (full detail below as each is audited):
 | synthetic_fusion_data.py | 148 | no | not started |
 | word_relevance.py | 72 | no | not started |
 
-**Progress: 0 / 59 files marked done, 0 / 8,570 lines confirmed read this pass.**
+**Progress: 1 / 59 files marked done, 793 / 8,570 lines confirmed read this pass (brain.py). 5 cluster audits in progress covering the remaining 58 files.**
 (The reachability map above and the module list itself IS the first real
 output of this audit -- it already answers "does anything obviously
 duplicate anything else" at the module-graph level, ahead of the
@@ -139,7 +139,42 @@ line-by-line pass.)
 
 ## Findings
 
-_(populated as each cluster is audited; empty until the first cluster reports back)_
+### brain.py (793 lines) -- read in full, line by line, 2026-11-03
+
+**FINDING 1 (CONFLICT, confirmed, highest priority): `plan_stages()` can predict `rule_application_method == "forward_chain"` for a call that will actually execute the THRESHOLD branch, which never does forward chaining -- directly contradicting this module's own documented invariant.**
+
+`plan_stages()` (brain.py:140-211) computes `rule_application_method` from only two things (line 202):
+```python
+rule_application_method = "forward_chain" if (rule_signal["fires"] and len(verb_rules) > 1) else "single_step"
+```
+`verb_rules` (`_find_verb_rules`, line 113) scans **every** passage for verb-conditional rules, independent of what `rule_hit` (`_find_rule`, line 98) actually returned. `_find_rule` returns the **first** passage (in list order) that matches either a verb-conditional or threshold shape -- verb shape checked first per-passage, but passage order decides which rule is "the" rule_hit, not ask relevance.
+
+Concrete failure scenario: `passages = [threshold_passage, verb_rule_1, verb_rule_2]`, ask contains rule-application language (`wants_rule_application` fires).
+- `_find_rule(passages)` checks `threshold_passage` first: not verb-shaped, is threshold-shaped -> returns `("threshold", rule, threshold_passage)` immediately, **never examining `verb_rule_1`/`verb_rule_2`**.
+- `_find_verb_rules(passages)` separately scans all three passages and finds `verb_rule_1` and `verb_rule_2` -> `len(verb_rules) == 2`.
+- `rule_signal["fires"]` is True -> `rule_application_method = "forward_chain"` (line 202), because the condition checks `len(verb_rules) > 1` with **no check that `rule_hit`'s own kind is "verb"**.
+- `stage_plan["rule_application_method"]` is now `"forward_chain"`, visible in `trace`'s `"plan"` entry.
+- In `reason()` (line 617 on): `kind, rule, rule_passage = rule_hit` -> `kind == "threshold"` -> the `if kind == "threshold":` branch (line 620) runs. **This branch never reads `stage_plan["rule_application_method"]` at all** -- only the verb branch (line 726) checks `if stage_plan["rule_application_method"] == "forward_chain":`. The two verb rules are never applied, never chained, despite the plan explicitly saying forward-chaining would happen.
+
+This contradicts the module's own docstring (lines 151-155): *"This computes the SAME signals reason() itself checks ... so the plan accurately predicts what reason() is actually about to do -- not a second, independent guess that could disagree with the real execution."* It can disagree, in exactly this (admittedly narrow) case: a passage set containing both rule kinds, where a threshold rule happens to sort before any verb rule.
+
+Not yet reproduced with a live regression script (would need a hand-built fixture with one threshold rule + 2 verb rules + an ask that fires `wants_rule_application`) -- recommend building a small one-off script to confirm empirically before deciding whether to fix (e.g. by also gating `forward_chain` method selection on `rule_hit[0] == "verb"`) or just documenting it as a known narrow limitation.
+
+**FINDING 2 (inconsistency, confirmed): three different "rule matched structurally but doesn't apply" cases get three different treatments.**
+- Threshold rule, no computed total (line 621-622): `trace.append({"skipped": "no computed total to compare"})` -- **no `answer_parts` entry, no dependency node, not even a rule node.**
+- Threshold rule, role mismatch (line 623-626): explicit `answer_parts.append("policy does not apply (role mismatch...)")` **and** a `_add_dependency(..., "conclusion", ...)` node.
+- Threshold rule, applied but threshold not exceeded (line 658-660): explicit `answer_parts.append("policy does not apply (threshold not exceeded)")` **and** a conclusion dependency node.
+- Verb rule, `apply_rule` found no lemma match (`applied["matched"]` is False, after line 681): **there is no `else` branch at all** for this case (confirmed by reading lines 675-724 in full -- the `if applied["matched"]:` block runs from 681 to 724 with nothing following it before the function moves to `if not answer_parts:` fallback at line 757). No trace entry, no answer text, no dependency node -- this case is silently indistinguishable from "no rule was found at all" by the time `reason()` falls through to `lookup_fallback`.
+
+Net effect: a verb-trigger rule that's present but doesn't match its fact silently vanishes, while the equivalent threshold case explicitly reports "threshold not exceeded." Not a correctness bug in the sense of a wrong *answer* (lookup_fallback still runs and may find something reasonable), but it is a real asymmetry in how much the `trace`/`dependency_tree` explain *why* rule_application contributed nothing -- directly relevant to the user's "work in sync, explain what depends on what" ask.
+
+**FINDING 3 (fragility, not currently a bug): the literal string `"conclusion"` is reused as a dependency-tree node id across 6 different call sites** (lines 626, 648, 657, 660, 712, 724, 774) with no uniqueness guard (`_add_dependency`'s own docstring says "no dedup, is deliberate"). Verified by hand that every pair of these 6 sites is mutually exclusive within a single `reason()` call (each sits in a different branch of an if/elif/else chain, or behind `if not answer_parts:` which only runs when none of the others did) -- so today, at most one `"conclusion"` node is ever added per call. But this safety property is *implicit* (proven by this audit reading the control flow, not by any code-level guard), and a future edit to any one of these branches could silently violate it -- e.g. a future refactor that gives the verb-branch's `applied["matched"] == False` case a conclusion node (closing Finding 2) could, if careless, add a 7th `"conclusion"`-id site that is NOT provably exclusive with an existing one. Recommendation for whoever closes Finding 2: parameterize the id (e.g. `f"conclusion:{rule_passage['id']}"`) rather than reusing the bare literal.
+
+**No other overlap/conflict found in brain.py itself** on this full read -- `plan_stages()`'s other three stage picks (document/hierarchical-vs-disambiguate/graph_expand/identity/total) all gate correctly off data computed identically in both `plan_stages` and `reason()` (same function calls, same arguments), and I did not find a second case of plan/execution disagreement beyond Finding 1.
+
+### Cluster audits (retrieval, extraction, verification, document-generation, misc)
+
+5 parallel sub-audits launched 2026-11-03, each covering one cluster of the remaining 58 files with explicit file:line citations. Results pending -- will be merged into this section as each one reports back.
 
 ## Open questions to resolve during the audit
 
