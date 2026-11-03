@@ -73,65 +73,65 @@ Notable from this list alone (full detail below as each is audited):
 
 | File | Lines | Reachable | Status |
 |---|---|---|---|
-| brain.py | 793 | - (root) | **done** (3 findings, see below) |
-| ask.py | 176 | yes | not started |
-| assemble.py | 184 | yes | not started |
-| calc.py | 85 | yes | not started |
-| connectives.py | 306 | yes | not started |
-| connectors.py | 197 | yes | not started |
-| doc_tools.py | 157 | yes | not started |
-| document_writer.py | 86 | yes | not started |
-| docx_writer.py | 71 | yes | not started |
-| entities.py | 507 | yes | not started |
-| graph_index.py | 128 | yes | not started |
-| index.py | 202 | yes | not started |
-| inference.py | 429 | yes | not started |
-| ingest.py | 96 | yes | not started |
-| intent_signals.py | 178 | yes | not started |
-| longform.py | 255 | yes | not started |
-| nested_index.py | 155 | yes | not started |
-| nli.py | 62 | yes | not started |
-| open_domain.py | 60 | yes | not started |
-| prompt_contract.py | 44 | yes | not started |
-| qa.py | 153 | yes | not started |
-| real_encoders.py | 176 | yes | not started |
-| real_models.py | 82 | yes | not started |
-| real_ner.py | 48 | yes | not started |
-| real_rewriter.py | 214 | yes | not started |
-| real_rewriter_legal_gemma.py | 75 | yes | not started |
-| real_rewriter_ollama.py | 241 | yes | not started |
-| real_rewriter_qwen.py | 66 | yes | not started |
-| relevance.py | 37 | yes | not started |
-| rewriter_backends.py | 107 | yes | not started |
-| rules.py | 317 | yes | not started |
-| semantic_index.py | 292 | yes | not started |
-| template_rewriter.py | 78 | yes | not started |
-| temporal.py | 103 | yes | not started |
-| textutil.py | 113 | yes | not started |
-| verify.py | 154 | yes | not started |
-| working_memory.py | 114 | yes | not started |
-| budget.py | 24 | no | not started |
-| chunking.py | 152 | no | not started |
-| coherence.py | 72 | no | not started |
-| deontic.py | 62 | no | not started |
-| engine.py | 283 | no | not started |
-| graph.py | 35 | no | not started |
-| harness.py | 119 | no | not started |
-| lora_finetune.py | 115 | no | not started |
-| memory.py | 126 | no | not started |
-| paged.py | 69 | no | not started |
-| proposals.py | 66 | no | not started |
-| provenance.py | 44 | no | not started |
-| real_bge_index.py | 104 | no | not started |
-| real_corpus.py | 107 | no | not started |
-| real_index.py | 85 | no | not started |
-| real_squad.py | 95 | no | not started |
-| schemas.py | 84 | no | not started |
-| store.py | 166 | no | not started |
-| synthetic_fusion_data.py | 148 | no | not started |
-| word_relevance.py | 72 | no | not started |
+| brain.py | 793 | - (root) | **done -- 3 findings (plan/exec conflict, non-match asymmetry, conclusion-id fragility)** |
+| ask.py | 176 | yes | **done (verification cluster)** |
+| assemble.py | 184 | yes | **done (document-gen cluster)** |
+| budget.py | 24 | no | **done (misc cluster)** |
+| calc.py | 85 | yes | **done (extraction cluster)** |
+| chunking.py | 152 | no | **done (document-gen cluster) -- name collision w/ ingest.chunk_document** |
+| coherence.py | 72 | no | **done (verification cluster) -- built, unused** |
+| connectives.py | 306 | yes | **done (extraction cluster) -- MODAL_RE disagreement found** |
+| connectors.py | 197 | yes | **done (retrieval cluster)** |
+| deontic.py | 62 | no | **done (extraction cluster) -- built, unused** |
+| doc_tools.py | 157 | yes | **done (document-gen cluster)** |
+| document_writer.py | 86 | yes | **done (document-gen cluster)** |
+| docx_writer.py | 71 | yes | **done (document-gen cluster)** |
+| engine.py | 283 | no | **done (misc cluster) -- LIVE PARALLEL BRAIN, see top finding #2** |
+| entities.py | 507 | yes | **done (extraction cluster) -- silent-miss diagnostic gap found** |
+| graph.py | 35 | no | **done (retrieval cluster) -- pinned by EXP-004, correctly kept** |
+| graph_index.py | 128 | yes | **done (retrieval cluster)** |
+| harness.py | 119 | no | **done (misc cluster) -- pure infra, confirmed safe** |
+| index.py | 202 | yes | **done (retrieval cluster) -- DRY dup w/ real_index/real_bge_index** |
+| inference.py | 429 | yes | **done (extraction cluster) -- forward_chain provenance finding** |
+| ingest.py | 96 | yes | **done (document-gen cluster)** |
+| intent_signals.py | 178 | yes | **done (verification cluster) -- no model-version guard** |
+| longform.py | 255 | yes | **done (document-gen cluster)** |
+| lora_finetune.py | 115 | no | **done (misc cluster) -- training-time only, correct** |
+| memory.py | 126 | no | **done (misc cluster) -- measured-not-wired-in (persistent recall)** |
+| nested_index.py | 155 | yes | **done (retrieval cluster)** |
+| nli.py | 62 | yes | **done (verification cluster) -- classical, live via fidelity_gate** |
+| open_domain.py | 60 | yes | **done (verification cluster) -- FORBIDDEN.md exception confirmed safe** |
+| paged.py | 69 | no | **done (retrieval cluster) -- zero callers found anywhere, orphaned prototype** |
+| prompt_contract.py | 44 | yes | **done (verification cluster)** |
+| proposals.py | 66 | no | **done (misc cluster) -- measured-not-wired-in** |
+| provenance.py | 44 | no | **done (misc cluster) -- see top finding, redundant-by-divergent-design w/ dependency_tree** |
+| qa.py | 153 | yes | **done (verification cluster) -- real_qa never called live** |
+| real_bge_index.py | 104 | no | **done (retrieval cluster)** |
+| real_corpus.py | 107 | no | **done (misc cluster) -- data fetcher, not a model** |
+| real_encoders.py | 176 | yes | **done (verification cluster)** |
+| real_index.py | 85 | no | **done (retrieval cluster) -- pinned by EXP-029/032/045, correctly kept** |
+| real_models.py | 82 | yes | **done (extraction + verification clusters) -- real_entities name collision** |
+| real_ner.py | 48 | yes | **done (verification cluster) -- opt-in only, default off** |
+| real_rewriter.py | 214 | yes | **done (document-gen cluster) -- retry path bypassed live** |
+| real_rewriter_legal_gemma.py | 75 | yes | **done (document-gen cluster)** |
+| real_rewriter_ollama.py | 241 | yes | **done (document-gen cluster) -- citation-splice repair bypassed live** |
+| real_rewriter_qwen.py | 66 | yes | **done (document-gen cluster)** |
+| real_squad.py | 95 | no | **done (misc cluster) -- data fetcher, not a model** |
+| relevance.py | 37 | yes | **done (verification cluster)** |
+| rewriter_backends.py | 107 | yes | **done (document-gen cluster) -- bypasses all backend repair logic** |
+| rules.py | 317 | yes | **done (extraction cluster)** |
+| schemas.py | 84 | no | **done (misc cluster) -- validate_note fully dead code** |
+| semantic_index.py | 292 | yes | **done (retrieval cluster)** |
+| store.py | 166 | no | **done (retrieval cluster)** |
+| synthetic_fusion_data.py | 148 | no | **done (misc cluster) -- training-time only, correct** |
+| template_rewriter.py | 78 | yes | **done (document-gen cluster) -- dead relative to live call path** |
+| temporal.py | 103 | yes | **done (extraction cluster) -- dateparser misroute risk flagged** |
+| textutil.py | 113 | yes | **done (extraction cluster) -- MODAL_RE disagreement found** |
+| verify.py | 154 | yes | **done (verification cluster)** |
+| word_relevance.py | 72 | no | **done (main session) -- built, unused** |
+| working_memory.py | 114 | yes | **done (document-gen cluster) -- dependency_tree() verified safe** |
 
-**Progress: 1 / 59 files marked done, 793 / 8,570 lines confirmed read this pass (brain.py). 5 cluster audits in progress covering the remaining 58 files.**
+**Progress: 57 / 57 files done, 8,569 / 8,569 lines read line-by-line (100% coverage of lab/common/, excluding the trivial 1-line __init__.py). First full pass complete 2026-11-03. See "Summary for the project owner" at the end of this file for the verdict and recommended next actions -- this audit stays open (append-only) for any follow-up fixes/decisions, per the project owner's own instruction to keep extending it rather than treating it as a one-shot report.**
 (The reachability map above and the module list itself IS the first real
 output of this audit -- it already answers "does anything obviously
 duplicate anything else" at the module-graph level, ahead of the
@@ -174,7 +174,103 @@ Net effect: a verb-trigger rule that's present but doesn't match its fact silent
 
 ### Cluster audits (retrieval, extraction, verification, document-generation, misc)
 
-5 parallel sub-audits launched 2026-11-03, each covering one cluster of the remaining 58 files with explicit file:line citations. Results pending -- will be merged into this section as each one reports back.
+5 parallel sub-audits launched 2026-11-03, each covering one cluster of the remaining 58 files with explicit file:line citations. 4 of 5 reported back; merged below. The 5th (misc/orphaned: budget, engine, harness, lora_finetune, memory, proposals, provenance, real_corpus, real_squad, schemas, synthetic_fusion_data) is still running.
+
+### TOP CROSS-CLUSTER FINDING: the project has repeatedly measured real-model capability that the live `brain.reason()` path does not actually use
+
+This is the single most important pattern across all four completed clusters, confirmed independently by two different sub-audits (verification cluster's Q1, document-generation cluster's Headline Finding) and corroborated by a third (extraction cluster's real_ner findings):
+
+1. **QA: the real DeBERTa-v3-squad2 checkpoint (`real_encoders.real_qa`) is NEVER called by `brain.reason()`.** Every live lookup (`lookup_fallback`, `graph_expand_lookup`) uses the classical lexical extractor `qa.answer_with_agreement` exclusively. `real_qa` only runs from standalone EXP-030/EXP-080 scripts. The real QA capability measured repeatedly across many explorations is not what answers a live question today.
+2. **NLI is split by role, inconsistently.** The rule exception/condition/temporal gate (`brain._check_rule_gate` -> `inference.check_exception`) DOES call the real DeBERTa-v3 MNLI model (`real_encoders.real_nli`) live, every time a rule fires. But the rewriter's own fidelity check (`real_rewriter.fidelity_gate` -> `verify.bidirectional_nli` -> `nli.judge`) uses the classical substitute, every time, even though `real_encoders.real_bidirectional_nli` (the real-model equivalent, built specifically to parallel `verify.bidirectional_nli`) exists and has **zero callers anywhere in the repo**. Two pieces of the same `reason()` call are held to measurably different evidentiary standards.
+3. **NER is opt-in and defaults off.** `real_ner.py`'s real dslim/bert-base-NER checkpoint only runs when a caller explicitly passes `use_real_ner=True`; every existing caller of `reason()` defaults to `False`, so the live default path uses `entities.py`'s rule/regex tagger.
+4. **Generation repair mechanisms are bypassed.** `rewriter_backends.rewrite_unit` (the only rewriter entry point `longform.write_long_document` calls) does one raw `generate()` call per backend and falls back on fidelity failure -- it never calls any backend's own retry-with-feedback (`real_rewriter.rewrite_unit`) or citation-splice repair (`real_rewriter_ollama`'s `_splice_missing_citations`, measured recovering 11/13 otherwise-failed rewrites in EXP-063). All of that repair logic sits in each backend's own module, unreachable from the dispatcher that generalized across them.
+
+None of these four are "wrong answer" bugs -- the fidelity/quote-check gates are uniformly applied regardless, so nothing ungrounded gets through. But together they describe a real, previously-undocumented shape: **this project's explorations (EXP-029 through EXP-080+) have repeatedly measured what the real models/repair mechanisms can do, and the live brain uses the weaker alternative in every one of these four cases**, with no comment anywhere in `brain.py`/`longform.py`/`rewriter_backends.py` acknowledging the gap. This is exactly the kind of "layers added over many explorations, do they still work in sync" question the project owner asked the audit to answer -- and the answer, for these four capabilities, is "the newer, stronger layer was built and measured but never actually connected."
+
+### TOP CROSS-CLUSTER FINDING #2: `lab/common/engine.py` is a complete, live, undocumented SECOND "brain" -- not dead code
+
+The misc-cluster audit disproved the working assumption (made in good faith by the verification cluster, based only on brain-reachability) that `engine.py` was simply dead. It is not: `engine.run_task(ask, passages, depth_cap=None, tau=None)` is a complete, independently-capable, alternative answer-from-passages controller, still actively exercised by exploration scripts as recently as **EXP-044/045 -- work done two days before this audit, in this same session's earlier RERUN_TODOS batch.**
+
+What it has that `brain.reason()` does NOT:
+- A genuine **multi-round retrieve-more-with-budget loop** (`state["rounds"]`/`max_rounds`, re-querying `index.search`+rerank each round when the first pass is insufficient) -- `brain.reason()` is single-pass retrieval only, it never re-queries.
+- A **different decision vocabulary**: `{"supported", "contradicted", "inconclusive"}` vs. `reason()`'s `{"supported", "supported_with_flags", "inconclusive", "ungrounded"}`. `engine.py` has an explicit top-level `"contradicted"` outcome (via `conflict_across`'s cross-passage NLI contradiction check) that `reason()` has no equivalent return value for -- `reason()`'s rule-gate conflicts get folded into prose answer text, never surfaced as a distinct decision label.
+- Its own schema-validated judgment payload (`schemas.validate_judgment`) and its own abstain-on-malformed-judgment path.
+
+No document anywhere in the repo (`EXPLORATIONS.md`, `FORBIDDEN.md`, `engine.py`'s own docstring) ever states engine.py is deprecated, superseded, or should stop being used. The closest statement is EXP-060's own goal text framing `brain.reason` as "a single unified controller" -- which asserts brain.py's own design intent, but never retires the alternative. **This means the project currently has two live, independently-exercised "answer a question" entry points with genuinely different capabilities and decision vocabularies, and nothing in the codebase says which one is canonical for new work.** This is the single biggest risk this audit found to the user's stated goal ("they all should work in sync like a real brain") -- not because the two disagree on any single measured case, but because nothing stops a future exploration or caller from picking either one and further diverging.
+
+**Recommendation (project owner's call, not applied by this audit):** either (a) formally document `engine.py` as a frozen, pre-EXP-060 historical alternative (not deleted -- it's still referenced in 6 closed explorations' own reproducibility manifests), explicitly stating `brain.reason()` is canonical for all new work, or (b) port `engine.py`'s one genuinely-missing capability (the multi-round retrieve-more budget loop) into `brain.reason()` and then retire `engine.py` for good.
+
+### Cluster: Retrieval & Navigation (10 files, ~1,400 lines -- full report in commit history / scratch)
+
+All resolved as either no-bug or low-severity:
+- `Index`/`SemanticIndex` genuinely are two independent signals (TF-IDF cosine vs. real bge cosine) in the live disambiguate branch -- not a hidden wrap. `RealBgeIndex` exists only to give `store.py` a persistable BM25+bge bundle; not a missing wiring.
+- Hierarchical `navigate_dual` correctly lacks EXP-069's `_group_margin` fix because its one-candidate-per-branch shape structurally can't hit that bug.
+- All margin/floor constants (`MIN_DENSE_SCORE`, `MIN_SEMANTIC_MARGIN`, `MIN_LEXICAL_MARGIN`, `SEMANTIC_SINGLE_FLOOR`) have exactly one definition each, imported everywhere, never redefined.
+- `graph.py`/`real_index.py` are NOT accidental dead duplicates of `graph_index.py`/`SemanticIndex` -- each is pinned in a closed exploration's own reproducibility manifest (EXP-004; EXP-029/032/045) and correctly superseded-but-kept, same pattern used elsewhere in this repo.
+- **Real but low-risk:** `Index`, `RealIndex`, `RealBgeIndex` each reimplement the identical `_minmax`/`_filters_ok`/0.5-0.5-blend helper code nearly verbatim (DRY violation, not a behavioral conflict).
+- **Minor, undocumented:** a `Store` instance passed by mistake as `connector=` to `brain.reason` would silently "work" via duck-typing (harmless today, coincidental, untested).
+- `paged.py`'s `Notebook`/`WorkingSet` (NOT reachable) looks like an earlier prototype of `working_memory.py`'s bounded-working-set idea -- flagged for the misc-cluster fork; zero callers found anywhere by this fork's own grep.
+
+### Cluster: Extraction & Rule-Application (9 files read fully + real_models.py, ~2,083+82 lines)
+
+- `rules.py`'s import of `real_models.ner_pipeline` is a genuine, non-stale dependency -- it's used purely as a generic spaCy dependency-parser object (`.pos_`/`.dep_`), never for NER, despite the misleading name. Not swappable to `real_encoders` (no equivalent generic-parser function exists there).
+- **Naming collision, confirmed real risk:** `real_models.real_entities` (spaCy OntoNotes NER) and `real_encoders.real_entities` (dslim/bert-base-NER) are two different functions with the identical name, in two different modules, both technically reachable from brain.py's dependency graph. Only the second is ever actually called live. No live bug today, but a future `from lab.common.real_models import real_entities` typo-import would silently swap in the weaker model with no error.
+- `detect_primary`'s rule-based person tagger requires 2+ consecutive Title-Case words (`FULL_PERSON` regex) or an honorific+name or an initial+name -- a bare single first name never matches, confirmed exactly from the regex itself. When this causes `graph_expand`/`identity_extraction` to find nothing, brain.py records no specific `abstain_reason` for it (unlike every other abstain path, which does carry a specific reason) -- a diagnostic-transparency gap, not a wrong-answer bug.
+- **Confirmed bug in this session's own new dependency_tree feature:** `forward_chain`'s derived facts beyond the first step always get `depends_on: ["conclusion"]` in brain.py's tree, hardcoded to the single primary-conclusion node -- omitting the actual SECOND rule (and the intermediate derived fact) that really produced a 2nd-step derivation. `inference.py`'s own `forward_chain` already tracks exact per-fact provenance (`derived_fact["derivation"] = {"rule": ..., "fact": ...}`, inference.py:423) -- brain.py simply doesn't surface it. Root cause: `_find_verb_rules` discards passage identity entirely (its returned rule dicts carry no passage-id field), so even if brain.py wanted to cite the real second rule's passage, it currently has no way to. Concrete counterexample built from this session's own EXP-084 fixture (Rohan/kill/jail/license-suspension, two rules) -- see commit history for the full derivation.
+- Condition-exception gates vs. temporal-bound gates are confirmed mutually exclusive by construction (disjoint connective-word sets in `connectives.CONNECTIVE_TABLE`) -- `_check_rule_gate`'s "exception first" ordering is a deliberate, safe precedence rule, not a coin-flip. Untested by any existing fixture for the case where both appear in one consequence, but not broken.
+- **Real, separate risk found in passing:** `check_temporal_bound` decides absolute-date-vs-event-relative routing by running `dateparser.parse(..., STRICT_PARSING=False)` over the entire bound-clause text; a number-containing event-relative clause could plausibly be misparsed as a date, silently routing to the wrong (overconfident) path. Not reproduced on any existing fixture; recommend a targeted regression case.
+- **Confirmed two-modules-disagree finding:** `textutil.MODAL_RE` (`r"\b(not|no|shall|may|must|unless|except|only|provided)\b"`) conflates true deontic modals (shall/may/must) with condition/exception connectives (unless/except/provided) that `connectives.py` -- the module built specifically to replace ad-hoc keyword regexes for exactly these words -- classifies as a completely different category (`Operator.CONDITION_NEGATIVE`/`POSITIVE`). Concrete failure: rewriting "unless the tenant pays" to "except the tenant pays" (a paraphrase `connectives.py` itself would call logically identical, same `Operator`) makes `verify.py`'s `modals()`-based fidelity check see `{'unless'}` vs `{'except'}` and flag a mismatch. Bounded impact (only ever causes an over-cautious rewriter fallback, never a wrong final answer), but a real instance of exactly the "silently drifting duplicate logic" this audit was asked to find.
+- `deontic.py` (EXP-087, 62 lines) is fully built, working, and self-contained, but not wired into `brain.reason()` -- a natural fit for distinguishing obligation/permission/prohibition in a rule's reported consequence, never connected.
+
+### Cluster: Verification & Intent-Signal Detection (12 files, incl. real_encoders.py/qa.py/real_ner.py/real_models.py re-read with this lens)
+
+(The QA/NLI/NER findings are folded into the "TOP CROSS-CLUSTER FINDING" above; not repeated here.)
+
+- **`ask.classify_task` (keyword/regex) vs. `intent_signals.wants_*` (bge-exemplar)** are two independently-maintained task-classification mechanisms. Confirmed safe today only because `brain.reason()` checks `wants_document` first and dispatches exclusively (so `classify_task`'s output for a document-wanting ask is simply never consulted in that branch) -- but flagged as a maintainability risk: any future stage consulting both without a defined precedence would be a latent conflict.
+- **None of the four `intent_signals.py` bge thresholds (IDENTITY_TAU=0.5971, TOTAL_TAU=0.6084, DOCUMENT_TAU=0.75, RULE_TAU=0.62) have any version guard tying them to the exact bge checkpoint (`BAAI/bge-small-en-v1.5`) they were calibrated against.** If `real_encoders.BGE_MODEL_NAME` were ever changed, all four would silently miscalibrate with zero warning, catchable only by manually rerunning EXP-069/078/084's fixtures. Same root cause applies to `MIN_DENSE_SCORE`/`MIN_SEMANTIC_MARGIN` (retrieval cluster) -- no model-version guard exists anywhere in this codebase for any calibrated threshold.
+- **`quote_check` coverage confirmed complete:** exactly two places in brain.py extract a free-text span via best-match search and assert it into the final answer (`graph_expand_lookup`, `lookup_fallback`) -- both gated by `quote_check` with zero exceptions. Every other `answer_parts.append` builds text from already-cited, directly-captured substrings (regex/dependency-parse extraction), not a free best-match search, so no second verification pass is needed there. **No citation-integrity gap found.**
+- **`open_domain.py`'s FORBIDDEN.md exception confirmed fully and correctly enforced:** `decision` is hardcoded to `"ungrounded"` on both return paths, never `"supported"`; any citation marker in generated text forces a hard "Insufficient evidence." fallback rather than being sanitized and shown; the disclaimer is unconditional. `prompt_contract.py` is pure string formatting, cannot inflate confidence.
+- **`lab/common/engine.py` (283 lines) is an entire second, dead verification/answer pipeline** unreachable from `brain.reason()` -- an older, parallel "answer this ask" control loop (imports `ask`, `budget`, `index`, `nli`, `qa`, `schemas`, `textutil`, `verify` directly). Its existence is why `verify.support_check`/`conflict_across`/`output_validator` (entailment check, cross-passage conflict check, a broader qualifier/number/modal/caveat output gate) are themselves entirely dead from the live brain's perspective -- `brain.reason()` only ever uses `quote_check`, a narrower check, on its own answer text, and never runs `output_validator`'s number-preservation/modality-preservation checks against its final `answer_parts` text at all. Open question for the project owner: intentional (because brain.py builds text by concatenation, not generation, so some of `output_validator`'s checks are inapplicable) or a genuine coverage gap (the number/modality checks are NOT obviously inapplicable to concatenated text and are simply never run) -- flagged for misc cluster to confirm `engine.py`'s status and for the project owner to decide.
+- `coherence.py` (EXP-050, genuinely bge-backed) is correct, working, unused -- `longform.py`'s leaf ordering never calls it.
+
+### Cluster: Document Generation (14 files, ~1,896+152 lines)
+
+(The rewriter-repair-bypass headline finding is folded into "TOP CROSS-CLUSTER FINDING" above; not repeated here.)
+
+- **Two unrelated `chunk_document` functions share a name, no shared caller, confirmed no active collision:** `ingest.py:26` (live, paragraph-then-sentence split, zero overlap between chunks) vs. `chunking.py:110` (NOT reachable from brain.py; heading/page-aware block splitting + 12%-overlap windows + `version_hash`/`chunk_type`/`extractive_summary`, used only by 6 standalone EXP-003/009/021/025/034/045 scripts). Real maintenance trap: anyone judging "does the live pipeline preserve heading structure" from those six explorations' names alone would wrongly conclude yes.
+- **`template_rewriter.py` is reachable in the module-import graph but dead relative to the actual call path:** `assemble.assemble()` (its only caller) is never invoked by `longform.write_long_document` (which only imports `build_outline` from `assemble.py`) or anywhere else in `brain.reason()`'s path. Three "leaf to prose" strategies exist in total (bare join / connective-spliced join / generative+fidelity-gated); only the third is live, with bare-join reused *inside* it as the deterministic fallback.
+- **Confirmed no bug (the dangling-edge question from this session's own new dependency_tree code):** every `contradiction_flag` node's `depends_on` references leaf ids that are guaranteed, by `check_and_remember_page`'s own ordering (append current leaf to `self.pages` unconditionally, after reading only prior pages), to already exist as `leaf:` nodes. No dangling edge possible by construction.
+- Default checkpoint (flan-t5-small) is consistent between `longform.write_long_document`'s own default and `rewriter_backends.rewrite_unit`'s own default. Fidelity gate is uniformly identical across all 4 rewriter backends (same `fidelity_gate` function, same call site). FORBIDDEN.md's "joining and grammar-correcting already-verified text" wording is honored identically by all 4 backends at the prompt level (`build_prompt` shared by all four) -- no backend does anything more generative/open-ended than the others.
+
+### word_relevance.py (72 lines, read in full by main session 2026-11-03)
+
+Confirmed orphaned (only caller: `lab/exp_049_word_relevance/run.py`), same "measured but never wired in" pattern as `deontic.py` and `coherence.py`. Internally correct and non-duplicative: reuses `rules._parser()` (the shared spaCy parser) and `textutil._token_close`/`content_tokens` rather than reimplementing fuzzy matching or grammaticality checking itself. No overlap/conflict found within the file. A natural EXP-057-adjacent "is this sentence even a well-formed, on-topic clause" pre-filter that nothing in `brain.py`'s signal chain currently calls.
+
+### Cluster: Misc/Orphaned (11 files, ~1,183 lines)
+
+(`engine.py`'s headline finding is promoted to "TOP CROSS-CLUSTER FINDING #2" above; not repeated here.)
+
+- **`provenance.py` vs. this session's new `dependency_tree` mechanism -- resolved, not a duplicate, but a real redundancy-by-divergent-design.** `provenance.py` is a single-statement grounding classifier (is THIS ONE claim `"inference"`/`"evidence"`/`"background"` -- a binary "is this claim grounded in the given text or is it unverified background noise" gate). `dependency_tree` is a multi-node derivation graph (how MULTIPLE already-computed facts/rules/gates chain into a conclusion). Genuinely different jobs -- the new work did not reinvent an existing wheel. But `provenance.py`'s actual safety property (never let a background/common-sense fact pass as a supported, cited claim) is completely unreachable from `brain.reason()` (zero importers besides its own two closed explorations, EXP-013/038) -- and yet that same safety property is still fully guaranteed in the live brain, by a different, more general mechanism that predates this session: every `answer_parts` addition is gated by `quote_check` against a given passage, and the one path with no given passage (`no_context_fallback`) is hardcoded to `decision="ungrounded"`, never `"supported"`. So: two different eras of this codebase independently solved "never let an ungrounded claim pass as supported," and the older, narrower one (`provenance.py`) was simply never deleted, generalized into, or referenced by the newer, more general mechanism once that mechanism took over the job for real. Not a conflict, not a safety gap -- a dead module whose purpose was quietly subsumed.
+- **`real_squad.py` confirmed NOT a duplicate of `real_encoders.real_qa`** -- it is a real SQuAD2 *dataset* fetcher (EXP-047), not a model; its own docstring states explicitly it still scores with the old lexical extractor from `qa.py`, no checkpoint involved. Same for `real_corpus.py` (EXP-025, real 1987 Reuters corpus fetcher) -- pure data-prep, no model, no overlap with anything in `real_encoders.py`.
+- **`schemas.validate_note` is fully dead code** -- defined, zero callers anywhere in the repo, including `memory.py` (whose note shape it was clearly meant to validate, but `memory.py` never actually imports it).
+- **Three more "measured once, never wired into the live brain" capabilities**, same pattern as `deontic.py`/`coherence.py`/`word_relevance.py` above: `memory.py`'s SQLite-backed persistent cross-call recall with revalidation (EXP-016) -- genuinely different from `working_memory.py` (disk-persistent and cross-session vs. in-process and single-call-ephemeral; complementary by design, confirmed not a duplicate, but neither ever calls the other and `brain.reason()` has access to neither's persistence); `proposals.py`'s query-proposal grounding filter (EXP-019, moot today since `brain.reason()` has no query-expansion step to filter candidates for in the first place); `budget.py`'s depth-capped retrieval-round budgeting (used only by `engine.py`, see Top Finding #2).
+- **Confirmed correct-by-design, no action needed:** `harness.py` (pure timing/scoring infra, no reasoning decisions, used by essentially every exploration), `lora_finetune.py`/`synthetic_fusion_data.py` (FORBIDDEN.md's offline-training-only carve-out for the one permitted rewriter exception, correctly never touched during live answering).
+
+## Summary for the project owner
+
+**Coverage: 100% -- all 57 non-trivial files in `lab/common/` (8,569 lines) read line-by-line, plus `brain.py` (793 lines) itself, across one main-session pass and 5 parallel cluster audits, 2026-11-03.** Nothing in `lab/common/` was skimmed from memory of earlier sessions; every claim above cites an exact file and line range (see each cluster's section and the full per-cluster scratch reports referenced in this session's commit history for complete detail -- this file holds the synthesized/condensed version of each).
+
+**Overall verdict: no correctness bug was found that produces a wrong, ungrounded, or fabricated answer.** Every citation-bearing span in the live path is gated by `quote_check` with zero exceptions (verification cluster, Q3); the one no-context path is hardcoded to never claim "supported" (verification cluster, Q4); fidelity gates are uniformly applied across every generative backend (document-gen cluster, Q3b). The things that work, work correctly and consistently.
+
+**What's actually wrong, ranked by how much it matters:**
+1. **`engine.py` is a live, undocumented second brain** (Top Finding #2) -- the clearest violation of "work in sync like one brain," because it's not a drifted duplicate, it's a second entry point nothing retires.
+2. **Real-model capability repeatedly measured, never connected to the live path** (Top Finding #1) -- real QA, half of real NLI, and every generation-repair mechanism this project built and specifically measured (EXP-029 through EXP-063+) sit unused while the live brain uses the weaker classical/bare-generation alternative, silently, with no code comment anywhere flagging the gap.
+3. **A confirmed bug in this session's OWN new work**: forward-chained dependency-tree edges beyond step 1 cite the wrong node (`"conclusion"` instead of the real second rule), because `_find_verb_rules` structurally discards passage identity (extraction cluster, Q3). Worth fixing directly, unlike the larger architectural findings above.
+4. **A genuine conflict between `plan_stages()`'s own documented invariant and actual execution** (brain.py Finding 1) -- narrow (requires a passage set mixing both rule kinds), not yet reproduced on a real fixture beyond this audit's own constructed example, but a real, confirmed contradiction worth a small fix or an explicit documented caveat.
+5. **A cluster of smaller, lower-severity findings**, each individually bounded in impact but all instances of the exact pattern the project owner asked about: `textutil.MODAL_RE` vs. `connectives.py` disagreeing on what counts as a "modal" (can cause an over-cautious rewriter fallback); two unrelated same-named `real_entities` functions (naming-collision risk, not a live bug); two unrelated same-named `chunk_document` functions (maintenance trap, not a live bug); `ask.classify_task` vs. `intent_signals.wants_*` as two parallel, never-reconciled task classifiers (safe today, latent risk); no model-version guard anywhere tying a calibrated bge threshold to the checkpoint it was calibrated against; three DRY-violated near-identical retrieval-helper implementations (`Index`/`RealIndex`/`RealBgeIndex`).
+6. **A real, growing list of capabilities that were built, measured, and closed as explorations, but never actually wired into `brain.reason()`**: `deontic.py` (obligation/permission/prohibition classification), `coherence.py` (bge-based page-ordering coherence), `word_relevance.py` (per-word relevance+grammaticality admission gate), `memory.py` (persistent cross-call recall), `proposals.py` (query-proposal grounding filter). None of these are bugs -- they're finished, working capability sitting unconnected, which is squarely within what "do all these layers work in sync" should also mean.
+
+**What this audit did NOT do:** fix anything. Per the project's own append-only-findings convention, this file records what was found; deciding which of the above to fix, document, or formally retire is the project owner's call, not something applied unilaterally during the audit itself. This file stays open for that next phase -- extend it, don't replace it, as each finding above gets addressed (or deliberately left as a documented, accepted tradeoff).
 
 ## Open questions to resolve during the audit
 
