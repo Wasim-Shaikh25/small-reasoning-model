@@ -7,6 +7,11 @@ deepset/deberta-v3-base-squad2, MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli,
 and bge-small-en-v1.5) rather than redefining them -- imported directly
 from that exploration's own module, the same way EXP-080 imported EXP-033's
 GOLD fixture instead of re-pasting it. FLAN-T5 stays out, per the todo.
+
+RETIRED (2026-11-03, reasoning-layer audit follow-up): see EXP-027's
+run.py docstring -- lab.common.engine was deleted once its capabilities
+were ported into lab.common.brain.reason. This script's results.json
+stays as the permanent record; a literal rerun now ImportErrors.
 """
 
 from __future__ import annotations

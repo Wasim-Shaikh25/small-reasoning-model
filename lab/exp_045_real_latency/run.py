@@ -7,6 +7,11 @@ applied here -- these are the plain transformers/sentence-transformers
 checkpoints, same as every other rerun in this batch; quantized runtimes
 are a follow-up, not attempted in this pass. CTranslate2/FLAN-T5 are not
 timed or loaded (FORBIDDEN.md).
+
+RETIRED (2026-11-03, reasoning-layer audit follow-up): see EXP-027's
+run.py docstring -- lab.common.engine was deleted once its capabilities
+were ported into lab.common.brain.reason. This script's results.json
+stays as the permanent record; a literal rerun now ImportErrors.
 """
 
 from __future__ import annotations

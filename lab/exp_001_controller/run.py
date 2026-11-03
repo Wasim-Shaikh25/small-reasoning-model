@@ -1,4 +1,14 @@
-"""EXP-001: task controller, schema repair, and budgets."""
+"""EXP-001: task controller, schema repair, and budgets.
+
+RETIRED (2026-11-03, reasoning-layer audit follow-up): lab.common.engine,
+imported below, was deleted once its two unique capabilities (multi-round
+retrieve-budget loop, "contradicted" decision) were ported into
+lab.common.brain.reason (retrieve_budget/check_contradiction params).
+This script is kept as the permanent historical record of what EXP-001
+measured; its own results.json is unaffected, but running this file again
+will now ImportError. Recover engine.py with `git show <commit before its
+deletion>:lab/common/engine.py` if a literal rerun is ever needed.
+"""
 
 from __future__ import annotations
 

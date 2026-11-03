@@ -1,4 +1,10 @@
-"""EXP-021: stage latency and peak RSS on this machine."""
+"""EXP-021: stage latency and peak RSS on this machine.
+
+RETIRED (2026-11-03, reasoning-layer audit follow-up): see EXP-001's
+run.py docstring -- lab.common.engine was deleted once its capabilities
+were ported into lab.common.brain.reason. This script's results.json
+stays as the permanent record; a literal rerun now ImportErrors.
+"""
 
 from __future__ import annotations
 

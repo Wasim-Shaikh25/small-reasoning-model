@@ -1,4 +1,10 @@
-"""EXP-020: red-team items through the controller loop."""
+"""EXP-020: red-team items through the controller loop.
+
+RETIRED (2026-11-03, reasoning-layer audit follow-up): see EXP-001's
+run.py docstring -- lab.common.engine was deleted once its capabilities
+were ported into lab.common.brain.reason. This script's results.json
+stays as the permanent record; a literal rerun now ImportErrors.
+"""
 
 from __future__ import annotations
 

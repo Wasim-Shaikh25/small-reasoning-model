@@ -1,11 +1,13 @@
 """The reasoning brain: one controller, not a dispatcher to separate task-type engines.
 
-THE canonical entry point: `reason()` below, not lab.common.engine.
-run_task() (a pre-dating, independent controller kept only as several
-closed explorations' own reproducibility fixture -- see that module's own
-docstring, recorded 2026-11-03's reasoning-layer audit, AUDIT.md). Any new
-reasoning capability belongs here, even one that resembles something
-engine.py already does differently (e.g. multi-round retrieval).
+THE canonical entry point: `reason()` below. `lab.common.engine.run_task`
+(a pre-dating, independent controller) is RETIRED as of 2026-11-03's
+reasoning-layer audit follow-up (AUDIT.md Top Finding #2): its two
+capabilities genuinely absent from this module -- a multi-round
+retrieve-more-with-budget loop, and a `"contradicted"` decision label --
+are now ported in below (`reason()`'s `retrieve_budget`/
+`check_contradiction` params). The project now has exactly one live
+reasoning controller.
 
 Everything built across EXP-057/058/059 proved the individual pieces work and
 generalize: rule application, entity/address extraction, arithmetic, hybrid
@@ -21,7 +23,8 @@ one candidate story here (flat, or nested across a hierarchy)? does the ask
 want an identity? a total? a full written document? is there a rule anywhere
 in context? -- and only the tools whose signal fires actually run. A plain
 lookup question fires none of the extra signals and falls back to the same
-lab.common.qa extractor lab.common.engine already uses. A question like
+lab.common.qa extractor lab.common.engine used (before its 2026-11-03
+retirement, see above). A question like
 EXP-058's fires three of them at once and chains their results. A document
 request (EXP-078, closing what this docstring itself used to name as a
 fifth-signal todo) fires its own signal first and exclusively, dispatching
@@ -332,8 +335,150 @@ def _group_margin(hits: list[dict], score_key: str) -> float:
     return scores[0] - scores[1]
 
 
-def reason(ask: str, passages: list[dict], use_real_ner: bool = False, connector=None, connector_top_k: int = 5, use_real_qa: bool = False, use_real_nli: bool = False, use_repair: bool = False) -> dict:
-    """`use_real_ner=True` threads through to every lab.common.entities.
+def _check_cross_passage_contradiction(ask: str, passages: list[dict], use_real_qa: bool = False, use_real_nli: bool = False) -> list[dict]:
+    """Port of lab.common.engine's own `judge_question`/`conflict_across`
+    usage -- the one piece of engine.py's `"contradicted"` decision label
+    (2026-11-03 audit, AUDIT.md Top Finding #2) genuinely absent from
+    reason(): reason() finds only ONE best-scoring span per question and
+    never checks whether a DIFFERENT passage would answer the same
+    question differently. Answers `ask` against each passage
+    independently, then checks every pair of resulting spans for
+    contradiction, exactly the way engine.judge_question/
+    verify.conflict_across already do -- same primitives, not a new
+    mechanism, reimplemented inline here only because conflict_across
+    itself hardcodes the classical `nli.judge` call and `use_real_nli`
+    needs to swap it for the real checkpoint (`real_encoders.real_nli`,
+    same {"entail","neutral","contradict"} shape), same opt-in discipline
+    every other real-model flag in this module already follows.
+
+    Called only from reason() when `check_contradiction=True` (default
+    False) -- see that function's own docstring.
+    """
+    from lab.common.nli import judge as classical_judge
+    from lab.common.textutil import normalize, numbers
+
+    judge_fn = classical_judge
+    if use_real_nli:
+        from lab.common.real_encoders import real_nli
+
+        judge_fn = real_nli
+
+    per_passage = []
+    for p in passages:
+        qa = answer_with_real_qa(ask, [p]) if use_real_qa else answer_with_agreement(ask, [p], tau=0.1)
+        if qa.get("span"):
+            per_passage.append((p.get("id"), qa["span"]))
+
+    conflicts = []
+    for i, (id_a, span_a) in enumerate(per_passage):
+        for id_b, span_b in per_passage[i + 1 :]:
+            if normalize(span_a) == normalize(span_b):
+                continue
+            probs = judge_fn(f"The value is {span_a}.", f"The value is {span_b}.")
+            if probs["contradict"] >= 0.45 or set(numbers(span_a)) != set(numbers(span_b)):
+                conflicts.append({"a": id_a, "b": id_b, "span_a": span_a, "span_b": span_b, "nli": probs})
+    return conflicts
+
+
+def reason(
+    ask: str,
+    passages: list[dict],
+    use_real_ner: bool = False,
+    connector=None,
+    connector_top_k: int = 5,
+    use_real_qa: bool = False,
+    use_real_nli: bool = False,
+    use_repair: bool = False,
+    retrieve_budget: int = 1,
+    check_contradiction: bool = False,
+) -> dict:
+    """Thin outer wrapper around `_reason_once` (the function this
+    docstring used to belong to, unchanged below) adding the two
+    capabilities `lab.common.engine.run_task` has that `_reason_once`
+    alone does not (2026-11-03 audit, AUDIT.md Top Finding #2): a
+    multi-round retrieve-more-with-budget loop, and a `"contradicted"`
+    top-level decision. Porting these closes the gap that finding
+    identified -- `engine.py` is retired as of this change (see its own
+    former docstring's history in git log; this project now has exactly
+    one live reasoning controller, as the finding recommended).
+
+    `retrieve_budget` (default 1: exactly one pass, today's existing
+    behavior, zero regression): when `connector` is given and the first
+    pass's decision is `"inconclusive"`/`"ungrounded"`, retries up to
+    `retrieve_budget` rounds total, doubling `connector_top_k` each
+    round before giving up -- engine.py's own `retrieve_more` action,
+    generalized to this module's connector (the one place in reason()
+    that genuinely samples a limited top-k from a larger store rather
+    than already searching every given passage in full, as every
+    in-process signal check below does). A caller with no connector, or
+    `retrieve_budget=1` (the default), takes the exact same single-pass
+    path as before this parameter existed.
+
+    `check_contradiction` (default False): after a pass that would
+    otherwise return `"supported"`/`"supported_with_flags"`, additionally
+    checks whether a DIFFERENT given passage would answer `ask`
+    differently (via `_check_cross_passage_contradiction` above) --
+    engine.py's own `judge_question`/`conflict_across` mechanism, ported
+    rather than reimplemented. A genuine conflict downgrades the decision
+    to `"contradicted"` (a new value, only ever returned when this flag
+    is explicitly set) and adds a `"contradictions"` key plus one
+    `contradiction_flag` dependency_tree node per conflicting pair.
+    Default False: no existing caller's decision set changes unless it
+    opts in.
+    """
+    result = _reason_once(
+        ask,
+        passages,
+        use_real_ner=use_real_ner,
+        connector=connector,
+        connector_top_k=connector_top_k,
+        use_real_qa=use_real_qa,
+        use_real_nli=use_real_nli,
+        use_repair=use_repair,
+    )
+    round_num = 1
+    while connector is not None and round_num < retrieve_budget and result["decision"] in ("inconclusive", "ungrounded"):
+        round_num += 1
+        connector_top_k = connector_top_k * 2
+        retried = _reason_once(
+            ask,
+            passages,
+            use_real_ner=use_real_ner,
+            connector=connector,
+            connector_top_k=connector_top_k,
+            use_real_qa=use_real_qa,
+            use_real_nli=use_real_nli,
+            use_repair=use_repair,
+        )
+        retried["trace"] = result["trace"] + [{"step": "retrieve_more", "round": round_num, "connector_top_k": connector_top_k}] + retried["trace"]
+        result = retried
+
+    if check_contradiction and result["decision"] in ("supported", "supported_with_flags"):
+        conflicts = _check_cross_passage_contradiction(ask, passages, use_real_qa=use_real_qa, use_real_nli=use_real_nli)
+        if conflicts:
+            result = dict(result)
+            result["decision"] = "contradicted"
+            result["contradictions"] = conflicts
+            dependency_tree = list(result["dependency_tree"])
+            for c in conflicts:
+                dependency_tree.append(
+                    {
+                        "id": f"contradiction:{c['a']}:{c['b']}",
+                        "kind": "contradiction_flag",
+                        "summary": f"{c['span_a']!r} (from {c['a']}) conflicts with {c['span_b']!r} (from {c['b']})",
+                        "depends_on": [c["a"], c["b"]],
+                    }
+                )
+            result["dependency_tree"] = dependency_tree
+            result["trace"] = result["trace"] + [{"step": "contradiction_check", "conflicts": conflicts}]
+
+    return result
+
+
+def _reason_once(ask: str, passages: list[dict], use_real_ner: bool = False, connector=None, connector_top_k: int = 5, use_real_qa: bool = False, use_real_nli: bool = False, use_repair: bool = False) -> dict:
+    """One single pass of the signal-chain below -- called directly by
+    reason() above, once per retry round. `use_real_ner=True` threads
+    through to every lab.common.entities.
     detect_primary call this function makes (identity extraction, graph
     expansion, long-form outlining) -- see that function for why it
     defaults to False: a real transformers model call is real added
@@ -682,11 +827,32 @@ def reason(ask: str, passages: list[dict], use_real_ner: bool = False, connector
         trace.append({"step": "find_rule", "kind": kind, "rule": rule["raw"]})
         if kind == "threshold":
             if "total" not in facts:
+                # FIX (audit 2026-11-03, Finding 2): this used to be the one
+                # "rule present but doesn't apply" case with NO answer_parts
+                # entry and no dependency node at all -- not even a rule
+                # node -- while the role-mismatch and not-exceeded cases
+                # below both explain themselves. Symmetric with those now.
                 trace.append({"step": "apply_rule", "skipped": "no computed total to compare"})
+                # Deliberately NOT added to answer_parts: that would change
+                # `if not answer_parts:` control flow below (falling through
+                # to lookup_fallback today) and so change decision/text for
+                # any existing fixture that hits this path -- the audit's
+                # own Finding 2 was about trace/dependency_tree
+                # explainability, not about changing what gets answered.
+                # Purely additive bookkeeping, same discipline as every
+                # other dependency_tree node in this function.
+                _add_dependency(dep_nodes, f"rule:{rule_passage['id']}", "rule", rule["raw"], [rule_passage["id"]])
+                _add_dependency(dep_nodes, f"conclusion:{rule_passage['id']}:no_total", "conclusion", "policy could not be evaluated: no total computed", [f"rule:{rule_passage['id']}"])
             elif not _role_matches(rule, scoped):
                 trace.append({"step": "apply_rule", "skipped": f"role mismatch with {rule['subject_placeholder']!r}"})
                 answer_parts.append(f"policy does not apply (role mismatch with {rule['subject_placeholder']!r}) [{rule_passage['id']}]")
-                _add_dependency(dep_nodes, "conclusion", "conclusion", f"role mismatch with {rule['subject_placeholder']!r}", [rule_passage["id"]])
+                # FIX (audit 2026-11-03, Finding 3): "conclusion" was reused
+                # as a bare literal id across 6 call sites, relying on an
+                # implicit (control-flow-proven, not code-enforced) mutual
+                # exclusivity. Parameterized by rule/fact passage id + case
+                # name so a future edit can't silently collide two live
+                # conclusion nodes in the same dependency_tree.
+                _add_dependency(dep_nodes, f"conclusion:{rule_passage['id']}:role_mismatch", "conclusion", f"role mismatch with {rule['subject_placeholder']!r}", [rule_passage["id"]])
             else:
                 applied = apply_threshold_rule(rule, facts["total"])
                 trace.append({"step": "apply_rule", "kind": "threshold", "result": applied})
@@ -708,7 +874,7 @@ def reason(ask: str, passages: list[dict], use_real_ner: bool = False, connector
                         else:
                             reason_phrase = "the rule's exception holds" if gate_result["polarity"] == "negative" else "the rule's condition is not satisfied"
                         answer_parts.append(f"policy does not apply: {reason_phrase} ({rule['raw']!r}) [{rule_passage['id']}]")
-                        _add_dependency(dep_nodes, "conclusion", "conclusion", f"policy blocked: {reason_phrase}", [gate_node])
+                        _add_dependency(dep_nodes, f"conclusion:{rule_passage['id']}:blocked", "conclusion", f"policy blocked: {reason_phrase}", [gate_node])
                     else:
                         citations.add(rule_passage["id"])
                         conditional = gate_result["status"] == "unknown"
@@ -717,10 +883,10 @@ def reason(ask: str, passages: list[dict], use_real_ner: bool = False, connector
                         unresolved_phrase = "the rule's temporal bound is unresolved" if gate_result["kind"] == "temporal" else ("the rule's exception is unresolved" if gate_result["polarity"] == "negative" else "the rule's condition is unresolved")
                         suffix = f" ({unresolved_phrase} -- not confirmed either way)" if conditional else ""
                         answer_parts.append(f"policy applies: {applied['consequence']}{suffix} [{rule_passage['id']}]")
-                        _add_dependency(dep_nodes, "conclusion", "conclusion", f"policy applies: {applied['consequence']}{suffix}", ["fact:total", f"rule:{rule_passage['id']}", gate_node])
+                        _add_dependency(dep_nodes, f"conclusion:{rule_passage['id']}:applied", "conclusion", f"policy applies: {applied['consequence']}{suffix}", ["fact:total", f"rule:{rule_passage['id']}", gate_node])
                 else:
                     answer_parts.append(f"policy does not apply (threshold not exceeded) [{rule_passage['id']}]")
-                    _add_dependency(dep_nodes, "conclusion", "conclusion", "threshold not exceeded", ["fact:total", f"rule:{rule_passage['id']}"])
+                    _add_dependency(dep_nodes, f"conclusion:{rule_passage['id']}:not_exceeded", "conclusion", "threshold not exceeded", ["fact:total", f"rule:{rule_passage['id']}"])
         else:
             # Excludes any passage that is itself a rule (verb or threshold
             # shape), not just rule_passage -- found by EXP-084's own
@@ -772,7 +938,7 @@ def reason(ask: str, passages: list[dict], use_real_ner: bool = False, connector
                         else:
                             reason_phrase = "the rule's exception holds" if gate_result["polarity"] == "negative" else "the rule's condition is not satisfied"
                         answer_parts.append(f"policy does not apply: {reason_phrase} ({rule['raw']!r}) [{rule_passage['id']}]")
-                        _add_dependency(dep_nodes, "conclusion", "conclusion", f"policy blocked: {reason_phrase}", [gate_node])
+                        _add_dependency(dep_nodes, f"conclusion:{rule_passage['id']}:{fact_passage['id']}:blocked", "conclusion", f"policy blocked: {reason_phrase}", [gate_node])
                     else:
                         citations.update([rule_passage["id"], fact_passage["id"]])
                         conditional = gate_result["status"] == "unknown"
@@ -784,7 +950,13 @@ def reason(ask: str, passages: list[dict], use_real_ner: bool = False, connector
                             f"{fact_passage['text']} [{fact_passage['id']}] matches the rule's trigger ({applied['trigger_lemma']}): "
                             f"{rule['raw']} [{rule_passage['id']}] Therefore, {applied['consequence']}{suffix}."
                         )
-                        _add_dependency(dep_nodes, "conclusion", "conclusion", f"policy applies: {applied['consequence']}{suffix}", [f"rule:{rule_passage['id']}", f"fact:{fact_passage['id']}", gate_node])
+                        # Parameterized (Finding 3) AND the one site forward_chain's
+                        # own raw_to_node_id lookup below resolves back to, by
+                        # variable rather than by re-typing the literal (Finding 3's
+                        # own recommendation: a future edit to this id can't
+                        # silently desync from the lookup that depends on it).
+                        primary_conclusion_id = f"conclusion:{rule_passage['id']}:{fact_passage['id']}:applied"
+                        _add_dependency(dep_nodes, primary_conclusion_id, "conclusion", f"policy applies: {applied['consequence']}{suffix}", [f"rule:{rule_passage['id']}", f"fact:{fact_passage['id']}", gate_node])
 
                         if stage_plan["rule_application_method"] == "forward_chain":
                             # EXP-084's actual new capability: a derived fact
@@ -835,7 +1007,7 @@ def reason(ask: str, passages: list[dict], use_real_ner: bool = False, connector
                             for r, p in verb_rule_pairs:
                                 raw_to_node_id[r["raw"]] = f"rule:{p['id']}"
                             for d in primary_derived:
-                                raw_to_node_id[d["raw"]] = "conclusion"
+                                raw_to_node_id[d["raw"]] = primary_conclusion_id
                             for i, extra in enumerate(extra_facts):
                                 if extra.get("conditional"):
                                     rule_conditional = True
@@ -843,10 +1015,35 @@ def reason(ask: str, passages: list[dict], use_real_ner: bool = False, connector
                                 answer_parts.append(f"Furthermore, {extra['subject']} {extra['verb_lemma']} {extra['object']}{extra_suffix}")
                                 derivation = extra.get("derivation") or {}
                                 rule_node = raw_to_node_id.get(derivation.get("rule"), f"rule:{rule_passage['id']}")
-                                antecedent_node = raw_to_node_id.get(derivation.get("fact"), "conclusion")
+                                antecedent_node = raw_to_node_id.get(derivation.get("fact"), primary_conclusion_id)
                                 derived_node_id = f"derived:{i}:{extra['subject']}:{extra['verb_lemma']}"
                                 _add_dependency(dep_nodes, derived_node_id, "derived_fact", f"{extra['subject']} {extra['verb_lemma']} {extra['object']}{extra_suffix}", [rule_node, antecedent_node])
                                 raw_to_node_id[extra["raw"]] = derived_node_id
+
+                else:
+                    # FIX (audit 2026-11-03, Finding 2): the verb-rule branch
+                    # used to have no else here at all -- a rule structurally
+                    # present whose trigger doesn't match the fact's verb
+                    # silently vanished (no trace entry, no answer_parts, no
+                    # dependency node), while the threshold branch's
+                    # equivalent ("threshold not exceeded") explicitly
+                    # reports itself. Symmetric with that now.
+                    # Same deliberate omission as the threshold branch's
+                    # "no_total" case above: no answer_parts entry, so
+                    # existing callers that rely on this falling through to
+                    # lookup_fallback keep doing exactly that. Only the
+                    # dependency_tree/trace gain a node explaining why
+                    # rule_application contributed nothing here.
+                    _add_dependency(dep_nodes, f"conclusion:{rule_passage['id']}:{fact_passage['id']}:not_matched", "conclusion", f"rule trigger ({applied['trigger_lemma']}) not matched by fact verb ({applied['fact_verb_lemma']})", [f"rule:{rule_passage['id']}", f"fact:{fact_passage['id']}"])
+            else:
+                # Same fix, the fact_passage == None case: a verb rule is
+                # present but no passage's extracted fact could even be
+                # compared against it -- the verb-branch analog of the
+                # threshold branch's "no computed total to compare" case
+                # above, now equally self-explaining.
+                trace.append({"step": "apply_rule", "skipped": "no matching fact passage found", "kind": "verb"})
+                _add_dependency(dep_nodes, f"rule:{rule_passage['id']}", "rule", rule["raw"], [rule_passage["id"]])
+                _add_dependency(dep_nodes, f"conclusion:{rule_passage['id']}:no_fact", "conclusion", "policy could not be evaluated: no matching fact found", [f"rule:{rule_passage['id']}"])
 
     if not answer_parts:
         # Deliberately NOT gated by "lookup_fallback" in stage_plan["stages"]
@@ -865,7 +1062,7 @@ def reason(ask: str, passages: list[dict], use_real_ner: bool = False, connector
         if not qa["span"] or not quote_check(qa["span"], next((p["text"] for p in scoped if p["id"] == qa.get("passage_id")), "")):
             return _finish(ask, trace, "inconclusive", ABSTAIN_TEXT, citations, reason="no span found", dependency_tree=dep_nodes)
         citations.add(qa["passage_id"])
-        _add_dependency(dep_nodes, "conclusion", "conclusion", f"{qa['span']!r}", [qa["passage_id"]])
+        _add_dependency(dep_nodes, f"conclusion:{qa['passage_id']}", "conclusion", f"{qa['span']!r}", [qa["passage_id"]])
         return _finish(ask, trace, "supported", f"{qa['span']} [{qa['passage_id']}]", citations, facts=facts, dependency_tree=dep_nodes)
 
     final_decision = "supported_with_flags" if rule_conditional else "supported"

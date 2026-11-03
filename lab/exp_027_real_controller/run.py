@@ -17,6 +17,15 @@ checkpoints in lab.common.real_encoders:
 
 engine.py itself is not edited: every other closed exploration that imports
 it keeps the exact lexical behavior it was measured with.
+
+RETIRED (2026-11-03, reasoning-layer audit follow-up): lab.common.engine
+was deleted once its two capabilities genuinely absent from lab.common.
+brain.reason (the multi-round retrieve-budget loop, the "contradicted"
+decision) were ported into reason() itself (retrieve_budget/
+check_contradiction params). This script's results.json stays as the
+permanent record of what it measured; a literal rerun now ImportErrors.
+Recover engine.py with `git show <commit before its deletion>:lab/
+common/engine.py` if ever needed.
 """
 
 from __future__ import annotations

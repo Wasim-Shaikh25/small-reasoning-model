@@ -84,6 +84,86 @@ EXP-045's own timing fields, which vary with machine load by design):**
   and the fragile shared `"conclusion"` node id (Finding 3) from the
   original brain.py read -- flagged, not fixed.
 
+## Second follow-up (2026-11-03, same day): Finding 2/3 fixed, engine.py ported and deleted
+
+The project owner asked, directly: why weren't Finding 2/3 fixed when
+everything else was, and if `engine.py` isn't needed and brain.reason()
+covers everything, delete it. Both done this pass, verified by a full
+regression rerun of every exploration that imports `lab.common.brain`
+(25 explorations) plus direct smoke tests of the two new capabilities
+below -- byte-identical at defaults.
+
+**Finding 2 (asymmetric non-match reporting) -- fixed, bookkeeping only.**
+The three previously-silent "rule present but doesn't apply" cases
+(threshold: no computed total; verb: trigger doesn't match the fact;
+verb: no fact passage found at all) now each add a `rule` dependency
+node and an explanatory `conclusion:...` node to `dependency_tree`/
+`trace`. Deliberately did **not** add matching `answer_parts` text --
+that would flip `if not answer_parts:` and change `decision`/`text` for
+any existing fixture landing in one of these cases (falling through to
+`lookup_fallback` today; would stop falling through if these cases
+suddenly produced their own answer text). The audit's own Finding 2 was
+about `trace`/`dependency_tree` explainability, not about the answer
+itself, so the fix stays scoped to exactly that -- purely additive, same
+discipline every other `dependency_tree` node in this function follows.
+
+**Finding 3 (fragile `"conclusion"` node id) -- fixed.** Every one of the
+now-9 call sites that add a `kind: "conclusion"` node gets a unique,
+parameterized `id` (e.g. `conclusion:{rule_passage_id}:{fact_passage_id}:applied`,
+`...{}_not_matched`, `...{}_no_total`, `...{}_no_fact`, `...{}_blocked`,
+`...{}_role_mismatch`, `...{}_not_exceeded`, plus lookup_fallback's own
+`conclusion:{passage_id}`) instead of the bare literal `"conclusion"`.
+`forward_chain`'s own `raw_to_node_id` lookup and its `antecedent_node`
+fallback now reference the live `primary_conclusion_id` variable rather
+than re-typing the string, so the two can't silently desync. `kind`
+stays the literal `"conclusion"` on every one of them, so a reader
+filtering by kind still finds "the" conclusion node(s); only `id`
+uniqueness changed.
+
+**Top Finding #2 (`engine.py`) -- resolved: ported, then deleted.**
+`lab.common.engine.run_task`'s two capabilities genuinely absent from
+`brain.reason()` are now ported into `reason()` itself, both opt-in,
+both default to today's exact single-pass behavior:
+- `retrieve_budget` (default `1`): when a `connector` is given and the
+  first pass abstains (`"inconclusive"`/`"ungrounded"`), retries up to
+  `retrieve_budget` rounds, doubling `connector_top_k` each round.
+  Smoke-tested directly: a fake connector that only surfaces the right
+  passage once `top_k` is large enough resolves on retry with
+  `retrieve_budget=3` where `retrieve_budget=1` (the default) abstains.
+- `check_contradiction` (default `False`): after a pass that would
+  return `"supported"`/`"supported_with_flags"`, answers `ask` against
+  every passage independently (same QA primitives `reason()` already
+  uses) and checks every pair of resulting spans for contradiction --
+  `engine.judge_question`/`verify.conflict_across`'s own mechanism,
+  reimplemented inline (not calling `conflict_across` directly) only so
+  `use_real_nli=True` can swap the classical `nli.judge` comparison for
+  the real checkpoint (`real_encoders.real_nli`). A genuine conflict
+  downgrades `decision` to a new `"contradicted"` value (only ever
+  reachable with this flag set) and adds a `contradiction_flag`
+  dependency_tree node per conflicting pair. Smoke-tested directly: two
+  passages giving conflicting amounts for the same total, which
+  `reason()` at defaults nonsensically **sums** into one wrong total
+  (`"total 1,400"`), correctly comes back `"contradicted"` with
+  `check_contradiction=True` instead -- the clearest concrete case this
+  capability actually earns its keep, not just closes an audit note.
+
+`lab.common.engine.py` was then **deleted** (not just documented as
+frozen). Its only live importers were the 6 closed explorations the
+original audit already identified (EXP-001/020/021/027/044/045) -- none
+of the 25 explorations that exercise `brain.reason()` ever imported it.
+Each of those 6 scripts' own docstrings now carries a short RETIRED note
+explaining the deletion; their `results.json` stays as the permanent
+historical record, but literally re-running any of those 6 scripts will
+now `ImportError` -- recoverable only via `git show <commit before this
+deletion>:lab/common/engine.py` if ever genuinely needed again. This is
+a real, accepted tradeoff (the project owner's own explicit call, not a
+default), not an oversight.
+
+**Still open, unaffected by this pass:** the five finished-but-never-
+wired-in capabilities, `entities.py`'s silent-miss diagnostic gap, the
+`dateparser` misroute risk, and whether `use_real_qa`/`use_real_nli`/
+`use_repair` should ever default on.
+
 ## How "coverage" is counted
 
 `lab/common/` is 59 files, ~8,570 lines. Coverage below is tracked per
