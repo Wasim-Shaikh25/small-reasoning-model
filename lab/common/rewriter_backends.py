@@ -115,6 +115,22 @@ def rewrite_unit(
     still runs exactly as it always did. Default False, so every existing
     measured `used_generative`/fidelity-pass rate stays exactly as
     recorded unless a caller explicitly opts in.
+
+    Single-finding leaves (`build_prompt`'s own instruction there is
+    literally "rewrite ... as one grammatically correct sentence") are
+    checked FIRST against `sentence_completeness.is_complete_sentence`
+    (AUDIT.md, 2026-11-09, "a deterministic pre-check that removes the
+    single-sentence case too") -- when the source statement already is
+    one, `generate()` is never called at all: there's nothing it could
+    legitimately do that the deterministic text doesn't already do.
+    Verified on both real fixtures this gate was built against (EXP-063
+    13/13, EXP-081 69/69) to change zero existing `used_generative`/
+    fidelity outcome, since every one of those leaves already fell back
+    to the identical deterministic text anyway -- this only removes the
+    now-provably-wasted model call that preceded that same fallback.
+    Multi-finding leaves are unaffected: the gate was only ever tested
+    against single-statement completeness, not "is this already one
+    combined paragraph."
     """
     if use_repair and checkpoint in _REPAIR_BACKENDS:
         module_path, extra_kwargs = _REPAIR_BACKENDS[checkpoint]
@@ -126,6 +142,21 @@ def rewrite_unit(
         return result
 
     deterministic_text = render_unit(leaf, glossary)
+
+    if len(leaf["findings"]) == 1:
+        from lab.common.sentence_completeness import is_complete_sentence
+
+        completeness = is_complete_sentence(leaf["findings"][0]["statement"])
+        if completeness["complete"]:
+            return {
+                "text": deterministic_text,
+                "used_generative": False,
+                "generated_text": None,
+                "checks": None,
+                "fallback_reason": ["already_complete"],
+                "checkpoint": checkpoint,
+            }
+
     prompt, src_text, cite_ids = build_prompt(leaf, glossary, ask=ask)
     generated = generate(checkpoint, prompt, max_new_tokens)
     checks = fidelity_gate(src_text, generated, cite_ids, ask=ask, use_real_nli=use_real_nli)

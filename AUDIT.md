@@ -1333,3 +1333,51 @@ running BEFORE the model call instead of after). Still open: whether the
 `no_verbal_root` case ever needs anything beyond "leave it verbatim and
 let `template_splice`/`render_unit` sequence it" -- neither real fixture
 tested contained a case where that wasn't already sufficient.
+
+## Follow-up, same day: the pre-check gate wired into the live default path, verified byte-identical output
+
+User said to actually wire the gate in rather than leave it standalone.
+Added the check to `rewriter_backends.rewrite_unit` itself (the shared
+dispatcher `longform.write_long_document` always calls at `use_repair=
+False`, its default): for a single-finding leaf, `sentence_completeness.
+is_complete_sentence` runs BEFORE `build_prompt`/`generate()`; if the
+statement is already complete, returns the deterministic text directly
+with a new `fallback_reason` value, `"already_complete"`, and never calls
+the model. Multi-finding leaves are untouched -- the gate was only ever
+tested against single-statement completeness.
+
+**Verified with a monkeypatched `generate()`** (so model calls are
+countable without needing the real checkpoints loaded): a complete-
+sentence single-finding leaf now makes 0 calls to `generate()` (previously
+1); a `no_verbal_root` single-finding leaf (a heading/fragment) still
+calls it once, unchanged -- the gate does not claim to handle that case
+live yet, exactly as scoped; a multi-finding leaf still calls it,
+unchanged.
+
+**Verified for real by re-running EXP-081** (the one real-document
+fixture this gate was built and measured against), both checkpoints:
+`gdpr_rewritten.md`'s sha256 is byte-identical to the pre-change
+committed version (`3d13701fb...`) -- same document, same 2,469 words,
+same `fidelity_pass_rate: 0.0` for both flan-t5-small and
+Qwen2.5-0.5B-Instruct (unchanged, as expected -- `already_complete` is
+also `used_generative: False`, same outcome the old failing generate()
+call already fell back to). The ONLY change in `results.json`:
+`fallback_reason_counts` now carries `"already_complete": 1` for each
+checkpoint (1 of 18 leaves on this fixture happens to be a single-finding
+leaf whose statement is already complete -- most of the 56 individually-
+complete findings measured earlier are grouped into multi-finding leaves
+by entity-outlining, which this gate does not touch), and one fewer real
+`generate()` call was made per checkpoint. `elapsed_sec` dropped from
+3096.0 to 815.7 on this run -- reported as observed on one run, not a
+timing benchmark (EXP-045 already noted timing varies with machine load),
+but directionally consistent with removing wasted model calls.
+
+**Not re-verified, scope limitation stated plainly:** four other
+explorations touch this same dispatcher (`lab/exp_052_ask_driven_outline`,
+`lab/exp_076_legal_gemma_rewriter`, `lab/exp_078_longform_consistency`,
+`lab/exp_082_document_tool_templates`) and were NOT re-run this session --
+their committed `results.json` may now be stale in the same narrow sense
+EXP-081's was (a `fallback_reason_counts` label, never the actual output
+text, which this change cannot alter for any leaf it doesn't skip).
+Re-run and refresh each the next time it's touched, per this file's own
+append-only/measure-before-claiming convention -- not assumed fixed here.
