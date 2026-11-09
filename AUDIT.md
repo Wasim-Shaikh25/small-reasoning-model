@@ -1128,3 +1128,24 @@ dependency. `resolve()` and `fix_sentence()` (the generative approaches)
 are kept in the file, unused by the new primary path, as the documented,
 tested, inferior alternatives -- not deleted, per this project's practice
 of keeping a failed design's evidence visible rather than erasing it.
+
+## Follow-up, same day (commit pending): informal-register normalization closes the "cos" gap
+
+The one miss left in spellfix.py's tally ("cos"->"cons", expected
+"because") was already correctly diagnosed as a different problem class:
+"because" isn't within edit distance 1 of "cos" at all, so no candidate-
+based method, generative or embedding, could ever reach it -- it's an
+informal WORD, not a misspelling.
+
+Added `lab/common/informal_register.py`: a small, hardcoded table of
+unambiguous English informal contractions (cos/coz/cuz->because,
+gonna->going to, wanna->want to, gotta->got to, etc.), applied as a
+literal whole-word substitution before typo detection runs -- same
+grounding this project already uses for `connectives.py` (a small,
+closed, catalogued linguistic class is legitimately hardcoded; guessing
+open-ended vocabulary is not). Wired into `spellfix.fix_sentence_joint`
+as a normalization pass before candidate detection.
+
+Re-ran the full 7-sentence paragraph: "cos" -> "because", correctly.
+All 7 distinct typo/informal-word instances in this file's running test
+case now resolve correctly with zero generative model calls.

@@ -226,7 +226,15 @@ def fix_sentence_joint(sentence: str, max_distance: int = 1) -> dict:
     directly (no ambiguity to resolve); a typo with several candidates is
     resolved by whichever one's own meaning best fits the rest of the
     sentence.
+
+    Informal-register words ("cos", "gonna", ...) are normalized first
+    (`informal_register.normalize_informal`) -- they are not typos (no
+    candidate within edit distance means what they mean) and were
+    confirmed live to be misdiagnosed as one otherwise ("cos"->"cons").
     """
+    from lab.common.informal_register import normalize_informal
+
+    sentence = normalize_informal(sentence)["text"]
     words = sentence.split()
     ambiguous: dict[int, list[str]] = {}
     for i, w in enumerate(words):
