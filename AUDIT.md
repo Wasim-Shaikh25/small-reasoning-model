@@ -1049,3 +1049,33 @@ heuristic, not coreference resolution. It will still guess wrong on
 cases shaped like the adversarial example above; the `antecedent_ambiguous`
 flag only tells a caller WHEN to distrust a resolution, not what the
 correct one actually is.
+
+## Follow-up, same day (commit pending): `article_tool.py` -- everything today combined into one named, schema-checked tool
+
+User: "now let's make it write one article, give it format as tool."
+Wraps today's three pieces (`notes_to_findings`, `write_article`,
+`relationship_graph`) into one callable with the same shape as this
+project's other named tools (`rewriter_backends.BACKENDS`,
+`method_teaching.PRIMITIVE_REGISTRY`): a fixed input contract
+(`{"notes": str, "sources": [{"id","text"}, ...]}`), a fixed output
+contract, validated before anything runs. Malformed input (empty notes,
+sources not a list) returns `ok: False` with specific errors and runs
+nothing -- never a guess at what a bad call meant, same discipline as
+every other primitive in this file.
+
+Renders the final output as one markdown article: sections with inline
+citations, a Sources appendix, and (new) a "Relationships detected"
+section listing any directed cycle `relationship_graph.find_cycles`
+found across the combined sources + notes, explicitly labeling any cycle
+that relied on a guessed (ambiguous) pronoun resolution rather than
+silently presenting it as certain.
+
+Verified two ways: (1) as a plain Python call on the original messy
+remote-work input -- correct 3-section article, 100% coverage, zero
+broken citations, zero relationship cycles found (correctly, since
+there are none in that input); (2) as the actual CLI
+(`python -m lab.common.article_tool payload.json`) on a fresh
+notes-only input with no sources at all, containing the pronoun-chain
+payment cycle from the relationship_graph work above -- correctly wrote
+the article AND correctly surfaced the cycle with its ambiguous-pronoun
+warning, end-to-end from a JSON file on disk through to printed output.
