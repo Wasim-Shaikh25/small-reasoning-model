@@ -1564,3 +1564,40 @@ application mechanism that worked well on one hand-written legal-rule
 shape does NOT transfer to real-world policy prose or to any condition
 that depends on a quantity or a date, which is most of what real policies
 actually turn on (4). All four reported as measured, not softened.
+
+**Addendum, same day: independently reproducing experiment (4) found an
+even sharper version of its own conclusion, and regenerating (1) found
+one more vocabulary-coverage bug in `spellfix.py`, same class as
+"overhear"/"colony", not yet fixed.** The fork-produced output files
+above were cleaned up before they could be handed off, so each experiment
+was independently re-run (not copy-pasted from the fork's own report) to
+produce real deliverable files -- this re-run, done separately, is itself
+a second, independent confirmation of each finding above, not a repeat
+of the same run.
+
+Policy-rule re-run (fresh fictional cases, fresh fetch of the same live
+page): the rewritten canonical rule applied to 4 new fictional cases
+(Amit/Priya/Rohan/Kavya) got 2 of 4 flatly WRONG, not just "right for the
+wrong reason" -- Priya (10 hours of playtime) and Rohan (refund requested
+a month after purchase) both wrongly `matched=True`, because every case's
+extracted verb lemma is "play" and `apply_rule` never compares
+`condition_text`'s "less than two hours"/"within two weeks" against the
+case's actual numbers at all. A sharper demonstration of the same
+structural gap, not a new one.
+
+Petition re-run surfaced one more vocabulary-coverage bug while
+regenerating: `candidates_for('commissioned')` returns only
+`['commissioner']` -- "commissioned" (a correctly-spelled past-participle
+verb form) isn't itself a single token in the flan-t5 vocabulary (same
+subword-splitting root cause as "overhear"/"colony"), so spellfix wrongly
+"corrects" it to "commissioner" (a different, real word, wrong part of
+speech, wrong meaning) wherever it appears -- confirmed with a direct,
+isolated test (`fix_sentence_joint('The unit was commissioned in mid
+2025.')` -> "The unit was commissioner in mid 2025."). Common verb
+inflections (-ed/-ing forms) splitting into subword pieces is likely a
+much more pervasive instance of this bug class than the two single-word
+anecdotes found before it, since English inflection is far more frequent
+than compound nouns. Not fixed here -- flagged as a real, now-confirmed-
+broader version of an already-known limitation, worth a real fix (e.g.
+lemmatizing before the vocabulary check) before trusting this on
+production text at any real volume.
