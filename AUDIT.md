@@ -1268,3 +1268,68 @@ measured value (EXP-063, 11/13 repair-recovered) was on a leaf-size-1
 fixture where there is nothing to splice between -- that specific
 measured win is about single-sentence citation-repair, a different
 capability `template_splice` does not attempt and cannot replace.
+
+## Follow-up, same day: a deterministic pre-check that removes the single-sentence case too, not just measures it
+
+User then asked for a genuinely novel mechanism, using only existing
+systems, to close the one remaining gap above -- single-sentence
+"rewrite as one grammatically correct sentence" (`real_rewriter.
+build_prompt`'s own literal instruction for a size-1 leaf). Reframed the
+question structurally: that instruction only has work to do if the
+source statement ISN'T already one grammatically correct sentence. If it
+already is, generation is a detour that can only end at the deterministic
+text it started from (confirmed twice already -- EXP-048 and this same
+day's EXP-081 re-run both measured 0% generative success on real
+fixtures). So the question became: can the project detect "already
+complete" BEFORE calling a model, deterministically, cheaply?
+
+Built `lab/common/sentence_completeness.py`'s `is_complete_sentence`:
+reuses `real_models`' already-loaded `en_core_web_sm` spaCy pipeline (an
+existing dependency, already used for NER elsewhere) for its dependency
+parse only. Checks two things, both zero-generation: the sentence has a
+finite verbal ROOT, and it doesn't end on a dangling conjunction/
+preposition/determiner (a clause cut off mid-way).
+
+**Tested against both real fixtures, verified individually rather than
+trusted from a summary flag:** EXP-063's 13 handwritten statements are
+13/13 `ok`. EXP-081's 69 real GDPR findings are 56/69 `ok`, plus 13
+flagged `no_verbal_root` -- printed every one of those 13 rather than
+assume what they were: 12 are verbatim article headings ("Art. 83 GDPR /
+General conditions for imposing administrative fines") and 1 is a genuine
+lead-in fragment ("For the purposes of this Regulation:"). Neither kind
+is a sentence a rewrite could legitimately fix -- forcing a heading into
+"one grammatical sentence" fabricates structure the source never had; the
+lead-in fragment is correctly incomplete by design, already handled
+correctly by `template_splice`'s sequencing, not by rewriting it. **69/69
+of this real document needs zero generative rewriting, provably in
+advance, for two different, individually-confirmed reasons -- not
+assumed from one convenient flag.** (The module's own first-draft
+`heading_like` sub-flag, token-count-only, matched just 1 of those 13 on
+re-check -- caught by re-verifying against the actual flagged text
+instead of trusting the flag, kept in the module only as a documented
+weak hint.)
+
+**Adversarially tested before trusting it, same discipline as every other
+mechanism this session:** correctly flags "The cat sat on the mat and"
+(dangling conjunction) and "Payment due on the 1st, subject to" (dangling
+preposition). But has two confirmed, undocumented-no-longer blind spots:
+"Running quickly down the street." (a gerund-only fragment) and "Because
+the tenant did not pay." (a subordinate clause alone, no independent
+clause) both parse with a verbal ROOT and wrongly pass as `complete`.
+Neither blind spot was hit by either real fixture tested; neither is
+fixed. This module does not claim to be a general grammaticality
+checker, and is explicitly not a grammar/spelling corrector (a sentence
+full of typos still parses with a verbal root and passes -- that is
+`spellfix.py`/`informal_register.py`'s scope, not duplicated here).
+
+**Net effect on the generative-model question:** flan-t5-small and
+Qwen2.5-0.5B-Instruct are now confirmed structurally unnecessary for
+every single-sentence leaf in both fixtures tested -- not just measured
+to fail after the fact, but detectable as unneeded before ever calling
+them. Not wired into `rewrite_unit`/`rewriter_backends.py` yet (a
+pre-check gate there would skip `generate()` entirely when this function
+returns `complete: True`, same spirit as the existing fallback but
+running BEFORE the model call instead of after). Still open: whether the
+`no_verbal_root` case ever needs anything beyond "leave it verbatim and
+let `template_splice`/`render_unit` sequence it" -- neither real fixture
+tested contained a case where that wasn't already sufficient.
