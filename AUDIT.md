@@ -998,3 +998,54 @@ spelling/alias resolution is attempted here, by design, matching this
 project's existing stance. `find_cycles` is brute-force DFS, bounded by
 `max_len`, appropriate for the small one-edge-per-passage graphs this
 builds, not a general large-graph cycle finder.
+
+## Follow-up, same day (commit pending): pronoun/coreference gap in relationship_graph.py -- found, fixed, limit made visible not hidden
+
+User's direct challenge: "Smith can also refer as she... what are we
+gonna do about that?" Confirmed live this was a real, currently-total
+gap: a pronoun subject/object ("He gave Carol Lee $300") normalizes to
+its own disconnected node ("he"), breaking cycle detection completely --
+re-ran the exact 3-party cycle from the section above with the 2nd and
+3rd mentions replaced by "He"/"She" and got 0 cycles found instead of 1.
+Checked whether `entities.resolve_mentions`/`apply_ambiguity_rules`
+already covered this: no -- that mechanism resolves SURNAME ambiguity
+("Smith" vs. which full "___ Smith"), not pronouns; there was no
+pronoun/coreference handling anywhere in this codebase before this.
+
+Fixed with a nearest-antecedent heuristic in `relationship_graph.py`
+only (no shared primitive touched): a bare pronoun resolves to whichever
+real person/organization span was most recently seen in passage order.
+Tested on two cases built specifically to find where this breaks:
+- Straightforward (name, then pronoun, then pronoun, in order): resolved
+  correctly, cycle found, exactly as before.
+- Adversarial (the true antecedent was the previous CLAUSE's subject,
+  not its most recently named entity -- an incidental mention sits in
+  between): resolved INCORRECTLY. Confirmed this is not a patchable bug
+  but the actual hard problem -- "prefer most recent mention" and "prefer
+  previous subject" each fix one of these two cases and break the other;
+  resolving both needs gender/number agreement or real discourse
+  modeling, neither of which this project uses anywhere else.
+
+Asked the user directly: best-effort guess (confirmed sometimes wrong)
+vs. abstain whenever more than one candidate exists (confirmed would
+also lose the straightforward case, since "X gave Y" sentences always
+name two people). User chose best-effort guessing, then asked for the
+better engineering answer rather than a blind binary choice --
+implemented BOTH: every edge now carries `antecedent_ambiguous` (True
+when the resolution picked among >1 real candidate) and
+`antecedent_alternatives` (what it passed over). Re-verified: the
+straightforward case's "He" resolution is correctly flagged ambiguous
+(2 candidates were present) even though the guess happened to be right;
+the adversarial case's wrong guess is flagged ambiguous too (visible,
+not hidden); a genuinely single-candidate case resolves with
+`antecedent_ambiguous: False`. This mirrors `entities.
+apply_ambiguity_rules`'s existing pattern of marking a conflict
+"ambiguous" with alternatives rather than either silently merging or
+silently dropping it -- the same principle, applied to a different
+(pronoun, not surname) ambiguity source.
+
+**Still open, stated as a limit, not hidden**: this is a recency
+heuristic, not coreference resolution. It will still guess wrong on
+cases shaped like the adversarial example above; the `antecedent_ambiguous`
+flag only tells a caller WHEN to distrust a resolution, not what the
+correct one actually is.

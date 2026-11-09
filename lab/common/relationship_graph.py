@@ -28,6 +28,22 @@ extractor was never built to carry. Fixed here, additively, by pulling
 the amount separately via lab.common.entities.detect_primary (already
 measured correctly matching "$500"-style spans) and attaching it to the
 edge -- extract_fact_triple itself is unmodified.
+
+Follow-up (same day): user asked what happens when "Smith" is later
+referred to as "she" or another pronoun rather than by name again.
+Confirmed live this broke cycle detection completely (a pronoun subject
+normalizes to its own node, e.g. "he", disconnected from the real
+entity). Fixed with a nearest-antecedent heuristic (see
+`_resolve_antecedent`) -- confirmed working on the straightforward case,
+and confirmed WRONG on a harder adversarial case built specifically to
+find the failure (the true antecedent was the previous clause's subject,
+not its most recently named entity). User's call on the resulting
+tradeoff: keep guessing rather than abstain, but every edge whose
+subject or object was resolved from >1 plausible candidate is tagged
+`antecedent_ambiguous: True` with the candidates it picked between in
+`antecedent_alternatives` -- so a caller can tell a confident resolution
+from a guess, without the module either silently dropping correct
+connections or silently trusting wrong ones.
 """
 
 from __future__ import annotations
@@ -37,6 +53,53 @@ from collections import defaultdict
 from lab.common.entities import detect_primary
 from lab.common.rules import extract_fact_triple
 from lab.common.textutil import normalize
+
+# Bare pronouns extract_fact_triple will happily return as a "subject" or
+# "object" span (it only parses dependency structure, it doesn't know these
+# aren't names). Resolved below by a nearest-antecedent heuristic -- NOT
+# true coreference. "that"/"this" are included for a demonstrative used as
+# a stand-in for a person ("that one paid Carol"), not for every
+# determiner use ("that payment").
+_PRONOUNS = {
+    "he", "him", "his", "she", "her", "hers",
+    "it", "its", "they", "them", "their", "theirs",
+    "that", "this",
+}
+
+
+def _resolve_antecedent(span: str, recent_mentions: list[str]) -> dict:
+    """Nearest-antecedent heuristic: a bare pronoun resolves to whichever
+    real (non-pronoun) person/organization span was most recently seen,
+    in passage order -- the simplest, best-known approximation for this
+    problem, not true coreference resolution. No gender/number agreement
+    is checked (none of this project's entity detection carries gender),
+    so it WILL pick the wrong antecedent whenever the true referent isn't
+    simply "whatever named entity appeared last" -- e.g. the previous
+    sentence's object, not its subject, when the subject is who a
+    following "she" actually meant. Known, named limit, not hidden; see
+    AUDIT.md, "pronoun/coreference gap" (2026-11-09).
+
+    User's own resolution of that tradeoff (asked directly, 2026-11-09):
+    keep resolving by best guess rather than abstaining whenever more than
+    one candidate exists, but never hide the uncertainty -- so this
+    returns {"text", "pronoun_resolved", "ambiguous", "alternatives"}
+    instead of a bare string: the guess is still made (so the
+    straightforward, confirmed-working case keeps working), but a caller
+    can see exactly which resolutions picked among >1 candidate, the same
+    spirit as `entities.apply_ambiguity_rules` marking a shared-surname
+    name "ambiguous" with alternatives rather than silently merging it.
+    `recent_mentions` is every real entity span seen in the most recent
+    passage that had any (order preserved); the last one is the guess,
+    the rest are the alternatives it passed over.
+    """
+    if normalize(span) not in _PRONOUNS or not recent_mentions:
+        return {"text": span, "pronoun_resolved": False, "ambiguous": False, "alternatives": []}
+    return {
+        "text": recent_mentions[-1],
+        "pronoun_resolved": True,
+        "ambiguous": len(recent_mentions) > 1,
+        "alternatives": recent_mentions[:-1],
+    }
 
 
 def build_relationship_graph(passages: list[dict]) -> dict:
@@ -48,29 +111,55 @@ def build_relationship_graph(passages: list[dict]) -> dict:
     Nodes are keyed on normalized exact span text, same substitute for
     "the system doesn't understand language" that graph_index.py already
     uses -- no model resolves whether two differently-phrased spans are
-    the same entity.
+    the same entity, except for the one narrow pronoun case handled by
+    `_resolve_antecedent` above.
     """
     edges = []
     nodes: dict[str, str] = {}
+    recent_mentions: list[str] = []
     for passage in passages:
         text = passage.get("text", "") or ""
         fact = extract_fact_triple(text)
+        real_mentions = [m["text"] for m in detect_primary(text) if m["label"] in ("person", "organization")]
         if not fact or not fact.get("subject") or not fact.get("object"):
+            if real_mentions:
+                recent_mentions = real_mentions
             continue
-        from_key, to_key = normalize(fact["subject"]), normalize(fact["object"])
+
+        subject_resolution = _resolve_antecedent(fact["subject"], recent_mentions)
+        subject_text = subject_resolution["text"]
+        object_resolution = {"text": fact["object"], "pronoun_resolved": False, "ambiguous": False, "alternatives": []}
+        if normalize(fact["object"]) in _PRONOUNS:
+            # Never resolve the object to the same entity just picked for
+            # the subject -- "he gave him money" needs two DIFFERENT
+            # antecedents, and this heuristic has only one to offer, so it
+            # abstains (keeps the raw pronoun span) rather than guess a
+            # self-loop.
+            candidate = _resolve_antecedent(fact["object"], recent_mentions)
+            if normalize(candidate["text"]) != normalize(subject_text):
+                object_resolution = candidate
+        object_text = object_resolution["text"]
+
+        from_key, to_key = normalize(subject_text), normalize(object_text)
+        if real_mentions:
+            recent_mentions = real_mentions
+        elif normalize(subject_text) not in _PRONOUNS:
+            recent_mentions = [subject_text]
         if not from_key or not to_key or from_key == to_key:
             continue
-        nodes[from_key] = fact["subject"]
-        nodes[to_key] = fact["object"]
+        nodes[from_key] = subject_text
+        nodes[to_key] = object_text
         amounts = [m["text"] for m in detect_primary(text) if m["label"] == "amount"]
         edges.append({
             "from": from_key,
             "to": to_key,
-            "from_text": fact["subject"],
-            "to_text": fact["object"],
+            "from_text": subject_text,
+            "to_text": object_text,
             "verb": fact["verb_lemma"],
             "amount": amounts[0] if amounts else None,
             "passage_id": passage.get("id"),
+            "antecedent_ambiguous": subject_resolution["ambiguous"] or object_resolution["ambiguous"],
+            "antecedent_alternatives": subject_resolution["alternatives"] + object_resolution["alternatives"],
         })
     return {"edges": edges, "nodes": nodes}
 
