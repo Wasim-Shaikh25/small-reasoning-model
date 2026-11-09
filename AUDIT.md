@@ -515,3 +515,81 @@ run on ask-types where an expected-answer-type check like `entities.DATE_RE`
 can validate the span's *category* even when presence can't be judged; or
 accepting the narrower, already-working single-fact case as the only
 production use for now).
+
+## Method-teaching experiment (2026-11-09, same day): LLM names a tool, never a fact -- partially validated
+
+Project owner's own reframing, after seeing the gap-fill finding above:
+the LLM should never produce content at all, even to fail safely -- it
+should only "teach" the deterministic layer WHICH of its own existing
+primitives to run for an ask type it doesn't recognize, then hand the
+actual work back to that layer entirely; if the taught method or its
+result is garbage, detect that and stop right there rather than let it
+through, even indirectly. Built `lab/common/method_teaching.py`: a closed
+`PRIMITIVE_REGISTRY` of 7 named, already-deterministic functions
+(`extract_dates`/`extract_persons`/`extract_organizations`/
+`extract_amounts` over `entities.detect_primary`; `group_by_sentence` over
+`textutil.sentences`; `sort_chronological` over `calc.parse_date`; `count`).
+The checkpoint (gemma3:270m) is asked, via Ollama's JSON-schema
+enum-constrained decoding, to name 1-4 primitives in order -- the schema's
+`enum` makes it structurally impossible to emit a name outside the
+registry, so the model literally cannot state a fact; it can only point at
+a tool. `validate_plan` re-checks registry membership unconditionally
+anyway (never trust the constraint alone), and `execute_method` runs the
+named primitives deterministically, threading one step's output into the
+next.
+
+**Tested live, 4 ask types (one direct repeat of the timeline case, two
+genuinely new types -- "list organizations", "how many people" -- plus one
+deliberately unanswerable "phone number" ask), gemma3:270m:**
+
+1. **Zero fabricated facts across every test, including every wrong tool
+   choice** -- a structural improvement over the gap-fill experiment above,
+   where the same checkpoint fabricated a phone number outright. The worst
+   observed failure mode here was either an empty result or a caught
+   exception, never invented content. This is the containment property the
+   project owner asked for, and it held under live testing, not just in
+   design.
+2. **Tool *selection* is still frequently wrong.** "List the organizations
+   mentioned" got `[sort_chronological, count]` -- nothing resembling
+   `extract_organizations` -- and "How many people are named" got the same
+   generic 4-extractor plan as the timeline ask, never `count`. Shifting the
+   LLM's job from "state a fact" to "name a tool" made failures safe, but
+   did not make tool-picking itself reliable at this model size.
+3. **A real bug of this session's own code, caught by the first live run
+   and fixed in the same pass:** `execute_method` originally overwrote
+   `result` on each step instead of accumulating it, so a 4-step
+   all-`extract_*` plan silently degenerated to only its last step's
+   output. Fixed by having each `_extract_*` primitive fold `prior` in.
+   A second bug, also caught live: a structurally valid plan can still be a
+   nonsensical *sequence* (`count` producing a dict fed into
+   `extract_persons`, which expects a list) that a membership check can't
+   catch -- this crashed the first post-fix run. Fixed by wrapping
+   execution in a `try/except` that reports it the same way an invalid plan
+   is reported (`ok: False`), never lets it propagate as an uncaught error.
+4. **The "ok" success signal itself needed a second fix mid-test:**
+   `bool(result)` alone called `{"count": 0}` a success (a non-empty dict
+   whose actual count is zero) -- caught by the "list organizations" case
+   actually running that exact path. Fixed to check the dict's own count
+   value, not just Python truthiness.
+5. **Remaining known gap, not yet fixed:** "How many people are named"
+   still reports `ok: True` with a raw extraction-list result instead of a
+   count -- a non-empty, real, *grounded* result that nonetheless doesn't
+   answer what was asked, because the chosen plan's output shape doesn't
+   match what the ask implies ("how many" implies a count, not a list).
+   `teach_and_execute`'s current contract only checks "did the plan produce
+   something non-trivially empty," not "does the result's shape match the
+   ask" -- the same category of gap `relevance.ask_relevance` was built to
+   catch for rewritten prose, not yet built for structured plan output.
+
+**Also unaddressed as of this writeup:** a pre-existing `entities.AMOUNT_RE`
+false positive ("2022 over" tagged as an amount, from "...15 June 2022 over
+unpaid rent...") leaked into both successful-looking results -- a bug in
+already-existing code this experiment exposed rather than introduced,
+not yet filed as its own finding.
+
+**Status: not wired into `brain.reason()`.** The core safety property (no
+fabricated content, ever, because the LLM's output space is a closed tool
+registry rather than free text) is validated. The core usefulness property
+(does the taught method actually fit the ask) is not yet reliable enough,
+and the one gap identified in finding 5 above (shape-of-result vs.
+shape-implied-by-ask) would need to close before this could run live.
