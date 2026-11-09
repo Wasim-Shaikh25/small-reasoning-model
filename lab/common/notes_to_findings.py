@@ -27,10 +27,28 @@ module in this file's AUDIT.md trail):
      alone). Requiring at least `min_shared` distinct tokens of length
      >=5 before trusting an attribution removes this false-positive class
      without touching the shared textutil.coverage() other callers rely on.
+
+Third bug, found testing a petition built from one narrowly-topical rule
+source (2026-11-09): when every sentence in a document is naturally
+about the same topic as its one source, lexical overlap alone isn't
+enough -- a petitioner's prayer ("I want the rent increase stopped and
+my deposit back") was wrongly attributed to the rule source purely
+because it shares two generic words ("rent", "increase") with it, even
+though it is not evidence of anything the rule talks about. Fixed with a
+second, STRUCTURAL gate, applied only when the source itself parses as a
+conditional rule (`rules.parse_conditional_rule`): the candidate note
+must also parse as a fact triple whose own verb lemma structurally
+matches the rule's trigger (`rules.apply_rule`), the same language-to-
+logic + tree-reasoning mechanism already validated for Grounds sections
+in method_teaching.py's `list_grounded_arguments`. Lexical overlap alone
+is the whole story for non-rule sources (unchanged, so the already-
+validated remote-work example keeps resolving exactly as before); this
+check only fires in the specific case it is needed for.
 """
 
 from __future__ import annotations
 
+from lab.common.rules import apply_rule, extract_fact_triple, parse_conditional_rule
 from lab.common.textutil import content_tokens, coverage, sentences
 
 
@@ -67,6 +85,11 @@ def notes_to_findings(
     output, since nothing here generates or paraphrases.
     """
     normalized = " ".join(messy_text.split())
+    rules_by_source_id = {
+        src["id"]: parse_conditional_rule(src["text"])
+        for src in sources
+        if parse_conditional_rule(src["text"])
+    }
     findings = []
     for i, sent in enumerate(sentences(normalized)):
         sent_tokens = content_tokens(sent)
@@ -77,6 +100,10 @@ def notes_to_findings(
             cov = coverage(sent_tokens, src_tokens)
             if len(hits) >= min_shared and cov > best_cov:
                 best_cov, best_id, best_shared = cov, src["id"], hits
+        if best_id in rules_by_source_id:
+            fact = extract_fact_triple(sent)
+            if not fact or not apply_rule(rules_by_source_id[best_id], fact)["matched"]:
+                best_id, best_cov, best_shared = None, 0.0, []
         findings.append({
             "finding_id": f"N{i + 1}",
             "statement": sent,

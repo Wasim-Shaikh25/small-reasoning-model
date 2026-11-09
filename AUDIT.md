@@ -1149,3 +1149,48 @@ as a normalization pass before candidate detection.
 Re-ran the full 7-sentence paragraph: "cos" -> "because", correctly.
 All 7 distinct typo/informal-word instances in this file's running test
 case now resolve correctly with zero generative model calls.
+
+## Follow-up, same day (commit pending): structural attribution gate fixes the rule-source mis-attribution found testing a full petition
+
+Direct test of "can a full petition be written from raw material with
+zero LLM calls": built one end-to-end, zero generative model anywhere
+(spellfix + informal_register to clean raw petitioner notes,
+notes_to_findings to attribute them, rules.apply_rule to derive Grounds
+from the petitioner's own fact against a rule source, assemble to render
+the document). It worked structurally -- 100% coverage, zero broken
+citations, a genuinely rule-derived Grounds section -- but surfaced a
+real mis-attribution: the petitioner's prayer ("I want the rent increase
+stopped and my deposit back") was wrongly tagged to the RULE-1 source,
+purely because it shares two generic words ("rent", "increase") with it.
+With only one narrowly-topical source, nearly every sentence in the
+document naturally shares enough vocabulary to clear
+`notes_to_findings`'s lexical threshold -- a real limitation of lexical
+attribution alone when sources aren't topically distinct from each
+other, not previously exercised since every earlier test used 3
+topically-separated sources.
+
+User's proposed fix, tested directly: run one more round through tree
+reasoning + the language-to-logic converter. Confirmed live: the
+genuinely-grounded sentence ("my landlord raised my rent...") structurally
+matches the rule's trigger verb lemma ("raise") via `extract_fact_triple`
++ `apply_rule`; the wrongly-attributed prayer sentence doesn't even parse
+as a fact triple at all (`extract_fact_triple` returns `None`). Added a
+second, STRUCTURAL gate to `notes_to_findings`, firing ONLY when the
+matched source itself parses as a conditional rule
+(`rules.parse_conditional_rule`): the candidate note must also parse as
+a fact whose verb lemma matches the rule's trigger (`rules.apply_rule`)
+before the lexical attribution is trusted; if not, falls back to
+USER-NOTE rather than keep a coincidental-vocabulary-only match. Re-ran
+the petition test: the prayer sentence now correctly tags USER-NOTE.
+Re-ran the original 3-source remote-work regression test (AUDIT.md,
+2026-11-09 earlier): byte-identical result -- none of those sources
+parse as conditional rules, so the new gate never fires for them,
+exactly as scoped.
+
+This directly answers "is writing content going through language logic
+converter and tree reasoning" from earlier the same day, in the one
+place it was actually missing: attribution against a RULE-shaped source
+now does, through the exact mechanism (`extract_fact_triple`/
+`apply_rule`) already validated for Grounds sections in
+`method_teaching.py`'s `list_grounded_arguments` -- reused, not
+reinvented, and scoped to only the case it was shown to be needed for.
