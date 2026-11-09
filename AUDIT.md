@@ -823,3 +823,65 @@ conservative by design (favors leaving a claim uncited over guessing), so
 some real but loosely-worded connections (the office-space example above)
 will be missed, not just hallucinated ones caught. Not measured yet at
 scale across inputs genuinely more varied than this one worked example.
+
+## Follow-up, same day: does the project's OWN validated rewriter actually write anything here? Tested directly -- no, every attempt fabricated a connection and was correctly discarded
+
+Direct test, not a restatement of the finding above: ran `rewriter_backends.
+rewrite_unit` with checkpoint `gemma3:270m` and `use_repair=True` (the
+citation-splice repair that recovered 11/13 otherwise-failed rewrites in
+EXP-063) on the exact outline `build_outline` produced from
+`notes_to_findings`'s output (3 sources + 7 messy-note sentences, grouped
+into 3 leaves of 2-4 findings each). This is not the open-ended synthesis
+prompt from the two sections above -- it is the project's own narrow,
+already-measured-safe "combine these verified findings into one flowing
+paragraph" role (`real_rewriter.build_prompt`/`fidelity_gate`), the one
+EXP-063 validated on clean, single-source findings.
+
+**All 3 leaves failed the gate and fell back to the deterministic
+concatenation.** The raw generated text, inspected directly, shows why --
+every single leaf fabricated a relationship between facts that were never
+actually linked:
+- Leaf 1 (SRC-1 productivity + SRC-2 onboarding + SRC-3 real-estate +
+  1 user note): wrote "This trend was followed by a decline towards
+  baseline over the following year, with a 20-30% reduction in
+  real-estate costs" -- fusing SRC-1's productivity trend and SRC-3's
+  unrelated cost figure into one invented causal/temporal relationship.
+  Also added "experiencing limited attention from their colleagues",
+  present in neither source. Caught: `nli_ok=False`; also dropped every
+  citation marker.
+- Leaf 2 (1 sourced + 3 user-note findings, the source text itself hedged
+  with "nobody really knows why"): wrote "The increase in productivity is
+  attributed to the temporary reduction in commute time, as other
+  reasons...are not considered" -- collapsed a stated, genuine two-sided
+  uncertainty into one confidently asserted cause. Caught: `modal_ok=False`.
+- Leaf 3 (1 sourced + 1 user-note finding, about two different things --
+  general team trust, and junior/senior mentorship specifically): wrote
+  "The relationship between young workers and senior staff has declined
+  over time, with a decrease in trust" -- merged two separate, unrelated
+  observations into one invented relationship. Caught: `modal_ok=False`,
+  `nli_ok=False`.
+
+**Why this is a different finding from the sections above, not a
+repeat:** those sections tested free-form, open-ended article synthesis
+with no structure/attribution decided yet. This tests the narrowest,
+already-safest role this project has -- phrasing ALREADY-decided,
+ALREADY-cited findings into one paragraph, with the fidelity gate active
+exactly as EXP-063 measured it. It still fails, every time, on this input
+shape specifically because the findings are heterogeneous: precise,
+numeric, third-party facts sitting next to vague, hedged, first-person
+notes. "Combine into flowing prose" implicitly requires deciding HOW
+these facts relate to each other, and that relational judgment is exactly
+the kind of thing this project's whole LLM-safety trail has shown small
+checkpoints fake confidently (a plausible-sounding causal link) rather
+than either doing correctly or declining to do. The existing gate
+(entity/number check, modality check, bidirectional NLI, citation
+presence) caught every one of these fabrications live, with zero
+exceptions in this run -- the safety net held. But the practical result
+is: for this kind of mixed-register, multi-source-plus-user-note input,
+the only thing currently reaching final output is the safe
+`notes_to_findings` + `assemble()` concatenation from the section above --
+genuine composed prose is not currently achievable without either (a)
+a much stronger model, or (b) narrowing the rewrite unit further so it
+never has to relate two DIFFERENT findings to each other at all (one
+finding per leaf, never combined -- untested here, since `build_outline`
+groups up to 4 per leaf by default).
