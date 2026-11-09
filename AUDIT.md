@@ -1194,3 +1194,77 @@ now does, through the exact mechanism (`extract_fact_triple`/
 `apply_rule`) already validated for Grounds sections in
 `method_teaching.py`'s `list_grounded_arguments` -- reused, not
 reinvented, and scoped to only the case it was shown to be needed for.
+
+## Follow-up, same day: does fluency require a generative model, and does `template_splice` actually beat what's live today?
+
+User asked why fluency can't come from NLI/embeddings and whether only
+a generative checkpoint (gemma3:270m) can supply it. Both halves tested
+rather than argued:
+
+**Why NLI/embeddings can't supply fluency, structurally:** both are
+comparison tools over text that already exists (NLI: 3-way label for a
+given pair; embeddings: one similarity float for a given pair). Neither
+has an operation that emits a new token sequence. `spellfix.py`'s
+embedding win worked because the candidate set was small and already
+enumerable (real words at edit-distance 1); sentence-level fluency
+(merging findings, varying phrasing) has no equivalent small enumerable
+set, so there is nothing for a comparison tool to pick between. This is
+the same lesson as spellfix's own, one level up: comparison is only
+safe when the candidate set is already closed.
+
+**But `lab/common/template_rewriter.py`'s `splice_unit` already proves
+*some* fluency doesn't need a model at all** -- a fixed, 4-connective
+closed vocabulary ("", "Also,", "However,", "In addition,") chosen by
+plain classical signals (`modals`, `polarity_flipped`, leading-subject
+match), built in EXP-054 specifically because generative rewriting was
+measured dropping content. It is wired into `assemble()`'s
+`rewriter="template_splice"` mode but NOT into `longform.
+write_long_document`/`rewriter_backends.rewrite_unit` (the live
+long-document path), so it had never been run against a real multi-
+finding long-document fixture before this check.
+
+**Tested against EXP-081's real fixture (19 leaves, 69 findings from a
+2,368-word GDPR excerpt), with a result sharper than expected:**
+`data/exp_081_real_document_pipeline/results.json` already shows BOTH
+checkpoints that exist for this live path -- flan-t5-small AND
+Qwen2.5-0.5B-Instruct -- scored `fidelity_pass_rate: 0.0`, 0/18 leaves
+each. Every leaf on this real document already falls back to the
+deterministic `render_unit` text today; the committed `gdpr_rewritten.md`
+/`gdpr_rewritten_qwen.md` files contain zero generative-model output,
+even though a generative call is attempted on all 18 leaves currently.
+Running `splice_unit` on the identical 19-leaf outline (reproduced from
+EXP-081's own embedded fixture, `_entity_outline`/`build_outline`)
+gets the same `coverage: 1.0`/`citations: {broken: []}` (expected --
+it cannot drop or invent anything) while actually inserting connective
+text between findings where today's live output has none. On this one
+real document, `template_splice` is a strict, measured improvement over
+what the live pipeline actually produces today, at zero model cost and
+zero latency.
+
+**But testing it, not just running it once, surfaced a real bug in the
+deterministic mechanism too** -- `choose_connective` picked "However,"
+between two GDPR definitions ('personal data' then 'processing') that
+are not actually in contrast. Root cause: `textutil.MODAL_RE`/`NEG_RE`
+match the bare word "not" inside "whether or not by automated means" --
+a fixed idiom meaning "regardless," not a real negation/modal -- so
+`modals()` wrongly reports a modal shift and `choose_connective` reads
+it as contrast. This is the same `MODAL_RE` looseness the 2026-11-03
+audit already flagged (Finding #5, "can cause an over-cautious
+rewriter fallback, never a wrong answer") -- but applied to a
+connective-choice mechanism that didn't exist at the time of that
+finding, its consequence is new: a wrong connective, not just an
+over-cautious fallback. Not yet fixed. Confirmed directly:
+`polarity_flipped(def_a, def_b)` returns `True` and `modals(def_b)`
+returns `['not']` purely from "whether or not."
+
+**Where this leaves the generative-model question:** flan-t5-small is
+confirmed dead weight on two separate real fixtures now (EXP-048's
+original 0/4, and this one's 0/18). `template_splice` already closes
+the connective-joining slice of fluency gemma3/Qwen were meant to cover,
+with a measured win on the one real document tested, zero model calls,
+zero fabrication risk -- but it is not bug-free either, and is not
+wired into the live `write_long_document` path. Gemma3:270m's own
+measured value (EXP-063, 11/13 repair-recovered) was on a leaf-size-1
+fixture where there is nothing to splice between -- that specific
+measured win is about single-sentence citation-repair, a different
+capability `template_splice` does not attempt and cannot replace.
