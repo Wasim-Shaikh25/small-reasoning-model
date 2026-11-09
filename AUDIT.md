@@ -685,3 +685,78 @@ already grows at, while `_INTENT_TO_PLAN` composes those labels with the
 existing operations. The checkpoint's role shrinks to "things this fixed
 vocabulary doesn't recognize at all" -- which, per every test in this file
 so far, has yet to produce a single reliably useful result on its own.
+
+## Open-ended "article from messy notes + sources" experiment (2026-11-09, same day): free-form long-form generation is unsafe in a new, worse way than single-fact extraction
+
+Different question from the gap-fill/method-teaching experiments above:
+those ask the LLM to extract/locate a single fact or name a tool. This
+asked it to do open-ended synthesis -- take a genuinely messy, non-legal,
+badly-written user input (misspellings, disconnected reasoning, "peopel
+who wrk from home...") plus 2-3 short named sources (`[SRC-1]`/`SRC-2`/
+`SRC-3`), and write one coherent article citing sources for sourced claims
+and marking the user's own uncited observations as such. Tested live
+against gemma3:270m and Qwen2.5-0.5B-Instruct, free-form generation first:
+
+- **Both checkpoints ignored the citation instruction completely** --
+  zero `[SRC-n]` markers in either output, despite the prompt explicitly
+  requiring one on every factual claim. Not a formatting slip fixable by
+  a post-hoc splice (like EXP-063's citation-splice repair) -- the model
+  never attempted a citation at all, free-form.
+- **gemma3:270m was non-deterministic across two separate runs of the
+  byte-identical prompt**, despite `temperature=0, seed=0` pinned the same
+  way `real_rewriter_ollama.generate`'s own docstring says this fixes
+  reproducibility for the narrow leaf-rewriting role. One run dropped the
+  13% figure entirely; the other kept it. Not yet root-caused (not
+  reproduced via Ollama's own harness independent of this project); noted
+  here because it directly contradicts an existing comment's claim and
+  needs re-checking before being relied on anywhere else in this project.
+- **Qwen2.5-0.5B-Instruct fabricated a named source organization**
+  ("a 2023 survey conducted by Remote Workers Association") that exists
+  in neither SOURCES nor USER NOTES -- invented wholesale to sound
+  properly attributed. This is the same confident-fabrication failure
+  mode as EXP's earlier phone-number fabrication, now at the
+  institution-name level instead of the fact level.
+- Both checkpoints defaulted to generic boilerplate ("double-edged
+  sword", "offers flexibility and autonomy") over the specific content in
+  either the sources or the user's notes -- the messy notes' actual
+  content (commute time saved, kids/noise, meetings moving online, trust
+  eroding) was vaguely paraphrased or dropped, never clearly surfaced.
+
+**Then tested whether this project's own established fix -- a closed
+output space via Ollama's JSON-schema `format` constrained decoding, the
+same mechanism `method_teaching.py` and `generate_constrained` already
+rely on -- closes this gap, the way it did for tool-naming.** Built a
+schema forcing a list of `{claim, source_id}` objects with `source_id`
+`enum`-constrained to the 3 real ids or `null` (no other string is
+structurally decodable). Result: **it made the failure worse, not
+better.** Every one of 5 generated claims carried a syntactically valid
+`source_id` -- but a deterministic check for literal source-specific terms
+(the 13% figure, "5,000", "20-30%", "onboarding", "senior staff") in the
+matching claim text found **zero of 3 distinct cited claims carried over
+any term actually present in their cited source.** Example: a claim about
+"improved employee well-being and reduced stress" was tagged `SRC-3`,
+whose actual content is a 20-30% real-estate cost reduction -- completely
+unrelated. The model produced confident, generic, properly-shaped
+citations attached to content the source never said.
+
+**Why this matters, and how it's different from the earlier findings
+above:** constraining the STRUCTURE of a field (which source_id is a
+valid enum value) does not constrain, or even correlate with, whether the
+CONTENT in the adjacent free-text field is actually grounded in that
+source. This is a sharper version of the "containment vs. usefulness"
+distinction already documented above -- here, the unconstrained field
+(claim text) isn't just unreliable, it looks MORE trustworthy than
+free-form prose did, because every claim wears a real citation, while
+being equally fabricated underneath. A reader (or a downstream pipeline)
+checking only "is this source_id real" would see 100% pass and miss that
+0% of claims are actually grounded in their cited source's content.
+
+**Open, not fixed**: the same remedy this file already established for
+leaf-level rewriting (`real_rewriter.fidelity_gate`'s NLI/number checks)
+has never been applied to this open-ended multi-claim synthesis shape.
+The concrete next step, if this capability is wanted, is a second,
+independent gate per claim -- content-grounding (NLI entailment or
+keyword/number overlap) between `claim` text and the specific source
+text named by its own `source_id` -- not more schema constraints on the
+citation slot, which this experiment showed does not touch this failure
+at all.
