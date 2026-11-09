@@ -760,3 +760,66 @@ keyword/number overlap) between `claim` text and the specific source
 text named by its own `source_id` -- not more schema constraints on the
 citation slot, which this experiment showed does not touch this failure
 at all.
+
+## Follow-up, same day (commit pending): the deterministic mechanism can write the article -- `notes_to_findings.py` closes the gap the LLM experiment above could not
+
+Direct response to the open question the previous section left: "assemble.py
+already writes documents with zero hallucination risk -- why did the LLM
+need to do this at all?" It didn't. The LLM test asked a 270M-500M model to
+do THREE jobs at once: split messy prose into claims, decide which source
+(if any) backs each claim, and write the final cited prose. `assemble.py`
+already does job 3 perfectly (deterministic, docstring: "Code writes the
+document; nothing is generated") -- it was simply never fed input that
+wasn't already pre-structured. Jobs 1 and 2 are the only real gap, and both
+are mechanical, not generative.
+
+Built `lab/common/notes_to_findings.py`: splits messy text into sentences
+(`textutil.sentences`) and attributes each one to whichever source shares
+the most distinctive content words with it (`textutil.content_tokens` +
+`coverage`, the same primitive `relevance.ask_relevance` already relies on
+for a different check), or tags it `USER-NOTE` if none qualifies. No LLM,
+no embedding call anywhere in this path.
+
+**First attempt, tested live on the identical messy input + sources from
+the article experiment above, found two real bugs, not hypothetical ones:**
+1. The raw text's hard-wrapped line breaks got treated as sentence
+   boundaries by `textutil.sentences`'s `\n+` split, tearing one sentence
+   ("productivity go up ... why for sure.") into two fragments that then
+   coincidentally matched two DIFFERENT sources. Fixed by joining
+   whitespace before splitting -- a line break in a messy paragraph is not
+   a sentence boundary.
+2. A single short-token prefix match produced a false positive:
+   `textutil`'s own `_token_close` matched "realy" (a typo for "really")
+   against "real" (from "real-estate") on substring-prefix alone, at 0.50
+   coverage -- enough to wrongly attribute an unrelated fragment to SRC-3.
+   Fixed in `notes_to_findings.py` only (the shared `textutil.coverage`
+   other callers rely on was left untouched) by requiring at least 2
+   distinct shared tokens of length >=5 before trusting an attribution,
+   not just a coverage ratio off one coincidental hit.
+
+**After both fixes, rerun on the same input end-to-end (raw messy text in,
+cited document out, zero manual claim-splitting, zero LLM calls):** every
+sentence attributed correctly -- the productivity sentence to SRC-1, the
+"senior staff / overhear conversations" sentence to SRC-2, and every
+sentence with no real lexical connection (including "company save money on
+office space", which IS about the same real-world fact as SRC-3's
+real-estate-cost reduction but shares no matching vocabulary) correctly
+and honestly left as `USER-NOTE` rather than guessed. `assemble()`'s own
+`coverage_report` showed 100% of findings present, `citation_integrity`
+showed zero broken markers and zero units without a citation -- both
+checks are mechanical, so this is a structural guarantee, not a measured
+pass rate. Misspellings/bad grammar in the user's notes are preserved
+verbatim in the output (nothing paraphrases), which is the direct tradeoff
+against the LLM path: zero fabrication risk, but also zero of the
+cosmetic cleanup a bounded paraphrase step (the existing
+`real_rewriter`/`method_teaching` leaf-rewriting role) could add on top, if ever applied
+AFTER attribution, to one already-decided, already-cited claim at a time
+-- never to decide structure or attribution itself, which is exactly the
+job this module and `assemble.py` were shown here to already do
+correctly without it.
+
+**Still open**: `notes_to_findings`'s lexical-overlap attribution is
+conservative by design (favors leaving a claim uncited over guessing), so
+some real but loosely-worded connections (the office-space example above)
+will be missed, not just hallucinated ones caught. Not measured yet at
+scale across inputs genuinely more varied than this one worked example.
