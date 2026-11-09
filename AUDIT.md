@@ -943,3 +943,58 @@ findings (grouping by shared tokens/entities across ALL findings, not
 just note-to-source attribution) would be a legitimate way to realize
 the "writing is tree reasoning" instinct that prompted this follow-up,
 but it has not been built or tested yet.
+
+## Follow-up, same day (commit pending): directed relationship graph + cycle detection, built and verified on the X-gave-Y-gave-Z-gave-X example
+
+User's direct challenge: "if it's not able to [connect facts like X gave Y
+money, Y gave Z money, Z gave X money, and find the relationship between
+X and Z], it's not built properly." Tested the two relevant existing
+primitives separately first, live:
+- `lab.common.graph_index.build_entity_graph` (undirected entity
+  co-occurrence graph, built for cross-referencing retrieval, not for
+  this): correctly found a closed triangle when every pair also directly
+  co-occurs, AND correctly performed genuine 2-hop traversal (Alice ->
+  Carol via Bob) in a variant where Alice and Carol are NEVER mentioned
+  in the same sentence at all -- confirms this project's multi-hop
+  fact-connecting machinery already works, tested, not assumed.
+- `lab.common.rules.extract_fact_triple` (subject/verb/object via
+  dependency parse): correctly recovered directed subject->object for
+  all three "X gave Y $N" sentences, and the three directed edges
+  (Alice->Bob, Bob->Carol, Carol->Alice) correctly chain back into a
+  real cycle.
+
+Neither primitive alone does what the user described (undirected
+co-occurrence has no notion of direction; the fact triple has direction
+but no cycle detection, and drops the amount -- "$500" never appears in
+`extract_fact_triple`'s output, a second complement the parser isn't
+built to carry).
+
+Built `lab/common/relationship_graph.py`, combining them: `extract_fact_triple`
+gives direction; the amount gap is fixed additively (pulled separately via
+`entities.detect_primary`'s already-measured "amount" label and attached
+to the edge, without changing `extract_fact_triple`'s own return shape,
+since `rules.apply_rule`/`answer_rule_question` already depend on it
+unchanged). `find_cycles` is a bounded DFS over the resulting directed
+graph, deduped across rotations of the same cycle.
+
+Verified live, three cases:
+1. The exact cycle (Alice->Bob $500, Bob->Carol $300, Carol->Alice $200):
+   found exactly 1 cycle, with every edge's amount correctly attached.
+2. The same two edges with the closing one removed (a plain chain, not a
+   cycle): 0 cycles found -- no false positive.
+3. Two completely unrelated gave-sentences (different people): 0 cycles
+   found -- no false positive.
+
+**Answer to "is this just not built properly": it already existed in two
+separate, independently-tested pieces, and combining them (not inventing
+new judgment) closes the gap.** No LLM anywhere in this path -- entirely
+dependency-parse + regex + bounded DFS, same safety profile as every
+other primitive in this file's trail.
+
+**Still open**: nodes are keyed on normalized exact span text (same
+substitute for "understanding" `graph_index.py` already uses) -- "Alice
+Smith" and "A. Smith" would not be recognized as the same node; no
+spelling/alias resolution is attempted here, by design, matching this
+project's existing stance. `find_cycles` is brute-force DFS, bounded by
+`max_len`, appropriate for the small one-edge-per-passage graphs this
+builds, not a general large-graph cycle finder.
