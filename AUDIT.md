@@ -438,3 +438,80 @@ Confirmed orphaned (only caller: `lab/exp_049_word_relevance/run.py`), same "mea
 5. Whether any two signal-chain stages in `plan_stages()`/`reason()`
    could fire in a way that contradicts each other's output for the
    same ask (not just "run in sequence without crashing").
+
+## LLM gap-fill experiment (2026-11-09): empirically tested, not yet safe to wire in
+
+Project owner asked for a generic "LLM fills the gap when deterministic logic
+doesn't know how to answer an ask" mechanism (today's timeline capability is
+task-specific glue -- `entities.DATE_RE` + `textutil.sentences` -- not general
+reasoning), explicitly **without fine-tuning**, with instructions to empirically
+validate it across different asks before trusting it. Built `lab/common/
+gapfill.py`: prompts an already-approved bounded checkpoint
+(`rewriter_backends.generate`) to propose `[passage_id] verbatim span`
+candidates, then keeps only candidates whose span passes `verify.quote_check`
+(a verbatim substring of the named passage) -- same "accept only if grounded,
+empty result over a guess" principle as CaseMap's agreed gap-fill design,
+generalized to this project.
+
+**Tested live against gemma3:270m and Qwen2.5-0.5B-Instruct (both already
+FORBIDDEN.md-approved bounded checkpoints) across 4 prompt variants: plain
+few-shot, few-shot with a worked NONE example, per-passage yes/no framing,
+and Ollama JSON-schema hard-constrained `{found: bool, span: str}` decoding.**
+Findings, with evidence:
+
+1. **The grounding gate is load-bearing, not a formality -- it already caught
+   two real hallucinations in this test session alone.** Asked "What is the
+   tenant's phone number?" against passages containing no phone number,
+   Qwen2.5-0.5B-Instruct fabricated `987-654-3210` outright; `quote_check`
+   correctly rejected it (not a substring of any passage) and the call
+   returned no answer. Asked "Why did the dispute arise?", Qwen gave a
+   plausible paraphrased causal sentence (not a verbatim quote); grounding
+   correctly rejected that too. Both are exactly the "confidently wrong"
+   failure mode FORBIDDEN.md rule 15 (CaseMap) warns about, caught by design,
+   not by luck.
+2. **Precise single-fact extraction, when the fact is genuinely present,
+   mostly works on both checkpoints** (e.g. "When was the lease agreement
+   signed?" -> correctly extracted the minimal span `"March 4, 2021"`,
+   grounded) -- but this capability already exists today via `lookup_fallback`
+   + classical QA, so gap-fill adds no new coverage here on its own.
+3. **Relevance/abstention judgment (does ANY passage actually answer this, or
+   should the system honestly decline) is unreliable, on both checkpoints,
+   under all 4 prompting strategies tried.** gemma3:270m defaulted to "found"
+   on every single JSON-schema-constrained call across 4 asks x 2 passages --
+   it never once said `found: false`, including for the unanswerable
+   phone-number ask, and twice produced garbled non-English token soup as the
+   "span" while still marking `found: true`. A deterministic bge-embedding
+   similarity pre-filter (tried as a cheaper alternative to asking the LLM to
+   self-judge) also failed to separate them: the phone-number ask scored
+   *higher* topical similarity (0.666) against a passage than a genuinely
+   on-topic, correctly-answerable ask ("Why did the dispute arise?", 0.493) --
+   embedding similarity measures topical overlap, not presence of the specific
+   requested fact, so it is the wrong tool for this gate.
+4. **Multi-span/list-style asks (the actual timeline use case) are not reliably
+   decomposed by either checkpoint via prompting alone.** Both models
+   sometimes returned only one of several events, and in one run literally
+   copied the few-shot example's placeholder passage ids (`x1`/`x2`) instead
+   of the real ones -- every candidate was correctly dropped by the grounding
+   gate for citing a nonexistent passage id, but for the wrong reason (a
+   format-copying bug, not a content failure).
+5. **Same exact question, same passages, flipped between correct and
+   incorrect across two prompt-wording variants** (Qwen: "When was the lease
+   signed" answered correctly in one run, incorrectly as `NONE` after only a
+   trailing-instruction wording change in the next) -- these checkpoints are
+   too prompt-sensitive at this size for the behavior to be trusted as stable.
+
+**Conclusion: grounding alone makes gap-fill safe against fabrication, but not
+yet useful.** The one sub-task it reliably adds (single fact extraction) is
+already covered by existing deterministic code; the two sub-tasks it was
+actually wanted for (timeline/multi-span aggregation, and honest abstention on
+genuinely unanswerable asks) are not reliably solved by either bounded
+checkpoint via prompting alone, with or without decoding-level constraints.
+**`gapfill.py` is NOT wired into `brain.reason()`** -- it exists as a tested,
+documented, opt-in-only module; wiring it into the live decision path is
+explicitly deferred pending a project-owner decision on how to close the
+relevance/abstention gap (candidates discussed: fine-tuning the checkpoint
+specifically on the abstain/no-abstain decision; scoping gap-fill to only
+run on ask-types where an expected-answer-type check like `entities.DATE_RE`
+can validate the span's *category* even when presence can't be judged; or
+accepting the narrower, already-working single-fact case as the only
+production use for now).
