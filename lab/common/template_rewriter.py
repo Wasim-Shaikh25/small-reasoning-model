@@ -10,13 +10,29 @@ it has no generation step, so there is nothing for it to omit or invent. It can
 only choose which of a handful of fixed connector words to place between two
 statements it copies verbatim, per AGENT.md's "rewrite from the given content
 itself" rule.
+
+BUG found and fixed (AUDIT.md, 2026-11-09) by running this on a real 69-finding
+GDPR document, not a handful of hand-picked examples: `choose_connective` used to
+infer "contrast" from `textutil.modals()`/`polarity_flipped()` -- raw regex
+presence of "not"/"no"/"shall"/"unless" anywhere in the sentence. On real legal
+text that is nearly every sentence (legal prose is saturated with negation and
+modal "shall"), not evidence of contrast with the PREVIOUS sentence specifically.
+Measured consequence: 21 of 51 connectives chosen on the real GDPR fixture were
+"However," -- almost none of them an actual contrast, just a list of parallel,
+sequential obligations and definitions. Fixed by reusing `lab.common.connectives.
+find_connectives` (this project's own already-validated, dependency-parse-based
+discourse-connective detector -- grounded, not regex, per [[feedback_no_hardcoded_
+connectives]]) instead: "contrast" now fires only when the CURRENT statement's own
+text structurally contains a genuine Comparison.Concession-class marker (however,
+although, though, despite, while, whereas, nevertheless) -- textual evidence of an
+actual contrast, not an inference from negation's mere presence.
 """
 
 from __future__ import annotations
 
 import re
 
-from lab.common.textutil import modals, polarity_flipped
+from lab.common.connectives import Operator, find_connectives
 
 CONNECTIVES = {
     "first": "",
@@ -36,14 +52,12 @@ def _leading_subject(statement: str) -> str:
 def choose_connective(prev_statement: str | None, curr_statement: str) -> str:
     """One bounded judgment: which of 4 fixed connectors (or none) fits between two
     already-verified statements, decided from simple, inspectable signals -- shared
-    subject, a sign of contrast, or plain sequence. Never a 5th word, never altered
-    statement text.
+    subject, a genuine contrast marker already in the text, or plain sequence. Never
+    a 5th word, never altered statement text.
     """
     if prev_statement is None:
         return CONNECTIVES["first"]
-    if modals(curr_statement) and not modals(prev_statement):
-        return CONNECTIVES["contrast"]
-    if polarity_flipped(prev_statement, curr_statement):
+    if any(m.operator == Operator.CONCESSION for m in find_connectives(curr_statement)):
         return CONNECTIVES["contrast"]
     prev_subject = _leading_subject(prev_statement)
     if prev_subject and prev_subject == _leading_subject(curr_statement):

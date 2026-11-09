@@ -26,7 +26,7 @@
     },
     "brain_reason_dispatch": {
       "decision": "supported_with_flags",
-      "answer_word_count": 2473,
+      "answer_word_count": 2565,
       "num_citations": 69,
       "dispatched_to_longform": true
     },
@@ -38,13 +38,10 @@
         "fell_back_to_extractive": 18,
         "fidelity_pass_rate": 0.0,
         "fallback_reason_counts": {
-          "numbers": 11,
-          "nli": 17,
-          "citations": 17,
-          "modal": 15,
+          "deterministic_splice_preferred": 17,
           "already_complete": 1
         },
-        "consistency_flags": 12,
+        "consistency_flags": 13,
         "working_memory_pages": 18,
         "docx_result": {
           "path": "C:\\python_project\\small-reasoning-model\\data\\exp_081_real_document_pipeline\\gdpr_rewritten.docx",
@@ -53,9 +50,9 @@
         },
         "md_result": {
           "path": "C:\\python_project\\small-reasoning-model\\data\\exp_081_real_document_pipeline\\gdpr_rewritten.md",
-          "sha256": "3d13701fbde1f0edb1255fc3c11329456951be947107b4a115c1daa0dfd30f09",
+          "sha256": "975dffc1f59d4063ba01e362b8c7b8659bbff2d5c9c762ae917e300c48a01b41",
           "sections": 18,
-          "word_count": 2469,
+          "word_count": 2561,
           "citations_indexed": 0
         }
       },
@@ -66,13 +63,10 @@
         "fell_back_to_extractive": 18,
         "fidelity_pass_rate": 0.0,
         "fallback_reason_counts": {
-          "nli": 16,
-          "citations": 17,
-          "numbers": 6,
-          "modal": 15,
+          "deterministic_splice_preferred": 17,
           "already_complete": 1
         },
-        "consistency_flags": 12,
+        "consistency_flags": 13,
         "working_memory_pages": 18,
         "docx_result": {
           "path": "C:\\python_project\\small-reasoning-model\\data\\exp_081_real_document_pipeline\\gdpr_rewritten_qwen.docx",
@@ -81,15 +75,15 @@
         },
         "md_result": {
           "path": "C:\\python_project\\small-reasoning-model\\data\\exp_081_real_document_pipeline\\gdpr_rewritten_qwen.md",
-          "sha256": "3d13701fbde1f0edb1255fc3c11329456951be947107b4a115c1daa0dfd30f09",
+          "sha256": "975dffc1f59d4063ba01e362b8c7b8659bbff2d5c9c762ae917e300c48a01b41",
           "sections": 18,
-          "word_count": 2469,
+          "word_count": 2561,
           "citations_indexed": 0
         }
       }
     }
   },
-  "results_prose": "Auto-chunked a real 2,368-word, 13-article GDPR excerpt into 69 passages with no manual pre-structuring. 'Rewrite this regulation into a clear, well-organized compliance summary.' (the phrasing tried by hand first) scores 0.6795 against wants_document's 0.75 threshold -- does NOT fire. 'Write a document summarizing this regulation in plain language.' scores 0.7846 -- fires. brain.reason (which always uses the default checkpoint, flan-t5-small) dispatched to lab.common.longform as expected and returned decision='supported_with_flags' with 69 citations. Checkpoint comparison on the identical 18-leaf fixture: flan-t5-small passed the fidelity gate on 0/18 leaves (0.0), Qwen2.5-0.5B-Instruct on 0/18 (0.0) -- Qwen2.5-0.5B-Instruct did NOT improve the fidelity pass rate on this real document. flan-t5-small's dominant failure reasons: ['nli', 'citations', 'modal', 'numbers', 'already_complete']; Qwen2.5-0.5B-Instruct's: ['citations', 'nli', 'modal', 'numbers', 'already_complete']. Both checkpoints' .docx/.md files were written to disk for direct comparison.",
+  "results_prose": "Auto-chunked a real 2,368-word, 13-article GDPR excerpt into 69 passages with no manual pre-structuring. 'Rewrite this regulation into a clear, well-organized compliance summary.' (the phrasing tried by hand first) scores 0.6795 against wants_document's 0.75 threshold -- does NOT fire. 'Write a document summarizing this regulation in plain language.' scores 0.7846 -- fires. brain.reason (which always uses the default checkpoint, flan-t5-small) dispatched to lab.common.longform as expected and returned decision='supported_with_flags' with 69 citations. Checkpoint comparison on the identical 18-leaf fixture: flan-t5-small passed the fidelity gate on 0/18 leaves (0.0), Qwen2.5-0.5B-Instruct on 0/18 (0.0) -- Qwen2.5-0.5B-Instruct did NOT improve the fidelity pass rate on this real document. flan-t5-small's dominant failure reasons: ['deterministic_splice_preferred', 'already_complete']; Qwen2.5-0.5B-Instruct's: ['deterministic_splice_preferred', 'already_complete']. Both checkpoints' .docx/.md files were written to disk for direct comparison.",
   "conclusion": "Qwen2.5-0.5B-Instruct did NOT measurably improve the fidelity pass rate over flan-t5-small on this real document -- see metrics.rewrite_fidelity_by_checkpoint for the exact failure reasons each checkpoint hit. This is evidence that dense modal/numeric regulatory language defeats the fidelity gate's current thresholds somewhat independent of which small checkpoint generates the rewrite, not just a flan-t5-small-specific weakness. Reported as measured, not assumed to improve just because a newer or larger model was substituted. brain.reason itself still defaults to flan-t5-small (write_long_document's own default checkpoint) -- this comparison used direct write_long_document calls with each checkpoint named explicitly; making Qwen2.5-0.5B-Instruct the live default for brain.reason's own dispatch is a separate decision, not made here.",
   "scale_down": "One real document (69 passages, 19 leaves), two checkpoints -- a genuine end-to-end proof and a real controlled comparison, not a benchmark across many documents, domains, or checkpoints.",
   "referenced_files": [
@@ -116,7 +110,7 @@
     "brain.reason's longform dispatch still hardcodes flan-t5-small as write_long_document's default checkpoint -- making the better-measured checkpoint the live default (rather than only reachable via a direct write_long_document call) is a separate, deliberate decision, not made in this exploration.",
     "The cross-page consistency checker's false-positive rate on repetitive legal text (same generic subject, many unrelated clauses) was not measured here, only observed qualitatively -- a dedicated precision measurement is a real follow-up before trusting this flag on this kind of document."
   ],
-  "elapsed_sec": 815.7495,
-  "peak_rss_mb": 3682.3,
+  "elapsed_sec": 68.278,
+  "peak_rss_mb": 996.86,
   "models_used": "dslim/bert-base-NER (entity detection, live via use_real_ner=True, not generative) + flan-t5-small and Qwen/Qwen2.5-0.5B-Instruct (bounded rewriter role, fidelity-gated, each run on the identical 19-leaf fixture for a controlled comparison) via lab.common.rewriter_backends."
 }

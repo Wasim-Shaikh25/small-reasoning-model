@@ -21,8 +21,8 @@ from __future__ import annotations
 
 from collections.abc import Callable
 
-from lab.common.assemble import render_unit
 from lab.common.real_rewriter import build_prompt, fidelity_gate
+from lab.common.template_rewriter import splice_unit
 
 
 def _flan_t5_small(prompt: str, max_tokens: int) -> str:
@@ -128,9 +128,21 @@ def rewrite_unit(
     fidelity outcome, since every one of those leaves already fell back
     to the identical deterministic text anyway -- this only removes the
     now-provably-wasted model call that preceded that same fallback.
-    Multi-finding leaves are unaffected: the gate was only ever tested
-    against single-statement completeness, not "is this already one
-    combined paragraph."
+    Multi-finding leaves: AUDIT.md 2026-11-09 ("the pre-check gate wired
+    into the live default path") measured generation succeeding on 0 of
+    17 real multi-finding leaves (EXP-081) -- every one fell back anyway.
+    `template_rewriter.splice_unit` is zero-fabrication BY CONSTRUCTION
+    (its own docstring: "it has no generation step, so there is nothing
+    for it to omit or invent" -- it only selects a connective from a
+    fixed 4-word vocabulary and copies statements verbatim) and was
+    separately measured to add real connective text where the old
+    `render_unit` fallback had none. Since generation is measured to add
+    nothing here and `splice_unit` is unconditionally at least as safe as
+    the deterministic fallback it replaces, multi-finding leaves skip
+    `generate()` too -- same logic as the single-finding gate above, one
+    level up. `splice_unit`'s own known bug (AUDIT.md: a "whether or not"
+    idiom false-triggers a wrong "However," connective via `textutil.
+    MODAL_RE`) is inherited, not hidden -- not yet fixed.
     """
     if use_repair and checkpoint in _REPAIR_BACKENDS:
         module_path, extra_kwargs = _REPAIR_BACKENDS[checkpoint]
@@ -141,7 +153,12 @@ def rewrite_unit(
         result.setdefault("checkpoint", checkpoint)
         return result
 
-    deterministic_text = render_unit(leaf, glossary)
+    # splice_unit(leaf) is byte-identical to the old render_unit(leaf) for
+    # a single-finding leaf (no previous statement to connect to -- see
+    # choose_connective's "first" case), so this is a strict superset,
+    # not a behavior change, for every leaf splice_unit doesn't get a
+    # chance to improve.
+    deterministic_text = splice_unit(leaf, glossary)
 
     if len(leaf["findings"]) == 1:
         from lab.common.sentence_completeness import is_complete_sentence
@@ -156,6 +173,15 @@ def rewrite_unit(
                 "fallback_reason": ["already_complete"],
                 "checkpoint": checkpoint,
             }
+    else:
+        return {
+            "text": deterministic_text,
+            "used_generative": False,
+            "generated_text": None,
+            "checks": None,
+            "fallback_reason": ["deterministic_splice_preferred"],
+            "checkpoint": checkpoint,
+        }
 
     prompt, src_text, cite_ids = build_prompt(leaf, glossary, ask=ask)
     generated = generate(checkpoint, prompt, max_new_tokens)

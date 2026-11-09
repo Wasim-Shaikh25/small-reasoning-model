@@ -1381,3 +1381,73 @@ EXP-081's was (a `fallback_reason_counts` label, never the actual output
 text, which this change cannot alter for any leaf it doesn't skip).
 Re-run and refresh each the next time it's touched, per this file's own
 append-only/measure-before-claiming convention -- not assumed fixed here.
+
+## Follow-up, same day: template_splice wired into multi-finding leaves too, and its connective bug turned out far worse than one example suggested
+
+User asked to wire `template_splice` into the multi-finding path the same
+way the completeness gate now covers single-finding leaves, then asked
+why fluency can't come from grammar/tree-reasoning enumeration plus
+NLI/embeddings -- correctly pointing out this is safe specifically
+because it assembles existing content rather than inventing any.
+
+**Wiring:** `rewriter_backends.rewrite_unit` now computes
+`template_rewriter.splice_unit(leaf, glossary)` as `deterministic_text`
+(byte-identical to the old `render_unit` output for a single-finding leaf,
+confirmed by inspection of `choose_connective`'s "first" case -- a strict
+superset, not a behavior change for leaves it can't improve) and, for any
+multi-finding leaf, returns it directly WITHOUT calling `generate()` at
+all -- same logic as the single-finding completeness gate, one level up.
+Verified with a monkeypatched `generate()`: 0 calls for both a complete
+single-finding leaf and a multi-finding leaf; a fragment/heading
+single-finding leaf still calls it once, unchanged.
+
+**Re-ran EXP-081 for real:** `fallback_reason_counts` is now exactly
+`{"deterministic_splice_preferred": 17, "already_complete": 1}` for BOTH
+checkpoints -- 18/18 leaves, zero `generate()` calls anywhere in this
+pipeline run. `elapsed_sec` dropped 815.7 -> 63.5 (~13x), `peak_rss_mb`
+3682 -> 998 (no transformer weights held for generation). Decision/
+citations/fidelity outcome unchanged (`supported_with_flags`, 69
+citations, 0.0 fidelity pass rate either way -- `already_complete` and
+`deterministic_splice_preferred` are both `used_generative: False`, the
+same outcome the old always-failing generate() call already fell back
+to). Document content legitimately changed (word count 2469->2546, +77
+words of real connective text; sha256 changed accordingly) -- the
+measured improvement, not a regression.
+
+**But reading the actual rendered document surfaced the earlier
+connective bug at a severity one hand-picked example never showed:** 21
+of 51 connectives chosen were "However," -- on a document that is
+overwhelmingly a LIST of parallel, non-contrasting legal obligations and
+definitions. Root cause confirmed at scale: `choose_connective`'s
+`modals()`/`polarity_flipped()` checks fire on bare presence of
+"not"/"no"/"shall"/"unless" ANYWHERE in the sentence -- which is nearly
+every sentence in dense legal prose, not evidence of contrast with the
+specific previous sentence. This is far more pervasive than the single
+"whether or not" idiom case found two turns ago; it's the dominant
+behavior on this entire document class.
+
+**Fixed, not just documented, per standing project policy**
+([[feedback_no_hardcoded_connectives]]: always detect connectives via
+`find_connectives`, never regex): `choose_connective`'s contrast check
+now reuses `lab.common.connectives.find_connectives` -- this project's
+own already-validated, dependency-parse-based discourse-connective
+detector -- and fires only when the current statement's own text
+structurally contains a genuine `Operator.CONCESSION`-class marker
+(however/although/though/despite/while/whereas/nevertheless), i.e.
+textual evidence of an actual contrast, never an inference from
+negation's mere presence. Verified: the exact idiom false-positive case
+("whether or not") now resolves to "In addition,"; a genuine contrast
+case ("The tenant paid... However, the landlord still...") still
+correctly resolves to "However,"; re-running EXP-081 end to end dropped
+"However," from 21/51 to 0/51, with fidelity numbers, leaf counts, and
+`fallback_reason_counts` otherwise unchanged (confirmed, not assumed).
+
+**Where this leaves the generative-model question, concretely:** on the
+one real document fixture tested, the live default pipeline now makes
+zero generative-model calls, with a verified byte-level before/after
+comparison at every step, not an assumption. The three theoretical gaps
+named in earlier entries (gerund/subordinate-clause fragments in
+`sentence_completeness`; the `no_verbal_root` single-finding case still
+calling `generate()`; the four untouched explorations sharing this
+dispatcher) remain exactly as stated -- none of them were hit by this
+fixture, none are claimed fixed.
