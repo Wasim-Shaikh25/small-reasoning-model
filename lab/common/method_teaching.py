@@ -38,6 +38,7 @@ import requests
 
 from lab.common.calc import parse_date
 from lab.common.entities import detect_primary
+from lab.common.intent_signals import _best_similarity
 from lab.common.textutil import sentences
 
 OLLAMA_URL = "http://localhost:11434/api/generate"
@@ -130,9 +131,13 @@ _PRIMITIVE_BLURBS = {
     "count": "counts how many prior findings there are",
 }
 
+NO_MATCH = "no_matching_tool"
+
 PLAN_PROMPT = """Below is a closed list of tools and a question. Pick which
 tools, in order, would answer the question -- you are naming tools only,
-never answering the question yourself.
+never answering the question yourself. If none of these tools, in any
+order, could answer the question, reply with exactly one step:
+"{no_match}" -- do not force a bad fit.
 
 Tools:
 {tool_list}
@@ -144,7 +149,7 @@ _SCHEMA = {
     "properties": {
         "steps": {
             "type": "array",
-            "items": {"type": "string", "enum": list(PRIMITIVE_REGISTRY)},
+            "items": {"type": "string", "enum": [*PRIMITIVE_REGISTRY, NO_MATCH]},
             "minItems": 1,
             "maxItems": 4,
         }
@@ -161,7 +166,7 @@ def propose_method(ask: str, checkpoint: str = TEACHING_CHECKPOINT, max_tokens: 
     `steps` key, or a `steps` value that validate_plan rejects.
     """
     tool_list = "\n".join(f"- {name}: {_PRIMITIVE_BLURBS[name]}" for name in PRIMITIVE_REGISTRY)
-    prompt = PLAN_PROMPT.format(tool_list=tool_list, ask=ask)
+    prompt = PLAN_PROMPT.format(tool_list=tool_list, ask=ask, no_match=NO_MATCH)
     resp = requests.post(
         OLLAMA_URL,
         json={
@@ -184,16 +189,75 @@ def propose_method(ask: str, checkpoint: str = TEACHING_CHECKPOINT, max_tokens: 
     return validate_plan(steps)
 
 
+# Live-tested finding (2026-11-09): asked directly, with an explicit
+# "no_matching_tool" escape option offered in the prompt, gemma3:270m still
+# defaulted to the generic extract_dates/persons/organizations/amounts plan
+# for every one of 3 genuinely out-of-scope asks ("What is the overall tone
+# of this case?", "strongest argument", "summarize in one sentence") rather
+# than ever choosing the escape option -- the same "always produce SOME
+# confident answer" bias lab.common.gapfill already found, now shown at the
+# planning level too. A self-reported plan cannot be trusted to mean it
+# actually fits; it is cross-checked here instead, the same
+# never-trust-the-claim discipline as everywhere else in this module.
+#
+# lab.common.intent_signals already solves exactly this judgment --
+# "does this ask's QUESTION FORM match a capability's form" -- for brain.py's
+# own stages (wants_identity/wants_total/...), via bge cosine similarity
+# against a few exemplar phrasings per capability, calibrated per-capability.
+# Reused here (_best_similarity) rather than reinvented, for the SAME kind of
+# judgment applied to this module's own primitives. Note this is a
+# different judgment than lab.common.gapfill's embedding pre-filter attempt,
+# which failed: that compared an ask against PASSAGE CONTENT to guess
+# fact-presence (topical overlap isn't presence-of-fact); this compares an
+# ask against CAPABILITY-DESCRIPTION exemplars to guess question-form fit --
+# the same comparison intent_signals.py already relies on successfully.
+_INTENT_EXEMPLARS = {
+    "extract_dates": ("When did this happen?", "What dates are mentioned?", "Give me a timeline of events."),
+    "extract_persons": ("Who is named in this case?", "What are the names of the people involved?"),
+    "extract_organizations": ("What organizations are mentioned?", "Which companies are named?"),
+    "extract_amounts": ("How much money is involved?", "What amounts are mentioned?"),
+    "count": ("How many are there?", "What is the count?"),
+}
+# A first measured value from one live test batch (timeline/list-orgs/
+# how-many-people scored 0.726-0.954; three genuinely out-of-scope asks
+# scored 0.582-0.626) -- a real gap, same shape as intent_signals.py's own
+# calibration note, but NOT yet calibrated the way IDENTITY_TAU/TOTAL_TAU
+# were (against a dedicated cross-domain exploration). Treat as provisional
+# until that exists.
+INTENT_TAU = 0.75
+
+
+def plan_matches_intent(ask: str, steps: list[str], tau: float = INTENT_TAU) -> dict:
+    """Checks the proposed plan's own content-producing steps (the
+    `_INTENT_EXEMPLARS` keys; `group_by_sentence`/`sort_chronological` are
+    composition-only and have no standalone intent of their own, so they
+    never block or contribute here) against what the ask's question FORM
+    actually looks like it wants. The plan passes if ANY of its
+    content-producing steps scores at or above `tau` -- a plan can
+    legitimately combine one well-matched step with others, so the
+    strongest step, not the weakest, decides.
+    """
+    scored = {name: _best_similarity(ask, _INTENT_EXEMPLARS[name]) for name in steps if name in _INTENT_EXEMPLARS}
+    best_score = max(scored.values(), default=0.0)
+    return {"fires": best_score >= tau, "scores": {k: round(v, 4) for k, v in scored.items()}, "tau": tau}
+
+
 def validate_plan(steps) -> list[str] | None:
     """The one gate every proposed plan must pass before anything runs:
     `steps` must be a non-empty list, every entry a real PRIMITIVE_REGISTRY
-    name. Enum-constrained decoding already makes a bad name unlikely, but
-    this does not trust that -- it is checked again here unconditionally,
-    the same "never trust the LLM's own claim" discipline lab.common.
-    gapfill applies to spans, applied here to plan steps instead.
+    name, OR the single sentinel step `NO_MATCH` -- the model's own
+    admission that no combination of existing primitives answers this ask,
+    which is a VALID, meaningful plan (gap correctly detected), not a
+    malformed one. Enum-constrained decoding already makes a name outside
+    the registry (and NO_MATCH) unlikely, but this does not trust that -- it
+    is checked again here unconditionally, the same "never trust the LLM's
+    own claim" discipline lab.common.gapfill applies to spans, applied here
+    to plan steps instead.
     """
     if not isinstance(steps, list) or not steps:
         return None
+    if steps == [NO_MATCH]:
+        return steps
     if not all(isinstance(s, str) and s in PRIMITIVE_REGISTRY for s in steps):
         return None
     return steps
@@ -222,6 +286,24 @@ def teach_and_execute(ask: str, passages: list[dict], checkpoint: str = TEACHING
     steps = propose_method(ask, checkpoint=checkpoint)
     if steps is None:
         return {"ok": False, "steps": None, "result": None, "reason": "invalid_or_missing_plan"}
+    if steps == [NO_MATCH]:
+        # The model's own correctly-shaped admission that nothing in
+        # PRIMITIVE_REGISTRY fits -- a genuine capability GAP, reported as
+        # such (distinct from a malformed-output failure), so a caller --
+        # or a human reading AUDIT.md later -- can tell "the toolbox needs
+        # a new primitive for this ask type" apart from "the model's output
+        # didn't parse."
+        return {"ok": False, "steps": steps, "result": None, "reason": "no_matching_tool"}
+    intent_check = plan_matches_intent(ask, steps)
+    if not intent_check["fires"]:
+        # The plan named only real primitives, but none of them actually
+        # matches what this ask's own question form looks like it wants --
+        # the deterministic override for the failure this module's live
+        # testing found: the model defaulting to its one favorite generic
+        # plan regardless of fit, instead of ever using the NO_MATCH escape
+        # it was explicitly offered. Reported the same way an explicit
+        # NO_MATCH is, since that is what this plan should have been.
+        return {"ok": False, "steps": steps, "result": None, "reason": "no_matching_tool", "intent_check": intent_check}
     try:
         result = execute_method(steps, passages)
     except (TypeError, AttributeError, KeyError):

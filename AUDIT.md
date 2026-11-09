@@ -593,3 +593,49 @@ registry rather than free text) is validated. The core usefulness property
 (does the taught method actually fit the ask) is not yet reliable enough,
 and the one gap identified in finding 5 above (shape-of-result vs.
 shape-implied-by-ask) would need to close before this could run live.
+
+### Follow-up, same day: a deterministic gate closes the "always picks something" gap
+
+Project owner asked directly what happens for a genuinely NEW ask type the
+7 primitives don't cover at all. Added an explicit `"no_matching_tool"`
+escape value to the plan schema's enum and re-tested against 3 asks
+chosen to be genuinely outside the registry's capability (sentiment/tone,
+argument strength, one-sentence summarization -- none of these are
+expressible as any combination of "find entities of type X" / "attach
+sentence" / "sort" / "count", because none of the 7 primitives performs
+any evaluative or synthesizing judgment at all). **Result: offering the
+escape option did not help.** gemma3:270m defaulted to the same generic
+4-extractor plan for 2 of 3 out-of-scope asks anyway, marked `ok: True`
+with a non-empty, grounded-but-irrelevant result -- the same
+"always-confident, never self-aware of not-knowing" bias `gapfill.py`
+already found, now shown at the planning level, confirming the model
+cannot be trusted to use its own escape hatch.
+
+**Fix: a second, deterministic gate, not another prompting attempt.**
+Reused `lab.common.intent_signals._best_similarity` (bge cosine similarity
+against a few exemplar phrasings per capability, the same mechanism
+`wants_identity`/`wants_total`/etc. already use for brain.py's own stages)
+to independently check whether the ask's own question FORM actually
+resembles any of the plan's chosen primitives' intent -- `plan_
+matches_intent` in `method_teaching.py`, `INTENT_TAU=0.75` (provisional,
+one test batch, not yet calibrated the way `IDENTITY_TAU`/`TOTAL_TAU` were
+against a dedicated cross-domain exploration). Retested: timeline (0.954),
+"list organizations" (0.926), "how many people" (0.844 via
+extract_persons) all clear 0.75 easily; "strongest argument" (max 0.582),
+"summarize in one sentence" (max 0.626) and the earlier "tenant's phone
+number" case (max 0.594) all fall well below it and are now correctly
+overridden to `no_matching_tool`, regardless of what the LLM itself
+claimed. This is a genuinely different judgment than the embedding
+pre-filter that failed in the `gapfill.py` experiment above: that compared
+an ask against PASSAGE CONTENT to guess fact-presence (topical overlap
+isn't presence-of-fact, and failed); this compares an ask against
+CAPABILITY-DESCRIPTION exemplars to guess question-form fit, the exact
+comparison `intent_signals.py` already relies on successfully elsewhere in
+this codebase.
+
+**Still open:** this closes "wrong category entirely," not "right category,
+wrong shape" -- "how many people are named" still passes the intent check
+(extract_persons legitimately matches) but returns a raw list instead of a
+count, because no step of the chosen plan ends in `count`. Finding 5's gap
+(shape-of-result vs. shape-implied-by-ask) is unchanged by this fix and
+still open.
