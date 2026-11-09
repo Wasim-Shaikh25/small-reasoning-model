@@ -885,3 +885,61 @@ a much stronger model, or (b) narrowing the rewrite unit further so it
 never has to relate two DIFFERENT findings to each other at all (one
 finding per leaf, never combined -- untested here, since `build_outline`
 groups up to 4 per leaf by default).
+
+## Follow-up, same day (commit pending): `write_article.py` -- the full pipeline, confirmed end-to-end, zero fabrication
+
+Closes the thread started by "why rewriting is not working" and "is it now
+able to write or rewrite." The fabrication found in the section above
+("does the project's OWN validated rewriter actually write anything
+here?") was traced to one specific thing: `assemble.build_outline`
+groups up to 4 findings into one leaf, and `real_rewriter.build_prompt`
+instructs the model to "combine these verified facts into one flowing
+paragraph" whenever a leaf has more than one finding -- that instruction
+is what invited the model to invent a relationship between facts that
+were never connected. It was NOT a missing language-to-logic/tree-
+reasoning step: `rules.parse_conditional_rule`/`extract_fact_triple` were
+tested directly against this exact content and found inapplicable (zero
+conditional-rule structure present; the fact-triple extractor discards
+the actual claim inside "a survey found..."-style reporting sentences).
+That mechanism is built for conditional legal/policy rules, a narrower
+shape than general declarative reporting -- not a stronger version of
+the same tool, a different one.
+
+Verified directly: restricting the rewrite unit to exactly ONE finding at
+a time (never combining) removes the invitation to invent a relationship
+entirely. Re-ran the same 10 findings this way: 8 passed the fidelity
+gate with zero fabrication (every pass a faithful paraphrase, at most
+trivial grammar smoothing); the 2 that fell back did so for ordinary,
+already-understood reasons -- one empty generation, one that dropped a
+hedge word ("not all") -- not invented relationships. This is the same
+failure class EXP-048/054/056/062 already measured and built this gate
+for, not a new one.
+
+Built `lab/common/write_article.py`, composing three independently-tested
+pieces in the order that keeps them safe together:
+1. `notes_to_findings` (language-to-structure: sentence-split + lexical
+   attribution, no LLM) -- the system cannot reason over raw strings, so
+   this step is the actual answer to "where does language-to-logic come
+   into the picture," just a lexical-token version of it rather than
+   `rules.py`'s SVO/conditional-rule version, which this content doesn't fit.
+2. `rewrite_findings_individually` -- one finding per call, fidelity-gated,
+   falls back to the original statement per-finding on failure.
+3. `assemble.assemble` -- unchanged, deterministic, with its own
+   coverage/citation-integrity checks.
+
+Ran the full pipeline end-to-end on the original messy paragraph + 3
+sources, zero manual claim-splitting: 100% finding coverage, zero broken
+citation markers, zero units without a citation, 8/10 findings
+individually rewritten with no fabrication, 2/10 safely using the
+original text. Grouping findings into sections for readability (still
+`assemble`'s groups-of-4) is kept fully separate from the one-at-a-time
+rewrite step, so a smarter, topic-aware grouping (an actual tree over
+shared entities/tokens, not yet built) could replace that chunking later
+without ever touching the part proven safe here.
+
+**Still open**: the section grouping itself is still arbitrary
+(chunks of 4), not topic-aware -- a genuine tree/clustering step over
+findings (grouping by shared tokens/entities across ALL findings, not
+just note-to-source attribution) would be a legitimate way to realize
+the "writing is tree reasoning" instinct that prompted this follow-up,
+but it has not been built or tested yet.
