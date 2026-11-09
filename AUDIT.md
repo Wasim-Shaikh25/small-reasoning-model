@@ -1451,3 +1451,116 @@ named in earlier entries (gerund/subordinate-clause fragments in
 calling `generate()`; the four untouched explorations sharing this
 dispatcher) remain exactly as stated -- none of them were hit by this
 fixture, none are claimed fixed.
+
+## Follow-up, same day: four big end-to-end tests, run in parallel, to see whether all this actually scales past one-paragraph examples
+
+User asked for one big combined experiment: (1) a ~10-page petition for
+the Bombay High Court from a fabricated case plus raw notes, (2) rewriting
+a real ~10-page document into simple English, (3) extracting "findings"
+from a research/decision document, (4) applying a company policy to
+customer case scenarios, including fetching real data from the web. All
+four run with zero generative-model calls, each independently, each
+reporting failures honestly, not just successes.
+
+**(1) Bombay HC petition, 2,543 words, zero generative calls (confirmed:
+`spellfix.fix_sentence_joint`, `notes_to_findings.notes_to_findings`,
+`rules.parse_conditional_rule`/`extract_fact_triple`/`apply_rule`,
+`assemble.assemble(rewriter="template_splice")` -- no model anywhere).
+Clearly labeled "SAMPLE/FICTIONAL... NOT A REAL FILING," invented parties.
+41 findings, coverage 1.0, zero broken citations.
+
+Surfaced and FIXED a real, previously-undiscovered bug in `spellfix.py`:
+with no proper-noun protection, "Sagar" -> "sugar", "Mehta" -> "meta",
+"Pvt" -> "pot" -- real close-by English words corrupting correctly-spelled
+capitalized input. First fix only skipped MID-sentence capitalized words
+(`i > 0`); direct adversarial testing of the fix itself caught that a
+SENTENCE-INITIAL proper noun ("Sagar Mehta of Oceanic Pvt Ltd filed...")
+was still corrupted, since position 0 was never checked. Fixed properly:
+the skip is now unconditional on position, accepting the same already-
+established trade-off (missing a rare typo in a capitalized word is
+cheaper than corrupting a real name) for every position, not just some.
+Verified zero regression on existing cases (peopel->people, overhear
+preserved, the pre-existing lonly->only limitation unchanged).
+
+Found, NOT fixed: "colony"->"colon" and "dated"->"date" (same vocabulary-
+coverage-gap class as the already-documented "overhear" case, but the
+compound-rescue check doesn't apply since the remaining piece isn't a
+real word). Found, NOT fixed, a genuine parser limit: spaCy mis-tags
+"discharges" as NOUN in "an industrial unit discharges effluent into...",
+so `parse_conditional_rule` picked the wrong trigger verb for one of three
+rules -- a real tagger error on this phrasing, not a mechanism bug.
+
+**(2) Simplify a real ~3,043-word GDPR excerpt (the embedded fixture plus
+3 more real articles fetched live from gdpr-info.eu) into plain English.**
+Built `lab/common/plain_language.py` (closed 50+ term formal->plain
+vocabulary table, same mechanism as `informal_register.py`). 61/88
+sentences (69.3%) got at least one substitution, zero generative calls,
+no meaning-changing substitution found on inspection.
+
+**Honest conclusion: this achieves "simpler vocabulary," not "simple
+English."** The document's longest, most convoluted sentences (Art. 49's
+nested conditions) read almost as densely after substitution -- same
+structure, friendlier words. This module has no mechanism to split a
+sentence, flip passive to active, or reorder a subordinate clause, so it
+cannot touch the actual source of complexity in a document like this one.
+Predicted before testing, confirmed by testing, not assumed either way.
+
+**(3) Extract "findings"/decisions from a fictional research/decision
+memo.** Combined `deontic.py` (built for EXP-087, never wired into
+anything until now) with a small new closed `DECISION_VERBS` table
+(decide/conclude/approve/recommend/resolve/agree/reject/authorize/
+determine), checked against the sentence's structural ROOT verb lemma,
+promoted into `lab/common/decision_findings.py`. On a 45-sentence
+synthetic memo: 14 flagged, checked by hand against the source --
+precision ~93% (13/14), recall ~93% (13/14 of the memo's real decisions).
+
+Two confirmed, unfixed failure modes, found by hand-checking rather than
+trusting the count: a reported/embedded modal inside a described research
+question ("studying whether the company SHOULD expand...") reads as a
+real directive -- one false positive; a passive, non-modal decision ("A
+follow-up review IS SCHEDULED...") is missed entirely since its ROOT verb
+isn't in the closed table -- one false negative. A third, non-blocking
+ordering artifact: a sentence with both a decision verb and an embedded
+modal gets labeled by the modal, not the decision verb -- still correctly
+flagged as a finding, just a less precise type tag.
+
+**(4) Fetch a real company policy, apply it to fictional customer
+cases.** Fetched Steam's real refund policy (store.steampowered.com/
+steam_refunds/) via WebFetch, paraphrased for copyright. Tested
+`rules.parse_conditional_rule`/`apply_rule` -- the exact mechanism already
+validated for the rent-petition's Grounds section -- against a brand-new
+domain.
+
+**Honest conclusion: `lab.common.rules` does NOT generalize to a new
+domain without modification -- the clearest negative finding of the
+four.** Only 3 of 8 real-policy-derived sentences parsed, and all 3 were
+ones deliberately rewritten into the canonical "If X, Y" shape first --
+every sentence phrased the way the real policy actually reads (plain
+declarative statements) failed outright, a structural mismatch against
+`RULE_RE`, not a judgment call. A second, independent failure mode hit in
+the same 8 sentences: an "if"-initial sentence with the right comma shape
+still failed because its condition clause is a copula+adjective ("is
+unused"), not a true VERB -- `_main_verb` requires `pos_=="VERB"`.
+
+Case application got 4/4 right by OUTCOME, but one (Priya, denied for
+requesting after the window closed) was right for the WRONG REASON: the
+mechanism rejected her because her sentence's verb was "email" not
+"request" (lemma-match brittleness), never because it evaluated the
+actual "two weeks" time condition -- `apply_rule` carries
+`condition_text` as inert text and never compares it against any
+quantitative/temporal value. A case like "requested a refund one month
+after purchase" would incorrectly match=True today. This is a real,
+structural gap (no temporal/numeric condition checker exists at all),
+not a phrasing quirk fixable by a bigger rule table.
+
+**Net assessment across all four:** the zero-LLM architecture scales to
+a genuinely long, real-structure document (1) without new fabrication
+risk, and a real latent bug was found and fixed doing it. It also has
+real, now-precisely-located limits that weren't visible in the smaller
+examples tested earlier: vocabulary substitution alone cannot simplify
+sentence STRUCTURE (2); the deontic/decision-verb combination is a good
+first-pass flagger, not an unsupervised-accurate one (3); and the rule-
+application mechanism that worked well on one hand-written legal-rule
+shape does NOT transfer to real-world policy prose or to any condition
+that depends on a quantity or a date, which is most of what real policies
+actually turn on (4). All four reported as measured, not softened.

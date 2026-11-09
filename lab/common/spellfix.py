@@ -231,6 +231,32 @@ def fix_sentence_joint(sentence: str, max_distance: int = 1) -> dict:
     (`informal_register.normalize_informal`) -- they are not typos (no
     candidate within edit distance means what they mean) and were
     confirmed live to be misdiagnosed as one otherwise ("cos"->"cons").
+
+    A capitalized word is never flagged -- found live (2026-11-09, a real
+    Bombay HC sample-petition test): with no such skip, "Sagar" (a proper
+    noun, correctly spelled, not in the lowercase-only vocabulary) was
+    "corrected" to "sugar", "Mehta" to "meta", and the abbreviation "Pvt"
+    to "pot" -- all real, close English words, all wrong, all actively
+    corrupting correctly-spelled input. Same risk-asymmetry reasoning
+    `candidates_for`'s own length<=2 exemption already uses: proper nouns
+    and abbreviations are overwhelmingly capitalized in running English
+    text, so this is a cheap, reliable signal, and the cost of wrongly
+    "fixing" a correct capitalized word (an active corruption) is worse
+    than the cost of missing a rare genuine typo in one (a silent
+    non-fix) -- same direction as leaving short words alone, not a new
+    principle.
+
+    First-fixed version of this skip only excluded `i > 0` (mid-sentence)
+    capitalized words, reasoning position 0 is capitalized by English
+    convention regardless of word identity. Caught live by direct
+    adversarial testing before trusting it: that left a sentence-initial
+    proper noun ("Sagar Mehta of Oceanic Pvt Ltd filed...") still
+    corrupted to "sugar Mehta...", since "Sagar" at position 0 was never
+    checked at all. The trade-off this module already accepts (missing a
+    rare sentence-initial typo is cheaper than corrupting a real name)
+    applies identically regardless of position, so the skip is now
+    unconditional on position -- a genuine capability loss for typos that
+    happen to start a sentence, accepted on purpose, not an oversight.
     """
     from lab.common.informal_register import normalize_informal
 
@@ -238,6 +264,8 @@ def fix_sentence_joint(sentence: str, max_distance: int = 1) -> dict:
     words = sentence.split()
     ambiguous: dict[int, list[str]] = {}
     for i, w in enumerate(words):
+        if w[:1].isupper():
+            continue
         clean = w.strip(".,!?\"'").lower()
         cands = candidates_for(clean, max_distance=max_distance)
         if cands:
