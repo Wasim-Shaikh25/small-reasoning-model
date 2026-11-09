@@ -639,3 +639,49 @@ wrong shape" -- "how many people are named" still passes the intent check
 count, because no step of the chosen plan ends in `count`. Finding 5's gap
 (shape-of-result vs. shape-implied-by-ask) is unchanged by this fix and
 still open.
+
+### Follow-up, same day: the ask itself becomes logic -- removes the checkpoint from the primary path entirely
+
+Project owner's own reframing, after seeing both the tool-count-growth
+problem (every new ask-shape got a new hand-written primitive,
+`list_grounded_arguments` included) and the checkpoint's unreliable
+picking: the ask is itself natural language, and this project already has
+a natural-language-to-logic converter (`lab.common.rules.
+parse_conditional_rule`/`extract_fact_triple`, built for rule/fact
+sentences) -- so parse the ASK the same structural way, instead of asking
+the checkpoint to guess or scoring bge similarity against hand-authored
+exemplars.
+
+Built `parse_ask_intent()`/`plan_for_ask()`: a WH-word (when/who/where) or
+"how many"/"how much" names an OPERATION directly; otherwise the ask's own
+head noun (dependency-parsed the same way `rules._main_verb` already
+parses rule sentences -- ROOT's object, or subject of a copula/ccomp/relcl
+chain) names it via a small, fixed, domain-agnostic noun->label table (not
+growing per ask type, same discipline as `entities.py`'s own fixed label
+set). Two genuinely new capabilities fell out of this for free: "how many
+people" now correctly resolves to `count` (every earlier test in this
+module, checkpoint-proposed, never once chose `count` for a counting
+question), and multi-step composition ("timeline" = extract_dates +
+group_by_sentence + sort_chronological, not a bare span list) is now a
+fixed, named, human-reviewed entry in `_INTENT_TO_PLAN` rather than
+something the checkpoint had to improvise into a 4-step sequence.
+
+**`teach_and_execute` now tries this FIRST, with zero checkpoint/embedding
+calls, and falls back to the checkpoint-proposed path only when
+`parse_ask_intent` returns `None`.** Retested the full 7-ask battery used
+throughout this file: all 5 in-scope asks (timeline, list-organizations,
+how-many-people, list-arguments-each-side, when-was-X-signed) resolved
+correctly via the new deterministic path alone; both out-of-scope asks
+(tone/sentiment, phone number) correctly fell through to the checkpoint
+path and were correctly rejected there (one by a malformed-plan response,
+one by the existing `plan_matches_intent` override) -- no regression in
+the fallback's own already-validated behavior.
+
+This also directly closes the "how many tools will we create" concern:
+the fixed vocabulary (`_NOUN_TO_LABEL`, `_WH_TO_LABEL`) does not grow one
+entry per ask-shape -- it grows one entry per genuinely new LABEL (a new
+kind of thing to extract), the same rate `entities.py`'s own label set
+already grows at, while `_INTENT_TO_PLAN` composes those labels with the
+existing operations. The checkpoint's role shrinks to "things this fixed
+vocabulary doesn't recognize at all" -- which, per every test in this file
+so far, has yet to produce a single reliably useful result on its own.

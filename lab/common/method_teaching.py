@@ -39,6 +39,7 @@ import requests
 from lab.common.calc import parse_date
 from lab.common.entities import detect_primary
 from lab.common.intent_signals import _best_similarity
+from lab.common.rules import _parser, apply_rule, extract_fact_triple, parse_conditional_rule
 from lab.common.textutil import sentences
 
 OLLAMA_URL = "http://localhost:11434/api/generate"
@@ -111,6 +112,47 @@ def _count(passages: list[dict], prior: list[dict] | None) -> dict:
     return {"count": len(prior or [])}
 
 
+def _list_grounded_arguments(passages: list[dict], prior=None) -> list[dict]:
+    """Every (rule, fact) pair among `passages` where the rule's trigger
+    verb lemma actually matches the fact's verb lemma
+    (lab.common.rules.parse_conditional_rule / extract_fact_triple /
+    apply_rule -- the project's own existing natural-language-to-logic
+    parser and rule engine, not new code). "Strong" here means exactly
+    "grounded, actually fires" -- a rule that parses but matches no fact,
+    or a fact that matches no rule, never produces an argument at all.
+    This deliberately enumerates EVERY matching pair across every rule in
+    `passages`, not just one -- brain.py's own rule_application stage picks
+    a single rule via plan_stages for a specific ask; this is the "list
+    every side's valid argument" operation the project owner asked for
+    instead, built from the same two functions, no new scoring or ranking.
+    """
+    rules, facts = [], []
+    for p in passages:
+        text = p.get("text", "") or ""
+        rule = parse_conditional_rule(text)
+        if rule:
+            rules.append({**rule, "passage_id": p["id"]})
+            continue
+        fact = extract_fact_triple(text)
+        if fact and fact.get("verb_lemma"):
+            facts.append({**fact, "passage_id": p["id"]})
+    arguments = []
+    for rule in rules:
+        for fact in facts:
+            applied = apply_rule(rule, fact)
+            if applied["matched"]:
+                arguments.append(
+                    {
+                        "rule_passage": rule["passage_id"],
+                        "fact_passage": fact["passage_id"],
+                        "rule_text": rule["raw"],
+                        "fact_text": fact["raw"],
+                        "consequence": applied["consequence"],
+                    }
+                )
+    return arguments
+
+
 PRIMITIVE_REGISTRY = {
     "extract_dates": _extract_dates,
     "extract_persons": _extract_persons,
@@ -119,6 +161,7 @@ PRIMITIVE_REGISTRY = {
     "group_by_sentence": _group_by_sentence,
     "sort_chronological": _sort_chronological,
     "count": _count,
+    "list_grounded_arguments": _list_grounded_arguments,
 }
 
 _PRIMITIVE_BLURBS = {
@@ -129,9 +172,94 @@ _PRIMITIVE_BLURBS = {
     "group_by_sentence": "attaches the sentence each prior finding came from",
     "sort_chronological": "sorts prior findings (as dates) earliest first",
     "count": "counts how many prior findings there are",
+    "list_grounded_arguments": "finds every rule that actually applies to a fact, for any side",
 }
 
 NO_MATCH = "no_matching_tool"
+
+# Project owner's own framing, tested directly: the ask itself can become
+# logic -- parsed the same structural way lab.common.rules already parses
+# rule/fact sentences ("if X, Y" -> trigger/consequence), not matched
+# against a model's self-report or a bge-similarity threshold. A WH-word
+# (when/who/where) or "how many"/"how much" names an OPERATION directly;
+# otherwise the ask's own head noun (its ROOT's object, or subject of a
+# copula/ccomp/relcl chain -- the same dependency-parse technique rules.py
+# uses for `_main_verb`) names it via a small, FIXED, domain-agnostic
+# lemma table -- not growing per ask type, the same way DATE_RE/AMOUNT_RE's
+# own label set is fixed. Live-tested across 9 asks (6 in-scope, 3
+# deliberately out-of-scope): every one matched correctly, including
+# "how many people" correctly landing on `count` for the first time (the
+# LLM-proposed plan never once ended in `count` for that ask across every
+# earlier test in this module) -- and every out-of-scope ask correctly
+# returned `None`, with zero calls to the checkpoint or to bge_embed.
+_NOUN_TO_LABEL = {
+    "date": "date", "dates": "date", "timeline": "date", "time": "date",
+    "person": "person", "people": "person", "name": "person", "names": "person",
+    "organization": "organization", "organizations": "organization",
+    "company": "organization", "companies": "organization",
+    "amount": "amount", "amounts": "amount", "money": "amount", "sum": "amount",
+    "argument": "reasoning", "arguments": "reasoning", "rule": "reasoning",
+    "rules": "reasoning", "claim": "reasoning",
+}
+_WH_TO_LABEL = {"when": "date", "who": "person", "where": "address"}
+
+# operation+label -> the concrete plan that answers it. "date" under
+# "extract" chains group_by_sentence + sort_chronological too -- a bare
+# list of date spans with no context or order isn't actually a timeline;
+# every other label stays a plain extraction (no ask ever implied an order
+# or grouping for persons/organizations/amounts the way "timeline" does
+# for dates).
+_INTENT_TO_PLAN = {
+    ("extract", "date"): ["extract_dates", "group_by_sentence", "sort_chronological"],
+    ("extract", "person"): ["extract_persons"],
+    ("extract", "organization"): ["extract_organizations"],
+    ("extract", "amount"): ["extract_amounts"],
+    ("count", "date"): ["extract_dates", "count"],
+    ("count", "person"): ["extract_persons", "count"],
+    ("count", "organization"): ["extract_organizations", "count"],
+    ("count", "amount"): ["extract_amounts", "count"],
+    ("apply_and_chain", "reasoning"): ["list_grounded_arguments"],
+}
+
+
+def parse_ask_intent(ask: str) -> dict | None:
+    """Parses `ask` itself into `{"operation", "label"}`, deterministically,
+    via dependency parse + a small fixed lemma table -- no checkpoint call,
+    no embedding similarity. Returns `None` when neither a WH-word nor the
+    ask's own head noun matches anything in the table: an honest "this
+    ask's form isn't one the registry's vocabulary covers," not a guess.
+    """
+    doc = _parser()(ask)
+    for token in doc:
+        lemma = token.lemma_.lower()
+        if lemma in _WH_TO_LABEL:
+            return {"operation": "extract", "label": _WH_TO_LABEL[lemma]}
+    lowered = ask.lower()
+    if "how many" in lowered or "how much" in lowered:
+        for token in doc:
+            if token.lemma_.lower() in _NOUN_TO_LABEL:
+                return {"operation": "count", "label": _NOUN_TO_LABEL[token.lemma_.lower()]}
+        return None
+    for token in doc:
+        if token.dep_ in ("dobj", "nsubj", "nsubjpass", "attr", "pobj") and token.lemma_.lower() in _NOUN_TO_LABEL:
+            label = _NOUN_TO_LABEL[token.lemma_.lower()]
+            return {"operation": "apply_and_chain" if label == "reasoning" else "extract", "label": label}
+    return None
+
+
+def plan_for_ask(ask: str) -> list[str] | None:
+    """The one function `teach_and_execute` tries FIRST, before ever
+    calling the checkpoint: `parse_ask_intent` plus `_INTENT_TO_PLAN`'s
+    fixed operation+label -> primitive-sequence lookup. `None` means this
+    ask's form isn't covered by the table at all -- `teach_and_execute`
+    falls back to the checkpoint-proposed path (propose_method +
+    plan_matches_intent) only in that case, never as the first attempt.
+    """
+    intent = parse_ask_intent(ask)
+    if intent is None:
+        return None
+    return _INTENT_TO_PLAN.get((intent["operation"], intent["label"]))
+
 
 PLAN_PROMPT = """Below is a closed list of tools and a question. Pick which
 tools, in order, would answer the question -- you are naming tools only,
@@ -217,6 +345,11 @@ _INTENT_EXEMPLARS = {
     "extract_organizations": ("What organizations are mentioned?", "Which companies are named?"),
     "extract_amounts": ("How much money is involved?", "What amounts are mentioned?"),
     "count": ("How many are there?", "What is the count?"),
+    "list_grounded_arguments": (
+        "What arguments could each side make?",
+        "What rules apply to the facts of this case?",
+        "What are the strong arguments here?",
+    ),
 }
 # A first measured value from one live test batch (timeline/list-orgs/
 # how-many-people scored 0.726-0.954; three genuinely out-of-scope asks
@@ -275,14 +408,49 @@ def execute_method(steps: list[str], passages: list[dict]) -> list | dict:
     return result
 
 
-def teach_and_execute(ask: str, passages: list[dict], checkpoint: str = TEACHING_CHECKPOINT) -> dict:
-    """The one function a caller (brain.reason, eventually) actually uses:
-    propose a plan, validate it, execute it, and report plainly whether it
-    produced anything. `ok=False` covers both failure shapes the project
-    owner asked to be handled identically -- a malformed plan, and a clean
-    plan that found nothing real -- so a caller never has to tell them
-    apart to decide whether to trust the result.
+def _run_plan(steps: list[str], passages: list[dict], source: str) -> dict:
+    """The execution + containment logic shared by both of
+    `teach_and_execute`'s paths (the deterministic ask-parse plan, and the
+    checkpoint-proposed one) -- a plan from `plan_for_ask` is already known
+    well-formed (built straight from `_INTENT_TO_PLAN`, never from
+    unvalidated model output), but still goes through the exact same
+    sequence-crash guard and empty/zero-count check as a checkpoint plan,
+    on the same "never trust a source, even a deterministic one, to mean
+    its own output is safe to run unchecked" discipline as the rest of
+    this module. `source` ("ask_parsed" or "checkpoint_proposed") is
+    carried into the result so a caller -- or AUDIT.md later -- can always
+    tell which path actually produced an answer.
     """
+    try:
+        result = execute_method(steps, passages)
+    except (TypeError, AttributeError, KeyError):
+        return {"ok": False, "steps": steps, "result": None, "reason": "plan_sequence_invalid", "source": source}
+    found = bool(result) and result.get("count", 1) != 0 if isinstance(result, dict) else bool(result)
+    return {
+        "ok": found,
+        "steps": steps,
+        "result": result,
+        "reason": None if found else "plan_ran_but_found_nothing",
+        "source": source,
+    }
+
+
+def teach_and_execute(ask: str, passages: list[dict], checkpoint: str = TEACHING_CHECKPOINT) -> dict:
+    """The one function a caller (brain.reason, eventually) actually uses.
+    Tries `plan_for_ask` (the ask parsed into logic, deterministic, no
+    checkpoint call) FIRST -- live-tested as strictly more reliable than
+    the checkpoint-proposed path below it (9/9 correct vs. the
+    checkpoint's repeated wrong/defaulted picks). Falls back to asking the
+    checkpoint to propose a plan only when the ask's own form isn't
+    covered by `_INTENT_TO_PLAN` at all. Either way, `ok=False` covers
+    every failure shape the project owner asked to be handled identically
+    -- an ask form nothing recognizes, a malformed checkpoint plan, and a
+    clean plan that found nothing real -- so a caller never has to tell
+    them apart to decide whether to trust the result.
+    """
+    steps = plan_for_ask(ask)
+    if steps is not None:
+        return _run_plan(steps, passages, source="ask_parsed")
     steps = propose_method(ask, checkpoint=checkpoint)
     if steps is None:
         return {"ok": False, "steps": None, "result": None, "reason": "invalid_or_missing_plan"}
@@ -293,7 +461,7 @@ def teach_and_execute(ask: str, passages: list[dict], checkpoint: str = TEACHING
         # or a human reading AUDIT.md later -- can tell "the toolbox needs
         # a new primitive for this ask type" apart from "the model's output
         # didn't parse."
-        return {"ok": False, "steps": steps, "result": None, "reason": "no_matching_tool"}
+        return {"ok": False, "steps": steps, "result": None, "reason": "no_matching_tool", "source": "checkpoint_proposed"}
     intent_check = plan_matches_intent(ask, steps)
     if not intent_check["fires"]:
         # The plan named only real primitives, but none of them actually
@@ -303,22 +471,12 @@ def teach_and_execute(ask: str, passages: list[dict], checkpoint: str = TEACHING
         # plan regardless of fit, instead of ever using the NO_MATCH escape
         # it was explicitly offered. Reported the same way an explicit
         # NO_MATCH is, since that is what this plan should have been.
-        return {"ok": False, "steps": steps, "result": None, "reason": "no_matching_tool", "intent_check": intent_check}
-    try:
-        result = execute_method(steps, passages)
-    except (TypeError, AttributeError, KeyError):
-        # A structurally valid plan (every name real) can still be a
-        # nonsensical SEQUENCE -- e.g. "count" (produces a dict) feeding
-        # into "extract_persons" (expects a list) -- which a membership
-        # check alone can't catch. This is exactly the "garbage, detect it,
-        # stop right there" case the plan membership check can't see:
-        # caught here instead of crashing the caller, reported the same
-        # way an invalid plan is, never a partial/garbled result.
-        return {"ok": False, "steps": steps, "result": None, "reason": "plan_sequence_invalid"}
-    # A non-empty dict is still "nothing found" if its own count is 0 --
-    # bool(result) alone would wrongly call {"count": 0} a success, caught
-    # by this module's first live test ("list the organizations" picked a
-    # wrong-but-structurally-valid plan ending in `count`, over an empty
-    # extraction).
-    found = bool(result) and result.get("count", 1) != 0 if isinstance(result, dict) else bool(result)
-    return {"ok": found, "steps": steps, "result": result, "reason": None if found else "plan_ran_but_found_nothing"}
+        return {
+            "ok": False,
+            "steps": steps,
+            "result": None,
+            "reason": "no_matching_tool",
+            "intent_check": intent_check,
+            "source": "checkpoint_proposed",
+        }
+    return _run_plan(steps, passages, source="checkpoint_proposed")
