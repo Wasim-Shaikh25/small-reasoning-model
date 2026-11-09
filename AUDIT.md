@@ -1079,3 +1079,52 @@ notes-only input with no sources at all, containing the pronoun-chain
 payment cycle from the relationship_graph work above -- correctly wrote
 the article AND correctly surfaced the cycle with its ambiguous-pronoun
 warning, end-to-end from a JSON file on disk through to printed output.
+
+## Follow-up, same day (commit pending): the fix is embedding-based disambiguation, zero generative model calls
+
+User's direct challenge after five failed generative attempts (isolated-
+word pick x2 checkpoints x2 prompts, joint-sentence pick, whole-sentence
+free rewrite, a worked few-shot example with the answer shown): "Why do
+we need a model? Can't our system make sense of it with the model's
+VOCAB?" Tested directly rather than assumed: resolve ambiguity via
+bge-embedding similarity between each candidate word and its sentence
+context (word removed) -- the same non-generative signal
+`intent_signals._best_similarity` already relies on for ask-vs-
+capability-exemplar matching, applied here to word-vs-context instead.
+
+**Result: 4/4 on every case every generative attempt got wrong or
+unreliable on** -- "herd"->heard, "realy"->really, "lonly"->lonely,
+"peopel"->people. Re-ran the full 7-sentence paragraph end-to-end:
+6 of 7 distinct typo types now resolve correctly with zero generative
+model calls (peopel x2, wrk, herd, lonly, realy all correct; "thats"
+loses its apostrophe, a vocabulary-construction artifact, not a wrong
+pick). The one true miss, "cos"->"cons" (expected "because"), is a
+DIFFERENT class of problem from everything else in this file: "because"
+is not within edit distance 1 of "cos" at all, so no candidate-based
+method -- generative or embedding -- can ever find it; this is a
+vocabulary-coverage gap (informal abbreviation, not a misspelling), not
+a disambiguation failure.
+
+**Why embeddings succeeded where five generative attempts, two
+checkpoints, and one worked few-shot example all failed**: picking which
+real word fits a context is a SEMANTIC RELATEDNESS judgment -- the same
+kind of judgment this project already measured bge embeddings as
+reliable for (ask-vs-capability-exemplar matching, `intent_signals.py`).
+It is a different use case from ask-vs-passage-content similarity for
+guessing fact presence, measured UNRELIABLE the same day in gapfill.py --
+the project's standing lesson that different embedding use cases have
+different reliability held again, now in the opposite, favorable
+direction: this was genuinely safe to trust, once tested, not assumed
+either way. A 270M-500M generative model, by contrast, has to perform
+several implicit reasoning steps (read the sentence, understand what
+each candidate means, judge fit) to answer the same question, and this
+file's own history shows that repeatedly fails even when a worked
+example with the literal answer is placed one line above the real
+question -- not a prompting gap, a genuine capacity ceiling.
+
+`lab/common/spellfix.py` rewritten: `fix_sentence_joint` now resolves via
+`_pick_by_context_embedding`, no model-backend parameter, no checkpoint
+dependency. `resolve()` and `fix_sentence()` (the generative approaches)
+are kept in the file, unused by the new primary path, as the documented,
+tested, inferior alternatives -- not deleted, per this project's practice
+of keeping a failed design's evidence visible rather than erasing it.
