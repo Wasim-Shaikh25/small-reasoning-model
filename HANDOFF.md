@@ -43,6 +43,89 @@ wired into multi-finding leaves". Nothing here is wired into a one-call
 it's reached today only through `longform.write_long_document`'s own
 default checkpoint argument, same as before.
 
+## Findings and failures from the four big scale-tests (2026-11-09/10)
+
+Four end-to-end tests were run at real document scale (a ~2,500-word
+fictional Bombay HC petition, a real ~3,000-word GDPR excerpt rewritten
+into plain English, decision-extraction from a fictional research memo,
+and a real company policy -- Steam's refund policy -- applied to
+fictional customer cases), each zero-generative-model. Three real bugs
+were found and fixed along the way (spellfix's capitalized-word
+corruption, spellfix's position-0 variant of the same bug, and
+template_rewriter's MODAL_RE-driven false "However," connective) -- all
+three are already fixed and covered above and in `AUDIT.md`; not
+repeated here. Everything below is still open, not fixed, reported as
+measured:
+
+- **Vocabulary substitution cannot simplify sentence structure.**
+  `plain_language.py` (new, closed 50+ term formal->plain table) got
+  real substitutions on ~70% of sentences in both runs, with no
+  meaning-changing substitution found -- but the document's longest,
+  most convoluted sentences (deeply nested conditions, cross-references)
+  still read almost as densely afterward. This module has no mechanism
+  to split a sentence, flip passive to active, or reorder a clause, so
+  it cannot touch the actual source of complexity in dense legal/
+  regulatory text. "Simpler vocabulary" was achieved; "simple English"
+  was not.
+
+- **`decision_findings.py` has two confirmed, reproduced-twice failure
+  modes**, independently hit on two different fictional memos: (1) a
+  reported/embedded modal inside a described research question
+  ("studying whether the company SHOULD expand...") is misread as a real
+  directive -- a false positive; (2) a passive, non-modal decision ("a
+  follow-up review IS SCHEDULED...") is missed entirely, since its ROOT
+  verb isn't in the closed `DECISION_VERBS` table -- a false negative.
+  ~93% precision/recall on both test runs; good enough as a first-pass
+  flagger a person still reviews, not for unsupervised use.
+
+- **`spellfix.py` still has an unfixed, likely-pervasive vocabulary-
+  coverage gap for ordinary verb inflection.** `candidates_for(
+  "commissioned")` returns only `["commissioner"]` -- the past-participle
+  form isn't a single token in the flan-t5 vocabulary (same subword-
+  splitting root cause as the already-known "overhear"/"colony" bugs),
+  so a correctly-spelled verb gets silently swapped for a different,
+  wrong-part-of-speech word. Common `-ed`/`-ing` inflection is far more
+  frequent than compound nouns, so this is likely a bigger, more
+  pervasive instance of the same bug class than either prior example --
+  not fixed; a real fix needs lemmatizing before the vocabulary check,
+  not another hardcoded exception.
+
+- **`rules.py`'s conditional-rule mechanism does not generalize to a new
+  domain or to real-world prose -- the sharpest finding of the four, and
+  the one most relevant before pitching this architecture for anything
+  beyond hand-written legal-rule shapes.** Tested twice (the original
+  fork run and an independent re-run against a freshly fetched copy of
+  Steam's real refund policy): 0 of 8 real-policy sentences parsed as a
+  conditional rule unmodified in either run -- only a sentence
+  deliberately hand-rewritten into the canonical "If X, Y" shape parsed.
+  Two distinct structural failure modes, not one: real declarative
+  policy prose doesn't match `RULE_RE` at all, and a copula+adjective
+  condition ("is unused") isn't recognized since `_main_verb` requires
+  `pos_=="VERB"`.
+
+  Worse, and structural rather than a parsing-coverage gap: **`apply_rule`
+  never evaluates any quantitative or temporal condition at all** -- it
+  only compares the fact's verb lemma against the rule's trigger lemma.
+  In the independent re-run, applying the one rule that DID parse ("if a
+  game has been played for less than two hours and refunded within two
+  weeks...") to 4 fresh fictional cases got **2 of 4 flatly wrong**: a
+  case with 10 hours of playtime and a case refunded a month late both
+  wrongly came back `matched=True`, because `condition_text` carries
+  "less than two hours"/"within two weeks" as inert text, never compared
+  against the case's actual numbers. This means the rule-application
+  mechanism is not safe to point at any real policy whose outcome turns
+  on a number or a date (most of them) without first building a real
+  quantitative/temporal condition checker -- a gap that doesn't show up
+  at all on the hand-written legal-rule examples this mechanism was
+  originally validated against, because those examples never happened to
+  test it.
+
+Source documents and extracted-output files for all four tests were sent
+to the user directly (`SendUserFile`), not committed to this repo --
+regenerate them from `AUDIT.md`'s own entries (search "four big end-to-
+end tests") if needed again; the original scratch scripts were cleaned
+up when their background sessions closed.
+
 ## What's new in `lab/common/` since the 2026-10-14 version below
 
 Not in the old plan at all -- built and measured since:
@@ -65,6 +148,9 @@ Not in the old plan at all -- built and measured since:
 - `rewriter_backends.rewrite_unit` -- now skips `generate()` entirely for
   both already-complete single-finding leaves and all multi-finding
   leaves.
+- `plain_language.py` / `decision_findings.py` -- built and tested during
+  the four big scale-tests above; see that section for their honest,
+  measured limits before reusing either.
 
 ## House rules to keep following (unchanged, from `AGENT.md`)
 
