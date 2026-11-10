@@ -465,6 +465,34 @@ already uses) -- confirmed zero regression on 17 existing experiments.
 closed question rather than a postponed one: direct testing of its own
 motivating case found nothing left for a dynamic loop to fix.**
 
+**Second update, same day: the project owner pushed back -- the ask was
+never "does fact-chaining need a loop," it was "let the controller use
+ANY of this project's tools, in whatever sequence a given ask needs,"
+and that gap was real.** Built `brain.reason_dynamic` (`AUDIT.md`,
+search "a bounded tool router, built after the project owner pushed
+back"): a new, separate, opt-in function -- `reason()` itself completely
+unchanged -- that loops `reason()` over a passage set allowed to grow in
+exactly two closed, named ways: a fact `forward_chain` derived this
+round gets textified into a pseudo-passage so a LATER round's identity/
+total/graph stages can see it (they only scan passage text today,
+nothing else did before this); and when a `Store` is given and the
+round's decision is inconclusive/ungrounded, `store.search(ask)` pulls
+in real related passages, once. Bounded by `max_rounds` (default 5,
+same cap discipline as `forward_chain`'s own `max_steps`), stops at
+fixpoint, every round traced in a new `"rounds"` field. Measured, not
+assumed: zero-expansion parity with `reason()` on a plain lookup; the
+derived-fact mechanism genuinely exercised (not just inert) on the
+Rohan/jail/license fixture with no regression; and a real capability
+win on related-case retrieval -- `reason(ask, [])` with no passages
+fabricates "Meera Iyer lives in Mumbai" (wrong, `decision="ungrounded"`);
+`reason_dynamic(ask, [], store=store)` retrieves the real passage and
+answers correctly, citing it. Confirmed additive-only: EXP-060/084/089/
+097 (all through `reason()`'s existing call sites) still pass unchanged.
+`document_write` is deliberately NOT folded into this loop -- it stays
+`plan_stages`'s own exclusive stage exactly as before; interleaving
+page-by-page document writing into a round loop would be its own,
+larger, separate decision.
+
 ## House rules to keep following (unchanged, from `AGENT.md`)
 
 - Add a `todo` entry before implementing a new exploration, close it only

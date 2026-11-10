@@ -520,6 +520,118 @@ def reason(
     return result
 
 
+DYNAMIC_EXPANSION_KINDS = ("derived_fact", "related_case")
+
+
+def reason_dynamic(
+    ask: str,
+    passages: list[dict],
+    use_real_ner: bool = False,
+    store=None,
+    max_rounds: int = 5,
+    **reason_kwargs,
+) -> dict:
+    """Follow-up (2026-11-10): a bounded, traced, closed-vocabulary tool
+    router generalizing `reason()`'s single fixed pass into a loop --
+    the project owner's own request, after direct testing showed the
+    one case originally worried about (a multi-hop rule chain feeding
+    an identity answer) already works in one pass, with no loop needed
+    (see AUDIT.md, "tested the self-expanding core's own motivating
+    scenario directly"). What genuinely doesn't exist yet is letting
+    one round's result change what the NEXT round has available to
+    reason over -- not a free-form planner inventing steps, but a fixed,
+    named set of ways the input can grow, each one an EXISTING, already-
+    measured tool, never a new one invented at call time:
+
+    - `derived_fact`: a fact `forward_chain` derived this round (already
+      bounded/deduplicated/traced internally -- see inference.py) gets
+      textified into one new pseudo-passage (`id="derived:<round>:<i>"`,
+      deterministic `f"{subject} {verb_lemma} {object}."` template, no
+      generative model) so a LATER round's identity/total/graph stages,
+      which only ever scan passage text today, can see it too -- closing
+      exactly the gap this project's own rule-dispatch/total-scope bug
+      hunt surfaced (a derived consequence never reaching another
+      stage's input), without inventing a new reasoning mechanism.
+    - `related_case`: when a `store` (lab.common.store.Store) is given
+      AND this round's decision is `"inconclusive"`/`"ungrounded"`,
+      `store.search(ask)` is called once and any REAL passages it finds
+      that aren't already in the passage set are added -- the "find
+      related cases automatically" capability, built on the already-
+      measured RRF-fused hybrid search (store.py's own follow-up), not
+      a new retrieval mechanism. These are real passages with real ids,
+      never synthetic text, so they never weaken citation grounding the
+      way a `derived_fact` pseudo-passage's id could (flagged below).
+
+    Stops the moment a round adds nothing (fixpoint) or after
+    `max_rounds` regardless (same cap discipline as `forward_chain`'s
+    own `max_steps` -- a malformed input can't loop forever). Every
+    round is one entry in the returned `"rounds"` list (round number,
+    decision, passage count, what was added and why, or why it
+    stopped) -- nothing silent. `reason()` itself is completely
+    unchanged; this is a new, separate, opt-in entry point, never
+    called by `reason()` or any existing caller.
+
+    Named limit, honestly: a `derived_fact` pseudo-passage's citation id
+    (`"derived:..."`) is not a literal source quote the way every other
+    citation in this project is -- if a later round's answer cites one,
+    that id's own provenance (`derivation` field, carried from
+    `forward_chain`'s trace) names the real rule/fact it came from, the
+    same non-literal-citation idiom `_add_dependency`'s own
+    `"derived_fact"` dependency-tree nodes already use elsewhere in this
+    module. A second named limit: `document_write` stays its own
+    exclusive pipeline exactly as it is in `plan_stages` today (a
+    document-writing ask short-circuits to ONLY that stage) -- this
+    router does not attempt to interleave page-by-page document writing
+    with the round loop, that would be a different, larger change.
+    """
+    current_passages = list(passages)
+    seen_fact_signatures: set[tuple] = set()
+    rounds = []
+    result = None
+    for round_num in range(1, max_rounds + 1):
+        result = reason(ask, current_passages, use_real_ner=use_real_ner, **reason_kwargs)
+        round_entry = {"round": round_num, "decision": result["decision"], "passage_count": len(current_passages)}
+
+        derived_facts = [f for t in result["trace"] if t.get("step") == "forward_chain" for f in t.get("extra_facts", [])]
+        new_passages = []
+        for i, fact in enumerate(derived_facts):
+            signature = (fact["subject"], fact["verb_lemma"], fact.get("object"))
+            if signature in seen_fact_signatures:
+                continue
+            seen_fact_signatures.add(signature)
+            new_passages.append(
+                {
+                    "id": f"derived:{round_num}:{i}",
+                    "text": f"{fact['subject']} {fact['verb_lemma']} {fact['object']}.",
+                    "kind": "derived_fact",
+                    "derivation": fact.get("derivation"),
+                }
+            )
+
+        if store is not None and result["decision"] in ("inconclusive", "ungrounded"):
+            existing_ids = {p.get("id") for p in current_passages}
+            for hit in store.search(ask, top_k=5):
+                candidate = hit.get("passage", hit)
+                if candidate.get("id") not in existing_ids:
+                    new_passages.append({**candidate, "kind": "related_case"})
+                    existing_ids.add(candidate.get("id"))
+
+        if not new_passages:
+            round_entry["added"] = []
+            round_entry["stopped_reason"] = "fixpoint"
+            rounds.append(round_entry)
+            break
+        round_entry["added"] = [{"id": p["id"], "kind": p["kind"]} for p in new_passages]
+        rounds.append(round_entry)
+        current_passages = current_passages + new_passages
+    else:
+        rounds[-1]["stopped_reason"] = "max_rounds"
+
+    result = dict(result)
+    result["rounds"] = rounds
+    return result
+
+
 def _reason_once(ask: str, passages: list[dict], use_real_ner: bool = False, connector=None, connector_top_k: int = 5, use_real_qa: bool = False, use_real_nli: bool = False, use_repair: bool = False, plain_english: bool = False, template_id: str | None = None) -> dict:
     """One single pass of the signal-chain below -- called directly by
     reason() above, once per retry round. `use_real_ner=True` threads

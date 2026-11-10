@@ -2287,3 +2287,72 @@ now fixed, not by the control-flow architecture. The deliberately-not-
 attempted decision above stands -- not as a postponed task, but as a
 closed question: nothing found in this session's direct testing asks
 for it.
+
+## Second follow-up, same day: a bounded tool router, built after the
+project owner pushed back on scope -- not fact-chaining, the ability to
+invoke any existing tool (reasoning, related-case retrieval, document
+writing) in whatever sequence a given ask needs
+
+The conclusion above ("nothing found asks for a dynamic core") answered
+a narrower question than what the project owner actually wanted: not
+"does multi-hop fact-chaining need a loop" (it doesn't, measured), but
+"can the controller invoke any of this project's tools -- not just
+rules -- in whatever sequence a given ask needs, instead of always
+running the same fixed, ask-derived subset." That IS a real, currently-
+missing capability, and most of the actual tools for it already exist
+as separate, measured, deterministic primitives: rule/NLI/QA reasoning,
+hybrid retrieval for related cases (`store.py`'s RRF-fused search, this
+same session's earlier follow-up), document writing with template
+contracts. What was missing was a controller that could reach for any
+of them adaptively, per sub-need, rather than today's one fixed pass.
+
+Built `brain.reason_dynamic` (new function, `reason()` itself completely
+unchanged): a bounded loop around `reason()` that re-runs the SAME fixed
+pipeline each round over a passage set that can grow in exactly two
+closed, named ways -- never a free-form planner inventing a step:
+
+1. **`derived_fact`**: a fact `forward_chain` derived this round (already
+   bounded/deduplicated/traced inside `inference.py`) is textified into
+   one new pseudo-passage (deterministic template, no generative model)
+   so a later round's identity/total/graph stages -- which only scan
+   passage TEXT today -- can see it too.
+2. **`related_case`**: when a `Store` is given and the round's decision
+   is `"inconclusive"`/`"ungrounded"`, `store.search(ask)` runs once and
+   any real passages not already present get added -- the "find related
+   cases automatically" capability named explicitly.
+
+Stops at fixpoint (a round adds nothing) or `max_rounds` (default 5,
+same cap discipline as `forward_chain`'s own `max_steps`), with every
+round recorded in a new `"rounds"` field -- nothing silent.
+
+Measured, not assumed:
+- **Zero-expansion parity**: on a plain lookup with nothing to add,
+  `reason_dynamic` produces an identical decision and text to `reason()`
+  -- one round, immediate fixpoint.
+- **Derived-fact reentry exercised without changing the answer**: on the
+  Rohan/jail/license-suspension fixture, round 1 derives the fact (as
+  it already did before this change) and round 2 genuinely reenters it
+  as a pseudo-passage (`derived:1:0`) before reaching fixpoint -- proving
+  the mechanism runs, not just that it's inert, while confirming no
+  regression (text is unchanged from `reason()` alone, since round 1's
+  own answer already stated it).
+- **Related-case retrieval is a genuine capability win, not just
+  parity**: `reason(ask, [])` with no passages returns `decision=
+  "ungrounded"` and a FABRICATED answer ("Meera Iyer lives in Mumbai" --
+  wrong). `reason_dynamic(ask, [], store=store)` against a 3-passage
+  store pulls the real passage in round 2 and returns `decision=
+  "supported"`, `"Meera Iyer lives at 22 Lake View Road, Chennai 600028.
+  [s1]"` -- correct, grounded, citing a real passage id.
+
+Named limits, honestly: a `derived_fact` pseudo-passage's citation id
+is not a literal source quote (its own `derivation` field names the
+real rule/fact it came from, the same non-literal-citation idiom
+`_add_dependency`'s existing `"derived_fact"` dependency-tree nodes
+already use); `document_write` stays its own exclusive pipeline exactly
+as `plan_stages` already has it (not interleaved into the round loop --
+a separate, larger change); grouped/disambiguated passage sets exclude
+ungrouped pseudo-passages from `scoped` the same way they already
+exclude an ungrouped policy passage, inherited behavior, not new.
+Regression-checked against `reason()`'s existing call sites (EXP-060/
+084/089/097) -- `reason_dynamic` is purely additive, no existing
+function's code path changed.
