@@ -101,6 +101,43 @@
           }
         }
       }
+    ],
+    "dependency_tree": [
+      {
+        "id": "rule:rule-provided",
+        "kind": "rule",
+        "summary": "If anyone processes special category data, it is lawful, provided that the data subject has given explicit consent to the processing of those personal data for one or more specified purposes.",
+        "depends_on": [
+          "rule-provided"
+        ]
+      },
+      {
+        "id": "fact:fact-1",
+        "kind": "fact",
+        "summary": "MedCorp process Aisha",
+        "depends_on": [
+          "fact-1"
+        ]
+      },
+      {
+        "id": "gate:rule-provided",
+        "kind": "gate_check",
+        "summary": "condition gate status=not_holds",
+        "depends_on": [
+          "rule:rule-provided",
+          "fact:fact-1"
+        ]
+      },
+      {
+        "id": "conclusion:rule-provided:fact-1:applied",
+        "kind": "conclusion",
+        "summary": "policy applies: it is lawful, provided that the data subject has given explicit consent to the processing of those personal data for one or more specified purposes",
+        "depends_on": [
+          "rule:rule-provided",
+          "fact:fact-1",
+          "gate:rule-provided"
+        ]
+      }
     ]
   },
   "case2_positive_condition_blocked": {
@@ -201,6 +238,41 @@
             ]
           }
         }
+      }
+    ],
+    "dependency_tree": [
+      {
+        "id": "rule:rule-provided",
+        "kind": "rule",
+        "summary": "If anyone processes special category data, it is lawful, provided that the data subject has given explicit consent to the processing of those personal data for one or more specified purposes.",
+        "depends_on": [
+          "rule-provided"
+        ]
+      },
+      {
+        "id": "fact:fact-1",
+        "kind": "fact",
+        "summary": "MedCorp process Aisha",
+        "depends_on": [
+          "fact-1"
+        ]
+      },
+      {
+        "id": "gate:rule-provided",
+        "kind": "gate_check",
+        "summary": "condition gate status=holds",
+        "depends_on": [
+          "rule:rule-provided",
+          "fact:fact-1"
+        ]
+      },
+      {
+        "id": "conclusion:rule-provided:fact-1:blocked",
+        "kind": "conclusion",
+        "summary": "policy blocked: the rule's condition is not satisfied",
+        "depends_on": [
+          "gate:rule-provided"
+        ]
       }
     ]
   },
@@ -305,6 +377,43 @@
             ]
           }
         }
+      }
+    ],
+    "dependency_tree": [
+      {
+        "id": "rule:rule-provided",
+        "kind": "rule",
+        "summary": "If anyone processes special category data, it is lawful, provided that the data subject has given explicit consent to the processing of those personal data for one or more specified purposes.",
+        "depends_on": [
+          "rule-provided"
+        ]
+      },
+      {
+        "id": "fact:fact-1",
+        "kind": "fact",
+        "summary": "MedCorp process Aisha",
+        "depends_on": [
+          "fact-1"
+        ]
+      },
+      {
+        "id": "gate:rule-provided",
+        "kind": "gate_check",
+        "summary": "condition gate status=unknown",
+        "depends_on": [
+          "rule:rule-provided",
+          "fact:fact-1"
+        ]
+      },
+      {
+        "id": "conclusion:rule-provided:fact-1:applied",
+        "kind": "conclusion",
+        "summary": "policy applies: it is lawful, provided that the data subject has given explicit consent to the processing of those personal data for one or more specified purposes (the rule's condition is unresolved -- not confirmed either way)",
+        "depends_on": [
+          "rule:rule-provided",
+          "fact:fact-1",
+          "gate:rule-provided"
+        ]
       }
     ]
   },

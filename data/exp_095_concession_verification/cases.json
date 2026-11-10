@@ -91,6 +91,43 @@
           "detail": null
         }
       }
+    ],
+    "dependency_tree": [
+      {
+        "id": "rule:rule-1",
+        "kind": "rule",
+        "summary": "If anyone processes special category data, it is unlawful although the data subject has given explicit consent.",
+        "depends_on": [
+          "rule-1"
+        ]
+      },
+      {
+        "id": "fact:fact-1",
+        "kind": "fact",
+        "summary": "MedCorp process Aisha",
+        "depends_on": [
+          "fact-1"
+        ]
+      },
+      {
+        "id": "gate:rule-1",
+        "kind": "gate_check",
+        "summary": "none gate status=no_exception",
+        "depends_on": [
+          "rule:rule-1",
+          "fact:fact-1"
+        ]
+      },
+      {
+        "id": "conclusion:rule-1:fact-1:applied",
+        "kind": "conclusion",
+        "summary": "policy applies: it is unlawful although the data subject has given explicit consent",
+        "depends_on": [
+          "rule:rule-1",
+          "fact:fact-1",
+          "gate:rule-1"
+        ]
+      }
     ]
   },
   "context_contradicted": {
@@ -185,6 +222,43 @@
           "detail": null
         }
       }
+    ],
+    "dependency_tree": [
+      {
+        "id": "rule:rule-1",
+        "kind": "rule",
+        "summary": "If anyone processes special category data, it is unlawful although the data subject has given explicit consent.",
+        "depends_on": [
+          "rule-1"
+        ]
+      },
+      {
+        "id": "fact:fact-1",
+        "kind": "fact",
+        "summary": "MedCorp process Aisha",
+        "depends_on": [
+          "fact-1"
+        ]
+      },
+      {
+        "id": "gate:rule-1",
+        "kind": "gate_check",
+        "summary": "none gate status=no_exception",
+        "depends_on": [
+          "rule:rule-1",
+          "fact:fact-1"
+        ]
+      },
+      {
+        "id": "conclusion:rule-1:fact-1:applied",
+        "kind": "conclusion",
+        "summary": "policy applies: it is unlawful although the data subject has given explicit consent",
+        "depends_on": [
+          "rule:rule-1",
+          "fact:fact-1",
+          "gate:rule-1"
+        ]
+      }
     ]
   },
   "no_context": {
@@ -278,6 +352,43 @@
           "status": "no_exception",
           "detail": null
         }
+      }
+    ],
+    "dependency_tree": [
+      {
+        "id": "rule:rule-1",
+        "kind": "rule",
+        "summary": "If anyone processes special category data, it is unlawful although the data subject has given explicit consent.",
+        "depends_on": [
+          "rule-1"
+        ]
+      },
+      {
+        "id": "fact:fact-1",
+        "kind": "fact",
+        "summary": "MedCorp process Aisha",
+        "depends_on": [
+          "fact-1"
+        ]
+      },
+      {
+        "id": "gate:rule-1",
+        "kind": "gate_check",
+        "summary": "none gate status=no_exception",
+        "depends_on": [
+          "rule:rule-1",
+          "fact:fact-1"
+        ]
+      },
+      {
+        "id": "conclusion:rule-1:fact-1:applied",
+        "kind": "conclusion",
+        "summary": "policy applies: it is unlawful although the data subject has given explicit consent",
+        "depends_on": [
+          "rule:rule-1",
+          "fact:fact-1",
+          "gate:rule-1"
+        ]
       }
     ]
   }

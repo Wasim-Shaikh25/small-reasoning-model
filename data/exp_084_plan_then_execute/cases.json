@@ -143,6 +143,52 @@
             }
           ]
         }
+      ],
+      "dependency_tree": [
+        {
+          "id": "rule:rule-crime",
+          "kind": "rule",
+          "summary": "If anyone kills another person, it is a crime and he will go to jail.",
+          "depends_on": [
+            "rule-crime"
+          ]
+        },
+        {
+          "id": "fact:fact-rohan",
+          "kind": "fact",
+          "summary": "Rohan kill Arun",
+          "depends_on": [
+            "fact-rohan"
+          ]
+        },
+        {
+          "id": "gate:rule-crime",
+          "kind": "gate_check",
+          "summary": "none gate status=no_exception",
+          "depends_on": [
+            "rule:rule-crime",
+            "fact:fact-rohan"
+          ]
+        },
+        {
+          "id": "conclusion:rule-crime:fact-rohan:applied",
+          "kind": "conclusion",
+          "summary": "policy applies: it is a crime and he will go to jail",
+          "depends_on": [
+            "rule:rule-crime",
+            "fact:fact-rohan",
+            "gate:rule-crime"
+          ]
+        },
+        {
+          "id": "derived:0:Rohan:suspend",
+          "kind": "derived_fact",
+          "summary": "Rohan suspend their license",
+          "depends_on": [
+            "rule:rule-license",
+            "conclusion:rule-crime:fact-rohan:applied"
+          ]
+        }
       ]
     }
   },
@@ -288,6 +334,43 @@
               ]
             }
           }
+        }
+      ],
+      "dependency_tree": [
+        {
+          "id": "rule:rule-1",
+          "kind": "rule",
+          "summary": "If anyone processes special category data, it is unlawful, unless the data subject has given explicit consent to the processing of those personal data for one or more specified purposes; processing is necessary to protect the vital interests of the data subject or of another natural person where the data subject is physically or legally incapable of giving consent; or processing is necessary for the establishment, exercise or defence of legal claims or whenever courts are acting in their judicial capacity.",
+          "depends_on": [
+            "rule-1"
+          ]
+        },
+        {
+          "id": "fact:fact-1",
+          "kind": "fact",
+          "summary": "MedCorp process Aisha",
+          "depends_on": [
+            "fact-1"
+          ]
+        },
+        {
+          "id": "gate:rule-1",
+          "kind": "gate_check",
+          "summary": "condition gate status=unknown",
+          "depends_on": [
+            "rule:rule-1",
+            "fact:fact-1"
+          ]
+        },
+        {
+          "id": "conclusion:rule-1:fact-1:applied",
+          "kind": "conclusion",
+          "summary": "policy applies: it is unlawful, unless the data subject has given explicit consent to the processing of those personal data for one or more specified purposes; processing is necessary to protect the vital interests of the data subject or of another natural person where the data subject is physically or legally incapable of giving consent; or processing is necessary for the establishment, exercise or defence of legal claims or whenever courts are acting in their judicial capacity (the rule's exception is unresolved -- not confirmed either way)",
+          "depends_on": [
+            "rule:rule-1",
+            "fact:fact-1",
+            "gate:rule-1"
+          ]
         }
       ]
     }

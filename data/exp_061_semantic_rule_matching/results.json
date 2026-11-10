@@ -121,7 +121,7 @@
     "Wire semantic_apply_rule into lab.common.brain as the default rule-matching step (with apply_rule as a cheap first check, escalating to the NLI call only when the lemma check fails), so the brain itself gets this robustness, not just this standalone test.",
     "EXP-056 already showed NLI-based checks can misfire when wired against the wrong comparison target (the whole-document ask). This result and that one together argue the entailment direction and the comparison target both have to be chosen deliberately, not assumed safe just because the underlying model is real."
   ],
-  "elapsed_sec": 221.6245,
-  "peak_rss_mb": 722.37,
+  "elapsed_sec": 114.2144,
+  "peak_rss_mb": 741.73,
   "models_used": "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli, a local checkpoint loaded with transformers (not an API call), the same real NLI judge EXP-031 measured. Used here for one bounded judgment (does this fact entail this rule's condition), not as a general-purpose reasoner."
 }

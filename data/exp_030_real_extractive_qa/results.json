@@ -41,7 +41,7 @@
   "follow_ups": [
     "Rerun EXP-047's 300 real SQuAD2 dev questions with this same real_qa function for a true model-vs-model comparison on identical real data, as EXP-047 itself flagged."
   ],
-  "elapsed_sec": 50.1092,
-  "peak_rss_mb": 821.79,
+  "elapsed_sec": 19.0511,
+  "peak_rss_mb": 773.41,
   "models_used": "deepset/deberta-v3-base-squad2, a local checkpoint loaded with transformers (not an API call). This is the real blueprint extractive QA checkpoint (ARCHITECTURE.md section 8), not a substitute."
 }

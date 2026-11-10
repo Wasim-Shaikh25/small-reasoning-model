@@ -126,6 +126,42 @@
           }
         }
       }
+    ],
+    "dependency_tree": [
+      {
+        "id": "fact:total",
+        "kind": "fact",
+        "summary": "total=70000.0",
+        "depends_on": [
+          "policy",
+          "fact-1"
+        ]
+      },
+      {
+        "id": "rule:policy",
+        "kind": "rule",
+        "summary": "Company policy: if a contractor's total billed amount in a quarter exceeds INR 30000, the payment requires finance head approval, unless the finance head has pre-approved the vendor in writing.",
+        "depends_on": [
+          "policy"
+        ]
+      },
+      {
+        "id": "gate:policy",
+        "kind": "gate_check",
+        "summary": "condition gate status=holds",
+        "depends_on": [
+          "fact:total",
+          "rule:policy"
+        ]
+      },
+      {
+        "id": "conclusion:policy:blocked",
+        "kind": "conclusion",
+        "summary": "policy blocked: the rule's exception holds",
+        "depends_on": [
+          "gate:policy"
+        ]
+      }
     ]
   },
   "case2_exception_contradicted": {
@@ -255,6 +291,44 @@
           }
         }
       }
+    ],
+    "dependency_tree": [
+      {
+        "id": "fact:total",
+        "kind": "fact",
+        "summary": "total=70000.0",
+        "depends_on": [
+          "policy",
+          "fact-1"
+        ]
+      },
+      {
+        "id": "rule:policy",
+        "kind": "rule",
+        "summary": "Company policy: if a contractor's total billed amount in a quarter exceeds INR 30000, the payment requires finance head approval, unless the finance head has pre-approved the vendor in writing.",
+        "depends_on": [
+          "policy"
+        ]
+      },
+      {
+        "id": "gate:policy",
+        "kind": "gate_check",
+        "summary": "condition gate status=not_holds",
+        "depends_on": [
+          "fact:total",
+          "rule:policy"
+        ]
+      },
+      {
+        "id": "conclusion:policy:applied",
+        "kind": "conclusion",
+        "summary": "policy applies: the payment requires finance head approval, unless the finance head has pre-approved the vendor in writing",
+        "depends_on": [
+          "fact:total",
+          "rule:policy",
+          "gate:policy"
+        ]
+      }
     ]
   },
   "case3_no_context": {
@@ -383,6 +457,44 @@
             ]
           }
         }
+      }
+    ],
+    "dependency_tree": [
+      {
+        "id": "fact:total",
+        "kind": "fact",
+        "summary": "total=70000.0",
+        "depends_on": [
+          "policy",
+          "fact-1"
+        ]
+      },
+      {
+        "id": "rule:policy",
+        "kind": "rule",
+        "summary": "Company policy: if a contractor's total billed amount in a quarter exceeds INR 30000, the payment requires finance head approval, unless the finance head has pre-approved the vendor in writing.",
+        "depends_on": [
+          "policy"
+        ]
+      },
+      {
+        "id": "gate:policy",
+        "kind": "gate_check",
+        "summary": "condition gate status=unknown",
+        "depends_on": [
+          "fact:total",
+          "rule:policy"
+        ]
+      },
+      {
+        "id": "conclusion:policy:applied",
+        "kind": "conclusion",
+        "summary": "policy applies: the payment requires finance head approval, unless the finance head has pre-approved the vendor in writing (the rule's exception is unresolved -- not confirmed either way)",
+        "depends_on": [
+          "fact:total",
+          "rule:policy",
+          "gate:policy"
+        ]
       }
     ]
   }

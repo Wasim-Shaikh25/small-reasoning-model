@@ -32,7 +32,7 @@
     "If this helps, test whether 1 retry captures most of the gain (cheaper) or more retries keep helping (diminishing returns curve not yet measured).",
     "If this doesn't help, the research report's fine-tuning recommendation is the next concrete step: build a small DiscoFuse-style synthetic 'combine facts, keep all of them' dataset and LoRA-adapt flan-t5-small on it."
   ],
-  "elapsed_sec": 252.4906,
-  "peak_rss_mb": 621.4,
+  "elapsed_sec": 61.379,
+  "peak_rss_mb": 693.59,
   "models_used": "google/flan-t5-small, the same local checkpoint EXP-048/054/056 measured. The retry loop is new control flow around the same checkpoint and the same fidelity gate, not a different model or a change to the gate's own criteria."
 }

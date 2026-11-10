@@ -44,7 +44,7 @@
     "If this closes the gap, wire the leaf size down for the bounded rewriter in lab/common/assemble.assemble() (currently hardcoded to 4 in build_outline) and re-run EXP-048 at the new size as the real default.",
     "If it does not close the gap, try a more directive single-fact prompt before concluding the checkpoint cannot do this role at this size."
   ],
-  "elapsed_sec": 248.1525,
-  "peak_rss_mb": 682.07,
+  "elapsed_sec": 50.1101,
+  "peak_rss_mb": 700.35,
   "models_used": "google/flan-t5-small, the same local checkpoint EXP-048 measured. Rewriter role only, fidelity-gated, identical to EXP-048's contract."
 }

@@ -67,7 +67,7 @@
     "Try gemma3:270m with the same retry-with-feedback loop EXP-062 tested on flan-t5-small, since the two checkpoints may respond differently to that control mechanism.",
     "If neither checkpoint clears a usable bar, the research report's fine-tuning recommendation is the next lever, independent of which base checkpoint is chosen."
   ],
-  "elapsed_sec": 81.7935,
-  "peak_rss_mb": 145.35,
+  "elapsed_sec": 64.7032,
+  "peak_rss_mb": 145.19,
   "models_used": "gemma3:270m, a local checkpoint run via Ollama (fully local, no remote host), permitted 2026-10-15 specifically for this comparison. Rewriter role only, same fidelity gate as flan-t5-small."
 }

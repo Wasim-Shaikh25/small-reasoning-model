@@ -89,10 +89,45 @@
             "status": "not_in_effect",
             "method": "absolute_date",
             "resolved_date": "2020-01-01T00:00:00",
-            "reference_date": "2026-10-22T21:06:47.051088"
+            "reference_date": "2026-11-03T14:38:26.656359"
           },
           "phrase": "until"
         }
+      }
+    ],
+    "dependency_tree": [
+      {
+        "id": "rule:rule-past",
+        "kind": "rule",
+        "summary": "If anyone processes special category data, it is lawful until 1 January 2020.",
+        "depends_on": [
+          "rule-past"
+        ]
+      },
+      {
+        "id": "fact:fact-1",
+        "kind": "fact",
+        "summary": "MedCorp process Aisha",
+        "depends_on": [
+          "fact-1"
+        ]
+      },
+      {
+        "id": "gate:rule-past",
+        "kind": "gate_check",
+        "summary": "temporal gate status=holds",
+        "depends_on": [
+          "rule:rule-past",
+          "fact:fact-1"
+        ]
+      },
+      {
+        "id": "conclusion:rule-past:fact-1:blocked",
+        "kind": "conclusion",
+        "summary": "policy blocked: the rule's temporal bound ('until') is not currently satisfied",
+        "depends_on": [
+          "gate:rule-past"
+        ]
       }
     ]
   },
@@ -189,10 +224,47 @@
             "status": "in_effect",
             "method": "absolute_date",
             "resolved_date": "2030-01-01T00:00:00",
-            "reference_date": "2026-10-22T21:06:47.954431"
+            "reference_date": "2026-11-03T14:38:26.885788"
           },
           "phrase": "until"
         }
+      }
+    ],
+    "dependency_tree": [
+      {
+        "id": "rule:rule-future",
+        "kind": "rule",
+        "summary": "If anyone processes special category data, it is lawful until 1 January 2030.",
+        "depends_on": [
+          "rule-future"
+        ]
+      },
+      {
+        "id": "fact:fact-1",
+        "kind": "fact",
+        "summary": "MedCorp process Aisha",
+        "depends_on": [
+          "fact-1"
+        ]
+      },
+      {
+        "id": "gate:rule-future",
+        "kind": "gate_check",
+        "summary": "temporal gate status=not_holds",
+        "depends_on": [
+          "rule:rule-future",
+          "fact:fact-1"
+        ]
+      },
+      {
+        "id": "conclusion:rule-future:fact-1:applied",
+        "kind": "conclusion",
+        "summary": "policy applies: it is lawful until 1 January 2030",
+        "depends_on": [
+          "rule:rule-future",
+          "fact:fact-1",
+          "gate:rule-future"
+        ]
       }
     ]
   },
@@ -294,6 +366,41 @@
           },
           "phrase": "until"
         }
+      }
+    ],
+    "dependency_tree": [
+      {
+        "id": "rule:rule-until-event",
+        "kind": "rule",
+        "summary": "If anyone processes special category data, it is lawful until the data subject withdraws consent.",
+        "depends_on": [
+          "rule-until-event"
+        ]
+      },
+      {
+        "id": "fact:fact-1",
+        "kind": "fact",
+        "summary": "MedCorp process Aisha",
+        "depends_on": [
+          "fact-1"
+        ]
+      },
+      {
+        "id": "gate:rule-until-event",
+        "kind": "gate_check",
+        "summary": "temporal gate status=holds",
+        "depends_on": [
+          "rule:rule-until-event",
+          "fact:fact-1"
+        ]
+      },
+      {
+        "id": "conclusion:rule-until-event:fact-1:blocked",
+        "kind": "conclusion",
+        "summary": "policy blocked: the rule's temporal bound ('until') is not currently satisfied",
+        "depends_on": [
+          "gate:rule-until-event"
+        ]
       }
     ]
   },
@@ -399,6 +506,43 @@
           "phrase": "until"
         }
       }
+    ],
+    "dependency_tree": [
+      {
+        "id": "rule:rule-until-event",
+        "kind": "rule",
+        "summary": "If anyone processes special category data, it is lawful until the data subject withdraws consent.",
+        "depends_on": [
+          "rule-until-event"
+        ]
+      },
+      {
+        "id": "fact:fact-1",
+        "kind": "fact",
+        "summary": "MedCorp process Aisha",
+        "depends_on": [
+          "fact-1"
+        ]
+      },
+      {
+        "id": "gate:rule-until-event",
+        "kind": "gate_check",
+        "summary": "temporal gate status=not_holds",
+        "depends_on": [
+          "rule:rule-until-event",
+          "fact:fact-1"
+        ]
+      },
+      {
+        "id": "conclusion:rule-until-event:fact-1:applied",
+        "kind": "conclusion",
+        "summary": "policy applies: it is lawful until the data subject withdraws consent",
+        "depends_on": [
+          "rule:rule-until-event",
+          "fact:fact-1",
+          "gate:rule-until-event"
+        ]
+      }
     ]
   },
   "case5_after_direction_reversed": {
@@ -502,6 +646,43 @@
           },
           "phrase": "after"
         }
+      }
+    ],
+    "dependency_tree": [
+      {
+        "id": "rule:rule-after-event",
+        "kind": "rule",
+        "summary": "If anyone processes special category data, it is lawful after the data subject withdraws consent.",
+        "depends_on": [
+          "rule-after-event"
+        ]
+      },
+      {
+        "id": "fact:fact-1",
+        "kind": "fact",
+        "summary": "MedCorp process Aisha",
+        "depends_on": [
+          "fact-1"
+        ]
+      },
+      {
+        "id": "gate:rule-after-event",
+        "kind": "gate_check",
+        "summary": "temporal gate status=not_holds",
+        "depends_on": [
+          "rule:rule-after-event",
+          "fact:fact-1"
+        ]
+      },
+      {
+        "id": "conclusion:rule-after-event:fact-1:applied",
+        "kind": "conclusion",
+        "summary": "policy applies: it is lawful after the data subject withdraws consent",
+        "depends_on": [
+          "rule:rule-after-event",
+          "fact:fact-1",
+          "gate:rule-after-event"
+        ]
       }
     ]
   }

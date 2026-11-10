@@ -118,7 +118,7 @@
     "data/exp_022_on_disk_index/index.pkl"
   ],
   "follow_ups": [],
-  "elapsed_sec": 0.1479,
-  "peak_rss_mb": 140.92,
+  "elapsed_sec": 0.2449,
+  "peak_rss_mb": 141.41,
   "models_used": "sklearn TfidfVectorizer (already a dependency, classical, deterministic) plus the existing in-process BM25 implementation. No generative model. Qdrant/SPLADE/fastembed/bge remain not loaded, per this todo's own standing note."
 }

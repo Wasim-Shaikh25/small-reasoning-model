@@ -62,7 +62,7 @@
     "flan-t5-small collapsed every 4-finding leaf to a near-copy of one finding instead of combining all four; try smaller leaves (1-2 findings) or a more directive prompt before concluding the checkpoint cannot do this role at all.",
     "If this moves to production latency, convert to CTranslate2 int8 (EXP-045) and re-measure."
   ],
-  "elapsed_sec": 119.1497,
-  "peak_rss_mb": 658.25,
+  "elapsed_sec": 27.9399,
+  "peak_rss_mb": 688.64,
   "models_used": "google/flan-t5-small, a local checkpoint loaded with transformers (not an API call), used only in the rewriter role per FORBIDDEN.md's bounded exception: it joins findings lab.common.qa's lexical extractor and lab.common.nli's lexical judge have already verified into prose, and never extracts, answers, proposes, or judges support/contradiction. Extraction and verification in this run are the same unchanged lexical substitutes every other closed exploration uses."
 }
