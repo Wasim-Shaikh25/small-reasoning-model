@@ -435,6 +435,36 @@ catch a dispatch regression across the ~90 experiments that call
 own discipline exists to prevent. Left genuinely undone; HANDOFF's own
 proposal already scoped it as "its own phase," not a same-pass fix.
 
+**Update, next day: tested the self-expanding core's own motivating
+scenario directly -- found no dynamic-control gap, fixed two unrelated
+latent bugs instead** (`AUDIT.md`, search "tested the self-expanding
+core's own motivating scenario directly"). The project owner asked to
+find a way to control dynamic reasoning before building it; rather than
+design controls in the abstract, the actual scenario was run first.
+Measured: `reason()` already answers a multi-hop identity question
+("who will have their license suspended?" after kill->crime+jail->
+license_suspended) correctly in ONE pass, no dynamic re-planning --
+`forward_chain`'s existing bounded/traced fixpoint loop runs inside the
+`rule_application` stage, and `plan_stages` already computes every
+relevant stage from the ask text up front, so `identity_extraction` and
+`rule_application` both fire together and their text concatenates. No
+capability gap. Looking for a harder case (a derived fee updating
+`total_computation` in the same pass) surfaced two real but unrelated
+bugs instead of a control problem: `_find_rule` tried verb-shape rule
+parsing before threshold-shape (every existing fixture avoided the
+collision by prefixing the sentence with a policy label that the verb
+parser's anchor rejects; a bare "If X's total exceeds $N, ..." sentence
+did not); and `total_computation`'s money-scan summed dollar amounts
+from rule-shaped passages too (every existing fixture avoided this by
+accident, via disambiguation filtering the ungrouped policy passage out
+of scope). Both fixed narrowly in `brain.py` (`_find_rule` tries the
+more specific pattern first; the money-scan now excludes rule-shaped
+passages, same precedent `_reason_once`'s own fact-passage lookup
+already uses) -- confirmed zero regression on 17 existing experiments.
+**The self-expanding reasoning core stays not-attempted, now as a
+closed question rather than a postponed one: direct testing of its own
+motivating case found nothing left for a dynamic loop to fix.**
+
 ## House rules to keep following (unchanged, from `AGENT.md`)
 
 - Add a `todo` entry before implementing a new exploration, close it only

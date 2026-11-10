@@ -2210,3 +2210,80 @@ exists to prevent (measure before trusting, never guess). HANDOFF.md's
 own proposal already scopes this as "its own phase after the four-layer
 core is validated," not a same-session wiring change -- left genuinely
 undone, not quietly skipped.
+
+## Follow-up, next day: tested the self-expanding core's own motivating
+scenario directly before designing anything -- no dynamic loop needed,
+two unrelated latent bugs found and fixed instead
+
+Before building any generalization of `plan_stages`'s fixed order, the
+project owner asked to first find a way to CONTROL dynamic reasoning,
+then build it. Rather than design the control mechanism in the
+abstract, the actual scenario motivating it was tested directly: does
+today's single fixed pass already handle a derived fact feeding an
+identity-style answer (Rohan kills Arun -> crime+jail -> license
+suspended; ask "who will have their license suspended?")? Measured: it
+already does, correctly, with no new code -- `forward_chain`'s own
+bounded (`max_steps=10`), deduplicated, fully-traced fixpoint loop
+already runs inside the `rule_application` stage, and `plan_stages`
+already computes EVERY relevant stage's signal from the ask text up
+front (not from passages), so `identity_extraction` and `rule_
+application` both fire in the same pass and their `answer_parts`
+concatenate -- `reason()` already returns "Furthermore, Rohan suspend
+their license." with zero dynamic re-planning. There is no capability
+gap here for a dynamic core to close.
+
+Pushed one step further looking for a genuinely harder case -- a
+derived rule consequence (a threshold rule's fee) feeding back into a
+DIFFERENT stage (`total_computation`) within the same pass -- and the
+attempt surfaced two unrelated, pre-existing bugs instead of a control
+problem:
+
+1. `_find_rule` ([brain.py](lab/common/brain.py)) tried `parse_
+   conditional_rule` (verb shape) before `parse_threshold_rule`
+   (threshold shape). `THRESHOLD_RULE_RE` requires a possessive
+   subject + comparison keyword + number -- strictly more specific
+   than `RULE_RE`'s generic `^if <anything>, <anything>.` -- but every
+   existing threshold-rule fixture in this repo (EXP-057/058/059/060/
+   066/068/069/070/094) prefixes the sentence with a label ("Company
+   policy:", "Hospital policy:", ...) that `RULE_RE`'s `^\s*if\s+`
+   anchor already rejects, so the collision was never exercised. A
+   bare "If a customer's total exceeds $500, a $50 fee applies."
+   sentence (no label prefix) got misclassified as a verb rule and
+   silently produced no answer. Fixed by trying the more specific
+   pattern first -- zero regression risk, since a verb-rule sentence
+   never matches `THRESHOLD_RULE_RE`'s shape anyway.
+2. `total_computation`'s money-scan summed `AMOUNT_RE` matches from
+   EVERY passage in `scoped`, including rule-shaped passages
+   themselves -- a threshold rule's own stated threshold/fee amounts
+   got counted as if they were additional invoice line items. Every
+   existing fixture avoided this by accident (disambiguation's group
+   filter excludes the ungrouped policy passage from `scoped` before
+   the sum runs), not because of any deliberate exclusion -- an
+   ungrouped rule sitting alongside ungrouped facts (no disambiguation
+   group to filter it out) had its own numbers summed in, inflating a
+   $550 total to $1,100. Fixed the same way `_reason_once`'s own
+   fact_passage lookup already excludes rule-shaped passages (same
+   precedent, same reasoning) -- skip any passage that parses as
+   either rule shape before scanning it for amounts.
+
+Both fixes are narrow, measured, zero-regression (confirmed by rerunning
+17 existing experiments touching rule-dispatch, totals, or both --
+EXP-026/053/058/060/066/068/069/070/078/081/082/084/085/089/091/094/097
+-- all still `all_correct: true`, identical to their prior recorded
+results). Neither fix is a dynamic-control mechanism; they are exactly
+the kind of latent edge-case bugs the project's own discipline expects
+to surface only once a case outside the existing fixtures' phrasing is
+actually tried, not something a generic loop would have caught or
+needed.
+
+**Conclusion on the self-expanding core, now with direct evidence
+rather than only architectural caution: there is no concrete capability
+gap left that justifies building it.** The multi-hop scenario that
+motivated it already works, bounded and traced, through the existing
+fixed-plan + forward_chain combination. The one adjacent case that
+looked like it might need cross-stage dynamic feedback (a derived fee
+updating a total) turned out to be blocked by ordinary parsing bugs,
+now fixed, not by the control-flow architecture. The deliberately-not-
+attempted decision above stands -- not as a postponed task, but as a
+closed question: nothing found in this session's direct testing asks
+for it.

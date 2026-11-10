@@ -109,14 +109,35 @@ def _find_rule(passages: list[dict]):
     """Scan every passage for either rule shape. Rules can be global policy
     text, not necessarily inside the resolved story's own group, so this
     always searches the full passage set, not the disambiguated scope.
+
+    Follow-up (2026-11-10): threshold shape is checked FIRST, not second.
+    THRESHOLD_RULE_RE is strictly the more specific pattern (a possessive
+    subject plus an explicit numeric comparison), while RULE_RE (parse_
+    conditional_rule's own pattern) is a generic "if X, Y." match that
+    also happens to accept a threshold-shaped sentence whenever its if-
+    clause has an extractable main verb (e.g. "exceeds") -- found by
+    direct testing (a bare "If a customer's total exceeds $500, a $50
+    fee applies." sentence, with no leading "Company policy:"/"Hospital
+    policy:" prefix) to always lose to parse_conditional_rule under the
+    old verb-first order, misclassifying it as kind="verb" and silently
+    producing no answer (no fact passage has an "exceed" verb to match
+    against). None of this project's existing threshold-rule fixtures hit
+    this: every one of them prefixes the sentence with a label ("Company
+    policy:", "Hospital policy:", ...) that RULE_RE's `^\\s*if\\s+` anchor
+    already rejects outright, which is why the collision went unnoticed
+    until a bare "If ..." threshold sentence was tried directly. Trying
+    the narrower, more specific pattern first is strictly safe for every
+    existing fixture (a verb-rule sentence, lacking THRESHOLD_RULE_RE's
+    possessive+comparison shape, never matches it) and fixes the bare-
+    sentence case going forward.
     """
     for passage in passages:
-        rule = parse_conditional_rule(passage.get("text", ""))
-        if rule:
-            return "verb", rule, passage
         rule = parse_threshold_rule(passage.get("text", ""))
         if rule:
             return "threshold", rule, passage
+        rule = parse_conditional_rule(passage.get("text", ""))
+        if rule:
+            return "verb", rule, passage
     return None
 
 
@@ -835,6 +856,17 @@ def _reason_once(ask: str, passages: list[dict], use_real_ner: bool = False, con
     if "total_computation" in stage_plan["stages"]:
         spans, sources = [], []
         for p in scoped:
+            # Follow-up (2026-11-10): a rule-shaped passage (verb or
+            # threshold) is policy text, not a fact to sum -- its own
+            # numbers (a threshold, a fee) are not another line item.
+            # Found by direct testing: an ungrouped threshold rule sitting
+            # alongside ungrouped fact passages (no disambiguation group
+            # to filter it out, unlike every existing grouped fixture)
+            # had its own $500/$50 counted into the total, inflating it.
+            # Same exclusion _reason_once's own fact_passage lookup
+            # already applies for the identical reason (line ~925 above).
+            if parse_conditional_rule(p.get("text", "")) or parse_threshold_rule(p.get("text", "")):
+                continue
             for found in AMOUNT_RE.findall(p["text"]):
                 spans.append(found)
                 sources.append(p["id"])

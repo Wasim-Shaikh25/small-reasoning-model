@@ -93,7 +93,7 @@
             "per_exception": [
               {
                 "status": "holds",
-                "best_entail": 0.9941,
+                "best_entail": 0.9942,
                 "best_contradict": 0.0008,
                 "best_context": "The data subject has given explicit consent to the processing of those personal data for one or more specified purposes."
               }

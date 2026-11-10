@@ -2,13 +2,12 @@
   "case1_exception_holds": {
     "ask": "How much money has the contractor billed in total this quarter, and does company policy require finance head approval?",
     "decision": "supported",
-    "text": "total 70,000 [policy, fact-1]. policy does not apply: the rule's exception holds (\"Company policy: if a contractor's total billed amount in a quarter exceeds INR 30000, the payment requires finance head approval, unless the finance head has pre-approved the vendor in writing.\") [policy].",
+    "text": "total 40,000 [fact-1]. policy does not apply: the rule's exception holds (\"Company policy: if a contractor's total billed amount in a quarter exceeds INR 30000, the payment requires finance head approval, unless the finance head has pre-approved the vendor in writing.\") [policy].",
     "citations": [
-      "fact-1",
-      "policy"
+      "fact-1"
     ],
     "facts": {
-      "total": 70000.0
+      "total": 40000.0
     },
     "trace": [
       {
@@ -72,9 +71,8 @@
       },
       {
         "step": "compute_total",
-        "total": 70000.0,
+        "total": 40000.0,
         "sources": [
-          "policy",
           "fact-1"
         ]
       },
@@ -88,17 +86,17 @@
         "kind": "threshold",
         "result": {
           "matched": true,
-          "computed_value": 70000.0,
+          "computed_value": 40000.0,
           "threshold": "INR 30000",
           "comparison": {
             "ok": true,
             "relation": "greater",
             "values": [
-              70000.0,
+              40000.0,
               30000.0
             ],
             "inputs": [
-              "70000.0",
+              "40000.0",
               "INR 30000"
             ],
             "rule": "numeric comparison of extracted spans",
@@ -131,9 +129,8 @@
       {
         "id": "fact:total",
         "kind": "fact",
-        "summary": "total=70000.0",
+        "summary": "total=40000.0",
         "depends_on": [
-          "policy",
           "fact-1"
         ]
       },
@@ -167,13 +164,13 @@
   "case2_exception_contradicted": {
     "ask": "How much money has the contractor billed in total this quarter, and does company policy require finance head approval?",
     "decision": "supported",
-    "text": "total 70,000 [policy, fact-1]. policy applies: the payment requires finance head approval, unless the finance head has pre-approved the vendor in writing [policy].",
+    "text": "total 40,000 [fact-1]. policy applies: the payment requires finance head approval, unless the finance head has pre-approved the vendor in writing [policy].",
     "citations": [
       "fact-1",
       "policy"
     ],
     "facts": {
-      "total": 70000.0
+      "total": 40000.0
     },
     "trace": [
       {
@@ -237,9 +234,8 @@
       },
       {
         "step": "compute_total",
-        "total": 70000.0,
+        "total": 40000.0,
         "sources": [
-          "policy",
           "fact-1"
         ]
       },
@@ -253,17 +249,17 @@
         "kind": "threshold",
         "result": {
           "matched": true,
-          "computed_value": 70000.0,
+          "computed_value": 40000.0,
           "threshold": "INR 30000",
           "comparison": {
             "ok": true,
             "relation": "greater",
             "values": [
-              70000.0,
+              40000.0,
               30000.0
             ],
             "inputs": [
-              "70000.0",
+              "40000.0",
               "INR 30000"
             ],
             "rule": "numeric comparison of extracted spans",
@@ -296,9 +292,8 @@
       {
         "id": "fact:total",
         "kind": "fact",
-        "summary": "total=70000.0",
+        "summary": "total=40000.0",
         "depends_on": [
-          "policy",
           "fact-1"
         ]
       },
@@ -334,13 +329,13 @@
   "case3_no_context": {
     "ask": "How much money has the contractor billed in total this quarter, and does company policy require finance head approval?",
     "decision": "supported_with_flags",
-    "text": "total 70,000 [policy, fact-1]. policy applies: the payment requires finance head approval, unless the finance head has pre-approved the vendor in writing (the rule's exception is unresolved -- not confirmed either way) [policy].",
+    "text": "total 40,000 [fact-1]. policy applies: the payment requires finance head approval, unless the finance head has pre-approved the vendor in writing (the rule's exception is unresolved -- not confirmed either way) [policy].",
     "citations": [
       "fact-1",
       "policy"
     ],
     "facts": {
-      "total": 70000.0
+      "total": 40000.0
     },
     "trace": [
       {
@@ -404,9 +399,8 @@
       },
       {
         "step": "compute_total",
-        "total": 70000.0,
+        "total": 40000.0,
         "sources": [
-          "policy",
           "fact-1"
         ]
       },
@@ -420,17 +414,17 @@
         "kind": "threshold",
         "result": {
           "matched": true,
-          "computed_value": 70000.0,
+          "computed_value": 40000.0,
           "threshold": "INR 30000",
           "comparison": {
             "ok": true,
             "relation": "greater",
             "values": [
-              70000.0,
+              40000.0,
               30000.0
             ],
             "inputs": [
-              "70000.0",
+              "40000.0",
               "INR 30000"
             ],
             "rule": "numeric comparison of extracted spans",
@@ -463,9 +457,8 @@
       {
         "id": "fact:total",
         "kind": "fact",
-        "summary": "total=70000.0",
+        "summary": "total=40000.0",
         "depends_on": [
-          "policy",
           "fact-1"
         ]
       },

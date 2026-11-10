@@ -108,14 +108,14 @@
           "per_exception": [
             {
               "status": "holds",
-              "best_entail": 0.9941,
+              "best_entail": 0.9942,
               "best_contradict": 0.0008,
               "best_context": "The data subject has given explicit consent to the processing of those personal data for one or more specified purposes."
             },
             {
               "status": "not_holds",
               "best_entail": 0.0016,
-              "best_contradict": 0.8913,
+              "best_contradict": 0.8904,
               "best_context": "The data subject has given explicit consent to the processing of those personal data for one or more specified purposes."
             },
             {
@@ -156,7 +156,7 @@
             },
             {
               "status": "holds",
-              "best_entail": 0.9075,
+              "best_entail": 0.9073,
               "best_contradict": 0.0043,
               "best_context": "Processing was necessary to protect the vital interests of the data subject or of another natural person where the data subject was physically or legally incapable of giving consent."
             },

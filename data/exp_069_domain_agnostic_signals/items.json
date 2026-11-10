@@ -26,7 +26,7 @@
         {
           "domain": "logistics",
           "ask": "Identify the vendor responsible for the delayed shipment and state where their business operates.",
-          "score": 0.6619
+          "score": 0.6528
         }
       ],
       "negatives": [
@@ -56,10 +56,10 @@
           "score": 0.472
         }
       ],
-      "min_positive_score": 0.6619,
+      "min_positive_score": 0.6528,
       "max_negative_score": 0.5414,
       "separable": true,
-      "recommended_tau_if_separable": 0.6017
+      "recommended_tau_if_separable": 0.5971
     },
     "total": {
       "signal": "total",
