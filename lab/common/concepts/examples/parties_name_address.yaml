@@ -1,0 +1,11 @@
+concept: parties_name_address
+describes: >
+  The name and address of every party, from a list of party records --
+  no role filter, every party regardless of side.
+aliases:
+  - "parties name and address"
+  - "party details"
+  - "name and address"
+recipe:
+  - tool: select_fields
+    fields: [name, address]

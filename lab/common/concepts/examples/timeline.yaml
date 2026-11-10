@@ -1,0 +1,14 @@
+concept: timeline
+describes: >
+  A chronologically ordered list of dated events extracted from text, each
+  with the sentence it actually occurred in.
+aliases:
+  - timeline
+  - chronology
+  - "sequence of events"
+  - "events in order"
+recipe:
+  - tool: extract_by_label
+    label: date
+  - tool: group_by_sentence
+  - tool: sort_chronological

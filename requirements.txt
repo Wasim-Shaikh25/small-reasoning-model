@@ -34,3 +34,10 @@ sentence-transformers>=3.0
 # Cross-platform peak-RSS measurement in lab/common/harness.py. `resource`
 # (the POSIX module the metric originally used) does not exist on Windows.
 psutil>=5.9
+
+# python-docx was already a real runtime dependency of
+# lab/common/docx_writer.py, just never pinned. PyYAML is new with the
+# teach-tool concept registry (lab/common/concept_tools.py,
+# lab/common/connector_config.py) and lab/common/render.py's .docx output.
+PyYAML>=6.0
+python-docx>=1.1

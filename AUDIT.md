@@ -1601,3 +1601,165 @@ than compound nouns. Not fixed here -- flagged as a real, now-confirmed-
 broader version of an already-known limitation, worth a real fix (e.g.
 lemmatizing before the vocabulary check) before trusting this on
 production text at any real volume.
+
+## Follow-up, next day: the teach-tool concept registry -- "timeline"/"respondent addresses"/"acts and sections" built and proven with zero hardcoded, task-specific Python
+
+Per the product-redesign request in `HANDOFF.md` ("Product redesign
+proposal"): a new `lab.common.concept_tools` module extends
+`lab.common.doc_tools`'s own "a template is DATA" rule to capabilities --
+a new task ("give me a timeline", "give me the respondent's address",
+"give me every act and section cited") is taught by adding one YAML file
+under `lab/common/concepts/`, never by writing a new Python function named
+after that task. Only 8 generic, data-parameterized primitives are Python
+(`extract_by_label`, `extract_by_pattern`, `group_by_sentence`,
+`sort_chronological`, `filter_records`, `select_fields`,
+`resolve_addresses`, `count`); every concept YAML only composes them.
+
+Also built: `lab.common.connector_config` (a YAML-declared data source --
+`inline`/`records`/`file` fully implemented and tested below; `qdrant`/
+`graph` wired to the already-built `lab.common.connectors` classes but
+NOT live-tested this session, no server running), `lab.common.render`
+(JSON/Markdown/.docx output), and `lab.common.engine.run` as the one
+public entry point tying all three together.
+
+**Tested end-to-end against one fictional fixture** (3 passages -- a
+purchase date, a notice date with a statute citation, a filing date with
+a second statute citation -- plus 2 party records, complainant and
+respondent, each with a role and address):
+
+| Ask | Concept matched | Result |
+|---|---|---|
+| "what is the emotional tone of this document" | none (embedding score 0.579, below the 0.6 threshold) | `ok=False`, `reason="unknown_concept"`, a "teach me" message -- no crash, no guess, no generative fallback |
+| "give me a timeline of events" | `timeline` (alias match) | all 3 dated events, each with its sentence, correctly sorted chronologically |
+| "what acts and sections are used in this petition" | `acts_and_sections` (alias match) | both statute citations found via the YAML-supplied regex pattern, rendered to Markdown |
+| "give me the respondent addresses" | `respondent_addresses` (alias match) | exactly the one respondent record, projected to `{name, address}` -- the complainant correctly excluded |
+| "give me parties name and address" | `parties_name_address` (alias match) | both records, projected to `{name, address}`, rendered to a real `.docx` file (`python-docx`, confirmed written to disk) |
+
+All 5 asserted outcomes passed on the first clean run after fixing two
+wrong-API-signature bugs caught by running it, not by inspection:
+`lab.common.ingest.chunk_document`'s real signature is
+`(raw_text, max_words_per_chunk=120)`, not `(text, doc_id=...)`, and
+`QdrantConnector`/`GraphConnector` take `collection` (and an on-disk
+`base_dir`), not a `url`, and `QdrantConnector.search` returns
+`[{"passage": {...}, "score"}]`, not a flat passage list -- all three
+assumptions were wrong on the first draft, corrected by reading
+`lab/common/connectors.py` and `lab/common/ingest.py` directly before
+re-running, not by guessing.
+
+**What this does and does not prove.** It proves the core claim -- a new
+capability is addable as data, with a graceful, non-hallucinating failure
+for anything not yet taught -- on one small, controlled fixture with
+unambiguous aliases. It does NOT yet prove: embedding-fallback matching
+on an ask that uses none of a concept's literal aliases (every ask in
+this test happened to contain an exact alias, so `match_concept`'s
+alias-substring path fired every time; the embedding path only fired for
+the one deliberately-unmatched ask, correctly, but that is one data point,
+not a calibration); `CONCEPT_TAU=0.6` is provisional, same status as
+`method_teaching.INTENT_TAU` before it; the `qdrant`/`graph` connector
+branches (code written, not run against a live store); and nothing here
+is wired into `brain.reason` or `longform.write_long_document` yet -- it
+is a new, separate entry point (`lab.common.engine.run`), not a
+replacement for the existing pipeline.
+
+`requirements.txt` updated to list `PyYAML` (new, for the concept/
+connector YAML files) and `python-docx` (already a real runtime
+dependency of `lab/common/docx_writer.py`, just never pinned -- a fresh
+clone following `requirements.txt` alone would not have had it either).
+
+## Follow-up, same week: making the teach-tool layer actually industry-blank, and testing it against every open HANDOFF.md issue
+
+The project owner's explicit objection to the first version above: the
+four worked concepts (timeline/acts_and_sections/respondent_addresses/
+parties_name_address) shipped inside `lab/common/concepts/`, the
+directory `concept_tools.load_concepts()` scans by default -- so a fresh
+install of this "product" would have come with legal-petition vocabulary
+baked in, exactly the kind of hardcoding the teach-tool layer was built
+to eliminate. Two changes, both verified, not just asserted:
+
+1. **The four proof concepts moved to `lab/common/concepts/examples/`**,
+   a subdirectory `load_concepts()` never scans (it globs `CONCEPTS_DIR`
+   non-recursively). Verified directly: `concept_tools.load_concepts()`
+   now returns `[]` on this exact codebase. A fresh install, any
+   industry, starts with **zero** registered concepts and teaches its
+   own the same way these four examples were taught -- there is no
+   longer a legal-domain default to un-teach.
+2. **`resolve_addresses` (a primitive literally named after one field)
+   retired in favor of `structure_field(field, parser)`** -- `parser` is
+   now YAML data (today: only `"address"` is registered in
+   `STRUCTURE_PARSERS`, but a new parser is a registry entry, not a new
+   primitive signature), matching the discipline `extract_by_label`
+   already set with its `label` argument. No shipped example used the
+   old primitive, so this was a pure generalization, not a behavior
+   change for any existing concept.
+
+**A fifth, deliberately non-legal example was added to test genericity
+directly: `examples/refund_eligible_cases.yaml`**, plus a new primitive,
+`filter_by_condition(field, operator, value)` -- a generic numeric/
+duration comparison (`less_than`/`at_most`/`greater_than`/`at_least`/
+`equal_to`, backed by `lab.common.calc.compare_numbers`, with duration
+units hours/days/weeks/months normalized to a common base so "14 days"
+and "2 weeks" compare correctly against each other). This directly
+targets HANDOFF.md's own sharpest named finding: **`lab.common.
+rules.apply_rule` matches a policy rule on its trigger verb lemma only
+and never evaluates the rule's quantitative/temporal condition at all**
+-- on the real Steam refund policy ("played less than two hours and
+refunded within two weeks"), that gap got a 10-hour-playtime case and a
+refunded-a-month-late case both wrongly `matched=True`.
+
+Reconstructed that exact scenario as a 4-case fixture and ran it through
+`engine.run` with only `filter_by_condition` steps (no new domain-named
+Python): the correct single eligible case was returned, and **both of
+HANDOFF's named wrong cases were correctly excluded** -- a direct,
+reproducible fix for that bug, achieved through the generic design
+layer rather than by patching `rules.py` in place. A bug was found and
+fixed while building this test, not hidden: the first version of
+`filter_by_condition` converted a bare, unitless record value (`30`, no
+unit) by leaving it unconverted while converting the YAML threshold
+("14 days") to hours, so `30 < 336` passed when it should have failed on
+`days_since_purchase`. Fixed by having a bare record value inherit the
+threshold's own unit (a "30" compared against "14 days" is 30 days, not
+30 of nothing) before any conversion -- caught by the test asserting the
+exact expected case-id set, not by eyeballing the output.
+
+**Honest scope of that fix -- what it does NOT solve.** HANDOFF.md names
+two distinct failures for `rules.py`: (a) the quantitative/temporal
+condition is never checked (fixed above, by the generic design), and
+(b) `parse_conditional_rule`/`RULE_RE` fail to parse real policy prose
+at all (0 of 8 real sentences in the independent re-run). This fix
+**sidesteps (b) rather than solving it** -- the policy is declared
+directly as a YAML recipe of `filter_by_condition` steps, never parsed
+from English prose. That is a legitimate product shape (a person or a
+future bounded proposer encodes a policy once, as data), but it is not
+"rules.py now parses arbitrary policy text," and claiming otherwise
+would overstate this.
+
+**Every other open issue named in HANDOFF.md's "four big scale-tests"
+and redesign sections was checked against this design, not just listed
+-- most are NOT solved by it, and here is why, specifically:**
+
+| HANDOFF issue | Verdict | Why |
+|---|---|---|
+| `rules.py` never checks quantitative/temporal conditions | **Solved** (generically) | `filter_by_condition`, proven above |
+| `rules.py` doesn't parse real policy prose (0/8) | **Sidestepped, not solved** | policy is declared as YAML, never parsed from prose |
+| `decision_findings.py` reported-question false positive | Not solved | needs syntactic (ccomp/xcomp) awareness; no such primitive exists in `GENERIC_REGISTRY` |
+| `decision_findings.py` passive-decision false negative | Not solved | needs embedding-neighbor verb widening; different subsystem, untouched |
+| `spellfix.py` verb-inflection gap | Not solved | token-level typo correction; unrelated to concept/recipe matching entirely |
+| `plain_language.py` can't split/reorder sentences | Not solved | would need a new sentence-restructuring primitive (e.g. splitting on `connectives.find_connectives`); not built |
+| `sentence_completeness.py` blind spots + `no_verbal_root` | Not solved | pre-generation completeness gate; different subsystem |
+| Reference resolution is pronoun-only (`relationship_graph._resolve_antecedent`) | Not solved | this layer never resolves references; that work is still unstarted (point 2 of the redesign proposal) |
+| `store.py` streaming upsert / always-hybrid search | Not solved | data layer; untouched by this session |
+| Self-expanding reasoning core (point 3 of the redesign) | Not solved | this teach-tool layer is the *tools* layer, not the reasoning core; no budget/cycle/coverage loop exists yet |
+| `doc_tools.py` per-section template contracts | Not solved | not built |
+| Keep/delete pass on the 8 dormant modules | Not solved | not attempted this session |
+
+**What this does prove, honestly:** the genericity objection itself is
+fixed and verified (empty shipped registry, no primitive named after a
+field or a task), and the single sharpest, most architecturally-relevant
+open bug (rules.py's structural blindness to quantitative/temporal
+conditions) is fixed through this same generic design, on a
+deliberately different industry than the four original examples. It does
+NOT prove the teach-tool layer is a general fix for every open issue in
+HANDOFF.md -- nine of eleven other named issues live in subsystems
+(language-brain normalization, the reasoning core, the data layer,
+template contracts, dormant-module cleanup) this layer was never scoped
+to touch, and none of them moved as a side effect of this work.

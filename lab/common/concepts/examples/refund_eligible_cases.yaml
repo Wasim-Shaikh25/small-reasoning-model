@@ -1,0 +1,38 @@
+# Fifth proof example -- NOT a legal-petition case like the other four
+# in this folder, deliberately, to show the same primitives work outside
+# that one industry. This is also the direct test of HANDOFF.md's
+# sharpest open finding: lab.common.rules.apply_rule matches a policy
+# rule on its trigger VERB LEMMA ONLY and never evaluates the rule's own
+# quantitative/temporal condition -- on the real Steam refund policy
+# ("played for less than two hours and refunded within two weeks"),
+# that gap got 2 of 4 fictional cases flatly wrong: a 10-hour-playtime
+# case and a refunded-a-month-late case both wrongly came back
+# matched=True, because "less than two hours"/"within two weeks" were
+# carried as inert text, never compared against the case's real numbers.
+#
+# Here the condition IS the mechanism, not inert text: each
+# filter_by_condition step is a mandatory, generic numeric/duration
+# comparison (lab.common.concept_tools.filter_by_condition), so a case
+# can only pass if its own recorded numbers actually satisfy the policy.
+# Same two primitives would work unchanged for a warranty window, an SLA
+# deadline, a leave-balance cap, or a credit limit -- any industry, any
+# two-condition eligibility policy, by changing only the field names and
+# thresholds below, never the Python.
+
+concept: refund_eligible_cases
+describes: >
+  Which cases qualify for a refund under a playtime-and-time-window
+  policy: played under a time limit AND refunded within a deadline.
+aliases:
+  - "eligible for a refund"
+  - "refund eligibility"
+  - "which cases qualify for a refund"
+recipe:
+  - tool: filter_by_condition
+    field: playtime_hours
+    operator: less_than
+    value: "2 hours"
+  - tool: filter_by_condition
+    field: days_since_purchase
+    operator: at_most
+    value: "14 days"

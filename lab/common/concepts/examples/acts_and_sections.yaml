@@ -1,0 +1,14 @@
+concept: acts_and_sections
+describes: >
+  Every legal act and section citation mentioned in the document, such as
+  "Section 420 of the Indian Penal Code, 1860".
+aliases:
+  - "acts and sections"
+  - "sections used"
+  - "acts used in the petition"
+  - "statutory citations"
+recipe:
+  - tool: extract_by_pattern
+    label: statute_citation
+    pattern: 'Section[s]?\s+\d+[A-Za-z]?(?:\s*(?:,|and|to)\s*\d+[A-Za-z]?)*\s+of\s+the\s+[A-Z][A-Za-z,.\s]+?Act,?\s*\d{4}'
+  - tool: group_by_sentence

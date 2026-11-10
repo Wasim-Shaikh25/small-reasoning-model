@@ -152,6 +152,187 @@ Not in the old plan at all -- built and measured since:
   the four big scale-tests above; see that section for their honest,
   measured limits before reusing either.
 
+## Product redesign proposal (2026-11-10): one `Engine`, a unified language brain, a self-expanding reasoning core, a teach/template tool layer -- status: proposed, not yet implemented
+
+Driven by a request to turn this from a research lab into a product other
+systems can integrate. Every open issue above shares one root cause worth
+naming before any redesign: closed, hand-written pattern tables and fixed
+pipelines that don't generalize past the shapes they were validated on
+(`rules.RULE_RE`'s "If X, Y" phrasing, `decision_findings.DECISION_VERBS`'
+closed lemma list, `spellfix`'s single-token vocabulary, the lexical QA
+extractor's 0.0 SQuAD2 exact match, real embeddings losing to TF-IDF on a
+harder retrieval test). The redesign below is organized around fixing that
+root cause structurally, not patching each symptom again.
+
+**Four layers, replacing today's single `brain.reason` signal chain:**
+
+1. **Data layer -- promote `store.py` (currently zero fan-in, dormant) to
+   the one place data enters the system.** `Store.build/load/search/
+   expand_entity` already wraps `index.Index`, `real_bge_index.RealBgeIndex`
+   and `graph_index`; `connectors.QdrantConnector`/`GraphConnector` already
+   give it a remote/persistent backend. Missing and needed: an incremental/
+   streaming upsert path (today `Store.build` is one-shot batch-fit only),
+   and always-hybrid search (never dense-only -- the EXP-029 finding that
+   real embeddings lost to TF-IDF on a harder retrieval test is exactly the
+   failure mode hybrid search exists to avoid).
+
+2. **Language brain -- one entry point merging what's scattered across
+   `rules.py`/`inference.py`/`connectives.py`/`deontic.py`/`temporal.py`/
+   `spellfix.py`/`plain_language.py`/`informal_register.py`/`word_relevance.py`
+   today.** Normalizes vocabulary, parses structure, and emits one logic
+   graph (facts, rule shapes, temporal/quantitative conditions, discourse
+   relations, unresolved references) for both the ask and the data -- this
+   is literally the "data logic" / "ask logic" split asked for. The one
+   real design change here, not just consolidation: **reference resolution
+   stops being a special case.** `relationship_graph._resolve_antecedent`
+   today is a one-off nearest-antecedent heuristic for pronouns only.
+   `ARCHITECTURE.md` section 6.0 already specifies the right shape --
+   "ambiguous reference" is one of seven generic gap types, resolved by the
+   same mechanism as entity identity, defined-term linking, and vague
+   criteria -- but the code never actually built it that way. Fix: retire
+   the pronoun-only heuristic in favor of one generic "bind this unresolved
+   reference to the best-supported node" operation, scored by the same
+   features already used elsewhere (recency, embedding similarity, role
+   compatibility), usable for "it"/"the said premises" exactly as it's used
+   for "the Lessee". Keep the old heuristic as a fallback until the generic
+   version is measured to beat it on a labeled set -- don't rip it out same-day.
+
+3. **Reasoning core -- make the self-expanding tree the primary mechanism,
+   not a buried helper.** `inference.forward_chain` already does exactly
+   this for rules: repeatedly matches every rule against every known fact,
+   derives new facts, until nothing new fires. The fix is to generalize the
+   *same loop* to admit every other operation (`qa.answer_with_real_qa`,
+   `nli.judge`, the new reference-binder, `rules.apply_rule`) as an
+   expansion move against a growing node set, instead of `brain._reason_once`'s
+   fixed stage order. Required safety controls, non-optional: `budget.
+   cap_depth` as a hard node/round cap, `relationship_graph.find_cycles` as
+   a loop guard, and `verify.coverage_check` as the stop condition once
+   every required fact is found/missing/conflicted. This is still zero new
+   generative capability -- every expansion step is one of the existing
+   deterministic/encoder operations; what changes is that they fire
+   generically to a stop condition instead of in a hard-coded sequence.
+   This also structurally fixes the sharpest open bug above: in the new
+   design, the rule-expansion operator is required to call `calc.
+   compare_numbers`/`temporal.check_temporal_bound` before it's allowed to
+   fire, so `apply_rule` can no longer match on verb lemma alone while
+   ignoring "within two weeks"/"less than two hours" as inert text.
+
+4. **Tools -- teach tool, template contracts, domain tools.**
+   `method_teaching.py` (482 lines, currently zero fan-in, dormant) already
+   is the "teach it how to do a task" mechanism asked for (propose a short
+   plan of primitives, validate the plan against the ask's intent, execute
+   deterministically) -- promote it to the sanctioned way any new
+   capability (a timeline, a policy application) gets added, instead of
+   hand-writing a new one-off function per task. `doc_tools.py`'s template
+   registry already selects templates and routes findings to sections by
+   similarity; extend it so each template section carries an explicit
+   contract (required fact types, ordering, min/max findings) the
+   reasoning core can check per-section, not just globally. `gapfill.py`
+   (the FLAN-T5 "untrusted proposer" from section 3.2.1, also dormant)
+   becomes the one sanctioned fallback for anything the deterministic tools
+   can't cover, gated the same way `FORBIDDEN.md`'s bounded-rewriter
+   exception already gates generation elsewhere.
+
+**Per-issue fix mapping (every open item above, now with a concrete fix
+instead of just a measurement):**
+- `rules.py` never checks quantitative/temporal conditions -> structural
+  fix in the reasoning core's rule operator (point 3).
+- `rules.py` doesn't parse real policy prose (0/8) -> widen
+  `parse_conditional_rule` to use `connectives.find_connectives`'s already-
+  generic operator detection instead of `RULE_RE`'s canonical-phrasing regex.
+- `decision_findings.py`'s reported-question false positive -> check
+  whether the modal sits inside a `ccomp`/`xcomp` of a cognition verb
+  before accepting it as a directive.
+- `decision_findings.py`'s passive-decision false negative -> widen past
+  the closed `DECISION_VERBS` lemma list using embedding nearest-neighbors,
+  not another hardcoded entry.
+- `spellfix.py`'s verb-inflection gap -> lemmatize before the vocabulary
+  lookup.
+- `plain_language.py`'s structural ceiling -> explicitly not plain_
+  language's job; sentence restructuring becomes a reasoning-core operation
+  (split on the connectives `find_connectives` already detects), not a
+  vocabulary-substitution patch.
+- `sentence_completeness.py`'s two blind spots and the still-generating
+  `no_verbal_root` case -> extend the gate's classifier for gerund/lone-
+  subordinate fragments; route headings to deterministic formatting
+  instead of ever calling `generate()` on them.
+
+**Keep / promote / delete, once each replacement is wired and verified
+(never delete before the replacement is measured, per this project's own
+discipline of not removing a working path until its successor is proven)**:
+- Promote to core: `store.py`, `method_teaching.py`, `gapfill.py`,
+  `decision_findings.py`, `plain_language.py`, `spellfix.py`,
+  `informal_register.py` -- all dormant today, all generic enough to be
+  tools rather than one-off scripts.
+- Keep, narrow the scope: `relationship_graph.py`'s graph/cycle-detection
+  parts stay; its `_resolve_antecedent` one-off gets replaced per point 2.
+- Candidate delete (one-off, task-specific, superseded by the template/
+  tool layer once it's wired): `article_tool.py` (a bespoke single-purpose
+  wrapper), `write_article.py` (folds into a registered template instead).
+- Move out of the shipped package, keep for research: `synthetic_fusion_data.py`,
+  `lora_finetune.py`, `real_corpus.py`, `real_squad.py` -- offline
+  training/benchmark plumbing, not part of a product's runtime path.
+- Not touched: the 91 `lab/exp_*` scripts stay as the append-only research
+  trail (`AGENT.md`'s own discipline); productization means a new clean
+  public surface on top of `lab/common`, not deleting the evidence base.
+
+**Framework/API surface asked for ("any system can integrate this")**: one
+public entry point, e.g. an `Engine` class wrapping the four layers
+(`Engine(data_source=..., templates=[...]).teach(...)`/`.ask(...)`/
+`.write(...)`), so external callers import one stable surface instead of
+reaching into `lab.common.*` internals. Scope this as its own phase after
+the four-layer core is validated -- versioning and a stable public API are
+a real commitment, not something to bolt on mid-redesign.
+
+**Update, next day: the tool layer's teach/template half is now built and
+tested** (`AUDIT.md`, search "the teach-tool concept registry"). New:
+`lab.common.concept_tools` (a YAML-defined concept registry -- 8 generic
+primitives in Python, every task-specific capability a YAML file under
+`lab/common/concepts/`), `lab.common.connector_config` (YAML-declared
+data sources: `inline`/`records`/`file` tested, `qdrant`/`graph` wired to
+the existing connector classes but not live-tested), `lab.common.render`
+(JSON/Markdown/.docx output), and `lab.common.engine.run` as one public
+entry point. Proven end-to-end on a fictional fixture: "timeline",
+"acts and sections", "respondent addresses" and "parties name and
+address" all work with zero hardcoded, task-named Python; an untaught ask
+("emotional tone") correctly returns a graceful "teach me" response
+instead of a guess. `CONCEPT_TAU` (0.6) is provisional, not calibrated.
+
+**Update, same week: made the teach-tool layer genuinely industry-blank,
+and tested it against every other open issue below** (`AUDIT.md`, search
+"making the teach-tool layer actually industry-blank"). The four
+legal-petition concepts moved to `lab/common/concepts/examples/`
+(`load_concepts()` never scans it) -- the shipped registry is now
+verified empty, so a fresh install of any industry starts from nothing.
+`resolve_addresses` (named after one field) was retired for
+`structure_field(field, parser)`, parameterized the same way
+`extract_by_label`'s `label` already is. A new primitive,
+`filter_by_condition(field, operator, value)`, directly fixes this
+project's sharpest named structural bug: `rules.py`'s verb-lemma-only
+`apply_rule` never checks a rule's quantitative/temporal condition at
+all, which wrongly matched a 10-hour-playtime case and a
+refunded-a-month-late case against the real Steam refund policy.
+Reconstructed that exact scenario on a deliberately non-legal fixture
+and got both wrong cases correctly excluded, via the generic design, not
+a `rules.py` patch -- proof it generalizes past the original four
+examples' one industry. Honest limit: this sidesteps `rules.py`'s other
+named bug (parsing real policy prose, 0/8) rather than solving it -- the
+policy is declared as YAML, never parsed from English. Checked, not just
+listed: nine of the eleven other issues named below (`decision_findings.py`'s
+two bugs, `spellfix.py`'s inflection gap, `plain_language.py`'s
+structural ceiling, `sentence_completeness.py`'s blind spots, reference
+resolution, the data layer, the reasoning core, template contracts, the
+dormant-module pass) are **not** solved by this layer -- each lives in a
+different subsystem this teach-tool layer was never scoped to touch, and
+none moved as a side effect of this work.
+
+**Still not done**: `lab.common.engine.run` is a new, separate entry
+point -- it is not wired into `brain.reason` or `longform.
+write_long_document`, and the rest of this proposal (the self-expanding
+reasoning core, generalized reference resolution, the data layer's
+streaming upsert, the per-section template contracts, and the actual
+keep/delete pass on the 8 dormant modules) has not been started.
+
 ## House rules to keep following (unchanged, from `AGENT.md`)
 
 - Add a `todo` entry before implementing a new exploration, close it only

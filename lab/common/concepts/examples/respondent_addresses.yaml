@@ -1,0 +1,14 @@
+concept: respondent_addresses
+describes: >
+  The postal address of every party whose role is respondent, from a list
+  of party records.
+aliases:
+  - "respondent address"
+  - "respondent addresses"
+  - "address of the respondent"
+recipe:
+  - tool: filter_records
+    field: role
+    equals: respondent
+  - tool: select_fields
+    fields: [name, address]

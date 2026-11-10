@@ -1,0 +1,31 @@
+# Template for teaching this system a new concept -- copy this file,
+# rename it, and fill in your own task. No Python change is needed.
+#
+# concept:    a short machine id (lowercase, underscores).
+# describes:  one sentence, used for embedding-similarity matching when
+#             the ask doesn't literally contain one of your aliases.
+# aliases:    phrases that, if found inside the ask (case-insensitive
+#             substring), match this concept immediately and exactly.
+# recipe:     an ordered list of steps. Each step's `tool` must be one of
+#             the primitives in lab/common/concept_tools.py's
+#             GENERIC_REGISTRY (extract_by_label, extract_by_pattern,
+#             group_by_sentence, sort_chronological, filter_records,
+#             select_fields, structure_field, filter_by_condition, count).
+#             Every other key on a step is passed straight through as
+#             that primitive's argument.
+#
+# None of these primitives know about any industry. A new capability is
+# always a new YAML file here, never a new Python function -- see
+# lab/common/concepts/examples/ for four worked examples (all from one
+# legal-petition fixture) and HANDOFF.md for a fifth, cross-industry one
+# (a warranty/refund eligibility check using filter_by_condition).
+#
+# This file is never loaded itself (its name starts with "_").
+
+concept: my_new_concept
+describes: Replace this with one sentence describing what this concept produces.
+aliases:
+  - "a phrase that should trigger this concept"
+recipe:
+  - tool: extract_by_label
+    label: person
