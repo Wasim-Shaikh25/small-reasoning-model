@@ -1,0 +1,32 @@
+# Known false-positive matches for the person-name regex (FULL_PERSON:
+# "two or three consecutive Title-Case words") that don't end in an
+# org-suffix or place word -- "New Delhi", "High Court", "Notice Period".
+#
+# HONEST LIMIT, not hidden: this is a denylist of SPECIFIC phrases found
+# in this project's own test fixtures, not a generalizable rule -- a
+# different document will hit a different capitalized-common-noun false
+# positive this list has never seen, and this list will not catch it.
+# Moving it from a Python set to this file only fixes WHERE the
+# vocabulary lives (data, not code), not the underlying non-
+# generalization. The actual proven fix already exists in this same
+# module: `detect_primary(text, use_real_ner=True)` replaces this whole
+# regex-based person heuristic with dslim/bert-base-NER, measured
+# (EXP-080) to correctly return ZERO person matches for exactly this
+# class of capitalized-noun-phrase false positive, with no denylist at
+# all -- it defaults to False only so the 80+ existing explorations that
+# call `detect_primary` without opting in keep their exact prior speed
+# and behavior, not because the regex path is the recommended one.
+phrases:
+  - "Park Street"
+  - "New Delhi"
+  - "High Court"
+  - "Notice Period"
+  - "MG Road"
+  - "Ashok Nagar"
+  - "Baker Street"
+  - "Private Limited"
+  - "United States"
+  - "Security Deposit"
+  - "Termination Clause"
+  - "Pvt Ltd"
+  - "Private Ltd"

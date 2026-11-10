@@ -350,16 +350,39 @@ and "eat" (verbs that must NOT be caught), with no threshold that
 separates them. No confident deterministic alternative identified yet;
 this is an open design question, not a fix in progress.
 
+**Update, same day: `plain_language.py` is wired into `brain.reason`,
+and the hardcoded vocabulary tables are moved to data** (`AUDIT.md`,
+search "the hardcoded tables moved to data"). New `lab.common.
+grammar_logic` (`passive_to_active`, `split_on_connective`, both gated
+by bidirectional NLI entailment) plus `plain_language.simplify_document`
+closes `plain_language.py`'s own named structural ceiling -- a new
+`plain_english` flag (default `False`, same opt-in shape as `use_real_
+ner`) threads through `brain.reason -> _reason_once ->
+write_long_document -> simplify_document`, verified end to end, zero
+change to the default path. `entities.py`'s live `ORG_SUFFIXES`/
+`PLACE_LAST`/`NOT_PERSON` and `decision_findings.py`'s `DECISION_VERBS`
+are now `lab/common/lexicons/*.yaml`, not Python literals; a real
+duplicate-vocabulary bug (`ORG_SUFFIXES` and `ORG_RE`'s regex used to be
+two separately hand-typed copies of the same suffix list) was found and
+fixed while doing this, not just relocated. `method_teaching.py` is
+explicitly flagged as a delete candidate (superseded by `concept_tools.py`,
+which does the same job generically) rather than promoted or fixed in
+place. `proposals.py`/`provenance.py` were deliberately left untouched
+-- both are confined to old, closed experiments.
+
 **Still not done**: `lab.common.engine.run` is a new, separate entry
 point -- it is not wired into `brain.reason` or `longform.
-write_long_document`. Of the original nine untouched issues, five remain
-genuinely untouched: `plain_language.py`'s structural ceiling (can't
-split/reorder sentences), pronoun-only reference resolution, the data
+write_long_document` (that pipeline is now reached through `plain_
+english`/other existing flags, a separate path from the teach-tool
+concept registry). Of the original nine untouched HANDOFF issues, four
+remain genuinely untouched: pronoun-only reference resolution, the data
 layer's streaming upsert/hybrid search default, the per-section template
 contracts, and the keep/delete pass on the 8 dormant modules -- plus the
 self-expanding reasoning core itself was never attempted. The passive-
-decision false negative above is open with no known fix, not merely
-unattempted.
+decision false negative is still open with no known fix, not merely
+unattempted. A non-generative CoLA grammaticality classifier was
+identified as the right tool for catching grammar problems beyond the
+ones hand-found this session, but is not yet downloaded or wired in.
 
 ## House rules to keep following (unchanged, from `AGENT.md`)
 

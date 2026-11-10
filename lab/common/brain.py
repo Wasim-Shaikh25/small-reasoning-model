@@ -391,6 +391,7 @@ def reason(
     use_repair: bool = False,
     retrieve_budget: int = 1,
     check_contradiction: bool = False,
+    plain_english: bool = False,
 ) -> dict:
     """Thin outer wrapper around `_reason_once` (the function this
     docstring used to belong to, unchanged below) adding the two
@@ -425,6 +426,14 @@ def reason(
     `contradiction_flag` dependency_tree node per conflicting pair.
     Default False: no existing caller's decision set changes unless it
     opts in.
+
+    `plain_english` (default False, same opt-in shape, 2026-11-10):
+    threads through to `write_long_document`'s own flag of the same
+    name when `document_write` is one of this ask's stages -- see that
+    function's docstring for what it actually does
+    (`plain_language.simplify_document`: vocabulary substitution plus
+    gated passive-to-active/sentence-splitting). A no-op for any ask
+    that doesn't reach the document-writing stage.
     """
     result = _reason_once(
         ask,
@@ -435,6 +444,7 @@ def reason(
         use_real_qa=use_real_qa,
         use_real_nli=use_real_nli,
         use_repair=use_repair,
+        plain_english=plain_english,
     )
     round_num = 1
     while connector is not None and round_num < retrieve_budget and result["decision"] in ("inconclusive", "ungrounded"):
@@ -449,6 +459,7 @@ def reason(
             use_real_qa=use_real_qa,
             use_real_nli=use_real_nli,
             use_repair=use_repair,
+            plain_english=plain_english,
         )
         retried["trace"] = result["trace"] + [{"step": "retrieve_more", "round": round_num, "connector_top_k": connector_top_k}] + retried["trace"]
         result = retried
@@ -475,7 +486,7 @@ def reason(
     return result
 
 
-def _reason_once(ask: str, passages: list[dict], use_real_ner: bool = False, connector=None, connector_top_k: int = 5, use_real_qa: bool = False, use_real_nli: bool = False, use_repair: bool = False) -> dict:
+def _reason_once(ask: str, passages: list[dict], use_real_ner: bool = False, connector=None, connector_top_k: int = 5, use_real_qa: bool = False, use_real_nli: bool = False, use_repair: bool = False, plain_english: bool = False) -> dict:
     """One single pass of the signal-chain below -- called directly by
     reason() above, once per retry round. `use_real_ner=True` threads
     through to every lab.common.entities.
@@ -606,7 +617,7 @@ def _reason_once(ask: str, passages: list[dict], use_real_ner: bool = False, con
         # document whose passages were named "CHUNK0008" -- that string
         # ended up in the final .docx, EXP-081).
         findings = findings_from_chunks([p for p in passages if p.get("text")])
-        doc_result = write_long_document(ask, findings, task=plan["task_type"], use_real_ner=use_real_ner, use_real_nli=use_real_nli, use_repair=use_repair)
+        doc_result = write_long_document(ask, findings, task=plan["task_type"], use_real_ner=use_real_ner, use_real_nli=use_real_nli, use_repair=use_repair, plain_english=plain_english)
         trace.append(
             {
                 "step": "longform_write",

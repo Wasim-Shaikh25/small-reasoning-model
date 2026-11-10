@@ -13,8 +13,16 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics.pairwise import cosine_similarity
 
+from lab.common.lexicon import load_lexicon
 from lab.common.qa import answer_with_agreement
 from lab.common.textutil import content_tokens, find_span, normalize, sentences
+
+_ORG_SUFFIX_ENTRIES = load_lexicon("org_suffixes")["entries"]
+# Both built from the one lexicon file now -- see its own comment for why
+# a hand-typed duplicate of this vocabulary (one for this set, a second
+# for ORG_RE's regex below) used to risk silently drifting apart.
+ORG_SUFFIXES = {w for entry in _ORG_SUFFIX_ENTRIES for w in entry["words"]}
+_ORG_SUFFIX_ALTERNATION = "|".join(entry["regex"] for entry in _ORG_SUFFIX_ENTRIES)
 
 TITLE_PERSON = re.compile(
     r"\b(?:Mr|Mrs|Ms|Dr|Shri|Smt)\.?\s+[A-Z][a-z]+(?:\s+[A-Z][a-z]+)?\b"
@@ -36,7 +44,7 @@ FULL_PERSON = re.compile(r"\b[A-Z][a-z]{1,20}(?:[ \t]+[A-Z][a-z]{1,20}){1,2}\b")
 INITIAL_PERSON = re.compile(r"\b[A-Z]\.\s?[A-Z][a-z]+\b")
 ORG_RE = re.compile(
     r"\b[A-Z][A-Za-z0-9&]*(?:\s+[A-Z][A-Za-z0-9&]*){0,4}\s+"
-    r"(?:Pvt\.?\s+Ltd\.?|Private Limited|Inc\.?|LLC|Ltd\.?|LLP|GmbH|Corp\.?|Corporation)\b"
+    rf"(?:{_ORG_SUFFIX_ALTERNATION})\b"
 )
 DEFINED_RE = re.compile(r"\bthe\s+[A-Z][a-z]+\b|\(the\s+[A-Z][a-z]+\)")
 DATE_RE = re.compile(
@@ -117,13 +125,8 @@ STREET_RE = re.compile(
 PLOT_RE = re.compile(r"\bPlot\s+\d+,\s*Sector\s+\d+\b", re.I)
 NAGAR_RE = re.compile(r"\b[A-Z][a-z]+\s+Nagar\b")
 PARK_STREET_RE = re.compile(r"\bPark Street\b")
-NOT_PERSON = {
-    "Park Street", "New Delhi", "High Court", "Notice Period", "MG Road",
-    "Ashok Nagar", "Baker Street", "Private Limited", "United States",
-    "Security Deposit", "Termination Clause", "Pvt Ltd", "Private Ltd",
-}
-ORG_SUFFIXES = {"pvt", "ltd", "inc", "llc", "llp", "gmbh", "corp", "corporation", "limited", "private"}
-PLACE_LAST = {"road", "street", "st", "avenue", "ave", "lane", "marg", "drive", "boulevard", "blvd", "nagar", "market"}
+NOT_PERSON = set(load_lexicon("not_person_denylist")["phrases"])
+PLACE_LAST = set(load_lexicon("place_words")["words"])
 
 
 def _add(found: list[dict], text: str, match: re.Match, label: str, conf: float, tagger: str):

@@ -1,0 +1,72 @@
+# formal phrase (lowercase) -> plain equivalent. plain_language.py
+# sorts by phrase length before compiling, so entry order here does
+# not matter. See plain_language.py module docstring for why this
+# closed class (plain-English style guides have catalogued this exact
+# substitution list for decades) is legitimate data, not a guess.
+phrases:
+  notwithstanding the foregoing: despite this
+  notwithstanding anything to the contrary: despite anything else said here
+  notwithstanding: despite
+  pursuant to: under
+  in accordance with: under
+  in the event that: if
+  in the event of: if there is
+  in so far as: to the extent that
+  insofar as: to the extent that
+  with respect to: about
+  with regard to: about
+  in respect of: about
+  prior to: before
+  subsequent to: after
+  for the purposes of: for
+  for the purpose of: for
+  by virtue of: because of
+  in the absence of: without
+  shall not: must not
+  shall: must
+  may not: must not
+  forthwith: immediately
+  herein: in this document
+  hereof: of this document
+  hereby: by this
+  hereto: to this
+  heretofore: until now
+  thereof: of it
+  thereto: to it
+  therein: in it
+  the aforementioned: this
+  aforementioned: already mentioned
+  the said: this
+  whereas: since
+  whereby: by which
+  wherein: in which
+  provided that: if
+  save that: except that
+  save for: except for
+  inter alia: among other things
+  mutatis mutandis: with the necessary changes
+  bona fide: genuine
+  ab initio: from the start
+  de minimis: too small to matter
+  ipso facto: by that fact alone
+  null and void: invalid
+  deemed to be: treated as
+  at the discretion of: as decided by
+  undertake to: agree to
+  endeavour to: try to
+  render: make
+  utilise: use
+  utilize: use
+  ascertain: find out
+  constitute: count as
+  comprise: include
+  facilitate: help
+  commence: start
+  terminate: end
+  cease: stop
+  remuneration: pay
+  indemnify: cover the cost for
+  sufficient: enough
+  promulgate: issue
+  stipulate: set out
+  expeditiously: quickly

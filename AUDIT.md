@@ -1979,3 +1979,101 @@ hardcoded domain-vocabulary tables (`entities.py`'s live ones;
 dormant ones) and wiring `plain_language.py` (plus whatever sentence-
 restructuring layer gets built) into `brain.reason` -- both explicitly
 asked for this same turn -- have not been started either.
+
+## Follow-up, same day: the hardcoded tables moved to data, a gated grammar-structure layer built, both wired into brain.reason
+
+**Hardcoded vocabulary moved to `lab/common/lexicons/*.yaml`** (loaded by
+the new, tiny `lab.common.lexicon.load_lexicon`, cached per process --
+NOT the same mechanism as `concept_tools.load_concepts`, which teaches a
+capability; this loads a closed VOCABULARY an existing primitive already
+needs): `entities.py`'s `ORG_SUFFIXES`/`PLACE_LAST`/`NOT_PERSON` (all
+LIVE, used by every `detect_primary` call), `plain_language.py`'s
+`PLAIN_TABLE`, `decision_findings.py`'s `DECISION_VERBS`. A real overlap
+bug fixed along the way, not just relocated: `entities.py` used to hand-
+type the business-suffix vocabulary TWICE (once for `ORG_SUFFIXES`'s
+membership check, once inside `ORG_RE`'s regex alternation) -- exactly
+the "two modules/structures independently implementing the same
+decision" failure class this project's own audit discipline looks for.
+Both are now built from one file (`lexicons/org_suffixes.yaml`); the
+regex is rebuilt from the file's own `regex` field per entry, verified
+byte-identical to the original hand-written pattern before trusting it.
+`NOT_PERSON`'s own comment is explicit that this is a RELOCATION, not a
+fix -- it is still a denylist of this project's own fixture phrases, not
+a generalizable rule; the proven, more general fix (`detect_primary(...,
+use_real_ner=True)`, EXP-080) already exists in the same module and
+still defaults to off, unchanged.
+
+**`method_teaching.py` is NOT promoted** -- its own `_NOUN_TO_LABEL`/
+`_WH_TO_LABEL`/`_INTENT_TO_PLAN`/`_INTENT_EXEMPLARS` are exactly the
+hardcoded ask-vocabulary pattern `concept_tools.py` was built to retire,
+and that replacement is now proven, not just proposed. Flagged in its
+own docstring as a delete candidate rather than half-genericized in
+place, which would just build a second, parallel copy of what
+`concept_tools.py` already does. `proposals.py`'s `GENERIC` set and
+`provenance.py`'s `BACKGROUND_FACTS` (literal trivia, "capital of
+france": "Paris") were deliberately left untouched: both are confined to
+old, closed experiments (EXP-019, EXP-013/038) that import them by
+name, same discipline as not silently changing EXP-032/033's `.ents`
+output when the shared parser was upgraded.
+
+**New module, `lab/common/grammar_logic.py`**: a bidirectional-NLI
+`preserves_meaning` gate (the pattern researched and cited in this
+file's earlier entry), `passive_to_active` (modal passive + explicit
+"by"-agent only -- "the notice shall be given by the Lessor" -> "the
+Lessor shall give the notice"), and `split_on_connective` (splits at a
+`connectives.find_connectives` match for the two supported dependency
+shapes, `mark+advcl` and `cc`). Two real bugs found and fixed by
+testing against real sentences, not assumed correct from the design:
+(1) `find_connectives`'s own `anchor_text`/`clause_text` fields serve
+its original discourse-classification purpose, not splitting -- using
+them directly produced a sentence that repeated the entire original
+text with a bare connective word prefixed ("And. The product was found
+defective and the complainant sent a notice..."), which the NLI gate
+did NOT catch (the degenerate candidate still trivially entails the
+original); fixed by computing both clause spans directly from the
+dependency tree instead, and adding a cheap `sentence_completeness.
+is_complete_sentence` check on each half BEFORE the NLI call, specifically
+to catch this class of degenerate split structurally. (2) The first
+version of `passive_to_active` always appended every remaining child
+after the new object in original token order, which is only correct for
+a TRAILING modifier ("to the Lessee") -- a sentence-initial adverbial
+("Despite this, the notice shall be given...") landed mid-sentence
+instead ("...give the notice despite this to the Lessee"); fixed by
+partitioning a verb's other children on whether they appeared before or
+after the passive subject in the original sentence, keeping that
+ordering on the rebuild.
+
+Also measured, not hidden: `because`-clause splitting sometimes fails
+the NLI gate even on a seemingly clean example -- splitting "Because X,
+Y" into "X. Y." measurably weakens the backward entailment (0.7366,
+just under the 0.75 threshold) since the split loses the explicit
+causal link the original sentence carries. This is the gate correctly
+being cautious, not a bug to work around.
+
+**Wired into `brain.reason` via a new opt-in `plain_english` parameter**
+(default `False`, same shape as `use_real_ner`/`use_real_nli`/
+`use_repair`), threaded through `reason() -> _reason_once() ->
+longform.write_long_document() -> plain_language.simplify_document`
+(the new combined entry point: vocabulary substitution, then per-
+sentence `passive_to_active` then `split_on_connective`, both gated).
+Verified end to end through `brain.reason` itself (not just the
+individual functions in isolation): with `plain_english=True`, a real
+ask correctly threads all the way through and the rendered leaf shows
+both a vocabulary substitution and a passive-to-active conversion, with
+full per-sentence diagnostics recorded in `rewrite_diagnostics`. With
+the flag left at its default, `rewrite_diagnostics` is confirmed
+unchanged except for one new, always-`None` `plain_english_result` key
+-- zero behavior change for any existing caller.
+
+**EXP-081 (the real GDPR document pipeline) was rerun as a broader
+integration check** (not just this new code in isolation) -- it
+completed with no errors and the same 0/18 fidelity-pass story already
+on record, but `consistency_flags` changed from 13 to 16, a real,
+measured side effect of the earlier parser upgrade (the cross-page
+consistency checker also runs on the shared, now-upgraded dependency
+parser). Disclosed, not silently absorbed into the committed
+`results.json`: this project's own existing follow-up note on that same
+checker ("false-positive rate... not measured here, only observed
+qualitatively") already flags it as unverified for precision, and this
+session does not change that -- the new count is reported as measured,
+not claimed as an improvement.

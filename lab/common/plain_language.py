@@ -13,94 +13,41 @@ the same reason: enumerating a closed class is not guessing. Replacement
 is the same literal, whole-word/whole-phrase, case-preserving substitution
 `informal_register.py`/`assemble.render_unit`'s glossary step already use.
 
-Explicitly NOT a sentence-restructuring tool: a long subordinate-clause
-sentence with every formal word swapped for a plain one is still a long,
-dense sentence. This module only ever swaps vocabulary; it has no
-mechanism to split a sentence, reorder a clause, or convert passive to
-active voice. Tested directly against a real ~3,400-word GDPR excerpt
-(2026-11-09): most sentences get at least one substitution, but several
-of the document's longest, most convoluted sentences (deeply nested
-conditions, multiple cross-references) read almost as densely after
-substitution as before -- the hard part of "plain English" for this kind
-of text is sentence structure, not vocabulary, and this module does not
-solve that part. Reported as a real, measured limit, not glossed over.
+`simplify_vocabulary` alone was NOT a sentence-restructuring tool: a long
+subordinate-clause sentence with every formal word swapped for a plain
+one is still a long, dense sentence. Tested directly against a real
+~3,400-word GDPR excerpt (2026-11-09): most sentences got at least one
+substitution, but several of the document's longest, most convoluted
+sentences (deeply nested conditions, multiple cross-references) read
+almost as densely after substitution as before -- the hard part of
+"plain English" for this kind of text is sentence structure, not
+vocabulary.
+
+`simplify_document` (2026-11-10) is the fix for that gap: vocabulary
+substitution, THEN `lab.common.grammar_logic.passive_to_active` and
+`.split_on_connective` per sentence -- both gated by bidirectional NLI
+entailment, falling back to the ungated text on any sentence where a
+transform doesn't apply or doesn't pass the gate. See
+`grammar_logic.py`'s own docstring for exactly which passive/split
+shapes those two transforms do and don't attempt; this module does not
+claim they cover every sentence, only that every sentence they DO touch
+is checked, not guessed.
 """
 
 from __future__ import annotations
 
 import re
 
-# formal phrase (lowercase) -> plain equivalent. Longer phrases are tried
+from lab.common.lexicon import load_lexicon
+
+# formal phrase (lowercase) -> plain equivalent, now DATA
+# (lab/common/lexicons/plain_language_phrases.yaml), not a Python
+# literal, so a company can add its own formal phrases without a code
+# change -- same "closed vocabulary lives in a file" rule as
+# entities.py's org-suffix/place-word lexicons. Longer phrases are tried
 # before shorter ones that could be a substring of them (handled by
 # sorting PLAIN_TABLE by phrase length, descending, before compiling).
-PLAIN_TABLE: dict[str, str] = {
-    "notwithstanding the foregoing": "despite this",
-    "notwithstanding anything to the contrary": "despite anything else said here",
-    "notwithstanding": "despite",
-    "pursuant to": "under",
-    "in accordance with": "under",
-    "in the event that": "if",
-    "in the event of": "if there is",
-    "in so far as": "to the extent that",
-    "insofar as": "to the extent that",
-    "with respect to": "about",
-    "with regard to": "about",
-    "in respect of": "about",
-    "prior to": "before",
-    "subsequent to": "after",
-    "for the purposes of": "for",
-    "for the purpose of": "for",
-    "by virtue of": "because of",
-    "in the absence of": "without",
-    "shall not": "must not",
-    "shall": "must",
-    "may not": "must not",
-    "forthwith": "immediately",
-    "herein": "in this document",
-    "hereof": "of this document",
-    "hereby": "by this",
-    "hereto": "to this",
-    "heretofore": "until now",
-    "thereof": "of it",
-    "thereto": "to it",
-    "therein": "in it",
-    "the aforementioned": "this",
-    "aforementioned": "already mentioned",
-    "the said": "this",
-    "whereas": "since",
-    "whereby": "by which",
-    "wherein": "in which",
-    "provided that": "if",
-    "save that": "except that",
-    "save for": "except for",
-    "inter alia": "among other things",
-    "mutatis mutandis": "with the necessary changes",
-    "bona fide": "genuine",
-    "ab initio": "from the start",
-    "de minimis": "too small to matter",
-    "ipso facto": "by that fact alone",
-    "null and void": "invalid",
-    "deemed to be": "treated as",
-    "at the discretion of": "as decided by",
-    "undertake to": "agree to",
-    "endeavour to": "try to",
-    "render": "make",
-    "utilise": "use",
-    "utilize": "use",
-    "ascertain": "find out",
-    "constitute": "count as",
-    "comprise": "include",
-    "facilitate": "help",
-    "commence": "start",
-    "terminate": "end",
-    "cease": "stop",
-    "remuneration": "pay",
-    "indemnify": "cover the cost for",
-    "sufficient": "enough",
-    "promulgate": "issue",
-    "stipulate": "set out",
-    "expeditiously": "quickly",
-}
+PLAIN_TABLE: dict[str, str] = load_lexicon("plain_language_phrases")["phrases"]
 
 _SORTED_PHRASES = sorted(PLAIN_TABLE, key=len, reverse=True)
 _WORD_RE = {phrase: re.compile(rf"\b{re.escape(phrase)}\b", re.I) for phrase in PLAIN_TABLE}
@@ -132,3 +79,40 @@ def simplify_vocabulary(text: str) -> dict:
 
         result = pattern.sub(_replace, result)
     return {"text": result, "changes": changes}
+
+
+def simplify_document(text: str) -> dict:
+    """Vocabulary substitution + per-sentence structural simplification
+    (`grammar_logic.passive_to_active` then `.split_on_connective`),
+    each sentence handled independently so one sentence's rejected
+    transform never blocks another's. Returns `{"text", "vocabulary_
+    changes", "sentence_results"}` -- `sentence_results` is one entry per
+    output sentence with whatever `passive_to_active`/`split_on_
+    connective` actually did, so a caller can see exactly which
+    sentences were touched and which were left alone, and why.
+    """
+    from lab.common.grammar_logic import passive_to_active, split_on_connective
+    from lab.common.textutil import sentences as split_sentences
+
+    vocab = simplify_vocabulary(text)
+    sentence_results = []
+    out_sentences = []
+    for sent in split_sentences(vocab["text"]):
+        voice = passive_to_active(sent)
+        split = split_on_connective(voice["text"])
+        out_sentences.append(split["text"])
+        sentence_results.append(
+            {
+                "original": sent,
+                "final": split["text"],
+                "voice_converted": voice["converted"],
+                "voice_reason": voice["reason"],
+                "split": split["split"],
+                "split_reason": split["reason"],
+            }
+        )
+    return {
+        "text": " ".join(out_sentences),
+        "vocabulary_changes": vocab["changes"],
+        "sentence_results": sentence_results,
+    }

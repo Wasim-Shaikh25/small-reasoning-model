@@ -1,0 +1,17 @@
+# Non-modal decision-language verb lemmas (decision_findings.py).
+# Closed, KNOWN not to generalize (HANDOFF.md, AUDIT.md: "schedule" is a
+# documented, confirmed, unfixed false negative -- an embedding-neighbor
+# widening attempt was tried and measurably does not separate "schedule"
+# from unrelated verbs like "describe"/"eat"). Moving this to a file
+# fixes WHERE the vocabulary lives, not that underlying gap -- adding a
+# verb here is still a manual, human judgment call, same as before.
+verbs:
+  - decide
+  - conclude
+  - approve
+  - recommend
+  - resolve
+  - agree
+  - reject
+  - authorize
+  - determine

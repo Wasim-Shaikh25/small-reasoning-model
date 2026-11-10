@@ -1,4 +1,21 @@
-"""Method teaching: when brain.py's deterministic stage planner
+"""SUPERSEDED for the vocabulary-mapping role (2026-11-10) -- read this
+before promoting or extending this module. `_NOUN_TO_LABEL`/
+`_WH_TO_LABEL`/`_INTENT_TO_PLAN`/`_INTENT_EXEMPLARS` below are exactly
+the hardcoded "ask word -> primitive sequence" pattern
+`lab.common.concept_tools` was built to eliminate: a NEW task-vocabulary
+entry here still requires a Python change, the thing a YAML-defined
+concept in `lab/common/concepts/` no longer does. That replacement is
+now proven (AUDIT.md, "the teach-tool concept registry" / "making the
+teach-tool layer actually industry-blank"), not just proposed, so this
+module should NOT be promoted to the live pipeline as-is -- it is a
+candidate for deletion once everything it still does (the bounded-
+checkpoint fallback described below) is confirmed to have no caller left
+depending on it, per this project's own "promote/delete once the
+replacement is measured" rule. Left unmodified rather than half-fixed:
+genericizing its tables in place would just produce a second, parallel
+version of what `concept_tools.py` already does correctly.
+
+Method teaching: when brain.py's deterministic stage planner
 (plan_stages, STAGE_REGISTRY) doesn't recognize what an ask needs, ask a
 bounded checkpoint to NAME which deterministic primitives to run -- never
 to produce content itself.

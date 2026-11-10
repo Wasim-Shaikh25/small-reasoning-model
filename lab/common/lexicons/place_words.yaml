@@ -1,0 +1,18 @@
+# Street/place-type words (road, street, avenue, ...) used to reject a
+# "person name"-shaped regex match whose last word is actually a place
+# type, not a surname -- a closed, real-world naming convention (like
+# org_suffixes.yaml), genuinely incomplete past English/Indian English
+# conventions (no "strasse", "calle", "via", etc.).
+words:
+  - road
+  - street
+  - st
+  - avenue
+  - ave
+  - lane
+  - marg
+  - drive
+  - boulevard
+  - blvd
+  - nagar
+  - market

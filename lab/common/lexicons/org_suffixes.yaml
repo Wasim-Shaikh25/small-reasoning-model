@@ -1,0 +1,37 @@
+# Business-entity suffixes (English-speaking jurisdictions). Closed,
+# real-world legal/naming convention, not a guess -- but genuinely
+# incomplete past this list (e.g. "AG", "SA", "Pty", "Co" are not here).
+# Add an entry here, never a second hardcoded copy elsewhere: entities.py
+# used to hand-type this same vocabulary TWICE (once as the ORG_SUFFIXES
+# membership-check set, once as ORG_RE's regex alternation) -- a real
+# risk of the two silently drifting apart, exactly the "overlap" failure
+# class this project's own audit discipline looks for. Both are now built
+# from this one file.
+#
+# `words`: every individual lowercase word this suffix is made of (used
+# for the single-word membership check, `pieces & ORG_SUFFIXES`).
+# `regex`: the exact pattern fragment ORG_RE's alternation uses for this
+# suffix (case-sensitive, matching the capitalized form a real org name
+# would use) -- kept as its own field rather than derived from `words`
+# because a multi-word suffix ("Pvt Ltd", "Private Limited") needs its
+# own literal spacing/optional-period pattern, not a naive word-by-word
+# rebuild.
+entries:
+  - words: [pvt, ltd]
+    regex: "Pvt\\.?\\s+Ltd\\.?"
+  - words: [private, limited]
+    regex: "Private Limited"
+  - words: [inc]
+    regex: "Inc\\.?"
+  - words: [llc]
+    regex: "LLC"
+  - words: [ltd]
+    regex: "Ltd\\.?"
+  - words: [llp]
+    regex: "LLP"
+  - words: [gmbh]
+    regex: "GmbH"
+  - words: [corp]
+    regex: "Corp\\.?"
+  - words: [corporation]
+    regex: "Corporation"

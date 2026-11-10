@@ -132,6 +132,7 @@ def write_long_document(
     template_id: str | None = None,
     use_real_nli: bool = False,
     use_repair: bool = False,
+    plain_english: bool = False,
 ) -> dict:
     """Writes one long document from `findings`, page by page, checking
     cross-page consistency as it goes.
@@ -163,6 +164,15 @@ def write_long_document(
     Both default False, so every existing measured fidelity-pass rate
     stays exactly as recorded unless a caller explicitly opts in.
 
+    `plain_english` (default False, same opt-in discipline): runs each
+    rendered leaf's text through `lab.common.plain_language.
+    simplify_document` -- formal-vocabulary substitution plus per-
+    sentence passive-to-active/connective-splitting, each gated by
+    bidirectional NLI entailment (see that module and `grammar_logic.py`
+    for exactly what is and isn't attempted). Recorded per-leaf in
+    `rewrite_diagnostics` as `plain_english_result`; never applied to a
+    leaf with no findings (nothing to simplify).
+
     Returns {"document_result", "consistency_flags", "rewrite_diagnostics",
     "working_memory"} -- `consistency_flags` is never empty-by-default-
     assumption; it is whatever WorkingMemory actually found, reported as
@@ -190,18 +200,27 @@ def write_long_document(
             # would make its fidelity checks meaningless. Reported
             # explicitly ("no_findings"), not silently skipped.
             unit_text = leaf["title"]
-            rewrite_diagnostics.append({"leaf_id": leaf["leaf_id"], "used_generative": False, "fallback_reason": ["no_findings"]})
+            rewrite_diagnostics.append({"leaf_id": leaf["leaf_id"], "used_generative": False, "fallback_reason": ["no_findings"], "plain_english_result": None})
             rendered_units.append(unit_text)
             continue
 
         result = rewrite_unit(leaf, glossary, checkpoint=checkpoint, ask=leaf.get("section_instructions"), use_real_nli=use_real_nli, use_repair=use_repair)
         unit_text = result["text"] if result["text"].startswith(leaf["title"]) else f"{leaf['title']}\n{result['text']}"
+
+        plain_english_result = None
+        if plain_english:
+            from lab.common.plain_language import simplify_document
+
+            plain_english_result = simplify_document(unit_text)
+            unit_text = plain_english_result["text"]
+
         rendered_units.append(unit_text)
         rewrite_diagnostics.append(
             {
                 "leaf_id": leaf["leaf_id"],
                 "used_generative": result["used_generative"],
                 "fallback_reason": result["fallback_reason"],
+                "plain_english_result": plain_english_result,
             }
         )
 

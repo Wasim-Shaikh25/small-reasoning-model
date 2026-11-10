@@ -45,13 +45,14 @@ accurate enough to run unsupervised on a document nobody checks.
 from __future__ import annotations
 
 from lab.common.deontic import classify_deontic
+from lab.common.lexicon import load_lexicon
 from lab.common.rules import _parser
 from lab.common.textutil import sentences
 
-DECISION_VERBS = {
-    "decide", "conclude", "approve", "recommend", "resolve", "agree",
-    "reject", "authorize", "determine",
-}
+# Now data (lab/common/lexicons/decision_verbs.yaml) -- see that file's
+# own comment for the known, confirmed-unfixed generalization gap this
+# relocation does not solve.
+DECISION_VERBS = set(load_lexicon("decision_verbs")["verbs"])
 
 
 def classify_sentence(sentence: str) -> dict:
