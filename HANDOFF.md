@@ -493,6 +493,35 @@ answers correctly, citing it. Confirmed additive-only: EXP-060/084/089/
 page-by-page document writing into a round loop would be its own,
 larger, separate decision.
 
+**Third update, same day: don't revert it, find where the fixed brain
+actually fails, then decide.** Did exactly that (`AUDIT.md`, search
+"tightened reason_dynamic under discipline"). Found and fixed a third
+latent bug in `_reason_once` along the way (verb-rule `fact_passage`
+lookup took the first fact-shaped passage, not the one whose verb
+matches the rule's trigger -- same bug family as the first two). Then
+found the real case: a single rule (`forward_chain` never involved)
+whose consequence states a fee relevant to `total_computation`, a
+DIFFERENT stage in the same pass -- `reason()` gets the total wrong
+(400 instead of 450) because the two stages never share state; widening
+`reason_dynamic`'s derived-fact collection to also cover this single-
+rule path (it previously only read `forward_chain`'s multi-rule path)
+fixes it correctly. **Verdict: `reason_dynamic`'s `derived_fact` path is
+worth keeping now -- it has a real, measured case where the fixed
+pipeline is not just imprecise but wrong, not merely a redundant one.
+The `related_case` path is still a straight duplicate of `connector`+
+`retrieve_budget` and should still be reconsidered separately.**
+Regression-confirmed on 19 experiments.
+
+**Also wired, fast, as asked:** `use_spellfix` (runs `spellfix.
+fix_sentence_joint` -- which already calls `informal_register.
+normalize_informal` -- over the ask only, never over evidence passages)
+and `decision_findings_only` (document-writing stage only: findings
+come from `decision_findings.extract_decision_findings` instead of
+`ingest.findings_from_chunks`'s verbatim-everything default, so only
+decision-bearing sentences become findings). Both new `reason()`
+params, both default False, both tested working. That closes out
+HANDOFF's "promote to core" list for these three modules.
+
 ## House rules to keep following (unchanged, from `AGENT.md`)
 
 - Add a `todo` entry before implementing a new exploration, close it only

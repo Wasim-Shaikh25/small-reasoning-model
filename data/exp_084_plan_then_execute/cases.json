@@ -111,7 +111,23 @@
             "fact_verb_lemma": "kill",
             "consequence": "it is a crime and he will go to jail"
           },
-          "fact_passage": "fact-rohan"
+          "fact_passage": "fact-rohan",
+          "derived": [
+            {
+              "subject": "Rohan",
+              "verb_lemma": "be",
+              "object": "a crime",
+              "raw": "it is a crime",
+              "justification": null
+            },
+            {
+              "subject": "Rohan",
+              "verb_lemma": "go",
+              "object": "jail",
+              "raw": "he will go to jail",
+              "justification": null
+            }
+          ]
         },
         {
           "step": "check_exception",
@@ -302,7 +318,16 @@
             "fact_verb_lemma": "process",
             "consequence": "it is unlawful, unless the data subject has given explicit consent to the processing of those personal data for one or more specified purposes; processing is necessary to protect the vital interests of the data subject or of another natural person where the data subject is physically or legally incapable of giving consent; or processing is necessary for the establishment, exercise or defence of legal claims or whenever courts are acting in their judicial capacity"
           },
-          "fact_passage": "fact-1"
+          "fact_passage": "fact-1",
+          "derived": [
+            {
+              "subject": "MedCorp",
+              "verb_lemma": "be",
+              "object": "unlawful",
+              "raw": "it is unlawful",
+              "justification": null
+            }
+          ]
         },
         {
           "step": "check_exception",

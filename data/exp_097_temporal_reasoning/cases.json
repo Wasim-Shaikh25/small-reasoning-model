@@ -77,7 +77,16 @@
           "fact_verb_lemma": "process",
           "consequence": "it is lawful until 1 January 2020"
         },
-        "fact_passage": "fact-1"
+        "fact_passage": "fact-1",
+        "derived": [
+          {
+            "subject": "MedCorp",
+            "verb_lemma": "be",
+            "object": "lawful",
+            "raw": "it is lawful until 1 January 2020",
+            "justification": null
+          }
+        ]
       },
       {
         "step": "check_exception",
@@ -89,7 +98,7 @@
             "status": "not_in_effect",
             "method": "absolute_date",
             "resolved_date": "2020-01-01T00:00:00",
-            "reference_date": "2026-11-10T22:34:16.563070"
+            "reference_date": "2026-11-10T22:55:42.123413"
           },
           "phrase": "until"
         }
@@ -212,7 +221,16 @@
           "fact_verb_lemma": "process",
           "consequence": "it is lawful until 1 January 2030"
         },
-        "fact_passage": "fact-1"
+        "fact_passage": "fact-1",
+        "derived": [
+          {
+            "subject": "MedCorp",
+            "verb_lemma": "be",
+            "object": "lawful",
+            "raw": "it is lawful until 1 January 2030",
+            "justification": null
+          }
+        ]
       },
       {
         "step": "check_exception",
@@ -224,7 +242,7 @@
             "status": "in_effect",
             "method": "absolute_date",
             "resolved_date": "2030-01-01T00:00:00",
-            "reference_date": "2026-11-10T22:34:17.226619"
+            "reference_date": "2026-11-10T22:55:42.791609"
           },
           "phrase": "until"
         }
@@ -346,7 +364,16 @@
           "fact_verb_lemma": "process",
           "consequence": "it is lawful until the data subject withdraws consent"
         },
-        "fact_passage": "fact-1"
+        "fact_passage": "fact-1",
+        "derived": [
+          {
+            "subject": "MedCorp",
+            "verb_lemma": "be",
+            "object": "lawful",
+            "raw": "it is lawful until the data subject withdraws consent",
+            "justification": null
+          }
+        ]
       },
       {
         "step": "check_exception",
@@ -485,7 +512,16 @@
           "fact_verb_lemma": "process",
           "consequence": "it is lawful until the data subject withdraws consent"
         },
-        "fact_passage": "fact-1"
+        "fact_passage": "fact-1",
+        "derived": [
+          {
+            "subject": "MedCorp",
+            "verb_lemma": "be",
+            "object": "lawful",
+            "raw": "it is lawful until the data subject withdraws consent",
+            "justification": null
+          }
+        ]
       },
       {
         "step": "check_exception",
@@ -626,7 +662,16 @@
           "fact_verb_lemma": "process",
           "consequence": "it is lawful after the data subject withdraws consent"
         },
-        "fact_passage": "fact-1"
+        "fact_passage": "fact-1",
+        "derived": [
+          {
+            "subject": "MedCorp",
+            "verb_lemma": "be",
+            "object": "lawful",
+            "raw": "it is lawful after the data subject withdraws consent",
+            "justification": null
+          }
+        ]
       },
       {
         "step": "check_exception",

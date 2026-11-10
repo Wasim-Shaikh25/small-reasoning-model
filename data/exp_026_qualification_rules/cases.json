@@ -80,7 +80,16 @@
           "fact_verb_lemma": "process",
           "consequence": "it is lawful, provided that the data subject has given explicit consent to the processing of those personal data for one or more specified purposes"
         },
-        "fact_passage": "fact-1"
+        "fact_passage": "fact-1",
+        "derived": [
+          {
+            "subject": "MedCorp",
+            "verb_lemma": "be",
+            "object": "lawful",
+            "raw": "it is lawful",
+            "justification": null
+          }
+        ]
       },
       {
         "step": "check_exception",
@@ -218,7 +227,16 @@
           "fact_verb_lemma": "process",
           "consequence": "it is lawful, provided that the data subject has given explicit consent to the processing of those personal data for one or more specified purposes"
         },
-        "fact_passage": "fact-1"
+        "fact_passage": "fact-1",
+        "derived": [
+          {
+            "subject": "MedCorp",
+            "verb_lemma": "be",
+            "object": "lawful",
+            "raw": "it is lawful",
+            "justification": null
+          }
+        ]
       },
       {
         "step": "check_exception",
@@ -357,7 +375,16 @@
           "fact_verb_lemma": "process",
           "consequence": "it is lawful, provided that the data subject has given explicit consent to the processing of those personal data for one or more specified purposes"
         },
-        "fact_passage": "fact-1"
+        "fact_passage": "fact-1",
+        "derived": [
+          {
+            "subject": "MedCorp",
+            "verb_lemma": "be",
+            "object": "lawful",
+            "raw": "it is lawful",
+            "justification": null
+          }
+        ]
       },
       {
         "step": "check_exception",

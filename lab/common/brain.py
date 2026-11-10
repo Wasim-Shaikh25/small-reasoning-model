@@ -414,6 +414,8 @@ def reason(
     check_contradiction: bool = False,
     plain_english: bool = False,
     template_id: str | None = None,
+    use_spellfix: bool = False,
+    decision_findings_only: bool = False,
 ) -> dict:
     """Thin outer wrapper around `_reason_once` (the function this
     docstring used to belong to, unchanged below) adding the two
@@ -466,7 +468,35 @@ def reason(
     check_template_contracts). A no-op (outline unchanged, contract_
     violations stays None) for any ask that doesn't reach that stage, or
     when this is left at its default.
+
+    `use_spellfix` (default False, 2026-11-10): runs `spellfix.
+    fix_sentence_joint` over `ask` ONLY, once, before anything else --
+    never over `passages`, which must stay verbatim for citation/quote
+    checking (fixing a typo in evidence text would be altering evidence,
+    not cleaning a query). `fix_sentence_joint` already normalizes
+    informal register first (`informal_register.normalize_informal`),
+    so this one flag covers both modules named in HANDOFF.md's "promote
+    to core" list, not just one of them. A no-op (ask unchanged) when
+    left at its default, or when the ask has no typo/informal word
+    `fix_sentence_joint` would touch.
+
+    `decision_findings_only` (default False, 2026-11-10, `document_write`
+    stage only): the document-writing stage's findings normally come
+    from `ingest.findings_from_chunks` -- every passage becomes a
+    finding verbatim, unfiltered. When this is True, each passage is run
+    through `decision_findings.extract_decision_findings` instead, and
+    only its decision/obligation/permission/prohibition-bearing
+    sentences become findings -- for the "decision memo" case this
+    module was built and measured for (HANDOFF.md, 93% precision/recall
+    on its own test fixture), not a general extractor. A passage with no
+    decision-bearing sentence contributes nothing. A no-op for any ask
+    that doesn't reach the document-writing stage, or when left at its
+    default.
     """
+    if use_spellfix:
+        from lab.common.spellfix import fix_sentence_joint
+
+        ask = fix_sentence_joint(ask)["text"]
     result = _reason_once(
         ask,
         passages,
@@ -478,6 +508,7 @@ def reason(
         use_repair=use_repair,
         plain_english=plain_english,
         template_id=template_id,
+        decision_findings_only=decision_findings_only,
     )
     round_num = 1
     while connector is not None and round_num < retrieve_budget and result["decision"] in ("inconclusive", "ungrounded"):
@@ -494,6 +525,7 @@ def reason(
             use_repair=use_repair,
             plain_english=plain_english,
             template_id=template_id,
+            decision_findings_only=decision_findings_only,
         )
         retried["trace"] = result["trace"] + [{"step": "retrieve_more", "round": round_num, "connector_top_k": connector_top_k}] + retried["trace"]
         result = retried
@@ -592,7 +624,18 @@ def reason_dynamic(
         result = reason(ask, current_passages, use_real_ner=use_real_ner, **reason_kwargs)
         round_entry = {"round": round_num, "decision": result["decision"], "passage_count": len(current_passages)}
 
+        # Follow-up (2026-11-10): forward_chain's own extra_facts were the
+        # only source checked here, but forward_chain only ever runs when
+        # rule_application_method=="forward_chain" (2+ verb rules present) --
+        # the far more common single-rule case derives its consequence via
+        # apply_rule/instantiate_consequence directly and never touches
+        # forward_chain at all. Found by direct testing: a single-rule
+        # fixture whose consequence states a derived amount relevant to a
+        # DIFFERENT stage (total_computation) got nothing reentered, because
+        # this list only ever looked at the multi-rule path. Both paths'
+        # derived facts are checked now, not just one of them.
         derived_facts = [f for t in result["trace"] if t.get("step") == "forward_chain" for f in t.get("extra_facts", [])]
+        derived_facts += [f for t in result["trace"] if t.get("step") == "apply_rule" and t.get("kind") == "verb" for f in t.get("derived", [])]
         new_passages = []
         for i, fact in enumerate(derived_facts):
             signature = (fact["subject"], fact["verb_lemma"], fact.get("object"))
@@ -632,7 +675,7 @@ def reason_dynamic(
     return result
 
 
-def _reason_once(ask: str, passages: list[dict], use_real_ner: bool = False, connector=None, connector_top_k: int = 5, use_real_qa: bool = False, use_real_nli: bool = False, use_repair: bool = False, plain_english: bool = False, template_id: str | None = None) -> dict:
+def _reason_once(ask: str, passages: list[dict], use_real_ner: bool = False, connector=None, connector_top_k: int = 5, use_real_qa: bool = False, use_real_nli: bool = False, use_repair: bool = False, plain_english: bool = False, template_id: str | None = None, decision_findings_only: bool = False) -> dict:
     """One single pass of the signal-chain below -- called directly by
     reason() above, once per retry round. `use_real_ner=True` threads
     through to every lab.common.entities.
@@ -762,7 +805,30 @@ def _reason_once(ask: str, passages: list[dict], use_real_ner: bool = False, con
         # verbatim into the rendered document body (caught on a real
         # document whose passages were named "CHUNK0008" -- that string
         # ended up in the final .docx, EXP-081).
-        findings = findings_from_chunks([p for p in passages if p.get("text")])
+        if decision_findings_only:
+            # Follow-up (2026-11-10): decision_findings.extract_decision_
+            # findings, not findings_from_chunks -- every passage is run
+            # through the decision/obligation/permission/prohibition
+            # classifier (measured 93% precision/recall on its own test
+            # fixture, HANDOFF.md) and only its flagged sentences become
+            # findings, instead of the whole passage verbatim. Same
+            # citation-safety discipline as findings_from_chunks (a clean
+            # sequential label per passage, never the passage's own
+            # internal id); finding_id is prefixed per-passage since
+            # extract_decision_findings numbers its own findings "D1",
+            # "D2", ... starting over on every call, which would collide
+            # across passages without it.
+            from lab.common.decision_findings import extract_decision_findings
+
+            findings = []
+            for i, p in enumerate(passages):
+                if not p.get("text"):
+                    continue
+                for f in extract_decision_findings(p["text"], citation=str(i + 1)):
+                    f["finding_id"] = f"{i + 1}-{f['finding_id']}"
+                    findings.append(f)
+        else:
+            findings = findings_from_chunks([p for p in passages if p.get("text")])
         doc_result = write_long_document(ask, findings, task=plan["task_type"], use_real_ner=use_real_ner, use_real_nli=use_real_nli, use_repair=use_repair, plain_english=plain_english, template_id=template_id)
         trace.append(
             {
@@ -1066,14 +1132,34 @@ def _reason_once(ask: str, passages: list[dict], use_real_ner: bool = False, con
             # among the passages was silently picked as "the fact" instead
             # of the real fact passage whenever it happened to sort before
             # it -- a latent bug no single-rule fixture could ever surface.
+            # Follow-up (2026-11-10): matched on the rule's own trigger_lemma
+            # now, not just "the first passage that parses as any fact at
+            # all". Found by direct testing: a story with an EARLIER,
+            # unrelated fact-shaped passage ("Priya's invoice totals $400")
+            # ahead of the one actually relevant to this rule ("Priya
+            # qualifies for the loyalty program") had the irrelevant one
+            # picked as fact_passage, compared against the rule, found not
+            # to match (different verb), and the rule silently contributed
+            # nothing -- the real matching fact was never even looked at.
+            # Same bug family as the EXP-084 fix above (the first match
+            # isn't necessarily the right match), one trigger-lemma check
+            # away from being closed for this branch too.
             fact_passage = next(
-                (p for p in scoped if not parse_conditional_rule(p.get("text", "")) and not parse_threshold_rule(p.get("text", "")) and extract_fact_triple(p["text"])),
+                (
+                    p
+                    for p in scoped
+                    if not parse_conditional_rule(p.get("text", ""))
+                    and not parse_threshold_rule(p.get("text", ""))
+                    and (candidate_fact := extract_fact_triple(p["text"]))
+                    and candidate_fact["verb_lemma"] == rule["trigger_lemma"]
+                ),
                 None,
             )
             if fact_passage:
                 fact = extract_fact_triple(fact_passage["text"])
                 applied = apply_rule(rule, fact)
-                trace.append({"step": "apply_rule", "kind": "verb", "result": applied, "fact_passage": fact_passage["id"]})
+                derived = instantiate_consequence(rule, fact) if applied["matched"] else []
+                trace.append({"step": "apply_rule", "kind": "verb", "result": applied, "fact_passage": fact_passage["id"], "derived": derived})
                 _add_dependency(dep_nodes, f"rule:{rule_passage['id']}", "rule", rule["raw"], [rule_passage["id"]])
                 _add_dependency(dep_nodes, f"fact:{fact_passage['id']}", "fact", f"{fact['subject']} {fact['verb_lemma']} {fact.get('object')}", [fact_passage["id"]])
                 if applied["matched"]:

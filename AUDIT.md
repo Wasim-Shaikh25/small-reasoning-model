@@ -2356,3 +2356,100 @@ exclude an ungrouped policy passage, inherited behavior, not new.
 Regression-checked against `reason()`'s existing call sites (EXP-060/
 084/089/097) -- `reason_dynamic` is purely additive, no existing
 function's code path changed.
+
+## Third follow-up, same day: tightened reason_dynamic under discipline,
+found the scenario where the fixed pipeline genuinely gives a WRONG
+number, and completed the decision_findings/spellfix/informal_register
+wiring
+
+The project owner's response to the second follow-up: don't revert it,
+find the test scenario where the fixed, disciplined pipeline actually
+fails, and use THAT to decide whether `reason_dynamic` is worth keeping.
+Direct testing found one, and it also turned up a third latent bug in
+`_reason_once` itself (same family as the first two, same cause --
+"the first match isn't necessarily the right match"):
+
+**Bug found: `_reason_once`'s verb-rule branch picked the first
+fact-shaped passage, not the one whose verb actually matches the
+rule's trigger.** A story with an earlier, unrelated fact-shaped
+passage ("Priya's invoice totals $400") ahead of the one actually
+relevant to the rule ("Priya qualifies for the loyalty program") had
+the wrong one picked as `fact_passage`, compared against the rule,
+found not to match, and the rule silently contributed nothing --
+exactly the EXP-084 bug's own sibling, one trigger-lemma check away
+from being closed. Fixed: `fact_passage` is now the first passage
+whose own extracted verb_lemma matches `rule["trigger_lemma"]`, not
+just the first passage that parses as any fact at all. Zero regression
+risk (identical to the old behavior whenever the first match already
+happened to be the right one, true of every existing fixture).
+
+**The scenario where the fixed pipeline genuinely fails, found after
+that fix:** a single verb rule (not 2+, so `forward_chain` never fires
+at all) whose consequence states a derived charge relevant to a
+DIFFERENT stage:
+
+```
+p1: "Priya's invoice totals $400."
+p2: "If a customer exceeds the free data limit, they owe an additional $50 overage fee."
+p3: "Priya exceeded the free data limit."
+ask: "What is Priya's total amount owed, including any fees?"
+```
+
+`reason()`: `facts["total"] == 400.0`. The answer TEXT correctly states
+the $50 fee applies ("Therefore, they owe an additional $50 overage
+fee"), but the NUMBER is wrong -- `total_computation` and
+`rule_application` are two independent branches in the same pass that
+never share state, so the fee is described in prose and never added to
+the total. This is not a parsing bug like the first three -- it is a
+genuine structural limit of a fixed, non-communicating-stages pipeline,
+and no amount of fixing individual stages closes it, because the gap is
+between stages, not inside one.
+
+`reason_dynamic()`: `facts["total"] == 450.0`, citing `[p1,
+derived:1:0]` -- correct. Round 1 derives the fee via `apply_rule`/
+`instantiate_consequence`, textifies it, round 2's `total_computation`
+picks it up from the reentered pseudo-passage like any other passage
+text. This required widening `reason_dynamic`'s own derived-fact
+collection: it previously only read `forward_chain`'s `extra_facts`
+(the 2+-rule chaining path), never the single-rule path's own
+consequence -- found by this same test, since the single-rule case is
+the MORE common one and the mechanism as first built missed it
+entirely. `_reason_once`'s `apply_rule`/verb trace entry now also
+carries a `"derived"` field (via `instantiate_consequence`, computed
+whenever `applied["matched"]`, purely additive to the trace dict), and
+`reason_dynamic` reads both sources now.
+
+**Verdict on reason_dynamic, with a real positive case in hand instead
+of only a redundant one:** worth keeping. The `related_case` path is
+still a duplicate of `connector`+`retrieve_budget` (unchanged finding
+from the second follow-up) and should probably be removed or merged
+with that mechanism rather than kept as a second way to do the same
+thing. The `derived_fact` path now has a genuine, measured case where
+the fixed pipeline is not just imprecise but produces a wrong number,
+and the loop fixes it correctly, at the cost of one more round. Full
+regression confirmed on 19 experiments touching rule-dispatch, totals,
+or document-writing (EXP-026/053/058/059/060/066/068/069/070/078/081/
+082/084/085/089/091/094/097) -- all unchanged.
+
+**Wiring completed, as asked, fast:** `decision_findings.py` and
+`spellfix.py`/`informal_register.py` (HANDOFF.md's "promote to core"
+list) are now reachable from `reason()` itself, both opt-in, both
+default False:
+- `use_spellfix`: runs `spellfix.fix_sentence_joint` (which already
+  calls `informal_register.normalize_informal` first) over `ask` ONLY,
+  once, before anything else -- never over `passages`, which must stay
+  verbatim for citation/quote checking. Tested working end to end; the
+  one honest caveat found while testing it: `fix_sentence_joint` picked
+  "her" over "where" for the ambiguous typo "wher" in one ad hoc test
+  sentence (context-embedding disambiguation choosing wrong) -- a real,
+  already-documented limit of that module (it is not claimed to be
+  perfect), not a new bug introduced by this wiring.
+- `decision_findings_only` (`document_write` stage only): each passage
+  is run through `decision_findings.extract_decision_findings` instead
+  of `ingest.findings_from_chunks`'s verbatim-everything default, so
+  only decision/obligation/permission/prohibition-bearing sentences
+  become findings. Measured on a 4-sentence mixed fixture: 2 of 4
+  passages (the ones with real decision language) became findings; the
+  other 2 (a meeting-logistics sentence, a lunch-arrangements sentence)
+  were correctly excluded. Both flags default False -- zero behavior
+  change for every existing caller.
