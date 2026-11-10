@@ -27,7 +27,7 @@ scored at or below 50% on these same cases across five independent
 prompt/architecture/checkpoint combinations; see AUDIT.md, "the fix:
 embedding-based disambiguation, zero generative model calls" (2026-11-09).
 
-Two bugs fixed along the way, both found by actually running this
+Three bugs fixed along the way, all found by actually running this
 against real text rather than assuming it would work:
 1. Plain vocabulary-nearest-match with no context picks a real but
    wrong word ("peopel"->"propel", "cos"->"cost") -- fixed by separating
@@ -38,6 +38,16 @@ against real text rather than assuming it would work:
    got wrongly flagged as a typo and "corrected" to "overhead") -- fixed
    by `_splits_into_known_compound`, checked to find zero false matches
    on the real typos in this file's own test set.
+3. Ordinary verb/noun inflection has the same root cause, far more
+   common (HANDOFF.md, 2026-11-10): `candidates_for("commissioned")`
+   returned only `["commissioner"]`, silently swapping a correctly-
+   spelled past participle for a different, wrong-part-of-speech word,
+   because "commission" is a single token but "commissioned" isn't --
+   fixed by `_lemma_known` (lemmatize via `lab.common.rules._parser`,
+   already a project dependency, before the vocabulary check), checked
+   directly against both regular ("walked", "studies") and irregular
+   ("ran", "children") inflections, with the real typos in this file's
+   own test set (herd/realy/lonly/peopel) confirmed still caught.
 """
 
 from __future__ import annotations
@@ -95,6 +105,34 @@ def _splits_into_known_compound(word: str, vocab: set[str], min_piece: int = 3) 
     return False
 
 
+def _lemma_known(word: str, vocab: set[str]) -> bool:
+    """True if `word`'s own LEMMA (spaCy's dependency parser pipeline,
+    already a project dependency -- `lab.common.rules._parser`) is a real
+    vocabulary word, even when the inflected surface form itself isn't a
+    single flan-t5-small token. Found live: `candidates_for("commissioned")`
+    returned only `["commissioner"]` (one true edit away: "...oned" vs
+    "...oner"), silently "correcting" a correctly-spelled past participle
+    to a different, wrong-part-of-speech word, because "commission" IS a
+    single token but "commissioned" is not -- the same subword-splitting
+    root cause already named for "overhear"/compound words, just for
+    ordinary verb inflection instead, and far more frequent in real prose.
+    Checked directly, not assumed: this correctly resolves both regular
+    inflections ("walked"->"walk", "studies"->"study") and irregular ones
+    ("ran"->"run", "children"->"child") the same way, while leaving real
+    typos ("herd", "realy", "peopel") untouched -- spaCy's lemmatizer
+    returns an unrecognized token's own surface form unchanged when it
+    isn't a known inflection, so a genuine typo's "lemma" is just itself,
+    still correctly absent from `vocab`.
+    """
+    from lab.common.rules import _parser
+
+    doc = _parser()(word)
+    if not len(doc):
+        return False
+    lemma = doc[0].lemma_.lower()
+    return lemma in vocab or _splits_into_known_compound(lemma, vocab)
+
+
 def candidates_for(word: str, max_distance: int = 1) -> list[str]:
     """Every vocabulary word within `max_distance` true edits of `word`,
     sorted for determinism. Already a real word (no fix needed) returns [].
@@ -111,7 +149,7 @@ def candidates_for(word: str, max_distance: int = 1) -> list[str]:
     if len(lower) <= 2:
         return []
     vocab = _load_vocab()
-    if lower in vocab or _splits_into_known_compound(lower, vocab):
+    if lower in vocab or _splits_into_known_compound(lower, vocab) or _lemma_known(lower, vocab):
         return []
     out = []
     for v in vocab:

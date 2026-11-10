@@ -36,20 +36,33 @@ pipeline (the same checkpoint this project's NER already runs) for its
 dependency parse only -- not a new dependency, not a new download, and not
 the generative capability this module exists to make unnecessary.
 
-Known blind spots, found by direct adversarial testing, not assumed away:
-this check only catches a DANGLING trailing token (a clause cut off
-mid-way, ending on a conjunction/preposition/determiner) and a missing
-finite verb. It does NOT catch a gerund-only fragment ("Running quickly
-down the street." parses with a VERB root and passes) or a subordinate
-clause presented alone with no independent clause ("Because the tenant
-did not pay." also parses with a VERB root and passes). Neither blind spot
-was hit by either real fixture tested, but neither is fixed, and this
-module does not claim to replace a general grammaticality checker.
+Two more blind spots, found by direct adversarial testing and FIXED
+(2026-11-10, HANDOFF.md): a gerund-only fragment ("Running quickly down
+the street.") and a lone subordinate clause ("Because the tenant did not
+pay.") both parse with a VERB ROOT and used to pass. Checked directly
+against real spaCy parses before writing either rule, not assumed:
+- A gerund fragment's own ROOT is tagged `VBG` (non-finite) with no
+  finite `aux` child to anchor its tense -- "He IS running..." has an
+  `aux` child tagged `VBZ` (finite), so it stays `complete`; "Running
+  quickly down the street." has none. An imperative ("Submit the form.")
+  is unaffected: its ROOT is tagged `VB`, not `VBG`, the same base form
+  English imperatives always use, so this rule never touches it.
+- A lone subordinate clause's own ROOT has a sentence-INITIAL `mark`
+  child (the subordinating conjunction itself, "Because"/"Although"/...)
+  -- in a real two-clause sentence ("Because X, Y."), spaCy's ROOT is
+  always the independent clause's own verb, and the subordinate verb
+  (with its `mark` child) sits one level down as an `advcl`, never at
+  ROOT -- checked directly on both shapes before trusting this, not
+  assumed from one example. A scale-down kept honest, not hidden: the
+  `mark` child must be the sentence's very first token for this rule to
+  fire, matching the one real failure documented, not every sentence
+  that happens to contain a subordinator anywhere.
 
-This is also not a grammar OR spelling corrector -- a statement riddled
-with typos ("i tryed to tork to him") still parses with a verbal root and
-is reported `complete`, same scope `spellfix.py`/`informal_register.py`
-already own, not duplicated here.
+This module still does not claim to replace a general grammaticality
+checker, and is not a grammar or spelling corrector -- a statement
+riddled with typos ("i tryed to tork to him") still parses with a verbal
+root and is reported `complete`, same scope `spellfix.py`/
+`informal_register.py` already own, not duplicated here.
 """
 
 from __future__ import annotations
@@ -68,6 +81,9 @@ def _pipeline():
     return _nlp
 
 
+_FINITE_TAGS = {"VBZ", "VBD", "VBP", "MD"}
+
+
 def is_complete_sentence(text: str) -> dict:
     """{"complete": bool, "reason": str, ...}. See module docstring for the
     exact checks and their known blind spots.
@@ -78,7 +94,11 @@ def is_complete_sentence(text: str) -> dict:
     `heading_like` (token count <= 6) is a weak, token-count-only hint,
     confirmed on EXP-081's real fixture to catch only 1 of 13 genuine
     headings -- treat `no_verbal_root` itself, not `heading_like`, as the
-    signal "don't force this into one sentence"), or "ok".
+    signal "don't force this into one sentence"), "gerund_fragment" (a
+    non-finite `VBG` root with no finite `aux` to anchor it),
+    "lone_subordinate_clause" (the root is introduced by a sentence-
+    initial subordinating conjunction, with no independent clause), or
+    "ok".
     """
     text = (text or "").strip()
     if not text:
@@ -93,8 +113,15 @@ def is_complete_sentence(text: str) -> dict:
     if last.pos_ in _DANGLING_POS:
         return {"complete": False, "reason": f"dangling_{last.pos_.lower()}", "last_token": last.text}
 
-    has_verbal_root = any(t.dep_ == "ROOT" and t.pos_ in ("VERB", "AUX") for t in doc)
-    if not has_verbal_root:
+    root = next((t for t in doc if t.dep_ == "ROOT" and t.pos_ in ("VERB", "AUX")), None)
+    if root is None:
         return {"complete": False, "reason": "no_verbal_root", "heading_like": len(tokens) <= 6}
+
+    if root.tag_ == "VBG" and not any(c.dep_ == "aux" and c.tag_ in _FINITE_TAGS for c in root.children):
+        return {"complete": False, "reason": "gerund_fragment", "root": root.text}
+
+    mark = next((c for c in root.children if c.dep_ == "mark"), None)
+    if mark is not None and mark.i == tokens[0].i:
+        return {"complete": False, "reason": "lone_subordinate_clause", "marker": mark.text}
 
     return {"complete": True, "reason": "ok"}

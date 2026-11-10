@@ -173,6 +173,24 @@ def rewrite_unit(
                 "fallback_reason": ["already_complete"],
                 "checkpoint": checkpoint,
             }
+        if completeness["reason"] == "no_verbal_root":
+            # A heading ("Art. 83 GDPR") or lead-in fragment ("For the
+            # purposes of this Regulation:") is correctly incomplete BY
+            # DESIGN (sentence_completeness.py's own docstring) -- forcing
+            # it into "one grammatically correct sentence" (build_prompt's
+            # own instruction) fabricates structure the source never had.
+            # HANDOFF.md named this the one remaining case still calling
+            # generate(); skipped here the same way "already_complete"
+            # already is, not forced through a model call with nothing
+            # legitimate for it to do.
+            return {
+                "text": deterministic_text,
+                "used_generative": False,
+                "generated_text": None,
+                "checks": None,
+                "fallback_reason": ["no_verbal_root_heading_or_lead_in"],
+                "checkpoint": checkpoint,
+            }
     else:
         return {
             "text": deterministic_text,

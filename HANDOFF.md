@@ -326,12 +326,40 @@ dormant-module pass) are **not** solved by this layer -- each lives in a
 different subsystem this teach-tool layer was never scoped to touch, and
 none moved as a side effect of this work.
 
+**Update, same day: three of the nine untouched issues fixed directly,
+one attempted and confirmed NOT to work** (`AUDIT.md`, search "three of
+the nine untouched issues fixed directly"). Fixed, each measured against
+HANDOFF's own named example: `decision_findings.py`'s reported-question
+false positive (`deontic.classify_deontic` now structurally skips a
+modal inside a "whether"/"if"-marked embedded clause); `spellfix.py`'s
+verb-inflection gap (lemmatize via the already-used spaCy parser before
+the vocabulary check, exactly as this file suggested); `sentence_
+completeness.py`'s gerund-fragment and lone-subordinate-clause blind
+spots, plus wiring its `no_verbal_root` reason into `rewriter_backends.
+rewrite_unit`'s existing `generate()`-skip so a heading/lead-in fragment
+is never sent to a generative model. The existing EXP-087 fixture
+(6 hand-built cases + the real 103-sentence GDPR document) was rerun and
+is byte-identical to its committed `results.json` -- zero regression.
+
+Attempted and measured, NOT fixed: `decision_findings.py`'s passive-
+decision false negative. This file's own suggested fix (embedding
+nearest-neighbor verb widening against `DECISION_VERBS`) was tried
+exactly as written and does not work -- "schedule" (the verb that should
+be caught) scored LOWER against the decision-verb set than "describe"
+and "eat" (verbs that must NOT be caught), with no threshold that
+separates them. No confident deterministic alternative identified yet;
+this is an open design question, not a fix in progress.
+
 **Still not done**: `lab.common.engine.run` is a new, separate entry
 point -- it is not wired into `brain.reason` or `longform.
-write_long_document`, and the rest of this proposal (the self-expanding
-reasoning core, generalized reference resolution, the data layer's
-streaming upsert, the per-section template contracts, and the actual
-keep/delete pass on the 8 dormant modules) has not been started.
+write_long_document`. Of the original nine untouched issues, five remain
+genuinely untouched: `plain_language.py`'s structural ceiling (can't
+split/reorder sentences), pronoun-only reference resolution, the data
+layer's streaming upsert/hybrid search default, the per-section template
+contracts, and the keep/delete pass on the 8 dormant modules -- plus the
+self-expanding reasoning core itself was never attempted. The passive-
+decision false negative above is open with no known fix, not merely
+unattempted.
 
 ## House rules to keep following (unchanged, from `AGENT.md`)
 

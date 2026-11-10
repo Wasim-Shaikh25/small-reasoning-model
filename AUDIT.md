@@ -1763,3 +1763,112 @@ HANDOFF.md -- nine of eleven other named issues live in subsystems
 (language-brain normalization, the reasoning core, the data layer,
 template contracts, dormant-module cleanup) this layer was never scoped
 to touch, and none of them moved as a side effect of this work.
+
+## Follow-up, same day: three of the nine untouched issues fixed directly in their own module (not via the concept layer), one attempted and confirmed NOT to work
+
+The project owner asked for the remaining nine issues to be attempted
+directly, one at a time, and to be told plainly which ones don't have a
+confident fix rather than have one guessed. Four attempted so far, each
+measured against the exact example HANDOFF.md itself named, not a
+simplified stand-in:
+
+**1. Fixed -- `decision_findings.py`'s reported-question false positive.**
+"The research team ... studying WHETHER the company should expand" was
+wrongly flagged `obligation` because `classify_deontic` only checked a
+modal's own negation, never whether the modal's clause is itself a
+reported/hypothetical question. Fix, in `lab.common.deontic
+._is_reported_question`: a modal's governing verb with a sentence-
+structural `mark` child lemma "whether"/"if" is an embedded question,
+not a direct assertion -- purely structural, no closed list of
+"reporting verbs" (study/wonder/debate/...) to maintain. Caught live
+while testing: spaCy's parser realizes this identical shape as `ccomp`
+for one governing verb and `advcl` for another on an otherwise
+structurally identical sentence ("studying whether..." vs "debated
+if...") -- checking `ccomp` alone silently missed the second until a
+second test sentence exposed it; both are now accepted. Verified on 7
+cases: the two reported-question shapes are correctly suppressed; a real
+conditional directive ("IF a claim is filed within 30 days, the vendor
+MUST respond"), a "that"-complement directive, and three ordinary modal
+sentences are all unaffected. The existing EXP-087 fixture (6 hand-built
+cases + the real 103-sentence GDPR document) was rerun end to end:
+6/6 hand-built still correct, and the GDPR document's modal
+classification is byte-identical (56/103 sentences, `{permission: 7,
+obligation: 43, prohibition: 6}` -- exactly `data/
+exp_087_deontic_classification/results.json`'s own committed numbers) --
+this fix changes nothing on the one real document already validated,
+only the specific reported-question pattern neither real fixture
+happened to contain.
+
+**2. Attempted, measured, does NOT work -- `decision_findings.py`'s
+passive-decision false negative.** HANDOFF.md's own suggested fix was
+"widen past the closed `DECISION_VERBS` lemma list using embedding
+nearest-neighbors, not another hardcoded entry." Tried exactly that,
+against `bge_embed` (the same encoder this project already uses
+elsewhere): measured the cosine similarity between the missed verb
+("schedule") and the existing `DECISION_VERBS` set, and between several
+genuinely unrelated verbs ("eat", "walk", "write", "describe") and that
+same set. Result: NO clean separation exists. "schedule" scored 0.629;
+"describe" (a verb this check must NOT fire on) scored HIGHER at 0.777;
+"eat" scored 0.671, also higher than "schedule". Tried a second encoding
+(short templated phrases, "a follow-up review is scheduled" vs "the
+committee decided this matter") in case bare single-word embeddings were
+the problem -- same result, "schedule" at 0.662 vs "eat" at 0.659,
+statistically indistinguishable. This is the same kind of negative
+finding this project has measured before (EXP-029: real embeddings lost
+to TF-IDF on a harder retrieval test) -- embeddings are not a universal
+hammer, and this is not the place they hold up. **Not fixed; no
+confident deterministic alternative identified either.** Flagged back to
+the project owner rather than shipping an unsupported fix.
+
+**3. Fixed -- `spellfix.py`'s verb-inflection gap.** `candidates_for(
+"commissioned")` returned only `["commissioner"]` (one true edit away),
+silently swapping a correctly-spelled past participle for a different,
+wrong-part-of-speech word, because "commission" is a single flan-t5-
+small vocabulary token but "commissioned" is not. Fix, `_lemma_known`:
+lemmatize the word first (`lab.common.rules._parser`, already a project
+dependency) and check the LEMMA against vocabulary before falling
+through to edit-distance candidate generation -- exactly the fix
+HANDOFF.md named ("lemmatize before the vocabulary check"). Verified
+directly on both regular inflections ("walked"->"walk", "studies"
+->"study") and irregular ones ("ran"->"run", "children"->"child"), with
+every real typo in this file's own test set (herd/realy/lonly/peopel)
+confirmed still caught with the correct word still among the candidates
+(heard/really/lonely/people respectively) -- a pure precision gain, not
+a trade-off against recall on the typos this module was already
+measured against.
+
+**4. Fixed -- `sentence_completeness.py`'s two named blind spots, plus
+the still-generating `no_verbal_root` case.** Both new checks were
+designed from real spaCy parses, not assumed:
+- Gerund fragment ("Running quickly down the street.") -- the ROOT is
+  tagged `VBG` (non-finite) with no finite `aux` child to anchor it;
+  "He IS running..." has a finite `aux` ("is", tag `VBZ`) and correctly
+  stays `complete`. An imperative ("Submit the form.") is unaffected --
+  its ROOT is tagged `VB`, the ordinary base form English imperatives
+  always use, never `VBG`.
+- Lone subordinate clause ("Because the tenant did not pay.") -- the
+  ROOT has a sentence-INITIAL `mark` child (the subordinator itself).
+  Checked on both shapes before trusting this: in a real two-clause
+  sentence ("Because X, Y."), spaCy's ROOT is always the independent
+  clause's own verb, with the subordinate clause one level down as an
+  `advcl` -- never at ROOT -- so this never misfires on a genuine
+  multi-clause sentence that happens to use "because" correctly.
+- `rewriter_backends.rewrite_unit` now also skips `generate()` for the
+  `no_verbal_root` reason specifically (a heading or lead-in fragment,
+  "correctly incomplete BY DESIGN" per this module's own docstring),
+  the same way it already skips it for `already_complete` -- verified
+  directly on both of this project's own real examples ("Art. 83 GDPR"
+  and "For the purposes of this Regulation:") without invoking
+  `generate()` at all. The other two new reasons (`gerund_fragment`,
+  `lone_subordinate_clause`) deliberately still fall through to
+  `generate()` -- unlike a heading, those ARE broken fragments a
+  rewrite could legitimately try to fix, so they are not given the same
+  skip.
+
+13 hand-built regression cases run across both new checks (gerund/
+imperative/subordinate/multi-clause/heading/typo-laden-but-structurally-
+complete), all correct; no existing committed `results.json` for this
+module exists to diff against (it was built and measured ad hoc during
+the four big scale-tests, not as a numbered EXP), so the EXP-087 rerun
+above is the only available before/after regression evidence this
+session, and it shows zero change on the one real document tested.
