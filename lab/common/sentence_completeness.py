@@ -31,10 +31,11 @@ rewriting -- not one convenient flag covering all 13 (this module's own
 first-draft `heading_like` sub-flag, based on token count alone, matched
 only 1 of the 13 on re-check; kept below as a weak hint, not a claim).
 
-Reuses `lab.common.real_models`' already-loaded en_core_web_sm spaCy
-pipeline (the same checkpoint this project's NER already runs) for its
-dependency parse only -- not a new dependency, not a new download, and not
-the generative capability this module exists to make unnecessary.
+Reuses `lab.common.real_models.parser_pipeline()` -- the one shared
+dependency-parse pipeline every other structural check in this project
+(`rules.py`, `deontic.py`, `decision_findings.py`, `connectives.py`) also
+uses -- for its dependency parse only, not the generative capability this
+module exists to make unnecessary.
 
 Two more blind spots, found by direct adversarial testing and FIXED
 (2026-11-10, HANDOFF.md): a gerund-only fragment ("Running quickly down
@@ -69,16 +70,21 @@ from __future__ import annotations
 
 _DANGLING_POS = {"CCONJ", "SCONJ", "ADP", "DET"}
 
-_nlp = None
-
 
 def _pipeline():
-    global _nlp
-    if _nlp is None:
-        import spacy
+    """The shared `lab.common.real_models.parser_pipeline()` -- this
+    module used to load its OWN separate `en_core_web_sm` copy here
+    (same model name, but a second independently-loaded instance, not
+    actually the one real_models caches), which no longer matches this
+    module's own claim of reusing the already-loaded pipeline. Fixed
+    2026-11-10 alongside the project-wide parser upgrade (`real_models.
+    PARSER_MODEL_NAME`) so this module's gerund/subordinate-clause/
+    dangling-token checks benefit from the same accuracy gain as
+    everything else built on dependency structure.
+    """
+    from lab.common.real_models import parser_pipeline
 
-        _nlp = spacy.load("en_core_web_sm")
-    return _nlp
+    return parser_pipeline()
 
 
 _FINITE_TAGS = {"VBZ", "VBD", "VBP", "MD"}

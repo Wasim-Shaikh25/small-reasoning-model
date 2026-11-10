@@ -13,13 +13,27 @@ dateparser>=1.2
 # generative models: NER (OntoNotes) and static word vectors. See
 # lab/common/real_models.py and lab/common/rules.py.
 spacy>=3.8
+# en_core_web_sm/md: see lab/common/real_models.py (NER/vector pipelines,
+# unchanged). en_core_web_trf (2026-11-10): the shared dependency-parse
+# pipeline every live structural check (rules.py, deontic.py,
+# decision_findings.py, connectives.py, sentence_completeness.py) runs
+# through (real_models.PARSER_MODEL_NAME) was upgraded from en_core_web_sm
+# to this transformer pipeline -- measured, not assumed: real_models.py's
+# own comment on PARSER_MODEL_NAME has the before/after accuracy numbers
+# and this machine's actual CPU latency (no GPU: ~4x slower in absolute
+# terms, ~4s instead of ~1s on a 3,000-word document -- negligible against
+# a pipeline already measured at ~63.5s/document). Requires the
+# spacy-transformers package below.
+spacy-transformers>=1.3
 # The pipelines themselves are not on PyPI by plain name; install with:
 #   python3 -m spacy download en_core_web_sm
 #   python3 -m spacy download en_core_web_md
+#   python3 -m spacy download en_core_web_trf
 # or, if that command's own network path is blocked, install the GitHub
 # release wheel directly:
 #   pip install https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl
 #   pip install https://github.com/explosion/spacy-models/releases/download/en_core_web_md-3.8.0/en_core_web_md-3.8.0-py3-none-any.whl
+#   pip install https://github.com/explosion/spacy-models/releases/download/en_core_web_trf-3.8.0/en_core_web_trf-3.8.0-py3-none-any.whl
 
 # EXP-048 (the bounded FLAN-T5 rewriter exception recorded in FORBIDDEN.md,
 # rewriter role only) and EXP-030/031/038/039/040/042 (the real blueprint

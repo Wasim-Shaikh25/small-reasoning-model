@@ -1872,3 +1872,110 @@ module exists to diff against (it was built and measured ad hoc during
 the four big scale-tests, not as a numbered EXP), so the EXP-087 rerun
 above is the only available before/after regression evidence this
 session, and it shows zero change on the one real document tested.
+
+## Follow-up, same day: an environment mismatch found and fixed, then a project-wide parser upgrade (en_core_web_sm -> en_core_web_trf), measured, not assumed
+
+**Environment finding.** Every command run this entire session (this
+conversation's earlier turns included) used the shared `C:\Python311`
+install, not this project's own isolated `.venv` (created 2026-11-01,
+per this project's own standing rule that new/risky dependencies belong
+there). Checked directly: the two have different package versions
+(`.venv`: torch 2.15.0, spacy 3.8.18, transformers 4.46.3; shared
+install: torch 2.4.1). Both are CPU-only (`torch.cuda.is_available()` is
+`False` in both). All work from this point on in this session ran
+against the `.venv`; the shared install was left untouched, not cleaned
+up, since the project owner hasn't said what to do with it yet.
+
+**Research, before touching code -- what actually helps "language logic
+conversion" get more robust, not hardcoding more rules:**
+1. A stronger parser is itself part of the fix. The ccomp/advcl
+   inconsistency found earlier this session (the identical "studying
+   WHETHER X should Y" clause shape parsed two different ways depending
+   on the governing verb) is parser noise, not a gap more hand-written
+   rules close. `en_core_web_sm`'s own published unlabeled attachment
+   score is ~0.918; `en_core_web_trf` (spaCy's RoBERTa-based transformer
+   pipeline)'s is ~0.953 -- a real accuracy gain, same `.dep_`/`.tag_`/
+   `.lemma_` API, zero new hardcoding.
+2. A real pretrained grammaticality classifier exists and is NOT
+   generative: CoLA-trained RoBERTa sequence classifiers (e.g.
+   `textattack/roberta-base-CoLA`), ~85% reported accuracy, trained on
+   10,657 real labeled sentences -- the same category of model this
+   project already trusts (bge-small, DeBERTa-MNLI), not a FORBIDDEN.md
+   violation. Not yet wired in; identified as the right tool for
+   catching grammar problems this project hasn't hand-found yet, rather
+   than hand-writing a rule for every one discovered by accident.
+3. Bidirectional NLI entailment (original<=>rewrite, both directions,
+   no contradiction) is the established pattern for verifying any
+   sentence transformation preserves meaning -- this project already
+   has the model (`real_nli`, used by `rules.semantic_apply_rule`).
+   Identified as the gate any future sentence-splitting/passive-active
+   transform must pass before being trusted; not yet built.
+4. Passive-to-active voice conversion has no mature deterministic tool
+   -- the one rule-based academic attempt found caps at ~50% accuracy.
+   Confirmed, not assumed. Any future attempt here needs the NLI gate
+   above, not confidence in the rules alone.
+5. Sentence-splitting on subordinate/coordinate clauses has a real
+   published rule set (DisSim, Niklaus et al., INLG 2019 -- 35 hand-
+   crafted English rules over dependency structure); the reference tool
+   is Java-only, not importable here, but the rule set itself is
+   legitimate grammar methodology, the same category as `connectives.py`'s
+   own PDTB-based rules, not domain-vocabulary hardcoding. Not yet
+   ported.
+
+**Parser upgrade, implemented and measured.** `lab.common.real_models`
+now has `PARSER_MODEL_NAME = "en_core_web_trf"`, loaded by a NEW, separate
+cache (`_parser_pipeline`) from `ner_pipeline()`'s own cache -- the two
+were split apart specifically so this upgrade never silently changes
+`lab/exp_032_real_multihop/run.py`/`lab/exp_033_real_entities/run.py`'s
+closed, already-measured `.ents`-based output; `ner_pipeline()` still
+loads plain `en_core_web_sm`, byte-for-byte as before. `sentence_
+completeness.py`'s own separate, duplicate `en_core_web_sm` load was
+also found and fixed to go through this same shared pipeline (it
+previously claimed to reuse `real_models`' loaded pipeline but actually
+loaded a second, independent copy of the same model).
+
+CPU latency measured directly on this machine (no GPU) before
+committing to the swap, not estimated from spaCy's own published figure
+(different hardware): a representative ~3,000-word sample parsed in
+0.98s on `en_core_web_sm` (3,132 words/s) vs 4.20s on `en_core_web_trf`
+(733 words/s) -- about 4x slower in absolute terms, negligible against
+`longform.write_long_document`'s own already-measured ~63.5s/document
+(AUDIT.md, EXP-081).
+
+**A real accuracy win found immediately, not theoretical:** rerunning
+EXP-087 (6 hand-built cases + the real 103-sentence GDPR document) with
+the new parser changed the real-document result from 56/103 sentences
+with a recognized modal (`{permission: 7, obligation: 43, prohibition:
+6}`, the previously-committed number) to 57/103 (`{permission: 7,
+obligation: 44, prohibition: 6}`). Diffed sentence-by-sentence (both
+parsers run side by side) to find exactly which one changed, not just
+accepted the aggregate delta: sentence 56, GDPR Article 33's breach-
+notification clause -- "the controller SHALL without undue delay and,
+where feasible, not later than 72 hours after having become aware of
+it, notify the personal data breach to the supervisory authority..." --
+a genuine, legally load-bearing obligation that `en_core_web_sm`
+completely missed (likely losing the long-range "shall"-to-"notify"
+attachment across the interposed adverbial clause), which
+`en_core_web_trf` correctly catches. `data/exp_087_deontic_
+classification/results.json` updated to this new, re-verified number
+(its `models_used` field corrected to name `en_core_web_trf`); the 6/6
+hand-built cases are unchanged. Per `AGENT.md`'s own rule for a new
+real-model substitute, both numbers are disclosed here, not just the
+new one.
+
+All of this session's other regression tests (the `deontic`/`spellfix`/
+`sentence_completeness` cases, the concept-registry `engine.run` proof)
+were rerun in the `.venv` after this swap and pass unchanged.
+
+`requirements.txt` updated: `spacy-transformers>=1.3` added, and
+`en_core_web_trf` download instructions added alongside the existing
+`sm`/`md` ones.
+
+**Not yet done**: the CoLA-classifier signal, the NLI bidirectional-
+entailment transform gate, sentence-splitting, and passive-to-active
+conversion are all identified above but not built. Removing the
+hardcoded domain-vocabulary tables (`entities.py`'s live ones;
+`method_teaching.py`/`proposals.py`/`provenance.py`/`decision_findings.py`'s
+dormant ones) and wiring `plain_language.py` (plus whatever sentence-
+restructuring layer gets built) into `brain.reason` -- both explicitly
+asked for this same turn -- have not been started either.

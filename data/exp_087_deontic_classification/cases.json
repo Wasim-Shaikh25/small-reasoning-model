@@ -293,6 +293,14 @@
       "governing_verb": "apply"
     },
     {
+      "sentence": "In the case of a personal data breach, the controller shall without undue delay and, where feasible, not later than 72 hours after having become aware of it, notify the personal data breach to the supervisory authority, unless the personal data breach is unlikely to result in a risk to the rights and freedoms of natural persons.",
+      "modal": "shall",
+      "lemma": "shall",
+      "negated": false,
+      "operator": "obligation",
+      "governing_verb": "notify"
+    },
+    {
       "sentence": "Where the notification to the supervisory authority is not made within 72 hours, it shall be accompanied by reasons for the delay.",
       "modal": "shall",
       "lemma": "shall",
