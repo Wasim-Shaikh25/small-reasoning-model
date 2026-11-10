@@ -113,6 +113,43 @@
           }
         }
       }
+    ],
+    "dependency_tree": [
+      {
+        "id": "rule:rule-1",
+        "kind": "rule",
+        "summary": "If anyone processes special category data, it is unlawful, unless the data subject has given explicit consent to the processing of those personal data for one or more specified purposes; processing is necessary to protect the vital interests of the data subject or of another natural person where the data subject is physically or legally incapable of giving consent; or processing is necessary for the establishment, exercise or defence of legal claims or whenever courts are acting in their judicial capacity.",
+        "depends_on": [
+          "rule-1"
+        ]
+      },
+      {
+        "id": "fact:fact-1",
+        "kind": "fact",
+        "summary": "MedCorp process Aisha",
+        "depends_on": [
+          "fact-1"
+        ]
+      },
+      {
+        "id": "gate:rule-1",
+        "kind": "gate_check",
+        "summary": "condition gate status=unknown",
+        "depends_on": [
+          "rule:rule-1",
+          "fact:fact-1"
+        ]
+      },
+      {
+        "id": "conclusion:rule-1:fact-1:applied",
+        "kind": "conclusion",
+        "summary": "policy applies: it is unlawful, unless the data subject has given explicit consent to the processing of those personal data for one or more specified purposes; processing is necessary to protect the vital interests of the data subject or of another natural person where the data subject is physically or legally incapable of giving consent; or processing is necessary for the establishment, exercise or defence of legal claims or whenever courts are acting in their judicial capacity (the rule's exception is unresolved -- not confirmed either way)",
+        "depends_on": [
+          "rule:rule-1",
+          "fact:fact-1",
+          "gate:rule-1"
+        ]
+      }
     ]
   },
   "case2_exception_holds": {
@@ -206,14 +243,14 @@
             "per_exception": [
               {
                 "status": "holds",
-                "best_entail": 0.9941,
+                "best_entail": 0.9942,
                 "best_contradict": 0.0008,
                 "best_context": "The data subject has given explicit consent to the processing of those personal data for one or more specified purposes."
               },
               {
                 "status": "not_holds",
                 "best_entail": 0.0016,
-                "best_contradict": 0.8913,
+                "best_contradict": 0.8904,
                 "best_context": "The data subject has given explicit consent to the processing of those personal data for one or more specified purposes."
               },
               {
@@ -225,6 +262,41 @@
             ]
           }
         }
+      }
+    ],
+    "dependency_tree": [
+      {
+        "id": "rule:rule-1",
+        "kind": "rule",
+        "summary": "If anyone processes special category data, it is unlawful, unless the data subject has given explicit consent to the processing of those personal data for one or more specified purposes; processing is necessary to protect the vital interests of the data subject or of another natural person where the data subject is physically or legally incapable of giving consent; or processing is necessary for the establishment, exercise or defence of legal claims or whenever courts are acting in their judicial capacity.",
+        "depends_on": [
+          "rule-1"
+        ]
+      },
+      {
+        "id": "fact:fact-1",
+        "kind": "fact",
+        "summary": "MedCorp process Aisha",
+        "depends_on": [
+          "fact-1"
+        ]
+      },
+      {
+        "id": "gate:rule-1",
+        "kind": "gate_check",
+        "summary": "condition gate status=holds",
+        "depends_on": [
+          "rule:rule-1",
+          "fact:fact-1"
+        ]
+      },
+      {
+        "id": "conclusion:rule-1:fact-1:blocked",
+        "kind": "conclusion",
+        "summary": "policy blocked: the rule's exception holds",
+        "depends_on": [
+          "gate:rule-1"
+        ]
       }
     ]
   },
@@ -341,6 +413,43 @@
             ]
           }
         }
+      }
+    ],
+    "dependency_tree": [
+      {
+        "id": "rule:rule-1",
+        "kind": "rule",
+        "summary": "If anyone processes special category data, it is unlawful, unless the data subject has given explicit consent to the processing of those personal data for one or more specified purposes; processing is necessary to protect the vital interests of the data subject or of another natural person where the data subject is physically or legally incapable of giving consent; or processing is necessary for the establishment, exercise or defence of legal claims or whenever courts are acting in their judicial capacity.",
+        "depends_on": [
+          "rule-1"
+        ]
+      },
+      {
+        "id": "fact:fact-1",
+        "kind": "fact",
+        "summary": "MedCorp process Aisha",
+        "depends_on": [
+          "fact-1"
+        ]
+      },
+      {
+        "id": "gate:rule-1",
+        "kind": "gate_check",
+        "summary": "condition gate status=not_holds",
+        "depends_on": [
+          "rule:rule-1",
+          "fact:fact-1"
+        ]
+      },
+      {
+        "id": "conclusion:rule-1:fact-1:applied",
+        "kind": "conclusion",
+        "summary": "policy applies: it is unlawful, unless the data subject has given explicit consent to the processing of those personal data for one or more specified purposes; processing is necessary to protect the vital interests of the data subject or of another natural person where the data subject is physically or legally incapable of giving consent; or processing is necessary for the establishment, exercise or defence of legal claims or whenever courts are acting in their judicial capacity",
+        "depends_on": [
+          "rule:rule-1",
+          "fact:fact-1",
+          "gate:rule-1"
+        ]
       }
     ]
   }

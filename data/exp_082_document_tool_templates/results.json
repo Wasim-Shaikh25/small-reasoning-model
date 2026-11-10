@@ -47,7 +47,7 @@
     "Template selection has never been tested on an ask that doesn't clearly belong to either registered tool (e.g. a company-policy or email-draft ask, tools not yet registered) -- worth a negative case once a third tool exists, to see what select_tool returns when nothing is a good match.",
     "assign_findings_to_sections has no abstention: every finding is forced into its best-scoring section even if that similarity is low. A finding that belongs to neither tool's templates at all was not tested here."
   ],
-  "elapsed_sec": 54.0473,
-  "peak_rss_mb": 890.23,
+  "elapsed_sec": 13.2755,
+  "peak_rss_mb": 2937.0,
   "models_used": "bge-small-en-v1.5 (lab.common.real_encoders, tool/template/section selection -- non-generative similarity scoring) + flan-t5-small (bounded rewriter role on the resulting leaves, fidelity-gated, diagnostics recorded but not this exploration's measured target)."
 }

@@ -44,6 +44,44 @@ subject or object was resolved from >1 plausible candidate is tagged
 `antecedent_alternatives` -- so a caller can tell a confident resolution
 from a guess, without the module either silently dropping correct
 connections or silently trusting wrong ones.
+
+Follow-up (2026-11-10): HANDOFF.md's redesign proposal named the actual
+fix for the adversarial case -- "bind this unresolved reference to the
+best-supported node", scored by recency, embedding similarity AND role
+compatibility, not recency alone. `_bind_reference`/`_score_candidate`
+below implement that, with one correction found by testing (see
+`_score_candidate`'s own docstring): a candidate carries the
+GRAMMATICAL ROLE (subject/object/none) it played in its own source
+sentence, but the right signal is SALIENCE (was this candidate a stated
+argument of the previous fact at all), not role-PARALLELISM (does it
+match the SAME role the pronoun plays) -- parallelism was tried first
+and found to break this project's own motivating payment-chain example,
+where the correct antecedent is deliberately the previous OBJECT, not a
+same-role SUBJECT. A soft type-compatibility score ("it"/"its" prefers
+an organization antecedent, "he"/"she"/... prefers a person) and an
+optional bge-embedding-similarity tiebreak (`use_embedding_tiebreak`)
+round out the score; this is a closed, generic fact about English
+discourse structure, the same class of exception this project already
+carves out for pronoun lists and POS-tag categories -- not a domain
+guess. Re-ran both named test cases (see AUDIT.md, "generic reference
+binder, replacing the pronoun-only recency heuristic"): the
+straightforward/payment-chain case still resolves correctly (salience
+ties, recency still breaks it the same way the old heuristic did), and
+the adversarial case -- which the old heuristic got WRONG -- now
+resolves correctly too, because the true antecedent (a real argument of
+the previous fact) outscores the closer but non-argument incidental
+mention on salience.
+
+Kept, not deleted: `_resolve_antecedent` (the old recency-only
+heuristic) stays as the default -- `build_relationship_graph`'s new
+`use_reference_binder` parameter defaults to False, so no existing
+caller's measured output changes unless it opts in, same discipline as
+every other flag in this project. HANDOFF.md's own instruction: "keep
+the old heuristic as a fallback until the generic version is measured
+to beat it on a labeled set" -- there is no real labeled set here (two
+hand-built test cases, not a corpus), so this is reported as a directly
+measured improvement on the two known failure shapes, not a general
+accuracy claim.
 """
 
 from __future__ import annotations
@@ -102,7 +140,105 @@ def _resolve_antecedent(span: str, recent_mentions: list[str]) -> dict:
     }
 
 
-def build_relationship_graph(passages: list[dict]) -> dict:
+# A closed fact about English pronouns' natural gender/type class (not a
+# domain guess) -- "they"/"them"/"their"/"theirs" and "that"/"this" stay
+# out of this map deliberately: they are genuinely type-neutral (a
+# singular-person "they" is common; "that"/"this" can stand in for either).
+_PRONOUN_TYPE_HINT = {
+    "he": "person", "him": "person", "his": "person",
+    "she": "person", "her": "person", "hers": "person",
+    "it": "organization", "its": "organization",
+}
+
+
+def _score_candidate(
+    candidate: dict,
+    pronoun: str,
+    rank: int,
+    total: int,
+    context_text: str,
+    use_embedding_tiebreak: bool,
+) -> float:
+    """Higher is a better antecedent guess.
+
+    First version of this scorer tried "role-parallelism" (prefer a
+    candidate whose own role matches the role the pronoun itself plays,
+    e.g. a subject pronoun prefers a previous SUBJECT) as the dominant
+    signal. Tested directly against this project's own two named cases
+    and found WRONG on the first one: this project's own motivating
+    example is a payment CHAIN ("X gave Y money, Y gave Z money, Z gave X
+    money"), where the correct antecedent for the next sentence's subject
+    pronoun is deliberately the PREVIOUS sentence's OBJECT (the chain
+    hands the topic off), not a same-role match. Parallelism is a real
+    heuristic in the coreference literature, but it is genre-dependent,
+    and this project's own primary demonstrated capability (the 3-party
+    cycle) is exactly the genre it gets backwards -- so it is not used.
+
+    The signal that actually generalizes across both named cases is
+    SALIENCE, not role-matching: a candidate that was itself a stated
+    argument (subject OR object) of the immediately preceding fact triple
+    is a far more available antecedent than one merely NAMED inside an
+    incidental/subordinate clause the triple extractor didn't bind at
+    all (centering theory ranks any realized grammatical argument above
+    a non-argument mention, without requiring the SAME argument slot).
+    Verified directly: in the payment-chain case both the previous
+    subject and object are salient (role is not None), so salience alone
+    doesn't discriminate between them and recency correctly breaks the
+    tie in the object's favor, same as the old heuristic; in the
+    subordinate-clause adversarial case, the incidental mention has no
+    recognized role at all (salience 0), so the true, salient-but-less-
+    recent antecedent wins even though it is textually farther away.
+
+    Type compatibility is a soft secondary filter (downweighted on a
+    mismatch, never zero-filtered, so this never regresses to "abstain"
+    when every real candidate happens to mismatch); an optional
+    bge-embedding similarity between the pronoun's own sentence and the
+    candidate's source sentence is the weakest-weighted signal, only
+    computed when `use_embedding_tiebreak` is set (an extra model call
+    per resolution, opt-in for exactly that cost reason).
+    """
+    salience_score = 1.0 if candidate.get("role") is not None else 0.0
+    type_hint = _PRONOUN_TYPE_HINT.get(pronoun)
+    type_score = 1.0 if not type_hint or candidate.get("label") == type_hint else 0.0
+    recency_score = (rank + 1) / total
+    embedding_score = 0.0
+    if use_embedding_tiebreak and context_text and candidate.get("source_text"):
+        from lab.common.real_encoders import bge_similarity
+
+        embedding_score = bge_similarity(context_text, candidate["source_text"])
+    return 3.0 * salience_score + 1.5 * type_score + 1.0 * recency_score + 1.0 * embedding_score
+
+
+def _bind_reference(
+    span: str,
+    candidates: list[dict],
+    context_text: str = "",
+    use_embedding_tiebreak: bool = False,
+) -> dict:
+    """The generic replacement for `_resolve_antecedent`: scores every
+    candidate (see `_score_candidate`) instead of always picking "whatever
+    was mentioned last". Returns the same `{"text", "pronoun_resolved",
+    "ambiguous", "alternatives"}` shape, so a caller doesn't need to know
+    which binder actually ran.
+    """
+    if normalize(span) not in _PRONOUNS or not candidates:
+        return {"text": span, "pronoun_resolved": False, "ambiguous": False, "alternatives": []}
+    pronoun = normalize(span)
+    scored = [
+        (c, _score_candidate(c, pronoun, i, len(candidates), context_text, use_embedding_tiebreak))
+        for i, c in enumerate(candidates)
+    ]
+    scored.sort(key=lambda pair: pair[1])
+    best_candidate = scored[-1][0]
+    return {
+        "text": best_candidate["text"],
+        "pronoun_resolved": True,
+        "ambiguous": len(candidates) > 1,
+        "alternatives": [c["text"] for c, _ in scored[:-1]],
+    }
+
+
+def build_relationship_graph(passages: list[dict], use_reference_binder: bool = False, use_embedding_tiebreak: bool = False) -> dict:
     """One directed edge per passage whose text parses as a fact triple
     with both a subject and an object. Returns
     {"edges": [{"from", "to", "from_text", "to_text", "verb", "amount",
@@ -111,22 +247,39 @@ def build_relationship_graph(passages: list[dict]) -> dict:
     Nodes are keyed on normalized exact span text, same substitute for
     "the system doesn't understand language" that graph_index.py already
     uses -- no model resolves whether two differently-phrased spans are
-    the same entity, except for the one narrow pronoun case handled by
-    `_resolve_antecedent` above.
+    the same entity, except for the one pronoun case handled by
+    `_resolve_antecedent` (default) or `_bind_reference`
+    (`use_reference_binder=True`) above.
     """
     edges = []
     nodes: dict[str, str] = {}
     recent_mentions: list[str] = []
+    recent_candidates: list[dict] = []
     for passage in passages:
         text = passage.get("text", "") or ""
         fact = extract_fact_triple(text)
         real_mentions = [m["text"] for m in detect_primary(text) if m["label"] in ("person", "organization")]
+        tagged_candidates = []
+        for m in detect_primary(text):
+            if m["label"] not in ("person", "organization"):
+                continue
+            role = None
+            if fact:
+                if normalize(m["text"]) == normalize(fact.get("subject") or ""):
+                    role = "subject"
+                elif normalize(m["text"]) == normalize(fact.get("object") or ""):
+                    role = "object"
+            tagged_candidates.append({"text": m["text"], "label": m["label"], "role": role, "source_text": text})
         if not fact or not fact.get("subject") or not fact.get("object"):
             if real_mentions:
                 recent_mentions = real_mentions
+                recent_candidates = tagged_candidates
             continue
 
-        subject_resolution = _resolve_antecedent(fact["subject"], recent_mentions)
+        if use_reference_binder:
+            subject_resolution = _bind_reference(fact["subject"], recent_candidates, context_text=text, use_embedding_tiebreak=use_embedding_tiebreak)
+        else:
+            subject_resolution = _resolve_antecedent(fact["subject"], recent_mentions)
         subject_text = subject_resolution["text"]
         object_resolution = {"text": fact["object"], "pronoun_resolved": False, "ambiguous": False, "alternatives": []}
         if normalize(fact["object"]) in _PRONOUNS:
@@ -135,7 +288,10 @@ def build_relationship_graph(passages: list[dict]) -> dict:
             # antecedents, and this heuristic has only one to offer, so it
             # abstains (keeps the raw pronoun span) rather than guess a
             # self-loop.
-            candidate = _resolve_antecedent(fact["object"], recent_mentions)
+            if use_reference_binder:
+                candidate = _bind_reference(fact["object"], recent_candidates, context_text=text, use_embedding_tiebreak=use_embedding_tiebreak)
+            else:
+                candidate = _resolve_antecedent(fact["object"], recent_mentions)
             if normalize(candidate["text"]) != normalize(subject_text):
                 object_resolution = candidate
         object_text = object_resolution["text"]
@@ -143,8 +299,10 @@ def build_relationship_graph(passages: list[dict]) -> dict:
         from_key, to_key = normalize(subject_text), normalize(object_text)
         if real_mentions:
             recent_mentions = real_mentions
+            recent_candidates = tagged_candidates
         elif normalize(subject_text) not in _PRONOUNS:
             recent_mentions = [subject_text]
+            recent_candidates = [{"text": subject_text, "label": "person", "role": "subject", "source_text": text}]
         if not from_key or not to_key or from_key == to_key:
             continue
         nodes[from_key] = subject_text

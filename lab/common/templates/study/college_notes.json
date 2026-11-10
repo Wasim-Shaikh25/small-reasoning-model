@@ -9,17 +9,20 @@
     {
       "title": "Key Concepts",
       "content_description": "A core term, concept, or definition being introduced -- what something IS or MEANS.",
-      "instructions": "List each distinct concept, term, or definition found in the material, one per line. Use only the terms and definitions present in the findings -- do not add a concept the material does not mention."
+      "instructions": "List each distinct concept, term, or definition found in the material, one per line. Use only the terms and definitions present in the findings -- do not add a concept the material does not mention.",
+      "contract": {"min_findings": 1}
     },
     {
       "title": "Detailed Notes",
       "content_description": "How something works: the mechanism, process, or supporting detail behind a concept.",
-      "instructions": "Expand on each concept with its supporting detail from the material, in the order the material gives it. Use only what the findings state -- do not add an example or explanation not present there."
+      "instructions": "Expand on each concept with its supporting detail from the material, in the order the material gives it. Use only what the findings state -- do not add an example or explanation not present there.",
+      "contract": {"min_findings": 1}
     },
     {
       "title": "Quick Revision Summary",
       "content_description": "A short summary, formula, or overall takeaway condensing the material for quick review.",
-      "instructions": "Condense the material above into short, exam-ready revision points. Use only facts already stated in the findings -- this section restates, it does not introduce anything new."
+      "instructions": "Condense the material above into short, exam-ready revision points. Use only facts already stated in the findings -- this section restates, it does not introduce anything new.",
+      "contract": {"min_findings": 1}
     }
   ]
 }

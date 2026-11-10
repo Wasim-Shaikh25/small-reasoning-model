@@ -90,13 +90,48 @@
             "per_exception": [
               {
                 "status": "holds",
-                "best_entail": 0.9941,
+                "best_entail": 0.9942,
                 "best_contradict": 0.0008,
                 "best_context": "The data subject has given explicit consent to the processing of those personal data for one or more specified purposes."
               }
             ]
           }
         }
+      }
+    ],
+    "dependency_tree": [
+      {
+        "id": "rule:rule-unless",
+        "kind": "rule",
+        "summary": "If anyone processes special category data, it is unlawful, unless the data subject has given explicit consent to the processing of those personal data for one or more specified purposes.",
+        "depends_on": [
+          "rule-unless"
+        ]
+      },
+      {
+        "id": "fact:fact-1",
+        "kind": "fact",
+        "summary": "MedCorp process Aisha",
+        "depends_on": [
+          "fact-1"
+        ]
+      },
+      {
+        "id": "gate:rule-unless",
+        "kind": "gate_check",
+        "summary": "condition gate status=holds",
+        "depends_on": [
+          "rule:rule-unless",
+          "fact:fact-1"
+        ]
+      },
+      {
+        "id": "conclusion:rule-unless:fact-1:blocked",
+        "kind": "conclusion",
+        "summary": "policy blocked: the rule's exception holds",
+        "depends_on": [
+          "gate:rule-unless"
+        ]
       }
     ]
   },
@@ -191,13 +226,48 @@
             "per_exception": [
               {
                 "status": "holds",
-                "best_entail": 0.9941,
+                "best_entail": 0.9942,
                 "best_contradict": 0.0008,
                 "best_context": "The data subject has given explicit consent to the processing of those personal data for one or more specified purposes."
               }
             ]
           }
         }
+      }
+    ],
+    "dependency_tree": [
+      {
+        "id": "rule:rule-except",
+        "kind": "rule",
+        "summary": "If anyone processes special category data, it is unlawful, except the data subject has given explicit consent to the processing of those personal data for one or more specified purposes.",
+        "depends_on": [
+          "rule-except"
+        ]
+      },
+      {
+        "id": "fact:fact-1",
+        "kind": "fact",
+        "summary": "MedCorp process Aisha",
+        "depends_on": [
+          "fact-1"
+        ]
+      },
+      {
+        "id": "gate:rule-except",
+        "kind": "gate_check",
+        "summary": "condition gate status=holds",
+        "depends_on": [
+          "rule:rule-except",
+          "fact:fact-1"
+        ]
+      },
+      {
+        "id": "conclusion:rule-except:fact-1:blocked",
+        "kind": "conclusion",
+        "summary": "policy blocked: the rule's exception holds",
+        "depends_on": [
+          "gate:rule-except"
+        ]
       }
     ]
   },
@@ -302,6 +372,43 @@
             ]
           }
         }
+      }
+    ],
+    "dependency_tree": [
+      {
+        "id": "rule:rule-except-that",
+        "kind": "rule",
+        "summary": "If anyone processes special category data, it is unlawful, except that explicit consent removes the prohibition.",
+        "depends_on": [
+          "rule-except-that"
+        ]
+      },
+      {
+        "id": "fact:fact-1",
+        "kind": "fact",
+        "summary": "MedCorp process Aisha",
+        "depends_on": [
+          "fact-1"
+        ]
+      },
+      {
+        "id": "gate:rule-except-that",
+        "kind": "gate_check",
+        "summary": "condition gate status=not_holds",
+        "depends_on": [
+          "rule:rule-except-that",
+          "fact:fact-1"
+        ]
+      },
+      {
+        "id": "conclusion:rule-except-that:fact-1:applied",
+        "kind": "conclusion",
+        "summary": "policy applies: it is unlawful, except that explicit consent removes the prohibition",
+        "depends_on": [
+          "rule:rule-except-that",
+          "fact:fact-1",
+          "gate:rule-except-that"
+        ]
       }
     ]
   },

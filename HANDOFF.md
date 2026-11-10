@@ -260,12 +260,24 @@ instead of just a measurement):**
 **Keep / promote / delete, once each replacement is wired and verified
 (never delete before the replacement is measured, per this project's own
 discipline of not removing a working path until its successor is proven)**:
-- Promote to core: `store.py`, `method_teaching.py`, `gapfill.py`,
-  `decision_findings.py`, `plain_language.py`, `spellfix.py`,
-  `informal_register.py` -- all dormant today, all generic enough to be
-  tools rather than one-off scripts.
+- Promote to core: `store.py` (done, 2026-11-10 -- `Store.upsert` +
+  fused `search`), `plain_language.py` (done, same week -- wired into
+  `brain.reason` via `plain_english`). Still dormant, not yet promoted:
+  `gapfill.py` (needs its own FORBIDDEN.md-gated review before it brings
+  a new generative fallback live), `decision_findings.py`, `spellfix.py`,
+  `informal_register.py` -- each tested and correct standalone, each
+  still needing its own dedicated wiring decision, not done yet.
+- Deleted (2026-11-10), not merely flagged: `method_teaching.py` -- zero
+  fan-in confirmed, its replacement (`concept_tools.py`'s YAML-defined
+  registry) measured and proven for weeks, per this project's own "never
+  delete before the replacement is proven" rule being satisfied, not
+  skipped.
 - Keep, narrow the scope: `relationship_graph.py`'s graph/cycle-detection
-  parts stay; its `_resolve_antecedent` one-off gets replaced per point 2.
+  parts stay; its `_resolve_antecedent` one-off is kept as the default,
+  with a measured, opt-in replacement (`use_reference_binder`) added
+  alongside it (2026-11-10) -- not yet made the default, since HANDOFF's
+  own instruction was to keep the old heuristic until the new one is
+  measured against a real labeled set, not just two hand-built cases.
 - Candidate delete (one-off, task-specific, superseded by the template/
   tool layer once it's wired): `article_tool.py` (a bespoke single-purpose
   wrapper), `write_article.py` (folds into a registered template instead).
@@ -374,15 +386,54 @@ place. `proposals.py`/`provenance.py` were deliberately left untouched
 point -- it is not wired into `brain.reason` or `longform.
 write_long_document` (that pipeline is now reached through `plain_
 english`/other existing flags, a separate path from the teach-tool
-concept registry). Of the original nine untouched HANDOFF issues, four
-remain genuinely untouched: pronoun-only reference resolution, the data
-layer's streaming upsert/hybrid search default, the per-section template
-contracts, and the keep/delete pass on the 8 dormant modules -- plus the
-self-expanding reasoning core itself was never attempted. The passive-
-decision false negative is still open with no known fix, not merely
-unattempted. A non-generative CoLA grammaticality classifier was
-identified as the right tool for catching grammar problems beyond the
-ones hand-found this session, but is not yet downloaded or wired in.
+concept registry). The passive-decision false negative is still open
+with no known fix, not merely unattempted. A non-generative CoLA
+grammaticality classifier was identified as the right tool for catching
+grammar problems beyond the ones hand-found this session, but is not yet
+downloaded or wired in. `gapfill.py` (the FLAN-T5 "untrusted proposer")
+and `informal_register.py`/`decision_findings.py`/`spellfix.py` stay
+dormant/partially-dormant -- `gapfill.py` brings in a NEW generative
+fallback capability, which needs its own FORBIDDEN.md-gated review, not
+a same-pass wiring decision; `decision_findings.py`/`spellfix.py` are
+each tested and correct standalone but wiring either into `brain.
+reason`'s live pipeline is its own design decision (where in the
+pipeline, what the flag's output surfaces as) that deserves the same
+dedicated testing every other flag in this project got, not a rushed
+addition under this pass's own time pressure.
+
+**Update, next day: four of the five remaining items fixed and
+measured; the fifth (the self-expanding reasoning core) deliberately
+not attempted** (`AUDIT.md`, search "four of the five remaining open
+items fixed"). Fixed: pronoun/coreference resolution
+(`relationship_graph.build_relationship_graph`'s new `use_reference_
+binder`, salience + recency + soft type-compatibility, NOT role-
+parallelism -- tried first, found to break this project's own
+payment-chain motivating example, replaced); the data layer's streaming
+upsert and always-hybrid search (`store.py`'s new `Store.upsert` +
+Reciprocal-Rank-Fusion `search`, honestly scoped per leg -- bge's dense
+leg is genuinely incremental, TF-IDF/the graph are cheap refits, not
+literal incremental updates); per-section template contracts
+(`doc_tools.check_section_contract`, wired into `write_long_document`'s
+new `contract_violations` and a new `template_id` parameter threaded
+through `brain.reason` itself); and the EXP-081 `consistency_flags`
+13->16 side effect (not just disclosed this time -- actually measured
+with real NLI and fixed: 15 of the 16 flags score under 0.02
+contradiction probability between their own source sentences, confirming
+EXP-081's own prior guess that this was a false-positive-prone checker
+on repetitive legal text; `working_memory.check_and_remember_page`'s new
+`use_real_nli` flag cuts 16 flags to 1 on the identical fixture, default
+False keeps the original recall-first behavior for every existing
+caller). Not attempted: the self-expanding reasoning core -- this is a
+different CONTROL PHILOSOPHY for `brain.reason` itself (a dynamic
+fixpoint loop replacing today's `plan_stages`-computed, deliberately
+fixed, inspectable stage order, which the project owner's own words in
+`plan_stages`'s docstring explicitly chose for controllability), not a
+same-shape wiring change like the four above -- rewiring the single most
+load-bearing function in this project without a dedicated labeled set to
+catch a dispatch regression across the ~90 experiments that call
+`reason()` would be exactly the kind of unmeasured change this project's
+own discipline exists to prevent. Left genuinely undone; HANDOFF's own
+proposal already scoped it as "its own phase," not a same-pass fix.
 
 ## House rules to keep following (unchanged, from `AGENT.md`)
 

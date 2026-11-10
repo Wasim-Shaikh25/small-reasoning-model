@@ -2077,3 +2077,136 @@ checker ("false-positive rate... not measured here, only observed
 qualitatively") already flags it as unverified for precision, and this
 session does not change that -- the new count is reported as measured,
 not claimed as an improvement.
+
+## Follow-up, next day: four of the five remaining open items fixed and measured; the fifth (the self-expanding reasoning core) deliberately not attempted, with reasoning
+
+User's direct challenge, given the four previously-"genuinely untouched"
+items plus the EXP-081 side effect: "these can be fixed now... check why
+these are not getting fix? and fix that side effect too." Investigated
+each on its own merits rather than assuming the newly-built grammar/NLI
+infrastructure would automatically cover them -- two were, two needed
+their own real design work, one is reported as deliberately not
+attempted.
+
+**1. Pronoun/coreference gap (`relationship_graph.py`) -- fixed, with a
+real correction found mid-design.** First attempt: "role-parallelism"
+(a pronoun prefers an antecedent that played the SAME grammatical role
+it itself plays -- a subject pronoun prefers a previous subject), the
+standard centering-theory heuristic. Tested directly against this
+project's own two named cases (AUDIT.md, "pronoun/coreference gap") and
+found WRONG on the first one: this project's own motivating example is a
+payment CHAIN ("X gave Y money, Y gave Z money..."), where the correct
+antecedent is deliberately the PREVIOUS OBJECT, not a same-role match --
+parallelism gets this backwards. Replaced with SALIENCE (was the
+candidate a stated argument -- subject OR object -- of the immediately
+preceding fact at all, vs. merely named inside an incidental/subordinate
+clause the triple extractor never bound), tiebroken by recency, with a
+soft pronoun-type-compatibility filter and an optional bge-embedding
+tiebreak. Re-verified directly: the payment-chain case still resolves
+exactly as before (salience ties between subject and object, recency
+breaks it the same way the old heuristic did); the adversarial
+subordinate-clause case ("Alice Smith confirmed that Bob Jones had
+missed the deadline. She gave Carol Lee $500." -- old heuristic
+resolves "She" to Bob Jones, wrong) now resolves correctly to Alice
+Smith, because Bob Jones was never a real argument of the extracted
+fact, only an incidental mention. `build_relationship_graph`'s new
+`use_reference_binder` (default False) and `use_embedding_tiebreak`
+(default False) keep every existing caller (`article_tool.py`, the only
+one) on the exact old heuristic unless it opts in.
+
+**2. Data layer -- streaming upsert and always-hybrid search
+(`store.py`) -- fixed, honestly scoped per leg.** `Store.upsert` appends
+new passages without the caller re-supplying every earlier one, but the
+cost is reported per-leg, not claimed uniform: `RealBgeIndex`'s dense
+leg is genuinely incremental (`bge_embed` only ever runs on the NEW
+passages -- one passage's embedding never depends on the rest of the
+corpus); the lexical `Index`'s TF-IDF vectorizer and the entity graph
+have no such property (no online-vocabulary update in scikit-learn;
+`build_entity_graph`'s own docstring already calls rebuilding "the
+cheap part") and are refit over the full passage set. `Store.search` now
+fuses both legs by Reciprocal Rank Fusion whenever both exist, instead
+of `prefer_bge` picking exactly one and discarding the other -- the
+direct structural fix for EXP-029's own finding that real bge embeddings
+can lose to plain TF-IDF on a harder retrieval test. Verified live: a
+3-passage store, upserted with a 4th, correctly re-ranks a query toward
+the new passage; `expand_entity` after the upsert correctly reaches the
+new passage through the rebuilt graph; `ingest_and_store` +
+`ingest_and_upsert` round-trip from raw text with no hand-built
+passages. `Store` had zero fan-in before this change and still does --
+zero regression risk, by construction.
+
+**3. Per-section template contracts (`doc_tools.py`) -- fixed, wired
+into both `write_long_document` and `brain.reason`.** `check_section_
+contract`/`check_template_contracts` check an OPTIONAL, per-section
+`contract` key (`required_labels` -- AND, `required_labels_any` -- OR,
+`min_findings`, `max_findings`) against `entities.detect_primary`'s
+labels over the findings actually routed to that section -- no new
+model, no new hardcoded keyword table, and a section with no `contract`
+key is simply never checked. Added real contracts to both shipped
+templates (`legal_notice.json`: Notice Header needs a person AND a
+date; Deadline and Consequence needs a date OR an amount -- checked
+directly, since a duration deadline like "within 15 days" is caught by
+this project's own AMOUNT_RE, not DATE_RE, so an AND here would have
+been a false-flag risk; `college_notes.json`: every section needs at
+least one finding). Wired into `write_long_document`'s new
+`contract_violations` return field (`None` when no `template_id`, `[]`
+when checked and all passed, else the failing sections), and threaded a
+new `template_id` parameter all the way through `brain.reason`/
+`_reason_once` so this is reachable from the one real entry point, not
+just a direct `write_long_document` call. Verified end to end via
+`brain.reason(ask, passages, template_id="legal_notice")`: a findings
+set missing a date in the header and missing any Demand finding
+produces exactly those two violations; the default (`template_id=None`)
+path is confirmed byte-identical to before this change.
+
+**4. EXP-081's consistency_flags side effect -- actually fixed, not
+just disclosed, and the fix is bigger than the one experiment.**
+Reproduced the real GDPR fixture directly and printed every one of the
+16 flagged pairs' full source sentences, then ran real bidirectional
+NLI (`real_encoders.real_nli`) between each pair: 15 of 16 score under
+0.02 contradiction probability -- a generic legal actor ("the
+controller"/"the data subject") stating a DIFFERENT, non-conflicting
+obligation under a different GDPR article, sharing only a subject+verb
+lemma. Exactly the failure mode EXP-081's own follow-up already named
+("false-positive rate on repetitive legal text... not measured here")
+and exactly what the parser upgrade made WORSE (more triples extracted
+= more coincidental subject+verb matches = more flags), not better --
+the parser upgrade didn't cause a new kind of bug, it amplified an
+existing, already-named precision gap. Fix: `WorkingMemory.check_and_
+remember_page`'s new `use_real_nli` parameter (default False) requires
+the two underlying sentences to clear a real NLI contradiction
+threshold (either direction) before keeping a candidate flag, reusing
+exactly the sentence text already carried in each triple's own `raw`
+field (no new storage, no violation of this module's "never the page's
+full text" rule). Measured on the identical fixture: 16 flags -> 1,
+keeping precisely the one pair (a fee-charging clause under two
+different articles) that plausibly deserved a second look. Threaded
+through `write_long_document`'s existing `use_real_nli` flag (the same
+flag that already gates the rewriter's own real-NLI fidelity check, not
+a new one) -- default False confirmed to reproduce the original 16
+flags exactly; `use_real_nli=True` confirmed to produce the 1.
+
+**5. The self-expanding reasoning core -- deliberately NOT attempted
+this pass, reported rather than rushed.** HANDOFF.md's own redesign
+proposal names this as generalizing `inference.forward_chain`'s
+rule-only fixpoint loop into the PRIMARY mechanism replacing `brain.
+_reason_once`'s fixed, `plan_stages`-computed stage order -- admitting
+`qa.answer_with_real_qa`, `nli.judge`, the new reference-binder, and
+`rules.apply_rule` as interchangeable expansion moves against a growing
+node set, with `budget.cap_depth`, `relationship_graph.find_cycles`,
+and `verify.coverage_check` as the required safety controls. This is
+not a wiring task like the four above -- it is a different CONTROL
+PHILOSOPHY for the single most load-bearing function in this project.
+`plan_stages`'s own docstring records the project owner's explicit
+reasoning for the CURRENT design ("give one simple prompt and system
+have to perform... first create full plan and than execute... it will
+keep it in control") -- a fixed plan computed once, before anything
+runs, is the deliberate opposite of a loop that re-derives which
+operator fires each round. Every one of this project's ~90 experiments
+that calls `reason()` depends on today's stage-dispatch order; rewiring
+it without a dedicated labeled set to verify no dispatch regression
+would be exactly the kind of change this project's own discipline
+exists to prevent (measure before trusting, never guess). HANDOFF.md's
+own proposal already scopes this as "its own phase after the four-layer
+core is validated," not a same-session wiring change -- left genuinely
+undone, not quietly skipped.

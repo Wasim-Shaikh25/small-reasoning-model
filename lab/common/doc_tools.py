@@ -26,6 +26,32 @@ each candidate's own description, picking the best match -- not a new,
 separate scheme. A tool/template is picked by its own documented purpose,
 the same way wants_document picks a signal by matching the ask's form, not
 by a keyword list.
+
+Follow-up (2026-11-10): HANDOFF.md's redesign proposal named the other
+missing piece -- "extend [the template registry] so each template
+section carries an explicit contract (required fact types, ordering,
+min/max findings) the reasoning core can check per-section, not just
+globally." `check_section_contract`/`check_template_contracts` below do
+exactly that, checked with the one mechanism already proven for exactly
+this question: `lab.common.entities.detect_primary`'s labels (person,
+organization, date, amount, address) over a section's ASSIGNED findings
+-- no new model, no new hardcoded keyword table. A contract is OPTIONAL,
+per-section DATA (`"contract": {"required_labels": [...],
+"required_labels_any": [...], "min_findings": int, "max_findings":
+int|null}` in the template's own JSON -- `required_labels` is an AND
+(every listed label must appear), `required_labels_any` is an OR (at
+least one must), kept as two separate keys because a real section can
+need either shape: a notice header genuinely needs BOTH a party name
+AND a date, but a deadline clause is satisfied by EITHER a calendar
+date ("by 15th January 2026") OR a duration ("within 15 days" -- caught
+by this project's own AMOUNT_RE, not DATE_RE, confirmed by testing both
+phrasings directly rather than assumed). Same "a template's shape is
+written by whoever actually knows the document, not inferred" principle
+this module's own original docstring states -- a section with no
+`contract` key is simply never checked (not a violation by omission).
+Wired into `lab.common.longform.write_long_document`'s
+`contract_violations` return field, checked once the template's outline
+is built, same point `assign_findings_to_sections` already runs.
 """
 
 from __future__ import annotations
@@ -155,3 +181,61 @@ def assign_findings_to_sections(template: dict, findings: list[dict]) -> tuple[l
 
     sections_with_findings = [{**s, "findings": assigned[i]} for i, s in enumerate(sections)]
     return sections_with_findings, []
+
+
+def check_section_contract(section: dict, findings: list[dict]) -> dict:
+    """Checks one section's own declared `contract` (if it has one)
+    against the findings actually routed to it. Returns
+    {"section": title, "ok": bool, "violations": [str, ...]} -- a
+    section with no `contract` key always returns `ok: True`, `[]`
+    (nothing was promised, so nothing can be violated); this is an
+    explicit per-section check, not a guess at what a section "should"
+    contain.
+
+    `required_labels` is checked against `lab.common.entities.
+    detect_primary` run over the section's combined finding text (the
+    same label set -- person/organization/date/amount/address -- every
+    other primitive in this project already uses, not a new vocabulary).
+    `min_findings`/`max_findings` are plain counts. Every check that can
+    run, runs -- a section can fail on more than one ground at once, all
+    reported, not just the first.
+    """
+    contract = section.get("contract")
+    if not contract:
+        return {"section": section["title"], "ok": True, "violations": []}
+
+    from lab.common.entities import detect_primary
+
+    violations = []
+    count = len(findings)
+    min_findings = contract.get("min_findings")
+    max_findings = contract.get("max_findings")
+    if min_findings is not None and count < min_findings:
+        violations.append(f"has {count} finding(s), contract requires at least {min_findings}")
+    if max_findings is not None and count > max_findings:
+        violations.append(f"has {count} finding(s), contract allows at most {max_findings}")
+
+    required_labels = contract.get("required_labels") or []
+    required_labels_any = contract.get("required_labels_any") or []
+    if required_labels or required_labels_any:
+        combined_text = " ".join(f["statement"] for f in findings)
+        present_labels = {m["label"] for m in detect_primary(combined_text)}
+        missing = [label for label in required_labels if label not in present_labels]
+        if missing:
+            violations.append(f"missing required fact type(s) {missing} (none of its findings mention one)")
+        if required_labels_any and not (present_labels & set(required_labels_any)):
+            violations.append(f"missing at least one of fact type(s) {required_labels_any} (none of its findings mention any)")
+
+    return {"section": section["title"], "ok": not violations, "violations": violations}
+
+
+def check_template_contracts(template: dict, sections_with_findings: list[dict]) -> list[dict]:
+    """`check_section_contract`, run over every one of a template's
+    sections in its own declared order -- the per-section granularity
+    HANDOFF.md's proposal asked for, instead of a single document-wide
+    pass/fail. `sections_with_findings` is `assign_findings_to_sections`'s
+    own first return value (or, equivalently, `lab.common.longform.
+    write_long_document`'s outline leaves, which carry the same
+    `findings` list per section).
+    """
+    return [check_section_contract(section, section["findings"]) for section in sections_with_findings]

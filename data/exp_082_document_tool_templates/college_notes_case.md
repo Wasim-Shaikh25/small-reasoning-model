@@ -12,7 +12,7 @@ Key Concepts
 
 Detailed Notes
 Photosynthesis is the process by which green plants convert light energy into chemical energy.
-Chlorophyll in the chloroplasts absorbs sunlight, which drives the conversion of carbon dioxide and water into glucose and oxygen.
+In addition, Chlorophyll in the chloroplasts absorbs sunlight, which drives the conversion of carbon dioxide and water into glucose and oxygen.
 
 Quick Revision Summary
 The overall reaction can be summarized as: carbon dioxide plus water, in the presence of light, yields glucose and oxygen.

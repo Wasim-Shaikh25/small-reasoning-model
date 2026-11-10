@@ -32,37 +32,33 @@
         "leaf_id": "T0000",
         "used_generative": false,
         "fallback_reason": [
-          "nli",
-          "citations",
-          "ask_relevance"
-        ]
+          "already_complete"
+        ],
+        "plain_english_result": null
       },
       {
         "leaf_id": "T0001",
         "used_generative": false,
         "fallback_reason": [
-          "nli",
-          "citations",
-          "ask_relevance"
-        ]
+          "already_complete"
+        ],
+        "plain_english_result": null
       },
       {
         "leaf_id": "T0002",
         "used_generative": false,
         "fallback_reason": [
-          "nli",
-          "citations",
-          "ask_relevance"
-        ]
+          "already_complete"
+        ],
+        "plain_english_result": null
       },
       {
         "leaf_id": "T0003",
         "used_generative": false,
         "fallback_reason": [
-          "nli",
-          "citations",
-          "ask_relevance"
-        ]
+          "already_complete"
+        ],
+        "plain_english_result": null
       }
     ],
     "document_sample": "Notice Header\nRavi Sharma, the landlord, is sending this notice to Priya Nair, the tenant, on 10 October 2026. [1]\n\nStatement of Facts\nPriya Nair has not paid rent for the months of August and September 2026. [2]\n\nDemand\nRavi Sharma demands payment of the outstanding rent of 45000 INR. [3]\n\nDeadline and Consequence\nPriya Nair must pay within 15 days of this notice, failing which eviction proceedings will be initiated. [4]",
@@ -105,32 +101,32 @@
         "used_generative": false,
         "fallback_reason": [
           "no_findings"
-        ]
+        ],
+        "plain_english_result": null
       },
       {
         "leaf_id": "T0001",
         "used_generative": false,
         "fallback_reason": [
-          "nli",
-          "citations",
-          "ask_relevance"
-        ]
+          "deterministic_splice_preferred"
+        ],
+        "plain_english_result": null
       },
       {
         "leaf_id": "T0002",
         "used_generative": false,
         "fallback_reason": [
-          "citations",
-          "ask_relevance"
-        ]
+          "already_complete"
+        ],
+        "plain_english_result": null
       }
     ],
-    "document_sample": "Key Concepts\n\nDetailed Notes\nPhotosynthesis is the process by which green plants convert light energy into chemical energy. [1]\nChlorophyll in the chloroplasts absorbs sunlight, which drives the conversion of carbon dioxide and water into glucose and oxygen. [2]\n\nQuick Revision Summary\nThe overall reaction can be summarized as: carbon dioxide plus water, in the presence of light, yields glucose and oxygen. [3]",
+    "document_sample": "Key Concepts\n\nDetailed Notes\nPhotosynthesis is the process by which green plants convert light energy into chemical energy. [1]\nIn addition, Chlorophyll in the chloroplasts absorbs sunlight, which drives the conversion of carbon dioxide and water into glucose and oxygen. [2]\n\nQuick Revision Summary\nThe overall reaction can be summarized as: carbon dioxide plus water, in the presence of light, yields glucose and oxygen. [3]",
     "md_result": {
       "path": "C:\\python_project\\small-reasoning-model\\data\\exp_082_document_tool_templates\\college_notes_case.md",
-      "sha256": "ce70d0a3f0c25d4ea2f0407eff4ef7bf37c24f15bbb110674fd0be0d4e998420",
+      "sha256": "35e0e6db091b46c3bd0f53568ea88743845e7776383177b46e57b5cba24436b5",
       "sections": 3,
-      "word_count": 80,
+      "word_count": 82,
       "citations_indexed": 0
     }
   }

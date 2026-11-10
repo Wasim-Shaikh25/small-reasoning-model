@@ -39,7 +39,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from lab.common.assemble import build_outline
-from lab.common.doc_tools import assign_findings_to_sections, load_template
+from lab.common.doc_tools import assign_findings_to_sections, check_template_contracts, load_template
 from lab.common.document_writer import write_document
 from lab.common.entities import detect_primary
 from lab.common.rewriter_backends import rewrite_unit
@@ -156,8 +156,15 @@ def write_long_document(
     `use_real_nli` (default False) passes straight through to every leaf's
     `rewrite_unit`/`fidelity_gate` call -- opt-in real DeBERTa-v3 MNLI
     entailment checking instead of the classical lexical judge (2026-11-03
-    reasoning-layer audit, AUDIT.md). `use_repair` (default False) passes
-    through too -- opt-in use of each backend's own repair mechanism
+    reasoning-layer audit, AUDIT.md) -- AND (2026-11-10) to `WorkingMemory.
+    check_and_remember_page`'s own NLI-contradiction gate: a same-subject-
+    same-verb-different-object candidate is only kept in `consistency_
+    flags` if its two underlying sentences actually show NLI contradiction
+    evidence, not just coincidence. See `lab.common.working_memory`'s
+    module docstring ("Follow-up 2026-11-10") for the measured EXP-081
+    false-positive rate this fixes (15/16 on that real document).
+
+    `use_repair` (default False) passes through too -- opt-in use of each backend's own repair mechanism
     (flan-t5-small's retry-with-feedback, gemma3:270m's citation-splice)
     instead of this project's dispatcher bypassing both (same audit,
     rewriter_backends.rewrite_unit's own docstring has the full story).
@@ -178,11 +185,31 @@ def write_long_document(
     assumption; it is whatever WorkingMemory actually found, reported as
     measured. If `out_path` is given, also writes the formatted file
     (lab.common.document_writer) and includes its result.
+
+    `contract_violations` (2026-11-10): when `template_id` is given, every
+    section with a declared `contract` (lab.common.doc_tools.
+    check_section_contract) is checked against the findings actually
+    routed to it; this list holds only the sections that FAILED their own
+    contract (empty list if every checked section passed, `None` -- not
+    an empty list -- when no `template_id` was given at all, so a caller
+    can tell "nothing to check" from "checked, all passed"). Never blocks
+    writing the document -- same "report, don't silently resolve" posture
+    `consistency_flags` already takes.
     """
     glossary = glossary or {}
+    contract_violations = None
     if template_id is not None:
         template = load_template(template_id)
         outline = _template_outline(template, findings)
+        # Same sections, same per-section findings `_template_outline` just
+        # built its leaves from -- re-paired here (rather than having
+        # `_template_outline` return them) so a caller who never passes
+        # `template_id` pays nothing for this, and the contract check
+        # itself stays in lab.common.doc_tools, not duplicated here.
+        contract_checks = check_template_contracts(
+            template, [{**section, "findings": leaf["findings"]} for section, leaf in zip(template["sections"], outline)]
+        )
+        contract_violations = [c for c in contract_checks if not c["ok"]]
     else:
         entity_leaves, leftover_findings = _entity_outline(findings, use_real_ner=use_real_ner)
         leftover_leaves = build_outline(leftover_findings, task) if leftover_findings else []
@@ -225,7 +252,7 @@ def write_long_document(
         )
 
         citation_ids = [f.get("citation") or f.get("evidence_id") for f in leaf["findings"]]
-        flags = memory.check_and_remember_page(leaf["leaf_id"], result["text"], citation_ids)
+        flags = memory.check_and_remember_page(leaf["leaf_id"], result["text"], citation_ids, use_real_nli=use_real_nli)
         consistency_flags.extend(flags)
 
     document_text = "\n\n".join(rendered_units)
@@ -284,4 +311,5 @@ def write_long_document(
         "rewrite_diagnostics": rewrite_diagnostics,
         "working_memory": memory.to_dict(),
         "dependency_tree": dependency_tree,
+        "contract_violations": contract_violations,
     }

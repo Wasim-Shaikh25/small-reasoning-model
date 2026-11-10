@@ -16,12 +16,57 @@ just remembers which id to go back to). This is the same bounded-working-
 set principle EXP-015's paged memory already proved for retrieval,
 generalized here to the controller's own reasoning and to long-form
 writing, where it has never existed before (EXP-053's gap).
+
+Follow-up (2026-11-10): EXP-081's own follow_ups already named the real
+gap here -- "the cross-page consistency checker's false-positive rate on
+repetitive legal text (same generic subject, many unrelated clauses) was
+not measured... a dedicated precision measurement is a real follow-up
+before trusting this flag on this kind of document." Measured directly
+on that exact fixture (GDPR, 16 flags after the parser upgrade): 15 of 16
+are a generic actor ("the controller"/"the data subject") stating a
+DIFFERENT, non-conflicting obligation under a different article, sharing
+only a subject+verb lemma -- real bidirectional NLI between the two
+underlying sentences (`real_encoders.real_nli`) scores every one of them
+under 0.02 contradiction, while the one flag that is plausibly a genuine
+tension scores 0.664. `check_and_remember_page`'s `use_real_nli` (default
+False, same opt-in discipline as everywhere else in this project) adds
+exactly this check -- a flag is only kept if the two sentences' own NLI
+contradiction score clears `NLI_CONTRADICTION_TAU` in either direction.
+
+This is a precision knob, not a replacement: default False keeps this
+check's original, deliberately recall-oriented design (surface every
+same-subject-same-verb-different-object pair as a CANDIDATE, exactly as
+this module's own docstring below already says -- "not proven false...
+surfaces it rather than silently rejecting or silently accepting it").
+A caller writing a document where that recall-first posture is wrong
+for the source material (dense regulatory/legal text with one recurring
+generic subject) opts in; nothing about the original behavior changes
+for a caller that doesn't.
 """
 
 from __future__ import annotations
 
 from lab.common.rules import extract_fact_triple
 from lab.common.textutil import sentences
+
+NLI_CONTRADICTION_TAU = 0.5  # same order of magnitude as grammar_logic.NLI_TAU's own entailment threshold; provisional, not calibrated against a labeled set
+
+
+def _looks_contradictory(sentence_a: str, sentence_b: str, tau: float = NLI_CONTRADICTION_TAU) -> bool:
+    """Real DeBERTa-v3 MNLI contradiction probability, checked in both
+    directions (a sentence pair's contradiction signal is not guaranteed
+    symmetric) -- kept if EITHER direction clears `tau`, same "don't miss
+    a real conflict just because one direction scored low" posture
+    `grammar_logic.preserves_meaning` takes for its own bidirectional
+    check (there requiring BOTH directions to pass; here requiring only
+    ONE to flag, because the cost of a false negative here is a missed
+    contradiction, not a corrupted rewrite).
+    """
+    from lab.common.real_encoders import real_nli
+
+    forward = real_nli(sentence_a, sentence_b)
+    backward = real_nli(sentence_b, sentence_a)
+    return max(forward["contradict"], backward["contradict"]) >= tau
 
 
 def _triples_for(text: str) -> list[dict]:
@@ -41,7 +86,7 @@ class WorkingMemory:
         # Long-form only: one compact entry per page/leaf already written.
         self.pages: list[dict] = []
 
-    def check_and_remember_page(self, leaf_id: str, text: str, citation_ids: list[str]) -> list[dict]:
+    def check_and_remember_page(self, leaf_id: str, text: str, citation_ids: list[str], use_real_nli: bool = False) -> list[dict]:
         """Called once per leaf as a long document is written, in order.
 
         Checks this leaf's claims against every *earlier* page's digest
@@ -55,6 +100,14 @@ class WorkingMemory:
         be a job change, not an error), so this surfaces it rather than
         silently rejecting or silently accepting it, the same posture
         every other verification step in this repo takes.
+
+        `use_real_nli=True` (see module docstring, "Follow-up 2026-11-10")
+        additionally requires the two underlying sentences (each triple's
+        own `raw` field -- already carried, not new storage) to clear
+        `NLI_CONTRADICTION_TAU` contradiction probability in at least one
+        direction before a candidate is kept; a pair that only coincides
+        on subject+verb lemma, with no real contradiction signal between
+        the actual sentences, is dropped instead of flagged.
         """
         new_triples = _triples_for(text)
         flags = []
@@ -63,6 +116,8 @@ class WorkingMemory:
                 continue
             for prior in self.find_prior_claims(triple["subject"], triple["verb_lemma"]):
                 if prior["triple"]["object"] and triple["object"] and prior["triple"]["object"].lower() != triple["object"].lower():
+                    if use_real_nli and not _looks_contradictory(prior["triple"]["raw"], triple["raw"]):
+                        continue
                     flags.append(
                         {
                             "leaf_id": leaf_id,
