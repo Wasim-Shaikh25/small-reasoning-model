@@ -36,7 +36,7 @@
     "A third rule shape -- two facts compared to each other rather than one fact to a fixed threshold ('if A's amount exceeds B's amount') -- is not built and would be a genuinely new primitive, not a domain extension.",
     "EXP-057's already-named qualifier gap (except/unless/provided that) applies across every domain here too, not just the legal one -- an obtuse-angle rule with 'unless measured from the reflex side' would be matched and applied without checking the exception, the same way a self-defense exception would be."
   ],
-  "elapsed_sec": 6.8787,
-  "peak_rss_mb": 2684.03,
+  "elapsed_sec": 6.4631,
+  "peak_rss_mb": 2684.05,
   "models_used": "No model decides any outcome. spaCy's en_core_web_sm dependency parser (already a project dependency) extracts a verb in the verb-trigger cases -- the same narrow syntactic sub-task EXP-057 used, not retrained or reconfigured for any domain here."
 }

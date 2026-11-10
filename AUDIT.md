@@ -2453,3 +2453,52 @@ default False:
   other 2 (a meeting-logistics sentence, a lunch-arrangements sentence)
   were correctly excluded. Both flags default False -- zero behavior
   change for every existing caller.
+
+## Fourth follow-up, same day: reason_dynamic deleted -- its one proven
+case needed exactly one fixed hop, not a loop, so it is hardwired into
+`_reason_once` directly instead
+
+Asked directly: does keeping a generic round-based wrapper function
+around make sense when the only thing it ever proved was a single,
+fixed propagation? No. `reason_dynamic` (added in the second follow-up,
+tightened in the third) is deleted entirely -- both the `related_case`
+path (already found to duplicate `connector`+`retrieve_budget`) and the
+`derived_fact` path (the one proven case, the overage-fee total). The
+overage-fee case never needed more than one hop -- round 1 derives the
+fact, round 2 uses it, done -- so an open-ended "loop until fixpoint or
+max_rounds" architecture was never the right shape for what was
+actually proven. It is now a fixed, deterministic extra step inside
+`_reason_once` itself, not opt-in, not a separate function:
+
+- `total_computation`'s own answer_parts entry index is captured when
+  it runs (`total_entry_index`), the same total already computed.
+- After rule_application finishes (both the verb branch's own
+  `derived` field and forward_chain's further hops), every derived
+  fact's own text is checked for an amount (`AMOUNT_RE`); any found are
+  added to the SAME `facts["total"]` already computed and the SAME
+  answer_parts entry is updated in place -- never a second "total"
+  fact, never a new citation marker scheme.
+- Not flag-gated, same as the three earlier bug fixes this session --
+  this is a correctness fix to the default path, not a new capability
+  needing an opt-in guard, and it is zero-regression for the same
+  reason those were: no existing fixture combines a verb-rule with a
+  numeric consequence AND total_computation firing in the same pass.
+
+Re-measured: `reason(ask, [invoice, overage-fee rule, triggering fact])`
+now returns `facts["total"] == 450.0` directly -- no `reason_dynamic`
+call, no rounds, no pseudo-passages. The Rohan/jail/license multi-hop
+case is unaffected (it never touches total_computation, so the new
+step is a no-op there, exactly as before). Full regression confirmed
+on 18 experiments (EXP-026/053/058/059/060/066/068/069/070/078/081/082/
+084/085/089/091/094/097) -- all unchanged.
+
+**Closing assessment on this whole four-part thread:** the project
+owner's original instinct -- don't accept "no dynamic core" on
+architectural grounds alone, go measure it -- surfaced three real bugs
+this session would not have found otherwise, and the one genuine gap
+it found did not need the generic machinery first reached for. The
+right lesson is not "build a dynamic core" or "nothing was needed" --
+it is that testing the actual motivating scenario, each time, revealed
+the SPECIFIC fixed propagation needed and nothing more, the same way
+EXP-084's own forward_chain was built as a bounded, specific mechanism
+rather than a general one.

@@ -522,6 +522,23 @@ decision-bearing sentences become findings). Both new `reason()`
 params, both default False, both tested working. That closes out
 HANDOFF's "promote to core" list for these three modules.
 
+**Fourth update, same day: `reason_dynamic` deleted -- its one proven
+case needed exactly one hop, so it's hardwired directly into
+`_reason_once` instead of kept as a round-based wrapper function**
+(`AUDIT.md`, search "its one proven case needed exactly one fixed hop").
+A rule's derived consequence now feeds `total_computation`'s already-
+computed total as one fixed extra step in the normal pass -- not
+flag-gated, same as the three bug fixes before it, since this is a
+correctness fix to the default path (no existing fixture combines a
+verb rule with a numeric consequence and total_computation in the same
+pass, so it's zero-regression the same way those were).
+`reason(ask, [invoice, overage-fee rule, fact])` now directly returns
+the correct total with no separate function, no rounds. 18 experiments
+regression-confirmed. **This closes the whole self-expanding-core
+thread**: three real bugs found by testing the actual motivating
+scenario each time, one genuine gap found and fixed as a specific,
+bounded step -- never the generic loop first reached for.
+
 ## House rules to keep following (unchanged, from `AGENT.md`)
 
 - Add a `todo` entry before implementing a new exploration, close it only
