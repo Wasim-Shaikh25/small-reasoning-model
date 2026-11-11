@@ -1,0 +1,43 @@
+{
+  "write": {
+    "decision": "supported",
+    "text": "30 days [P1]",
+    "correct": true
+  },
+  "recall_valid": {
+    "hits": [
+      {
+        "note_id": "e69836956f8656b2f7b1c623",
+        "valid": true,
+        "statement": "The notice period is 30 days.",
+        "chunk_id": "P1"
+      }
+    ],
+    "correct": true
+  },
+  "recall_missing_source": {
+    "hits": [
+      {
+        "note_id": "e69836956f8656b2f7b1c623",
+        "valid": false,
+        "reason": "missing_source"
+      }
+    ],
+    "correct": true
+  },
+  "recall_version_mismatch": {
+    "hits": [
+      {
+        "note_id": "e69836956f8656b2f7b1c623",
+        "valid": false,
+        "reason": "version_mismatch"
+      }
+    ],
+    "answer_text": "60 days now, updated policy [P1]",
+    "stale_correct": true,
+    "still_answers_fresh": true
+  },
+  "no_memory_path_unaffected": {
+    "correct": true
+  }
+}

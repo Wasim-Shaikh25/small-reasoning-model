@@ -35,7 +35,7 @@
     "Only tested on a 3-node cycle with one off-topic distractor source; a longer chain, a non-cyclic chain, or genuinely ambiguous antecedents (relationship_graph.py's own `antecedent_ambiguous` field) are untested here.",
     "checkpoint/rewrite options were real but inert before this session (the generative rewriter role they configured was withdrawn 2026-11-11, see FORBIDDEN.md) -- rewrite=True now runs template_rewriter.splice_unit, not a different renderer's output; worth deciding whether the rewrite flag still earns its keep now that both paths are deterministic."
   ],
-  "elapsed_sec": 6.3926,
-  "peak_rss_mb": 2800.55,
+  "elapsed_sec": 6.3876,
+  "peak_rss_mb": 2800.93,
   "models_used": "None -- this pipeline (and this exploration) never loads a generative or encoder model; attribution is lexical-overlap, relationship extraction is lab.common.rules.extract_fact_triple (deterministic dependency-parse based)."
 }

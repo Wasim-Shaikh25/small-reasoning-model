@@ -86,7 +86,7 @@
     "data/exp_036_real_decision_heads/results.json"
   ],
   "follow_ups": [],
-  "elapsed_sec": 90.2742,
-  "peak_rss_mb": 1824.14,
+  "elapsed_sec": 73.1708,
+  "peak_rss_mb": 1824.18,
   "models_used": "deepset/deberta-v3-base-squad2 (extractive QA feature), MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli (NLI feature). Local checkpoints, not API calls. Logistic regression (with Platt/sigmoid calibration) is the unchanged classical head."
 }

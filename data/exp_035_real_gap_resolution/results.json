@@ -173,7 +173,7 @@
     "data/exp_035_real_gap_resolution/results.json"
   ],
   "follow_ups": [],
-  "elapsed_sec": 18.6458,
-  "peak_rss_mb": 1819.48,
+  "elapsed_sec": 15.4761,
+  "peak_rss_mb": 1819.16,
   "models_used": "deepset/deberta-v3-base-squad2 (extractive QA), MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli (NLI support check). Local checkpoints, not API calls. Not generative."
 }

@@ -36,7 +36,7 @@
     "The threshold-rule branch (apply_threshold_rule) still has no exception awareness at all -- a separate, smaller follow-up if a threshold rule's consequence is ever found with an 'unless' clause in a real document.",
     "Not tested combined with the other reason() signals (identity/total/document) firing at the same time as the rule branch on the same ask -- only the rule branch's own behavior was exercised here."
   ],
-  "elapsed_sec": 15.0012,
-  "peak_rss_mb": 2800.75,
+  "elapsed_sec": 15.0815,
+  "peak_rss_mb": 2800.15,
   "models_used": "Same as EXP-083/085: spaCy dependency parser (unchanged) + MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli via the existing, unmodified check_exception/check_exceptions. No generative model, no new dependency -- this exploration only wires existing, already-measured pieces into reason()."
 }

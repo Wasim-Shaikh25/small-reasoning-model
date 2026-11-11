@@ -74,7 +74,7 @@
     "check_exception's NLI call reads the whole context sentence as one premise; a longer passage with the exception's evidence buried in one clause among many was not tested -- EXP-056/069's sentence-splitting approach for ask-relevance may be needed here too if this scales to real documents.",
     "Not yet wired into lab.common.brain.reason as a signal -- this module is callable standalone, the same gap lab.common.longform had before EXP-079 wired it in."
   ],
-  "elapsed_sec": 11.5467,
-  "peak_rss_mb": 2687.64,
+  "elapsed_sec": 11.9287,
+  "peak_rss_mb": 2686.6,
   "models_used": "spaCy en_core_web_sm dependency parser (fact/rule/consequence extraction, non-generative, deterministic) + MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli (exception entailment, one bounded judgment per check, non-generative). No generative model anywhere in this exploration."
 }

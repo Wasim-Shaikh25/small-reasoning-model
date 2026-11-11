@@ -70,8 +70,17 @@ Every tool this calls is a primitive already built and separately measured:
   - lab.common.entities: name/address extraction, EXP-009.
   - lab.common.longform / lab.common.working_memory: ask-derived
     long-form document writing and cross-page consistency checking,
-    EXP-052/053/078 -- the controller's own bounded "RAM", never the
-    full data, only pointers and short digests back to it.
+    EXP-052/053/078 -- the controller's own bounded "RAM" WITHIN one
+    document-write call, never the full data, only pointers and short
+    digests back to it.
+  - lab.common.memory (2026-11-11, `memory_path=`): the controller's
+    persistent, cross-CALL counterpart -- a verified lookup-fallback
+    answer is written as a revalidated note, keyed by its source
+    passage's own content hash, so a later call can recall it without
+    re-extracting, but only if that passage's text is still present and
+    unchanged; never trusted blindly. lab.common.paged.WorkingSet
+    (`working_set_budget=`) is the third RAM primitive -- bounding how
+    many passages a single connector fetch can add to one call.
   - lab.common.calc: arithmetic, EXP-007/014.
   - lab.common.rules: verb-trigger and threshold rule application,
     EXP-057/058/059 (including the role-match guard EXP-058 added).
@@ -99,7 +108,7 @@ from lab.common.qa import answer_with_agreement, answer_with_real_qa
 from lab.common.rules import apply_rule, apply_threshold_rule, extract_fact_triple, parse_conditional_rule, parse_threshold_rule
 from lab.common.semantic_index import MIN_LEXICAL_MARGIN, MIN_SEMANTIC_MARGIN, SemanticIndex, navigate_dual
 from lab.common.temporal import check_temporal_bound, find_temporal_bound
-from lab.common.textutil import normalize
+from lab.common.textutil import content_tokens, normalize
 from lab.common.verify import quote_check
 
 ABSTAIN_TEXT = "Insufficient evidence."
@@ -326,6 +335,32 @@ def _add_dependency(dep_nodes: list[dict], node_id: str, kind: str, summary: str
     dep_nodes.append({"id": node_id, "kind": kind, "summary": summary, "depends_on": list(depends_on)})
 
 
+def _note_version(text: str) -> str:
+    """A passage's own content hash, used as lab.common.memory's
+    `version_hash` column: if the SAME chunk_id's text ever differs from
+    this hash on a later call, `memory.revalidate` correctly reports the
+    note as stale (`version_mismatch`) rather than trusting it blindly.
+    Not a document-wide version number -- this project has no such
+    concept yet -- just "has this exact passage's text changed since the
+    note was written", which is the actual question revalidation asks.
+    """
+    import hashlib
+
+    return hashlib.sha256((text or "").encode("utf-8")).hexdigest()
+
+
+def _note_id(ask: str, passage_id: str) -> str:
+    """Stable per-(ask, passage) id so a repeated identical lookup
+    updates the same memory.py row (INSERT OR REPLACE) instead of
+    growing the note table once per call -- the same bounded-not-
+    unbounded discipline `working_set_budget` applies to passages applies
+    here to notes.
+    """
+    import hashlib
+
+    return hashlib.sha256(f"{ask}:{passage_id}".encode("utf-8")).hexdigest()[:24]
+
+
 def _group_margin(hits: list[dict], score_key: str) -> float:
     """The real top-group-vs-runner-up-group gap, not whatever gap exists
     between the top 2 individual *passages*.
@@ -416,6 +451,7 @@ def reason(
     use_spellfix: bool = False,
     decision_findings_only: bool = False,
     working_set_budget: int | None = None,
+    memory_path: str | None = None,
 ) -> dict:
     """Thin outer wrapper around `_reason_once` (the function this
     docstring used to belong to, unchanged below) adding the two
@@ -492,6 +528,30 @@ def reason(
     decision-bearing sentence contributes nothing. A no-op for any ask
     that doesn't reach the document-writing stage, or when left at its
     default.
+
+    `memory_path` (2026-11-11, default None -- today's existing
+    behavior, zero regression for every existing caller): a path to a
+    lab.common.memory SQLite file, closing that module's own gap (zero
+    real callers anywhere, confirmed by grep) as the controller's
+    persistent, cross-CALL memory -- deliberately narrow in scope, not a
+    general cache. Only wired at the one place a fact maps cleanly onto
+    memory.py's schema (a single verbatim span tied to a single source
+    passage): `lookup_fallback`'s own already-quote_checked span. On a
+    "supported" lookup answer, that fact is written as a verified note
+    (`memory.write_note`), keyed by the source passage's own content hash
+    (`version_hash`) so a later call with that SAME passage text still
+    present revalidates it; a later call where that passage is absent or
+    its text has changed correctly reports the note as unusable
+    (`missing_source`/`version_mismatch`), never trusted blindly. Before
+    the main signal chain runs, `memory.recall` checks for any
+    previously-verified note that still revalidates against THIS call's
+    own `passages` (direct + connector-fetched, after `working_set_
+    budget`'s eviction) and reports hits in `trace` as `"memory_recall"`
+    -- reported only, not yet used to short-circuit answering or
+    substituted into the signal chain's own decision, the same posture
+    `coherence_flags`/`contract_violations` started with before any
+    later decision to act on them. `memory.mark_conflicted` is not wired
+    at all -- a named follow-up, not done.
     """
     if use_spellfix:
         from lab.common.spellfix import fix_sentence_joint
@@ -509,6 +569,7 @@ def reason(
         template_id=template_id,
         decision_findings_only=decision_findings_only,
         working_set_budget=working_set_budget,
+        memory_path=memory_path,
     )
     round_num = 1
     while connector is not None and round_num < retrieve_budget and result["decision"] in ("inconclusive", "ungrounded"):
@@ -526,6 +587,7 @@ def reason(
             template_id=template_id,
             decision_findings_only=decision_findings_only,
             working_set_budget=working_set_budget,
+            memory_path=memory_path,
         )
         retried["trace"] = result["trace"] + [{"step": "retrieve_more", "round": round_num, "connector_top_k": connector_top_k}] + retried["trace"]
         result = retried
@@ -552,7 +614,7 @@ def reason(
     return result
 
 
-def _reason_once(ask: str, passages: list[dict], use_real_ner: bool = False, connector=None, connector_top_k: int = 5, use_real_qa: bool = False, use_real_nli: bool = False, plain_english: bool = False, template_id: str | None = None, decision_findings_only: bool = False, working_set_budget: int | None = None) -> dict:
+def _reason_once(ask: str, passages: list[dict], use_real_ner: bool = False, connector=None, connector_top_k: int = 5, use_real_qa: bool = False, use_real_nli: bool = False, plain_english: bool = False, template_id: str | None = None, decision_findings_only: bool = False, working_set_budget: int | None = None, memory_path: str | None = None) -> dict:
     """One single pass of the signal-chain below -- called directly by
     reason() above, once per retry round. `use_real_ner=True` threads
     through to every lab.common.entities.
@@ -657,6 +719,27 @@ def _reason_once(ask: str, passages: list[dict], use_real_ner: bool = False, con
             trace.append({"step": "connector_fetch", "added_passage_ids": [p["id"] for p in new_passages]})
             for p in new_passages:
                 _add_dependency(dep_nodes, p["id"], "connector_evidence", f"fetched from external connector for ask {ask!r}", [])
+    if memory_path is not None:
+        from lab.common.memory import connect as _memory_connect
+        from lab.common.memory import recall as _memory_recall
+
+        # Built from THIS call's own passages (direct + connector-fetched,
+        # after working_set_budget's eviction above) -- a note whose
+        # source chunk isn't in front of us right now is correctly
+        # reported "missing_source", not blindly trusted from a stale
+        # cache. See reason()'s own docstring for why this is reported
+        # only, not yet used to answer.
+        archive = {p.get("id"): {"version": _note_version(p.get("text", "") or ""), "text": p.get("text", "") or ""} for p in passages}
+        _conn = _memory_connect(str(memory_path))
+        recalled = _memory_recall(_conn, content_tokens(ask), archive)
+        _conn.close()
+        if recalled:
+            # Every ask-relevant note memory.py found, valid or not --
+            # a stale/missing-source hit is itself useful information
+            # (a prior answer exists but can no longer be trusted this
+            # call), reported rather than silently dropped, same posture
+            # consistency_flags/coherence_flags already take.
+            trace.append({"step": "memory_recall", "hits": recalled})
     stage_plan = plan_stages(ask, passages, use_real_ner=use_real_ner)
     trace.append({"step": "plan", **stage_plan})
     # From here on, whether a block below EXECUTES is always decided by
@@ -1269,6 +1352,31 @@ def _reason_once(ask: str, passages: list[dict], use_real_ner: bool = False, con
             return _finish(ask, trace, "inconclusive", ABSTAIN_TEXT, citations, reason="no span found", dependency_tree=dep_nodes)
         citations.add(qa["passage_id"])
         _add_dependency(dep_nodes, f"conclusion:{qa['passage_id']}", "conclusion", f"{qa['span']!r}", [qa["passage_id"]])
+        if memory_path is not None:
+            from lab.common.memory import connect as _memory_connect
+            from lab.common.memory import write_note as _memory_write_note
+
+            passage_text = next((p["text"] for p in scoped if p["id"] == qa.get("passage_id")), "")
+            _conn = _memory_connect(str(memory_path))
+            _memory_write_note(
+                _conn,
+                {
+                    "note_id": _note_id(ask, qa["passage_id"]),
+                    "kind": "stated_fact",
+                    # The passage's own full text, not just the bare
+                    # extracted span -- memory.recall filters notes by
+                    # whether the ASK's own content words appear in
+                    # `statement`, so this needs the surrounding context
+                    # a bare span (e.g. "30 days") would not contain. The
+                    # cited quote itself still lives in `exact_text`,
+                    # unchanged, for revalidation.
+                    "statement": passage_text,
+                    "source": {"exact_text": qa["span"], "chunk_id": qa["passage_id"], "version": _note_version(passage_text)},
+                    "verification": {"method": "quote_check"},
+                },
+                verified=True,
+            )
+            _conn.close()
         return _finish(ask, trace, "supported", f"{qa['span']} [{qa['passage_id']}]", citations, facts=facts, dependency_tree=dep_nodes)
 
     final_decision = "supported_with_flags" if rule_conditional else "supported"

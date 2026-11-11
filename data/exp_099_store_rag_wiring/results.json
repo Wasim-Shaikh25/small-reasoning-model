@@ -53,7 +53,7 @@
     "connector_top_k=2 was chosen to keep the fixture's retrieval precision meaningful (so the right passage has to actually outrank the other Ravi passage, not just be included among four); untested at the larger top_k a real multi-hundred-passage collection would use.",
     "No caller in this repo builds a Store from real documents yet (lab.common.ingest.chunk_document + Store.build/ingest_and_store exist and are callable, but nothing in lab/ does this outside this exploration's own fixture) -- the next real step is a caller that ingests an actual document into a Store collection before any ask arrives, rather than building fixture passages inline."
   ],
-  "elapsed_sec": 13.3394,
-  "peak_rss_mb": 2934.44,
+  "elapsed_sec": 13.1866,
+  "peak_rss_mb": 2933.45,
   "models_used": "bge-small-en-v1.5 (lab.common.real_encoders, Store's dense leg) -- non-generative similarity scoring only; brain.reason's own classical lookup path answers from the retrieved passages, same as every other direct-passages caller."
 }
