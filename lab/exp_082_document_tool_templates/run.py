@@ -91,7 +91,6 @@ def _check_case(label: str, ask: str, findings: list[dict], expected_tool: str, 
     doc_result = write_long_document(
         ask,
         findings,
-        checkpoint="flan-t5-small",
         title=template["title"],
         out_path=run.out_dir / f"{label}.md",
         template_id=template_result["template_id"] or expected_template,

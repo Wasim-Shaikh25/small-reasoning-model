@@ -1,4 +1,24 @@
-"""EXP-013: context faithfulness, invented terms, and provenance tags (H1, H2, H5)."""
+"""EXP-013: context faithfulness, invented terms, and provenance tags (H1, H2, H5).
+
+RETIRED (2026-11-11): lab.common.provenance was deleted after an honest
+wire-or-discard review found zero real callers anywhere (this
+experiment and EXP-038 were always its only two) and its own job
+independently superseded by two mechanisms built later and already
+live: its tiny hardcoded BACKGROUND_FACTS dict (a toy stand-in for
+general knowledge -- "capital of france": "Paris") is exactly what
+lab.common.open_domain.answer_from_general_knowledge now does for real,
+through a measured, FORBIDDEN.md-governed generative exception wired
+into lab.common.brain.reason's no_context_fallback branch; and tag_
+statement/answer_from_context_or_abstain's evidence-vs-background
+judgment (is this span actually in the evidence, or just asserted) is
+what lab.common.verify's citation/grounding checks plus brain.reason's
+own abstention logic ("Insufficient evidence", ABSTAIN_TEXT) already do
+across every live answer path. Kept as the historical record of this
+early architecture question (results.json unaffected); running this
+script again will now ImportError. Recover the deleted module with
+`git show <commit before this deletion>:lab/common/provenance.py` if
+this judgment is ever revisited.
+"""
 
 from __future__ import annotations
 

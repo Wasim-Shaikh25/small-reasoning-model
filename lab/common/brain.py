@@ -409,13 +409,13 @@ def reason(
     connector_top_k: int = 5,
     use_real_qa: bool = False,
     use_real_nli: bool = False,
-    use_repair: bool = False,
     retrieve_budget: int = 1,
     check_contradiction: bool = False,
     plain_english: bool = False,
     template_id: str | None = None,
     use_spellfix: bool = False,
     decision_findings_only: bool = False,
+    working_set_budget: int | None = None,
 ) -> dict:
     """Thin outer wrapper around `_reason_once` (the function this
     docstring used to belong to, unchanged below) adding the two
@@ -505,10 +505,10 @@ def reason(
         connector_top_k=connector_top_k,
         use_real_qa=use_real_qa,
         use_real_nli=use_real_nli,
-        use_repair=use_repair,
         plain_english=plain_english,
         template_id=template_id,
         decision_findings_only=decision_findings_only,
+        working_set_budget=working_set_budget,
     )
     round_num = 1
     while connector is not None and round_num < retrieve_budget and result["decision"] in ("inconclusive", "ungrounded"):
@@ -522,10 +522,10 @@ def reason(
             connector_top_k=connector_top_k,
             use_real_qa=use_real_qa,
             use_real_nli=use_real_nli,
-            use_repair=use_repair,
-            plain_english=plain_english,
+                plain_english=plain_english,
             template_id=template_id,
             decision_findings_only=decision_findings_only,
+            working_set_budget=working_set_budget,
         )
         retried["trace"] = result["trace"] + [{"step": "retrieve_more", "round": round_num, "connector_top_k": connector_top_k}] + retried["trace"]
         result = retried
@@ -552,7 +552,7 @@ def reason(
     return result
 
 
-def _reason_once(ask: str, passages: list[dict], use_real_ner: bool = False, connector=None, connector_top_k: int = 5, use_real_qa: bool = False, use_real_nli: bool = False, use_repair: bool = False, plain_english: bool = False, template_id: str | None = None, decision_findings_only: bool = False) -> dict:
+def _reason_once(ask: str, passages: list[dict], use_real_ner: bool = False, connector=None, connector_top_k: int = 5, use_real_qa: bool = False, use_real_nli: bool = False, plain_english: bool = False, template_id: str | None = None, decision_findings_only: bool = False, working_set_budget: int | None = None) -> dict:
     """One single pass of the signal-chain below -- called directly by
     reason() above, once per retry round. `use_real_ner=True` threads
     through to every lab.common.entities.
@@ -580,12 +580,6 @@ def _reason_once(ask: str, passages: list[dict], use_real_ner: bool = False, con
     measured behavior unless it explicitly opts in -- zero regression
     risk, same discipline `use_real_ner` already established.
 
-    `use_repair` (default False, `document_write` stage only): opt-in use
-    of each rewriter backend's own repair mechanism (flan-t5-small's
-    retry-with-feedback, gemma3:270m's citation-splice) instead of this
-    project's rewriter_backends.rewrite_unit dispatcher bypassing both --
-    same audit finding as above; see that function's own docstring.
-
     `connector` (lab.common.connectors.QdrantConnector or GraphConnector,
     default None) is the external-data-connector hookup the project
     owner asked for: when given, its hits are fetched once, up front
@@ -602,6 +596,28 @@ def _reason_once(ask: str, passages: list[dict], use_real_ner: bool = False, con
     passages given directly" and "no context available at all" are
     different things once an external connector exists; FORBIDDEN.md's
     no_context_fallback exception is about the latter.
+
+    `working_set_budget` (2026-11-11, default None -- today's existing
+    unbounded behavior, zero regression for every existing caller): the
+    project owner's own "brain RAM... not bounded by context length"
+    architecture question, closing lab.common.paged.WorkingSet's own
+    gap (zero real callers anywhere, confirmed by grep, despite already
+    being exactly the admit-with-relevance/evict-by-budget/pin
+    mechanism this needs). Only caps passages a `connector` adds, right
+    after they're fetched above -- every passage the CALLER directly
+    supplied is pinned (never evicted, same as today's behavior when
+    this parameter is omitted); only the connector's own hits beyond
+    `working_set_budget` are dropped, least-relevant-first, relevance
+    scored by lab.common.relevance.ask_relevance's existing lexical
+    coverage (the same signal several other live gates already use).
+    This is the one place passages can grow large in a single pass
+    (`connector_top_k` can be arbitrarily large, and a GraphConnector is
+    queried once per ask entity, so its own hits are not individually
+    capped by `connector_top_k` at all) -- the deeper `scoped`/
+    `graph_expand` machinery further below already commits to a bounded
+    subset by construction (one group/leaf, or a graph hop's own
+    expansion) and is not touched here, to avoid retrofitting eviction
+    into logic this change was not written against.
 
     This function also builds, alongside its existing `trace` (a flat,
     ordered execution log), an explicit dependency tree: a flat list of
@@ -623,6 +639,19 @@ def _reason_once(ask: str, passages: list[dict], use_real_ner: bool = False, con
         external_passages = fetch_context_passages(connector, ask, ask_entities=connector_entities, top_k=connector_top_k)
         existing_ids = {p.get("id") for p in passages}
         new_passages = [p for p in external_passages if p.get("id") not in existing_ids]
+        if working_set_budget is not None and len(new_passages) > working_set_budget:
+            from lab.common.paged import WorkingSet
+            from lab.common.relevance import ask_relevance
+
+            working_set = WorkingSet(budget=working_set_budget)
+            for p in new_passages:
+                relevance = ask_relevance(ask, p.get("text", "") or "")["coverage"] or 0.0
+                working_set.admit(p, relevance)
+            kept_ids = working_set.ids()
+            dropped_ids = [p["id"] for p in new_passages if p.get("id") not in kept_ids]
+            if dropped_ids:
+                trace.append({"step": "working_set_evict", "budget": working_set_budget, "dropped_passage_ids": dropped_ids})
+            new_passages = [p for p in new_passages if p.get("id") in kept_ids]
         if new_passages:
             passages = passages + new_passages
             trace.append({"step": "connector_fetch", "added_passage_ids": [p["id"] for p in new_passages]})
@@ -706,7 +735,7 @@ def _reason_once(ask: str, passages: list[dict], use_real_ner: bool = False, con
                     findings.append(f)
         else:
             findings = findings_from_chunks([p for p in passages if p.get("text")])
-        doc_result = write_long_document(ask, findings, task=plan["task_type"], use_real_ner=use_real_ner, use_real_nli=use_real_nli, use_repair=use_repair, plain_english=plain_english, template_id=template_id)
+        doc_result = write_long_document(ask, findings, task=plan["task_type"], use_real_ner=use_real_ner, use_real_nli=use_real_nli, plain_english=plain_english, template_id=template_id)
         trace.append(
             {
                 "step": "longform_write",
@@ -718,7 +747,17 @@ def _reason_once(ask: str, passages: list[dict], use_real_ner: bool = False, con
             }
         )
         decision = "supported_with_flags" if doc_result["consistency_flags"] else "supported"
-        return _finish(ask, trace, decision, doc_result["document"], set(doc_result["working_memory"]["citations"]), dependency_tree=dep_nodes + doc_result["dependency_tree"])
+        # document_for_reader (lab.common.longform.write_long_document's
+        # already citation-marker-stripped text) is what belongs in the
+        # text a caller/reader actually sees -- doc_result["document"]
+        # still carries the pipeline's internal markers (e.g. "[1]"), the
+        # exact thing that module's own docstring says should never reach
+        # a reader. This call site used the marker-containing field
+        # unnoticed until 2026-11-11; nothing downstream reads markers out
+        # of this text (citations are reported separately, from
+        # working_memory), so switching it is a pure fix, not a behavior
+        # trade-off.
+        return _finish(ask, trace, decision, doc_result["document_for_reader"], set(doc_result["working_memory"]["citations"]), dependency_tree=dep_nodes + doc_result["dependency_tree"])
 
     citations: set[str] = set()
     scoped = passages

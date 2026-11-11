@@ -4,6 +4,26 @@ These are prohibited at any cost, including for a demo, a test, a fixture, or a 
 
 ## No generative language models, with one narrow, bounded exception
 
+**WITHDRAWN (project owner's call, 2026-11-11).** The bounded rewriter
+exception below is no longer in effect. Not because fidelity measured
+poorly (it always did, from EXP-048 onward) but because the deterministic
+pre-checks added later (`lab.common.sentence_completeness`, `lab.common.
+template_rewriter.splice_unit`) measure at **zero actual invocations** on
+every real/recent fixture: `data/exp_081_real_document_pipeline` (a real
+2,368-word GDPR excerpt) measured 0/18 generative calls across both
+permitted checkpoints, and every experiment from EXP-078 onward shows the
+same zero. The rule's own reversibility clause ("if measurement shows the
+fidelity failure rate is unacceptable, the exception is withdrawn and the
+deterministic fallback becomes the only path again") is invoked here.
+`lab.common.rewriter_backends.rewrite_unit` is now permanently
+deterministic; `real_rewriter.py`, `real_rewriter_legal_gemma.py`,
+`real_rewriter_qwen.py`, and `lora_finetune.py` were deleted;
+`real_rewriter_ollama.py` was trimmed to just the function `lab.common.
+open_domain` still needs for the SEPARATE "genuinely empty context"
+exception below, which this withdrawal does NOT touch. The text below is
+kept as the historical record of what was permitted and why -- do not
+read it as currently in effect.
+
 Do not use an LLM or any pure generative language model of any size, **except**
 a small local FLAN-T5/T5 checkpoint (project owner's call, 2026-10-14), a
 small local Gemma 3 checkpoint run via Ollama (project owner's call,

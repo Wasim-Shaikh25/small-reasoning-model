@@ -89,7 +89,3 @@ def save_subset(items: list[dict]) -> str:
     return str(SUBSET_PATH.relative_to(ROOT))
 
 
-def load_subset() -> list[dict]:
-    if not SUBSET_PATH.exists():
-        raise FileNotFoundError(f"{SUBSET_PATH} is missing. Run lab/exp_047_real_squad_qa/run.py first.")
-    return json.loads(SUBSET_PATH.read_text())

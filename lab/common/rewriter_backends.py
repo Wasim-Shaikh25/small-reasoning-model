@@ -1,224 +1,57 @@
-"""The one place a new bounded-rewriter checkpoint gets registered.
+"""The bounded-rewriter generative exception, withdrawn (2026-11-11).
 
-lab.common.real_rewriter (flan-t5-small via transformers) and
-lab.common.real_rewriter_ollama (gemma3:270m via Ollama) already shared
-build_prompt and fidelity_gate -- only the generation step itself differed,
-and each module grew its own copy of rewrite_unit around that one
-difference. This module pulls the generation step out into one dispatcher,
-so adding a third permitted checkpoint (FORBIDDEN.md's bounded rewriter
-exception, which must be widened first -- this module does not itself
-grant permission, it only makes a permitted checkpoint pluggable) means
-writing one function with this signature and adding one line to BACKENDS,
-not a new copy of rewrite_unit's orchestration.
+This module used to dispatch to one of several small local checkpoints
+(flan-t5-small, gemma3:270m, a legal-finetuned gemma, Qwen2.5-0.5B-Instruct)
+to join verified findings into prose, each gated by `fidelity_gate` before
+use. It is kept, trimmed to its deterministic remainder, because every
+real/recent measurement -- not just a weak fidelity-pass rate, genuinely
+zero invocations -- showed the generative call never actually fired once
+the pre-checks below were added: `data/exp_081_real_document_pipeline`
+(a real 2,368-word GDPR excerpt, the most realistic fixture this project
+has) measured 0/18 generative calls across BOTH permitted checkpoints, and
+every experiment from exp_078 onward shows the same zero. FORBIDDEN.md's
+own rewriter exception has a built-in reversibility clause for exactly
+this ("if measurement shows the fidelity failure rate is unacceptable, the
+exception is withdrawn and the deterministic fallback becomes the only
+path again") -- invoked here, see FORBIDDEN.md's own dated note.
 
-generate(checkpoint, prompt, max_tokens) -> str is the entire contract a
-backend must satisfy. Everything downstream -- build_prompt, fidelity_gate,
-the deterministic fallback -- stays exactly as it was, unmodified, because
-none of it was ever specific to one checkpoint in the first place.
+`rewrite_unit` below keeps its name and return shape (every caller --
+longform.py, assemble.py, write_article.py -- depends on that shape) but
+never loads or calls a generative checkpoint: it is `template_rewriter.
+splice_unit`, decorated with the same `used_generative`/`fallback_reason`
+diagnostic fields every caller already expects, permanently.
+
+The deleted generative backends (`real_rewriter.py`, `real_rewriter_legal_
+gemma.py`, `real_rewriter_qwen.py`) and the training tool for them (`lora_
+finetune.py`) are recoverable from git history if this decision is ever
+revisited. `real_rewriter_ollama.py`'s `generate()` is NOT deleted -- it is
+still used by `lab.common.open_domain`'s separate, still-live
+"genuinely empty context" exception (FORBIDDEN.md, 2026-10-16), a
+different generative role this withdrawal does not touch.
 """
 
 from __future__ import annotations
 
-from collections.abc import Callable
-
-from lab.common.real_rewriter import build_prompt, fidelity_gate
 from lab.common.template_rewriter import splice_unit
-
-
-def _flan_t5_small(prompt: str, max_tokens: int) -> str:
-    from lab.common.real_rewriter import _generate, load
-
-    tokenizer, model = load()
-    return _generate(tokenizer, model, prompt, max_tokens)
-
-
-def _gemma3_270m_ollama(prompt: str, max_tokens: int) -> str:
-    from lab.common.real_rewriter_ollama import generate
-
-    return generate(prompt, max_tokens)
-
-
-def _gemma3_270m_legal_finetune(prompt: str, max_tokens: int) -> str:
-    from lab.common.real_rewriter_legal_gemma import generate
-
-    return generate(prompt, max_tokens)
-
-
-def _qwen2_5_0_5b_instruct(prompt: str, max_tokens: int) -> str:
-    from lab.common.real_rewriter_qwen import generate
-
-    return generate(prompt, max_tokens)
-
-
-# Keys must match FORBIDDEN.md's bounded rewriter exception exactly -- this
-# registry does not decide what's permitted, it only wires up what already
-# is. Adding an entry here without a matching FORBIDDEN.md/models.json
-# decision line is itself a policy violation, not just a code change.
-BACKENDS: dict[str, Callable[[str, int], str]] = {
-    "flan-t5-small": _flan_t5_small,
-    "gemma3:270m": _gemma3_270m_ollama,
-    "nagbhaskar55/gemma-3-270m-bhaskar-finetune": _gemma3_270m_legal_finetune,
-    "Qwen/Qwen2.5-0.5B-Instruct": _qwen2_5_0_5b_instruct,
-}
-
-
-def generate(checkpoint: str, prompt: str, max_tokens: int = 160) -> str:
-    if checkpoint not in BACKENDS:
-        raise ValueError(f"{checkpoint!r} is not a registered backend. Permitted checkpoints: {sorted(BACKENDS)}. See FORBIDDEN.md's bounded rewriter exception before adding a new one.")
-    return BACKENDS[checkpoint](prompt, max_tokens)
-
-
-#  checkpoint -> (module path, repair-capable rewrite_unit name, extra kwargs)
-#  for the two backends that have their own repair layer. Only these two:
-#  qwen/legal-gemma have no repair module of their own (confirmed by the
-#  2026-11-03 reasoning-layer audit, AUDIT.md) -- use_repair is simply a
-#  no-op for them, not an error, since there is genuinely nothing to
-#  dispatch to.
-_REPAIR_BACKENDS = {
-    "flan-t5-small": ("lab.common.real_rewriter", {"max_retries": 2}),
-    "gemma3:270m": ("lab.common.real_rewriter_ollama", {}),
-}
 
 
 def rewrite_unit(
     leaf: dict,
     glossary: dict[str, str],
-    checkpoint: str = "flan-t5-small",
     ask: str | None = None,
     max_new_tokens: int = 160,
-    use_real_nli: bool = False,
-    use_repair: bool = False,
 ) -> dict:
-    """Same contract every checkpoint-specific rewrite_unit already had:
-    same input shape, same fidelity gate, same deterministic fallback.
-    `checkpoint` selects the generation backend; nothing else changes with
-    it.
-
-    `use_real_nli` (default False, see fidelity_gate's own docstring)
-    passes straight through to the fidelity_gate call(s) below -- opt-in,
-    zero change to any existing measured fidelity-pass rate unless a
-    caller explicitly asks for the real DeBERTa-v3 MNLI check.
-
-    `use_repair` (default False): flagged by the 2026-11-03 reasoning-
-    layer audit (AUDIT.md, Top Finding #1) -- this dispatcher used to call
-    each backend's own bare `generate()` plus one `fidelity_gate` check,
-    bypassing flan-t5-small's own retry-with-feedback
-    (lab.common.real_rewriter.rewrite_unit's `max_retries`) and
-    gemma3:270m's own citation-splice repair (lab.common.
-    real_rewriter_ollama.rewrite_unit's `splice_missing_citations`,
-    measured recovering 11/13 otherwise-failed rewrites in EXP-063) --
-    both existed, both were measured, neither was reachable through this
-    dispatcher. `use_repair=True` dispatches to the checkpoint's own
-    repair-capable `rewrite_unit` instead, when one exists (flan-t5-small,
-    gemma3:270m); for a checkpoint with no repair module of its own
-    (qwen, legal-gemma), this flag changes nothing -- the bare path below
-    still runs exactly as it always did. Default False, so every existing
-    measured `used_generative`/fidelity-pass rate stays exactly as
-    recorded unless a caller explicitly opts in.
-
-    Single-finding leaves (`build_prompt`'s own instruction there is
-    literally "rewrite ... as one grammatically correct sentence") are
-    checked FIRST against `sentence_completeness.is_complete_sentence`
-    (AUDIT.md, 2026-11-09, "a deterministic pre-check that removes the
-    single-sentence case too") -- when the source statement already is
-    one, `generate()` is never called at all: there's nothing it could
-    legitimately do that the deterministic text doesn't already do.
-    Verified on both real fixtures this gate was built against (EXP-063
-    13/13, EXP-081 69/69) to change zero existing `used_generative`/
-    fidelity outcome, since every one of those leaves already fell back
-    to the identical deterministic text anyway -- this only removes the
-    now-provably-wasted model call that preceded that same fallback.
-    Multi-finding leaves: AUDIT.md 2026-11-09 ("the pre-check gate wired
-    into the live default path") measured generation succeeding on 0 of
-    17 real multi-finding leaves (EXP-081) -- every one fell back anyway.
-    `template_rewriter.splice_unit` is zero-fabrication BY CONSTRUCTION
-    (its own docstring: "it has no generation step, so there is nothing
-    for it to omit or invent" -- it only selects a connective from a
-    fixed 4-word vocabulary and copies statements verbatim) and was
-    separately measured to add real connective text where the old
-    `render_unit` fallback had none. Since generation is measured to add
-    nothing here and `splice_unit` is unconditionally at least as safe as
-    the deterministic fallback it replaces, multi-finding leaves skip
-    `generate()` too -- same logic as the single-finding gate above, one
-    level up. `splice_unit`'s own known bug (AUDIT.md: a "whether or not"
-    idiom false-triggers a wrong "However," connective via `textutil.
-    MODAL_RE`) is inherited, not hidden -- not yet fixed.
+    """Deterministic splice, unconditionally -- see module docstring for
+    why. `ask`/`max_new_tokens` are accepted and ignored, kept only so
+    every existing caller's call site (which still passes them) needs no
+    change beyond dropping the now-meaningless `checkpoint`/`use_real_nli`/
+    `use_repair` arguments.
     """
-    if use_repair and checkpoint in _REPAIR_BACKENDS:
-        module_path, extra_kwargs = _REPAIR_BACKENDS[checkpoint]
-        import importlib
-
-        backend_rewrite_unit = importlib.import_module(module_path).rewrite_unit
-        result = backend_rewrite_unit(leaf, glossary, ask=ask, max_new_tokens=max_new_tokens, use_real_nli=use_real_nli, **extra_kwargs)
-        result.setdefault("checkpoint", checkpoint)
-        return result
-
-    # splice_unit(leaf) is byte-identical to the old render_unit(leaf) for
-    # a single-finding leaf (no previous statement to connect to -- see
-    # choose_connective's "first" case), so this is a strict superset,
-    # not a behavior change, for every leaf splice_unit doesn't get a
-    # chance to improve.
-    deterministic_text = splice_unit(leaf, glossary)
-
-    if len(leaf["findings"]) == 1:
-        from lab.common.sentence_completeness import is_complete_sentence
-
-        completeness = is_complete_sentence(leaf["findings"][0]["statement"])
-        if completeness["complete"]:
-            return {
-                "text": deterministic_text,
-                "used_generative": False,
-                "generated_text": None,
-                "checks": None,
-                "fallback_reason": ["already_complete"],
-                "checkpoint": checkpoint,
-            }
-        if completeness["reason"] == "no_verbal_root":
-            # A heading ("Art. 83 GDPR") or lead-in fragment ("For the
-            # purposes of this Regulation:") is correctly incomplete BY
-            # DESIGN (sentence_completeness.py's own docstring) -- forcing
-            # it into "one grammatically correct sentence" (build_prompt's
-            # own instruction) fabricates structure the source never had.
-            # HANDOFF.md named this the one remaining case still calling
-            # generate(); skipped here the same way "already_complete"
-            # already is, not forced through a model call with nothing
-            # legitimate for it to do.
-            return {
-                "text": deterministic_text,
-                "used_generative": False,
-                "generated_text": None,
-                "checks": None,
-                "fallback_reason": ["no_verbal_root_heading_or_lead_in"],
-                "checkpoint": checkpoint,
-            }
-    else:
-        return {
-            "text": deterministic_text,
-            "used_generative": False,
-            "generated_text": None,
-            "checks": None,
-            "fallback_reason": ["deterministic_splice_preferred"],
-            "checkpoint": checkpoint,
-        }
-
-    prompt, src_text, cite_ids = build_prompt(leaf, glossary, ask=ask)
-    generated = generate(checkpoint, prompt, max_new_tokens)
-    checks = fidelity_gate(src_text, generated, cite_ids, ask=ask, use_real_nli=use_real_nli)
-
-    if checks["ok"]:
-        return {
-            "text": generated,
-            "used_generative": True,
-            "generated_text": generated,
-            "checks": checks,
-            "fallback_reason": None,
-            "checkpoint": checkpoint,
-        }
     return {
-        "text": deterministic_text,
+        "text": splice_unit(leaf, glossary),
         "used_generative": False,
-        "generated_text": generated,
-        "checks": checks,
-        "fallback_reason": checks["fail_reasons"],
-        "checkpoint": checkpoint,
+        "generated_text": None,
+        "checks": None,
+        "fallback_reason": ["generative_rewriter_withdrawn"],
+        "checkpoint": None,
     }

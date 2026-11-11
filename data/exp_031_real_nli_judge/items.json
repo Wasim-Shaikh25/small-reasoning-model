@@ -8,7 +8,7 @@
     "premise": "The notice period is 30 days.",
     "probs": {
       "entail": 0.9962,
-      "neutral": 0.0031,
+      "neutral": 0.0032,
       "contradict": 0.0007
     },
     "correct": true
@@ -35,7 +35,7 @@
     "claim": "Regarding notice period, the stated value is 30 days.",
     "premise": "The notice period is 30 days.",
     "probs": {
-      "entail": 0.9937,
+      "entail": 0.9938,
       "neutral": 0.0058,
       "contradict": 0.0004
     },
@@ -105,7 +105,7 @@
     "claim": "Lessee: Ravi Sharma.",
     "premise": "Ravi Sharma is the Lessee.",
     "probs": {
-      "entail": 0.9943,
+      "entail": 0.9944,
       "neutral": 0.0048,
       "contradict": 0.0008
     },
@@ -161,8 +161,8 @@
     "claim": "Regarding signing date, the stated value is 5 January 2024.",
     "premise": "The lease was signed on 5 January 2024.",
     "probs": {
-      "entail": 0.9093,
-      "neutral": 0.0813,
+      "entail": 0.9089,
+      "neutral": 0.0817,
       "contradict": 0.0094
     },
     "correct": true
@@ -176,7 +176,7 @@
     "premise": "A zorb is a refund issued after 14 days.",
     "probs": {
       "entail": 0.9861,
-      "neutral": 0.0119,
+      "neutral": 0.012,
       "contradict": 0.0019
     },
     "correct": true
@@ -217,8 +217,8 @@
     "claim": "The sprint length is 9 days.",
     "premise": "In this handbook a sprint lasts 9 days.",
     "probs": {
-      "entail": 0.97,
-      "neutral": 0.0273,
+      "entail": 0.9701,
+      "neutral": 0.0272,
       "contradict": 0.0027
     },
     "correct": true
@@ -231,7 +231,7 @@
     "claim": "sprint length: 9 days.",
     "premise": "In this handbook a sprint lasts 9 days.",
     "probs": {
-      "entail": 0.975,
+      "entail": 0.9751,
       "neutral": 0.0225,
       "contradict": 0.0025
     },
@@ -287,8 +287,8 @@
     "claim": "Regarding subletting, the stated value is prohibited.",
     "premise": "The tenant shall not sublet.",
     "probs": {
-      "entail": 0.9802,
-      "neutral": 0.019,
+      "entail": 0.98,
+      "neutral": 0.0191,
       "contradict": 0.0008
     },
     "correct": false
@@ -373,7 +373,7 @@
     "probs": {
       "entail": 0.0005,
       "neutral": 0.0006,
-      "contradict": 0.999
+      "contradict": 0.9989
     },
     "correct": true
   },
@@ -385,9 +385,9 @@
     "claim": "The security deposit is INR 10000.",
     "premise": "The security deposit is INR 50000.",
     "probs": {
-      "entail": 0.0372,
+      "entail": 0.037,
       "neutral": 0.007,
-      "contradict": 0.9558
+      "contradict": 0.956
     },
     "correct": true
   },
@@ -399,9 +399,9 @@
     "claim": "security deposit: INR 10000.",
     "premise": "The security deposit is INR 50000.",
     "probs": {
-      "entail": 0.0566,
+      "entail": 0.0567,
       "neutral": 0.0077,
-      "contradict": 0.9357
+      "contradict": 0.9356
     },
     "correct": true
   },
@@ -413,9 +413,9 @@
     "claim": "Regarding security deposit, the stated value is INR 10000.",
     "premise": "The security deposit is INR 50000.",
     "probs": {
-      "entail": 0.371,
+      "entail": 0.3714,
       "neutral": 0.0135,
-      "contradict": 0.6155
+      "contradict": 0.6151
     },
     "correct": true
   },
@@ -763,9 +763,9 @@
     "claim": "The deposit is INR 50000.",
     "premise": "The garden has roses.",
     "probs": {
-      "entail": 0.0185,
-      "neutral": 0.978,
-      "contradict": 0.0035
+      "entail": 0.0184,
+      "neutral": 0.9782,
+      "contradict": 0.0034
     },
     "correct": true
   },
@@ -777,8 +777,8 @@
     "claim": "deposit: INR 50000.",
     "premise": "The garden has roses.",
     "probs": {
-      "entail": 0.0084,
-      "neutral": 0.9903,
+      "entail": 0.0085,
+      "neutral": 0.9902,
       "contradict": 0.0013
     },
     "correct": true
@@ -791,7 +791,7 @@
     "claim": "Regarding deposit, the stated value is INR 50000.",
     "premise": "The garden has roses.",
     "probs": {
-      "entail": 0.0057,
+      "entail": 0.0058,
       "neutral": 0.9924,
       "contradict": 0.0018
     },
@@ -820,7 +820,7 @@
     "premise": "Schedule A lists four chairs.",
     "probs": {
       "entail": 0.0092,
-      "neutral": 0.9778,
+      "neutral": 0.9779,
       "contradict": 0.013
     },
     "correct": true
@@ -876,7 +876,7 @@
     "premise": "Park Street market opens at dawn.",
     "probs": {
       "entail": 0.0057,
-      "neutral": 0.9916,
+      "neutral": 0.9917,
       "contradict": 0.0027
     },
     "correct": true
@@ -889,8 +889,8 @@
     "claim": "The bond interest is 7 percent.",
     "premise": "The recipe uses salt.",
     "probs": {
-      "entail": 0.0988,
-      "neutral": 0.8937,
+      "entail": 0.0994,
+      "neutral": 0.8929,
       "contradict": 0.0076
     },
     "correct": true
@@ -903,8 +903,8 @@
     "claim": "bond interest: 7 percent.",
     "premise": "The recipe uses salt.",
     "probs": {
-      "entail": 0.0411,
-      "neutral": 0.9545,
+      "entail": 0.041,
+      "neutral": 0.9546,
       "contradict": 0.0044
     },
     "correct": true
@@ -918,7 +918,7 @@
     "premise": "The recipe uses salt.",
     "probs": {
       "entail": 0.0141,
-      "neutral": 0.981,
+      "neutral": 0.9809,
       "contradict": 0.0049
     },
     "correct": true
@@ -932,8 +932,8 @@
     "premise": "Meera Iyer signed the page.",
     "probs": {
       "entail": 0.0281,
-      "neutral": 0.9529,
-      "contradict": 0.0191
+      "neutral": 0.9527,
+      "contradict": 0.0192
     },
     "correct": true
   },
@@ -946,7 +946,7 @@
     "premise": "Meera Iyer signed the page.",
     "probs": {
       "entail": 0.0394,
-      "neutral": 0.9397,
+      "neutral": 0.9398,
       "contradict": 0.0208
     },
     "correct": true
@@ -961,7 +961,7 @@
     "probs": {
       "entail": 0.0994,
       "neutral": 0.8555,
-      "contradict": 0.045
+      "contradict": 0.0451
     },
     "correct": true
   },
@@ -973,9 +973,9 @@
     "claim": "The sprint length is 9 days.",
     "premise": "The parking slot is included.",
     "probs": {
-      "entail": 0.0137,
-      "neutral": 0.2472,
-      "contradict": 0.7391
+      "entail": 0.0138,
+      "neutral": 0.2476,
+      "contradict": 0.7386
     },
     "correct": false
   },
@@ -987,9 +987,9 @@
     "claim": "sprint length: 9 days.",
     "premise": "The parking slot is included.",
     "probs": {
-      "entail": 0.0477,
-      "neutral": 0.6592,
-      "contradict": 0.293
+      "entail": 0.0478,
+      "neutral": 0.6612,
+      "contradict": 0.291
     },
     "correct": true
   },
@@ -1002,8 +1002,8 @@
     "premise": "The parking slot is included.",
     "probs": {
       "entail": 0.0033,
-      "neutral": 0.0859,
-      "contradict": 0.9108
+      "neutral": 0.0862,
+      "contradict": 0.9104
     },
     "correct": false
   },
@@ -1016,7 +1016,7 @@
     "premise": "The tenant may sublet except where the landlord refuses.",
     "probs": {
       "entail": 0.9859,
-      "neutral": 0.0083,
+      "neutral": 0.0084,
       "contradict": 0.0057
     },
     "correct": false
@@ -1057,9 +1057,9 @@
     "claim": "The waiver is fees are waived.",
     "premise": "Fees are waived unless the invoice is late.",
     "probs": {
-      "entail": 0.9206,
-      "neutral": 0.0452,
-      "contradict": 0.0342
+      "entail": 0.9204,
+      "neutral": 0.0453,
+      "contradict": 0.0343
     },
     "correct": false
   },
@@ -1072,7 +1072,7 @@
     "premise": "Fees are waived unless the invoice is late.",
     "probs": {
       "entail": 0.9235,
-      "neutral": 0.0429,
+      "neutral": 0.043,
       "contradict": 0.0336
     },
     "correct": false
@@ -1085,8 +1085,8 @@
     "claim": "Regarding waiver, the stated value is fees are waived.",
     "premise": "Fees are waived unless the invoice is late.",
     "probs": {
-      "entail": 0.9668,
-      "neutral": 0.0236,
+      "entail": 0.9667,
+      "neutral": 0.0237,
       "contradict": 0.0096
     },
     "correct": false
@@ -1114,7 +1114,7 @@
     "premise": "The licence continues provided that the fee is paid.",
     "probs": {
       "entail": 0.9784,
-      "neutral": 0.019,
+      "neutral": 0.0191,
       "contradict": 0.0025
     },
     "correct": false
@@ -1127,9 +1127,9 @@
     "claim": "Regarding continuation, the stated value is the licence continues.",
     "premise": "The licence continues provided that the fee is paid.",
     "probs": {
-      "entail": 0.9658,
-      "neutral": 0.0269,
-      "contradict": 0.0073
+      "entail": 0.9657,
+      "neutral": 0.027,
+      "contradict": 0.0074
     },
     "correct": false
   },
@@ -1141,7 +1141,7 @@
     "claim": "The visitors is visitors are allowed.",
     "premise": "Visitors are allowed only on weekdays.",
     "probs": {
-      "entail": 0.9677,
+      "entail": 0.9678,
       "neutral": 0.0183,
       "contradict": 0.0139
     },
@@ -1212,7 +1212,7 @@
     "premise": "The cure period is 10 days except during a lockout.",
     "probs": {
       "entail": 0.9937,
-      "neutral": 0.0051,
+      "neutral": 0.0052,
       "contradict": 0.0011
     },
     "correct": false
@@ -1241,7 +1241,7 @@
     "probs": {
       "entail": 0.9776,
       "neutral": 0.0167,
-      "contradict": 0.0057
+      "contradict": 0.0058
     },
     "correct": false
   },
@@ -1253,8 +1253,8 @@
     "claim": "Regarding payment, the stated value is payment is due on Monday.",
     "premise": "Payment is due on Monday unless that day is a holiday.",
     "probs": {
-      "entail": 0.9792,
-      "neutral": 0.0171,
+      "entail": 0.9793,
+      "neutral": 0.017,
       "contradict": 0.0037
     },
     "correct": false

@@ -1,5 +1,19 @@
 """EXP-064: real decoding-level constraints for gemma3:270m, not a post-hoc patch.
 
+RETIRED (2026-11-11): the generative rewriter role this experiment measured
+was withdrawn -- every real/recent measurement (this experiment's own
+results among them) showed it was never actually invoked once the
+deterministic pre-checks were added (see lab.common.rewriter_backends's
+module docstring, and FORBIDDEN.md's dated withdrawal note). The checkpoint
+modules this script imports (lab.common.real_rewriter / real_rewriter_
+legal_gemma / real_rewriter_qwen / lora_finetune, and real_rewriter_ollama's
+rewriter-role functions) were deleted or trimmed. This script is kept as
+the permanent historical record of what it measured; its own results.json
+is unaffected, but running this file again will now ImportError/TypeError.
+Recover a deleted module with `git show <commit before this deletion>:lab/common/<module>.py`
+if a literal rerun is ever needed.
+
+
 EXP-063 found gemma3:270m preserves content verbatim but drops the citation
 marker, and fixed 11 of 13 cases with a post-hoc splice (append the missing
 marker, then re-check). This tests the stronger version: can the citation

@@ -9,13 +9,7 @@
           "organization"
         ]
       ],
-      "pred": [
-        [
-          0,
-          7,
-          "person"
-        ]
-      ]
+      "pred": []
     },
     {
       "text": "Please pay fifty thousand rupees.",
@@ -44,11 +38,6 @@
         ]
       ],
       "pred": [
-        [
-          0,
-          7,
-          "person"
-        ],
         [
           8,
           10,
@@ -89,14 +78,14 @@
       ],
       "pred": [
         [
-          15,
-          19,
-          "person"
-        ],
-        [
           20,
           22,
           "date"
+        ],
+        [
+          24,
+          30,
+          "person"
         ],
         [
           31,
@@ -149,7 +138,7 @@
       ],
       "pred": [
         [
-          0,
+          4,
           10,
           "person"
         ]

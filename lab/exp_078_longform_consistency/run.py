@@ -81,7 +81,7 @@ CONFLICTING_FINDINGS = CLEAN_FINDINGS + [
 
 
 def run_case(findings: list[dict], label: str) -> dict:
-    result = write_long_document(ASK, findings, checkpoint="flan-t5-small", task="lookup")
+    result = write_long_document(ASK, findings, task="lookup")
     coverage = coverage_report(findings, result["document"])
     valid_ids = {f["citation"] for f in findings}
     citations = citation_integrity(result["document"], valid_ids)

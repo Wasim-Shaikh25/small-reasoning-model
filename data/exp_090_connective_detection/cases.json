@@ -69,8 +69,8 @@
           "phrase": "in case",
           "operator": "condition_positive",
           "pdtb_class": "Contingency.Condition",
-          "dep_pattern": "prep+pobj+fallback_remainder",
-          "clause_text": "case the data subject has given explicit consent , the processing is lawful ."
+          "dep_pattern": "prep+pobj",
+          "clause_text": "case the data subject has given explicit consent"
         }
       ],
       "correct": true
@@ -99,8 +99,8 @@
           "phrase": "except",
           "operator": "condition_negative",
           "pdtb_class": "Contingency.Condition",
-          "dep_pattern": "prep+pcomp",
-          "clause_text": "where the data subject has given explicit consent"
+          "dep_pattern": "prep+no_clause_child",
+          "clause_text": ""
         }
       ],
       "correct": true
@@ -174,8 +174,8 @@
           "phrase": "despite",
           "operator": "concession",
           "pdtb_class": "Comparison.Concession",
-          "dep_pattern": "prep+pobj+fallback_remainder",
-          "clause_text": "the data subject having given explicit consent ."
+          "dep_pattern": "prep+pcomp",
+          "clause_text": "the data subject having given explicit consent"
         }
       ],
       "correct": true
@@ -295,7 +295,7 @@
           "operator": "combinator_or",
           "pdtb_class": "Contingency.Condition",
           "dep_pattern": "cc",
-          "clause_text": "consent or the processing"
+          "clause_text": "The data subject gave consent or the processing was necessary for vital interests ."
         }
       ],
       "correct": true
@@ -605,6 +605,12 @@
           "dep_pattern": "cc"
         },
         {
+          "phrase": "in",
+          "operator": null,
+          "pdtb_class": null,
+          "dep_pattern": "mark+advcl"
+        },
+        {
           "phrase": "or",
           "operator": "combinator_or",
           "pdtb_class": "Contingency.Condition",
@@ -687,17 +693,6 @@
           "operator": "temporal_bound",
           "pdtb_class": "Temporal",
           "dep_pattern": "prep+pobj+fallback_remainder"
-        }
-      ]
-    },
-    {
-      "sentence": "It shall be as easy to withdraw as to give consent.",
-      "connectives": [
-        {
-          "phrase": "as",
-          "operator": "causal",
-          "pdtb_class": "Contingency.Cause",
-          "dep_pattern": "mark+advcl"
         }
       ]
     },
@@ -1200,12 +1195,6 @@
           "operator": "combinator_and",
           "pdtb_class": "Expansion.Conjunction",
           "dep_pattern": "cc"
-        },
-        {
-          "phrase": "for",
-          "operator": null,
-          "pdtb_class": null,
-          "dep_pattern": "mark+advcl"
         }
       ]
     },

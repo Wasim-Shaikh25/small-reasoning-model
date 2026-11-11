@@ -3,6 +3,27 @@ pipeline -- the first stage of AGENT.md's word-by-word relevance
 cascade (chunk the prompt, then check every nearby word's relevance and
 grammar before deciding how to use the sentence).
 
+RETIRED (2026-11-11): lab.common.word_relevance was deleted after an
+honest wire-or-discard review found it genuinely superseded, not just
+unused. Its own follow-up already named EXP-051 (sentence role-tagging)
+as "the named next step that consumes this score as one of its own
+input features" -- checked directly, EXP-051 never did: it uses
+lab.common.relevance.ask_relevance (already live, with real callers in
+qa.py/notes_to_findings.py/verify.py/nli.py/paged.py) instead of
+word_relevance.score_words. And grammatical_check's own judgment (a ROOT
+verb with a subject) is strictly weaker than lab.common.
+sentence_completeness.is_complete_sentence (already live, gating
+lab.common.rewriter_backends and lab.common.grammar_logic) -- that
+module's own docstring documents two blind spots (gerund fragments, lone
+subordinate clauses) that grammatical_check has no equivalent check for
+at all. Neither half of this module was ever adopted by the mechanism
+meant to adopt it; both were independently superseded by something
+already live. This script is kept as the historical record of what it
+measured (its results.json is unaffected), but running it again will
+now ImportError. Recover the deleted module with `git show <commit
+before this deletion>:lab/common/word_relevance.py` if this judgment is
+ever revisited.
+
 lab.common.word_relevance.sentence_admission combines two independent,
 bounded judgments (score_words: per-word lexical relevance to the ask;
 grammatical_check: is this sentence a complete clause, not a fragment)

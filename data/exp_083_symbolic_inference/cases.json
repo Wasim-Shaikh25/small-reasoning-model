@@ -300,7 +300,7 @@
           "per_exception": [
             {
               "status": "holds",
-              "best_entail": 0.9069,
+              "best_entail": 0.9067,
               "best_contradict": 0.0029,
               "best_context": "Rohan acted in self-defense when he killed Arun."
             }

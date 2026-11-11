@@ -39,10 +39,13 @@ from __future__ import annotations
 from pathlib import Path
 
 from lab.common.assemble import build_outline
+from lab.common.coherence import sequence_coherence
 from lab.common.doc_tools import assign_findings_to_sections, check_template_contracts, load_template
 from lab.common.document_writer import write_document
 from lab.common.entities import detect_primary
 from lab.common.rewriter_backends import rewrite_unit
+from lab.common.textutil import sentences as split_sentences
+from lab.common.verify import strip_citation_markers
 from lab.common.working_memory import WorkingMemory
 
 
@@ -124,14 +127,12 @@ def write_long_document(
     findings: list[dict],
     glossary: dict | None = None,
     task: str = "lookup",
-    checkpoint: str = "flan-t5-small",
     title: str = "Document",
     out_path: Path | None = None,
     docx_out_path: Path | None = None,
     use_real_ner: bool = False,
     template_id: str | None = None,
     use_real_nli: bool = False,
-    use_repair: bool = False,
     plain_english: bool = False,
 ) -> dict:
     """Writes one long document from `findings`, page by page, checking
@@ -153,23 +154,21 @@ def write_long_document(
     leaf gets. When omitted (the default), behavior is unchanged from
     before this parameter existed.
 
-    `use_real_nli` (default False) passes straight through to every leaf's
-    `rewrite_unit`/`fidelity_gate` call -- opt-in real DeBERTa-v3 MNLI
-    entailment checking instead of the classical lexical judge (2026-11-03
-    reasoning-layer audit, AUDIT.md) -- AND (2026-11-10) to `WorkingMemory.
+    `use_real_nli` (default False) passes through to `WorkingMemory.
     check_and_remember_page`'s own NLI-contradiction gate: a same-subject-
     same-verb-different-object candidate is only kept in `consistency_
     flags` if its two underlying sentences actually show NLI contradiction
     evidence, not just coincidence. See `lab.common.working_memory`'s
     module docstring ("Follow-up 2026-11-10") for the measured EXP-081
-    false-positive rate this fixes (15/16 on that real document).
+    false-positive rate this fixes (15/16 on that real document). (It no
+    longer also gates a rewriter fidelity check -- `rewrite_unit` below is
+    fully deterministic as of 2026-11-11, see `rewriter_backends`'s module
+    docstring.)
 
-    `use_repair` (default False) passes through too -- opt-in use of each backend's own repair mechanism
-    (flan-t5-small's retry-with-feedback, gemma3:270m's citation-splice)
-    instead of this project's dispatcher bypassing both (same audit,
-    rewriter_backends.rewrite_unit's own docstring has the full story).
-    Both default False, so every existing measured fidelity-pass rate
-    stays exactly as recorded unless a caller explicitly opts in.
+    `checkpoint`/`use_repair` were removed 2026-11-11 along with the
+    generative rewriter role they only ever configured -- every real/
+    recent measurement showed it was never actually invoked (see
+    `lab.common.rewriter_backends`'s module docstring).
 
     `plain_english` (default False, same opt-in discipline): runs each
     rendered leaf's text through `lab.common.plain_language.
@@ -180,11 +179,22 @@ def write_long_document(
     `rewrite_diagnostics` as `plain_english_result`; never applied to a
     leaf with no findings (nothing to simplify).
 
-    Returns {"document_result", "consistency_flags", "rewrite_diagnostics",
-    "working_memory"} -- `consistency_flags` is never empty-by-default-
-    assumption; it is whatever WorkingMemory actually found, reported as
-    measured. If `out_path` is given, also writes the formatted file
-    (lab.common.document_writer) and includes its result.
+    Returns {"document_result", "consistency_flags", "coherence_flags",
+    "rewrite_diagnostics", "working_memory"} -- `consistency_flags` is
+    never empty-by-default-assumption; it is whatever WorkingMemory
+    actually found, reported as measured. If `out_path` is given, also
+    writes the formatted file (lab.common.document_writer) and includes
+    its result.
+
+    `coherence_flags` (2026-11-11, lab.common.coherence.sequence_coherence,
+    EXP-050's own named follow-up): each rendered leaf's own sentences,
+    checked for a genuine unsignaled topic jump within that leaf (never
+    across leaves -- that is `consistency_flags`' job, a different
+    question). Reported per leaf as `{"leaf_id", ...sequence_coherence's
+    own fields}`; empty list if nothing was flagged, never assumed empty.
+    Same known scale-down EXP-050 itself measured: this catches an
+    unsignaled jump, not a connective used to paper over an actually
+    unrelated sentence (see that module's own docstring).
 
     `contract_violations` (2026-11-10): when `template_id` is given, every
     section with a declared `contract` (lab.common.doc_tools.
@@ -219,6 +229,7 @@ def write_long_document(
     rendered_units = []
     rewrite_diagnostics = []
     consistency_flags = []
+    coherence_flags = []
 
     for leaf in outline:
         if not leaf["findings"]:
@@ -231,7 +242,7 @@ def write_long_document(
             rendered_units.append(unit_text)
             continue
 
-        result = rewrite_unit(leaf, glossary, checkpoint=checkpoint, ask=leaf.get("section_instructions"), use_real_nli=use_real_nli, use_repair=use_repair)
+        result = rewrite_unit(leaf, glossary, ask=leaf.get("section_instructions"))
         unit_text = result["text"] if result["text"].startswith(leaf["title"]) else f"{leaf['title']}\n{result['text']}"
 
         plain_english_result = None
@@ -255,6 +266,36 @@ def write_long_document(
         flags = memory.check_and_remember_page(leaf["leaf_id"], result["text"], citation_ids, use_real_nli=use_real_nli)
         consistency_flags.extend(flags)
 
+        # EXP-050's own named follow-up ("wire sequence_coherence into
+        # ... build_outline ... so a flagged leaf is actually ... surfaced
+        # during real document assembly, not just measured standalone"):
+        # within this leaf's own rendered sentences (marker-stripped --
+        # coherence is a discourse-readability question, not a citation-
+        # grounding one, so the "[C0]"-style internal markers would only
+        # distort the sentence boundaries and the bge similarity score),
+        # flag a genuine unsignaled topic jump the same way EXP-050
+        # measured it. Reported, never silently resolved or blocked on --
+        # same posture `consistency_flags`/`contract_violations` already
+        # take.
+        leaf_sentences = split_sentences(strip_citation_markers(unit_text))
+        # `unit_text` always starts with `leaf["title"]` (see above) joined
+        # by its own newline (template_rewriter.splice_unit's own "\n".join
+        # convention) -- split_sentences treats that newline as its own
+        # boundary, so the title shows up as an exact, standalone first
+        # element to drop before checking neighbor coherence (comparing a
+        # heading to the first real sentence is not the "unsignaled topic
+        # jump between two content sentences" EXP-050 measured, and would
+        # false-positive on nearly every leaf whose title isn't itself a
+        # full sentence). `plain_english`'s own simplify_document rejoins
+        # sentences with a single space, not a newline, so there the title
+        # ends up merged as a prefix of the first real sentence instead of
+        # a distinct element -- this check correctly does nothing there.
+        if leaf_sentences and leaf_sentences[0] == leaf["title"]:
+            leaf_sentences = leaf_sentences[1:]
+        for flag in sequence_coherence(leaf_sentences):
+            if flag["flagged"]:
+                coherence_flags.append({"leaf_id": leaf["leaf_id"], **flag})
+
     document_text = "\n\n".join(rendered_units)
     assembled = {"document": document_text}
 
@@ -268,8 +309,6 @@ def write_long_document(
     # internal marker belongs in a file a reader opens, clean display form
     # or not -- only a real citation to an actual outside source, written
     # as part of a finding's own statement text, would ever belong there.
-    from lab.common.verify import strip_citation_markers
-
     reader_facing_document = strip_citation_markers(document_text)
     reader_facing_assembled = {"document": reader_facing_document}
 
@@ -308,6 +347,7 @@ def write_long_document(
         "document_result": document_result,
         "docx_result": docx_result,
         "consistency_flags": consistency_flags,
+        "coherence_flags": coherence_flags,
         "rewrite_diagnostics": rewrite_diagnostics,
         "working_memory": memory.to_dict(),
         "dependency_tree": dependency_tree,

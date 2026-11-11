@@ -9,22 +9,22 @@
     "n_tokens": 335,
     "cv_folds": 5,
     "hard_slice": {
-      "precision": 0.0833,
-      "recall": 0.1111,
-      "f1": 0.0952,
-      "tp": 1
+      "precision": 0.2,
+      "recall": 0.2222,
+      "f1": 0.2105,
+      "tp": 2
     },
     "easy_slice": {
-      "precision": 0.197,
-      "recall": 0.3023,
-      "f1": 0.2385,
-      "tp": 13
+      "precision": 0.2424,
+      "recall": 0.3721,
+      "f1": 0.2936,
+      "tp": 16
     },
     "rule_tagger_hard_f1_baseline": 0.4615,
     "real_pretrained_ner_hard_f1_baseline": 0.4138,
     "improved_over_both_baselines": false
   },
-  "results_prose": "Sentence-grouped 5-fold cross-validated local span tagger on 335 tokens from 52 sentences (EXP-008's own EASY+HARD fixture, nothing newly labeled): hard-slice exact-span F1=0.0952 (precision=0.0833, recall=0.1111), easy-slice F1=0.2385. Baselines on the same hard sentences: rule tagger F1=0.4615 (EXP-008), real pretrained NER (dslim/bert-base-NER) F1=0.4138 (EXP-080) -- the local tagger does not improve on both.",
+  "results_prose": "Sentence-grouped 5-fold cross-validated local span tagger on 335 tokens from 52 sentences (EXP-008's own EASY+HARD fixture, nothing newly labeled): hard-slice exact-span F1=0.2105 (precision=0.2, recall=0.2222), easy-slice F1=0.2936. Baselines on the same hard sentences: rule tagger F1=0.4615 (EXP-008), real pretrained NER (dslim/bert-base-NER) F1=0.4138 (EXP-080) -- the local tagger does not improve on both.",
   "conclusion": "The local tagger did not clear both baselines on this fixture -- see metrics for the exact numbers, reported as measured rather than assumed to work. The fixture is tiny (10 hard sentences); a token-level classifier with only 5-fold sentence-grouped CV has very little signal to learn from.",
   "scale_down": "10 hard sentences, 19 gold hard-slice spans total -- a genuinely small fixture for a trained classifier; this result should not be read as a general claim about span tagging, only about this specific repository's own fixture. Per-token classification with contiguous-run span reconstruction, not a true BIO/CRF sequence tagger -- adjacent same-label entities would merge into one span, a real limit not exercised by this particular fixture (no two adjacent gold spans share a label here) but not proven absent either.",
   "referenced_files": [
@@ -36,7 +36,7 @@
     "data/exp_080_real_ner_rerun/results.json"
   ],
   "follow_ups": [],
-  "elapsed_sec": 45.6498,
-  "peak_rss_mb": 386.02,
+  "elapsed_sec": 8.4055,
+  "peak_rss_mb": 2799.84,
   "models_used": "Multinomial logistic regression (sklearn) trained only on labels already stored in this repository. spaCy en_core_web_sm's POS tagger (lab.common.rules._parser, already a dependency) for features -- its NER component is never read. No pretrained NER model, no generative model."
 }

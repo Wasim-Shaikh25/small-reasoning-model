@@ -1,0 +1,34 @@
+{
+  "case1_notice_period": {
+    "decision": "supported",
+    "text": "30 days [S3]",
+    "fetched_ids": [
+      "S3",
+      "S1"
+    ],
+    "correct": true
+  },
+  "case2_ravi_address": {
+    "decision": "supported",
+    "text": "Ravi Sharma lives at 14 MG Road, Pune 411001. [S0]",
+    "fetched_ids": [
+      "S0",
+      "S1"
+    ],
+    "correct": true
+  },
+  "case3_off_topic": {
+    "decision": "inconclusive",
+    "text": "Insufficient evidence.",
+    "fetched_ids": [
+      "S3",
+      "S0"
+    ],
+    "correct": true
+  },
+  "baseline_same_ask_no_connector": {
+    "decision": "ungrounded",
+    "text": "[Not grounded in any provided evidence -- general knowledge only.] The notice period is the time it takes for a notice to be issued.",
+    "correct": true
+  }
+}

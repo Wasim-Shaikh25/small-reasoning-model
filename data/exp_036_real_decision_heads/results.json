@@ -58,22 +58,22 @@
           1.0
         ],
         "n": 18,
-        "mean_p": 0.9589,
+        "mean_p": 0.9588,
         "empirical": 1.0
       }
     ],
     "chain_items": 30,
     "chain_number_errors": 0,
-    "next_action_accuracy": 0.8667,
+    "next_action_accuracy": 0.9222,
     "aggregation_check": 0.9961,
     "vs_exp_011_lexical": {
       "exp_011_test_accuracy": 1.0,
       "exp_036_test_accuracy": 1.0,
       "exp_011_next_action_accuracy": 0.8667,
-      "exp_036_next_action_accuracy": 0.8667
+      "exp_036_next_action_accuracy": 0.9222
     }
   },
-  "results_prose": "With features built from deepset/deberta-v3-base-squad2 and MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli instead of the lexical QA/NLI pair, decision head test accuracy is 1.0 on 54 items (EXP-011's lexical features scored 1.0). Validation selected threshold 0.4 (target met: True). At that threshold the test unsupported-claim rate among assertions is 0.0 and supported coverage is 0.3333. Next-action head accuracy is 0.8667 (EXP-011 scored 0.8667).",
+  "results_prose": "With features built from deepset/deberta-v3-base-squad2 and MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli instead of the lexical QA/NLI pair, decision head test accuracy is 1.0 on 54 items (EXP-011's lexical features scored 1.0). Validation selected threshold 0.4 (target met: True). At that threshold the test unsupported-claim rate among assertions is 0.0 and supported coverage is 0.3333. Next-action head accuracy is 0.9222 (EXP-011 scored 0.8667).",
   "conclusion": "The head and the validation-threshold procedure are unchanged; only the sentences each feature is computed from come from the real encoders now, so this isolates how much of EXP-011's accuracy was coming from the lexical QA/NLI pair's own feature quality versus the generated scenario's own templated regularity (truth/other pulled from a small, fixed value list per slot, which both the lexical and real checkpoints can latch onto similarly).",
   "scale_down": "Same generated 360-scenario set as EXP-011 (six slots, not MNLI/ANLI/FEVER/SQuAD2/HotpotQA).",
   "referenced_files": [
@@ -86,7 +86,7 @@
     "data/exp_036_real_decision_heads/results.json"
   ],
   "follow_ups": [],
-  "elapsed_sec": 4599.0018,
-  "peak_rss_mb": 1074.76,
+  "elapsed_sec": 90.2742,
+  "peak_rss_mb": 1824.14,
   "models_used": "deepset/deberta-v3-base-squad2 (extractive QA feature), MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli (NLI feature). Local checkpoints, not API calls. Logistic regression (with Platt/sigmoid calibration) is the unchanged classical head."
 }

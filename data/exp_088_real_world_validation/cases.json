@@ -8,14 +8,14 @@
     "per_exception": [
       {
         "status": "holds",
-        "best_entail": 0.7944,
+        "best_entail": 0.7943,
         "best_contradict": 0.0039,
         "best_context": "A gym introduced a facial recognition system to allow members access to its facilities. It offered members a choice rather than making it a condition of entry, and relied on explicit consent for processing the biometric facial scans of the members who indicated that they preferred that option."
       },
       {
         "status": "unknown",
-        "best_entail": 0.0804,
-        "best_contradict": 0.0286,
+        "best_entail": 0.0806,
+        "best_contradict": 0.0287,
         "best_context": "A gym introduced a facial recognition system to allow members access to its facilities. It offered members a choice rather than making it a condition of entry, and relied on explicit consent for processing the biometric facial scans of the members who indicated that they preferred that option."
       },
       {
@@ -37,18 +37,18 @@
       {
         "status": "not_holds",
         "best_entail": 0.0014,
-        "best_contradict": 0.9703,
+        "best_contradict": 0.9702,
         "best_context": "A member of staff experienced an accident at work, sustained serious injuries, and was unconscious. Their employer could not obtain the employee's consent to give the ambulance crew details of the employee's medication allergies, and so relied on the vital interests condition for the processing."
       },
       {
         "status": "holds",
-        "best_entail": 0.937,
+        "best_entail": 0.9371,
         "best_contradict": 0.0041,
         "best_context": "A member of staff experienced an accident at work, sustained serious injuries, and was unconscious. Their employer could not obtain the employee's consent to give the ambulance crew details of the employee's medication allergies, and so relied on the vital interests condition for the processing."
       },
       {
         "status": "unknown",
-        "best_entail": 0.0695,
+        "best_entail": 0.0694,
         "best_contradict": 0.0085,
         "best_context": "A member of staff experienced an accident at work, sustained serious injuries, and was unconscious. Their employer could not obtain the employee's consent to give the ambulance crew details of the employee's medication allergies, and so relied on the vital interests condition for the processing."
       }
@@ -65,18 +65,18 @@
       {
         "status": "unknown",
         "best_entail": 0.0042,
-        "best_contradict": 0.0046,
+        "best_contradict": 0.0047,
         "best_context": "An employer was being sued by one of its employees following an accident at work. The employer shared the accident details, including injury information, with its solicitors to obtain legal advice and defend the claim."
       },
       {
         "status": "unknown",
-        "best_entail": 0.2638,
-        "best_contradict": 0.0155,
+        "best_entail": 0.2637,
+        "best_contradict": 0.0154,
         "best_context": "An employer was being sued by one of its employees following an accident at work. The employer shared the accident details, including injury information, with its solicitors to obtain legal advice and defend the claim."
       },
       {
         "status": "unknown",
-        "best_entail": 0.6914,
+        "best_entail": 0.691,
         "best_contradict": 0.0083,
         "best_context": "An employer was being sued by one of its employees following an accident at work. The employer shared the accident details, including injury information, with its solicitors to obtain legal advice and defend the claim."
       }
@@ -98,7 +98,7 @@
       },
       {
         "status": "unknown",
-        "best_entail": 0.0579,
+        "best_entail": 0.058,
         "best_contradict": 0.013,
         "best_context": "A Spanish data protection authority fined an English-language school for requiring students and visitors to provide medical certificates and COVID-19 test certificates as a condition of entry, finding that no exception under Article 9 permitted this processing of health data."
       },

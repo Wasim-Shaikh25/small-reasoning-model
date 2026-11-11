@@ -100,12 +100,3 @@ def findings_from_chunks(chunks: list[dict]) -> list[dict]:
     return [{"finding_id": c["id"], "statement": c["text"], "citation": str(i + 1)} for i, c in enumerate(chunks)]
 
 
-def load_text_file(path: str) -> str:
-    """Plain .txt/.md. A real .pdf/.docx needs its own reader (python-docx,
-    pypdf) -- not duplicated here since this repo already depends on
-    python-docx for lab.common.docx_writer and would gain nothing from a
-    second copy of that logic.
-    """
-    from pathlib import Path
-
-    return Path(path).read_text(encoding="utf-8", errors="replace")

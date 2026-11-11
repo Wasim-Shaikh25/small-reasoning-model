@@ -1,0 +1,41 @@
+{
+  "id": "EXP-098",
+  "title": "write_article_tool wired in and measured on a non-legal fixture: citations, cycle detection, and no-fabrication all hold",
+  "status": "closed",
+  "goal": "Give lab.common.article_tool's notes-to-article pipeline its first real regression test (it had zero callers and zero tests anywhere before this), and directly test whether it is actually domain-agnostic, as its own code suggests, or legal-domain-specific, as a prior session's audit guessed from a surface read without running it.",
+  "method": "One fixture: workplace mentorship notes plus four named sources (three mentorship facts forming a three-person cycle, one unrelated all-hands announcement), run through write_article_tool end to end. Checked: the call succeeds; every citation marker resolves to a real source with none broken or missing; the directed relationship cycle is found and reported unambiguous; and -- checked directly, word by word -- the rendered article contains no content word absent from the notes or sources it was built from.",
+  "metrics": {
+    "ok": true,
+    "zero_broken_citations": true,
+    "expected_sources_cited": true,
+    "found_expected_cycle": true,
+    "cycle_not_ambiguous": true,
+    "no_fabrication": true,
+    "invented_words_found": [],
+    "coverage": {
+      "present": 7,
+      "missing": [],
+      "coverage": 1.0
+    },
+    "num_citation_markers": 7
+  },
+  "results_prose": "ok=True, zero_broken_citations=True, expected_sources_cited=True, found_expected_cycle=True, cycle_not_ambiguous=True, no_fabrication=True (invented words: none), citation coverage={'present': 7, 'missing': [], 'coverage': 1.0}.",
+  "conclusion": "write_article_tool (article_tool/write_article/relationship_graph/notes_to_findings) is wired in and measured for the first time, on a deliberately non-legal fixture (a workplace mentorship circle): every source is cited, no citation is broken or missing, the three-person mentorship cycle (Alice -> Bob -> Carol -> Alice) is detected correctly and unambiguously, and nothing in the rendered article is a word absent from the notes/sources it was built from. This directly refutes a prior session's surface-read guess that this pipeline is legal-domain-specific -- nothing in its own code mentions a domain at all; the only reason it looked that way is that its historical docstrings mention the legal-notice bugs it was originally found and fixed against, not anything the code depends on.",
+  "scale_down": "One fixture, four sources, a three-person cycle -- a proof the mechanism works end to end and is genuinely domain-agnostic, not a benchmark across many notes/source shapes or longer cycles.",
+  "referenced_files": [
+    "lab/exp_098_write_article/run.py",
+    "lab/common/article_tool.py",
+    "lab/common/write_article.py",
+    "lab/common/relationship_graph.py",
+    "lab/common/notes_to_findings.py",
+    "data/exp_098_write_article/results.json"
+  ],
+  "follow_ups": [
+    "Still not reachable from lab.common.brain.reason -- it answers a different question shape (write a document from notes) than reason() does (answer a question from documents), so wiring it in, if ever done, belongs as a sibling entry point (like lab.common.engine.run), not a new brain.reason stage.",
+    "Only tested on a 3-node cycle with one off-topic distractor source; a longer chain, a non-cyclic chain, or genuinely ambiguous antecedents (relationship_graph.py's own `antecedent_ambiguous` field) are untested here.",
+    "checkpoint/rewrite options were real but inert before this session (the generative rewriter role they configured was withdrawn 2026-11-11, see FORBIDDEN.md) -- rewrite=True now runs template_rewriter.splice_unit, not a different renderer's output; worth deciding whether the rewrite flag still earns its keep now that both paths are deterministic."
+  ],
+  "elapsed_sec": 6.3926,
+  "peak_rss_mb": 2800.55,
+  "models_used": "None -- this pipeline (and this exploration) never loads a generative or encoder model; attribution is lexical-overlap, relationship extraction is lab.common.rules.extract_fact_triple (deterministic dependency-parse based)."
+}

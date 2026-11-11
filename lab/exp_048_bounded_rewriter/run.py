@@ -1,5 +1,19 @@
 """EXP-048: the bounded FLAN-T5 rewriter (FORBIDDEN.md's narrow exception, 2026-10-14).
 
+RETIRED (2026-11-11): the generative rewriter role this experiment measured
+was withdrawn -- every real/recent measurement (this experiment's own
+results among them) showed it was never actually invoked once the
+deterministic pre-checks were added (see lab.common.rewriter_backends's
+module docstring, and FORBIDDEN.md's dated withdrawal note). The checkpoint
+modules this script imports (lab.common.real_rewriter / real_rewriter_
+legal_gemma / real_rewriter_qwen / lora_finetune, and real_rewriter_ollama's
+rewriter-role functions) were deleted or trimmed. This script is kept as
+the permanent historical record of what it measured; its own results.json
+is unaffected, but running this file again will now ImportError/TypeError.
+Recover a deleted module with `git show <commit before this deletion>:lab/common/<module>.py`
+if a literal rerun is ever needed.
+
+
 Loads flan-t5-small, a local checkpoint, and uses it only in the rewriter role:
 joining already-verified (statement, citation) findings into flowing prose
 (ARCHITECTURE.md section 3.7). It never sees a raw passage, a question, or a

@@ -9,7 +9,7 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 
 from lab.common.harness import Run
-from lab.common.memory import connect, mark_conflicted, recall, revalidate, write_note, wrong_note_count
+from lab.common.memory import connect, mark_conflicted, recall, revalidate, write_note
 from lab.common.schemas import validate_note
 
 FILES = [

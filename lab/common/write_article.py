@@ -40,14 +40,13 @@ from lab.common.notes_to_findings import notes_to_findings
 from lab.common.rewriter_backends import rewrite_unit
 
 
-def rewrite_findings_individually(
-    findings: list[dict],
-    checkpoint: str = "gemma3:270m",
-) -> list[dict]:
-    """Paraphrase each finding's statement on its own -- never alongside
-    another finding, so the model is never asked to relate two facts to
-    each other. Keeps the original statement (and reports why) when the
-    fidelity gate rejects the rewrite; never a partial accept.
+def rewrite_findings_individually(findings: list[dict]) -> list[dict]:
+    """Splice each finding's statement on its own -- never alongside
+    another finding, so nothing ever relates two facts to each other.
+    `rewrite_unit` is fully deterministic (`rewriter_backends`'s module
+    docstring); kept as its own step because `splice_unit`'s connective
+    choice differs from `assemble`'s own plain `render_unit`, not because
+    anything here is still generative.
     """
     rewritten = []
     diagnostics = []
@@ -58,7 +57,7 @@ def rewrite_findings_individually(
             "finding_ids": [finding["finding_id"]],
             "findings": [finding],
         }
-        result = rewrite_unit(leaf, glossary={}, checkpoint=checkpoint, use_repair=True)
+        result = rewrite_unit(leaf, glossary={})
         new_statement = finding["statement"]
         if result["used_generative"]:
             # result["text"] still carries the trailing "[CITE]" marker
@@ -82,15 +81,17 @@ def rewrite_findings_individually(
 def write_article(
     messy_text: str,
     sources: list[dict],
-    checkpoint: str = "gemma3:270m",
     rewrite: bool = True,
 ) -> dict:
     """messy_text (raw, possibly misspelled notes) + sources
     ([{"id","text"}, ...]) -> one cited, structurally-grounded document.
 
-    `rewrite=True` (default) applies the one-finding-at-a-time bounded
-    paraphrase from step 2 above; `rewrite=False` skips straight to
-    deterministic assembly (last session's result) for comparison.
+    `rewrite=True` (default) applies the one-finding-at-a-time deterministic
+    splice from step 2 above; `rewrite=False` skips straight to deterministic
+    assembly (last session's result) for comparison. (Both are deterministic
+    as of 2026-11-11 -- see `rewriter_backends`'s module docstring; `checkpoint`
+    was removed from this signature along with the generative role it used
+    to configure.)
     """
     source_findings = [
         {"finding_id": f"S{i + 1}", "statement": s["text"], "citation": s["id"]}
@@ -101,7 +102,7 @@ def write_article(
 
     rewrite_diagnostics = None
     if rewrite:
-        all_findings, rewrite_diagnostics = rewrite_findings_individually(all_findings, checkpoint)
+        all_findings, rewrite_diagnostics = rewrite_findings_individually(all_findings)
 
     result = assemble(all_findings, task="generic", glossary={}, rewriter="deterministic")
     result["attribution"] = note_findings

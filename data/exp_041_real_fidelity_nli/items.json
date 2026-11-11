@@ -5,12 +5,12 @@
     "nli": {
       "forward": {
         "entail": 0.9962,
-        "neutral": 0.0031,
+        "neutral": 0.0032,
         "contradict": 0.0007
       },
       "backward": {
         "entail": 0.9962,
-        "neutral": 0.0031,
+        "neutral": 0.0032,
         "contradict": 0.0007
       },
       "ok": true

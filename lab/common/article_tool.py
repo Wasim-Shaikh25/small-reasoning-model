@@ -6,7 +6,10 @@ PRIMITIVE_REGISTRY`) -- a fixed input contract, a fixed output contract,
 validated before anything runs, never a guess at what a malformed call meant.
 
 Input: {"notes": str, "sources": [{"id": str, "text": str}, ...],
-"checkpoint": str (optional), "rewrite": bool (optional)}.
+"rewrite": bool (optional)}. ("checkpoint" was accepted here until
+2026-11-11; the generative rewriter role it configured was withdrawn --
+see `lab.common.rewriter_backends`'s module docstring -- so it is no
+longer read.)
 
 Output: {"ok": bool, "article": str (rendered markdown), "coverage",
 "citations", "attribution", "rewrite_diagnostics", "relationships",
@@ -89,10 +92,9 @@ def write_article_tool(payload: dict) -> dict:
 
     notes = payload["notes"]
     sources = payload["sources"]
-    checkpoint = payload.get("checkpoint", "gemma3:270m")
     rewrite = payload.get("rewrite", True)
 
-    result = write_article(notes, sources, checkpoint=checkpoint, rewrite=rewrite)
+    result = write_article(notes, sources, rewrite=rewrite)
 
     # Relationship detection runs on the pre-rewrite findings (original
     # source text + original note sentences) -- extract_fact_triple's

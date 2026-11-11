@@ -1,4 +1,29 @@
-"""EXP-019: grounding filter and template queries (architecture Experiment P, no proposer model)."""
+"""EXP-019: grounding filter and template queries (architecture Experiment P, no proposer model).
+
+RETIRED (2026-11-11): lab.common.proposals was deleted after an honest
+wire-or-discard review found zero real callers anywhere (this
+experiment was always its only one -- checked by grep, not assumed) and,
+more fundamentally, no live use for what it exists to do. grounding_
+filter's whole premise is checking a PROPOSED candidate string (a query
+reformulation, in this experiment's own fixture) for new numbers/dates/
+names/terms not present in its source before admitting it -- a safety
+net for a proposer role. FORBIDDEN.md permanently bans that role for
+anything load-bearing (confirmed again this same session: lab.common.
+gapfill.py was deleted 2026-11-11 for exactly this), and every live
+text-producing path in this repo already guarantees grounded output by
+construction instead -- lab.common.template_rewriter.splice_unit copies
+every statement verbatim, lab.common.write_article's pipeline never
+paraphrases, lab.common.qa's extraction is citation-checked at the
+point of extraction. There is no candidate text anywhere in the live
+system that still needs a downstream fabrication filter; this module
+was built (even its own docstring says "architecture Experiment P, no
+proposer model") to guard against a role the project never ended up
+building and has since permanently closed off. Kept as the historical
+record of that early architecture question (results.json unaffected);
+running this script again will now ImportError. Recover the deleted
+module with `git show <commit before this deletion>:lab/common/
+proposals.py` if this judgment is ever revisited.
+"""
 
 from __future__ import annotations
 

@@ -117,10 +117,3 @@ def mark_conflicted(conn: sqlite3.Connection, note_id: str, conflict: dict) -> N
         (json.dumps(current), "conflicted", note_id),
     )
     conn.commit()
-
-
-def wrong_note_count(conn: sqlite3.Connection) -> int:
-    row = conn.execute(
-        "SELECT COUNT(*) AS n FROM notes WHERE verification_status != 'verified' OR exact_text IS NULL OR exact_text = ''"
-    ).fetchone()
-    return int(row["n"])

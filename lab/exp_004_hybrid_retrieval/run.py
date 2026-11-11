@@ -1,4 +1,20 @@
-"""EXP-004: hybrid retrieval, reranker lift, and one graph hop."""
+"""EXP-004: hybrid retrieval, reranker lift, and one graph hop.
+
+RETIRED (2026-11-11): lab.common.graph (EntityGraph), the "one graph
+hop" third of this script, was deleted after an honest wire-or-discard
+review found zero real callers anywhere (this experiment was always its
+only one) and its whole job long since superseded by lab.common.
+graph_index.build_entity_graph/expand_from_entity -- NER-aware (not
+just exact-name links), multi-hop (not one fixed hop), persisted
+(lab.common.store.Store, lab.common.connectors.GraphConnector), and
+already live in lab.common.brain.reason's own graph_expand stage since
+EXP-075. This script's other two measurements (hybrid retrieval,
+reranker lift) are unaffected as historical results -- results.json is
+still the record of all three -- but the script itself can no longer
+run as one unit now that its graph import is gone. Recover the deleted
+module with `git show <commit before this deletion>:lab/common/
+graph.py` if this judgment is ever revisited.
+"""
 
 from __future__ import annotations
 

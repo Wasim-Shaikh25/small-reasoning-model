@@ -9,9 +9,7 @@
     "rule_tagger_pred": [
       "cocoa exchange",
       "gerald clancy",
-      "howard katz",
-      "the new",
-      "york coffee"
+      "howard katz"
     ],
     "real_ner_pred": [
       "cocoa exchange",
@@ -47,7 +45,7 @@
       "International Coffee Organization"
     ],
     "rule_tagger_pred": [
-      "international coffee",
+      "international coffee organization",
       "jorge cardenas"
     ],
     "real_ner_pred": [
@@ -68,16 +66,11 @@
     "gold": [
       "Daniel Arap Moi"
     ],
-    "rule_tagger_pred": [
-      "arap moi",
-      "president daniel"
-    ],
+    "rule_tagger_pred": [],
     "real_ner_pred": [
       "daniel arap moi"
     ],
-    "rule_tagger_hits": [
-      "Daniel Arap Moi"
-    ],
+    "rule_tagger_hits": [],
     "real_ner_hits": [
       "Daniel Arap Moi"
     ]
@@ -88,16 +81,11 @@
       "Robin Taylor",
       "ZIANA"
     ],
-    "rule_tagger_pred": [
-      "administrative executive",
-      "robin taylor"
-    ],
+    "rule_tagger_pred": [],
     "real_ner_pred": [
       "robin taylor"
     ],
-    "rule_tagger_hits": [
-      "Robin Taylor"
-    ],
+    "rule_tagger_hits": [],
     "real_ner_hits": [
       "Robin Taylor"
     ]
@@ -109,11 +97,8 @@
       "International Coffee Organisation"
     ],
     "rule_tagger_pred": [
-      "alejandro martinez",
-      "international coffee",
-      "latin american",
-      "nicaraguan foreign",
-      "trade minister"
+      "international coffee organisation",
+      "latin american"
     ],
     "real_ner_pred": [
       "cuenca",
@@ -121,7 +106,6 @@
       "nicaraguan foreign"
     ],
     "rule_tagger_hits": [
-      "Alejandro Martinez Cuenca",
       "International Coffee Organisation"
     ],
     "real_ner_hits": [
@@ -136,7 +120,7 @@
     ],
     "rule_tagger_pred": [
       "co inc",
-      "george gordon"
+      "george gordon paton"
     ],
     "real_ner_pred": [
       "co inc",
@@ -155,7 +139,7 @@
       "International Coffee Organization"
     ],
     "rule_tagger_pred": [
-      "international coffee"
+      "international coffee organization"
     ],
     "real_ner_pred": [
       "ico",
@@ -175,13 +159,15 @@
       "IBC"
     ],
     "rule_tagger_pred": [
-      "president jorio"
+      "president jorio dauster"
     ],
     "real_ner_pred": [
       "ibc",
       "jorio dauster"
     ],
-    "rule_tagger_hits": [],
+    "rule_tagger_hits": [
+      "Jorio Dauster"
+    ],
     "real_ner_hits": [
       "Jorio Dauster",
       "IBC"
@@ -193,13 +179,15 @@
       "Rene Montes"
     ],
     "rule_tagger_pred": [
-      "ambassador rene"
+      "ambassador rene montes"
     ],
     "real_ner_pred": [
       "ico",
       "rene montes"
     ],
-    "rule_tagger_hits": [],
+    "rule_tagger_hits": [
+      "Rene Montes"
+    ],
     "real_ner_hits": [
       "Rene Montes"
     ]
@@ -212,7 +200,6 @@
     ],
     "rule_tagger_pred": [
       "teck hock",
-      "united industrial",
       "united industrial corp ltd"
     ],
     "real_ner_pred": [

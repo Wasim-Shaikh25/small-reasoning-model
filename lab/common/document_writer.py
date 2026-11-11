@@ -57,30 +57,60 @@ def write_document(title: str, assembled: dict, findings: list[dict], task: str,
     real citation to an actual outside source, if a template ever needs
     one, is a different thing -- part of the content, written into a
     finding's own statement text, not this internal marker.
+
+    Writes straight to `out_path` as each piece (title, TOC, body,
+    citation index) is produced, instead of concatenating everything into
+    one `rendered` string first and writing that in a single call (2026-
+    11-11) -- for a long document, that used to mean two full-document-
+    sized strings alive at once (`assembled["document"]`, already built by
+    the caller, plus this function's own copy of the same text wrapped in
+    headers) purely to hand the same bytes to `write_text` once. The file
+    on disk is byte-identical either way; only the peak memory this
+    function itself adds on top of what the caller already holds changes.
+    `assembled["document"]` is still one full string in memory by the time
+    this function is called -- that part is the caller's
+    (lab.common.longform.write_long_document's) contract, not something a
+    streaming write here can undo; see that module's docstring for why.
     """
     outline = build_outline(findings, task)
-    cite_markers = citation_markers(assembled["document"])
+    document_text = assembled["document"]
+    cite_markers = citation_markers(document_text)
     toc_titles = leaf_titles if leaf_titles is not None else [leaf["title"] for leaf in outline]
 
-    sections = [
-        f"# {title}",
-        "## Table of Contents",
-        "\n".join(f"{i + 1}. {t}" for i, t in enumerate(toc_titles)),
-        "## Document",
-        assembled["document"],
-    ]
-    if include_citation_index:
-        sections += ["## Citation Index", _citation_index(cite_markers)]
-    rendered = "\n\n".join(sections) + "\n"
+    head = "\n\n".join(
+        [
+            f"# {title}",
+            "## Table of Contents",
+            "\n".join(f"{i + 1}. {t}" for i, t in enumerate(toc_titles)),
+            "## Document",
+        ]
+    )
 
     out_path = Path(out_path)
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    out_path.write_text(rendered, encoding="utf-8")
+
+    hasher = hashlib.sha256()
+    word_count = 0
+
+    with out_path.open("w", encoding="utf-8") as fh:
+        def _write(chunk: str) -> None:
+            nonlocal word_count
+            fh.write(chunk)
+            hasher.update(chunk.encode("utf-8"))
+            word_count += len(chunk.split())
+
+        _write(head)
+        _write("\n\n")
+        _write(document_text)
+        if include_citation_index:
+            _write("\n\n## Citation Index\n\n")
+            _write(_citation_index(cite_markers))
+        _write("\n")
 
     return {
         "path": str(out_path),
-        "sha256": hashlib.sha256(rendered.encode("utf-8")).hexdigest(),
+        "sha256": hasher.hexdigest(),
         "sections": len(toc_titles),
-        "word_count": len(rendered.split()),
+        "word_count": word_count,
         "citations_indexed": len(cite_markers),
     }

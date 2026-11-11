@@ -1,0 +1,60 @@
+{
+  "id": "EXP-101",
+  "title": "lab.common.paged.WorkingSet wired into brain.reason as working_set_budget, capping connector-fetched passages only",
+  "status": "closed",
+  "goal": "Give lab.common.paged.WorkingSet -- a confirmed-dormant module matching the project owner's own 'brain RAM, not bounded by context length' architecture question -- its first real wiring into the live reasoning path, closing the concrete gap a connector (EXP-099) exposes: nothing today bounds how many passages a single connector fetch can add to a reasoning pass.",
+  "method": "A six-passage Store collection where only one passage actually answers the ask, the rest ranging from loosely related to irrelevant. Three reason() calls: no budget (today's default, all six fetched); working_set_budget=2 (checking eviction fires, the relevant passage survives, and the answer is still correct); and the same budget with one passage supplied directly by the caller alongside the connector (checking that directly-supplied passages are never eviction candidates).",
+  "metrics": {
+    "no_budget": {
+      "decision": "supported",
+      "fetched_count": 6,
+      "correct": true
+    },
+    "capped_budget_2": {
+      "decision": "supported",
+      "text": "30 days [S3]",
+      "fetched": [
+        "S3",
+        "S4"
+      ],
+      "evicted": [
+        "S5",
+        "S0",
+        "S1",
+        "S2"
+      ],
+      "correct": true
+    },
+    "direct_passage_survives_eviction": {
+      "decision": "supported",
+      "fetched": [
+        "S3",
+        "S4"
+      ],
+      "evicted": [
+        "S0",
+        "S1",
+        "S2"
+      ],
+      "correct": true
+    }
+  },
+  "results_prose": "No budget (today's default, unchanged): connector fetches all 6 of 6 candidate passages, decision='supported'. working_set_budget=2: only 2 survive (['S3', 'S4']), 4 evicted (['S5', 'S0', 'S1', 'S2']) -- the actually-relevant passage (S3) survives, the answer is still correct: '30 days [S3]'. Same budget, with one passage (S5) supplied directly by the caller instead of through the connector: S5 appears in neither the fetch nor the eviction list (True) -- confirming only connector-fetched passages are ever subject to eviction, never what the caller directly supplied.",
+  "conclusion": "lab.common.paged.WorkingSet is now wired into lab.common.brain.reason (working_set_budget=, default None, zero regression for every existing caller) as a real cap on how many passages a connector can add to a single reasoning pass: without it, a connector's fetch grows passages unboundedly; with it, only the budget's worth of most ask-relevant hits survive, least-relevant-first eviction, and the answer is still correctly produced from the surviving relevant passage. Passages the caller supplies directly are never subject to this eviction at all, by construction (only new_passages from the connector fetch are ever passed through WorkingSet), not just by coincidence on this fixture.",
+  "scale_down": "Six passages, one collection, budget=2 -- a proof the wiring works end to end and correctly scopes eviction to connector-fetched passages only, not a capacity benchmark at corpus scale.",
+  "referenced_files": [
+    "lab/exp_101_working_set_wiring/run.py",
+    "lab/common/brain.py",
+    "lab/common/paged.py",
+    "lab/common/relevance.py",
+    "data/exp_101_working_set_wiring/results.json"
+  ],
+  "follow_ups": [
+    "Only wired at the one connector-fetch point in _reason_once -- the deeper scoped/graph_expand passage accumulation further into the function is not capped by this parameter at all, and was deliberately left untouched (see this module's own docstring for why); a document with a very large entity-graph expansion could still grow scoped without a budget.",
+    "lab.common.paged.Notebook (sub-question row tracking, the other half of EXP-015) is still unwired -- this exploration only wires WorkingSet; Notebook's own purpose (tracking per-subquestion coverage) could parallel plan_stages' existing subquestions field, untested here.",
+    "Relevance is ask_relevance's lexical coverage score, the same scale-down every other lexical-overlap gate in this repo already carries (a true paraphrase with no shared word stems scores low) -- untested against a connector with strong dense-only hits that a lexical score would undervalue."
+  ],
+  "elapsed_sec": 10.5218,
+  "peak_rss_mb": 2801.74,
+  "models_used": "None -- WorkingSet's eviction is deterministic; ask_relevance (lexical coverage) drives the relevance score, no model of any kind."
+}

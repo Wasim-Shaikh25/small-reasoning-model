@@ -80,7 +80,16 @@
           "fact_verb_lemma": "process",
           "consequence": "it is unlawful although the data subject has given explicit consent"
         },
-        "fact_passage": "fact-1"
+        "fact_passage": "fact-1",
+        "derived": [
+          {
+            "subject": "MedCorp",
+            "verb_lemma": "be",
+            "object": "unlawful",
+            "raw": "it is unlawful although the data subject has given explicit consent",
+            "justification": null
+          }
+        ]
       },
       {
         "step": "check_exception",
@@ -211,7 +220,16 @@
           "fact_verb_lemma": "process",
           "consequence": "it is unlawful although the data subject has given explicit consent"
         },
-        "fact_passage": "fact-1"
+        "fact_passage": "fact-1",
+        "derived": [
+          {
+            "subject": "MedCorp",
+            "verb_lemma": "be",
+            "object": "unlawful",
+            "raw": "it is unlawful although the data subject has given explicit consent",
+            "justification": null
+          }
+        ]
       },
       {
         "step": "check_exception",
@@ -342,7 +360,16 @@
           "fact_verb_lemma": "process",
           "consequence": "it is unlawful although the data subject has given explicit consent"
         },
-        "fact_passage": "fact-1"
+        "fact_passage": "fact-1",
+        "derived": [
+          {
+            "subject": "MedCorp",
+            "verb_lemma": "be",
+            "object": "unlawful",
+            "raw": "it is unlawful although the data subject has given explicit consent",
+            "justification": null
+          }
+        ]
       },
       {
         "step": "check_exception",

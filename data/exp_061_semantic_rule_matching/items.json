@@ -44,8 +44,8 @@
     "exact_correct": false,
     "semantic_matched": true,
     "semantic_nli": {
-      "entail": 0.7959,
-      "neutral": 0.2004,
+      "entail": 0.7949,
+      "neutral": 0.2014,
       "contradict": 0.0038
     },
     "semantic_correct": true
@@ -61,8 +61,8 @@
     "exact_correct": false,
     "semantic_matched": true,
     "semantic_nli": {
-      "entail": 0.8751,
-      "neutral": 0.1233,
+      "entail": 0.8754,
+      "neutral": 0.123,
       "contradict": 0.0016
     },
     "semantic_correct": true
@@ -95,7 +95,7 @@
     "exact_correct": false,
     "semantic_matched": true,
     "semantic_nli": {
-      "entail": 0.9713,
+      "entail": 0.9712,
       "neutral": 0.0275,
       "contradict": 0.0012
     },
@@ -113,8 +113,8 @@
     "semantic_matched": false,
     "semantic_nli": {
       "entail": 0.0005,
-      "neutral": 0.1193,
-      "contradict": 0.8801
+      "neutral": 0.1181,
+      "contradict": 0.8814
     },
     "semantic_correct": true
   },
@@ -147,8 +147,8 @@
     "semantic_matched": false,
     "semantic_nli": {
       "entail": 0.0012,
-      "neutral": 0.3954,
-      "contradict": 0.6035
+      "neutral": 0.395,
+      "contradict": 0.6039
     },
     "semantic_correct": true
   },

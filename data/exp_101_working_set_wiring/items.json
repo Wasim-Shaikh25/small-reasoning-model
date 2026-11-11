@@ -1,0 +1,35 @@
+{
+  "no_budget": {
+    "decision": "supported",
+    "fetched_count": 6,
+    "correct": true
+  },
+  "capped_budget_2": {
+    "decision": "supported",
+    "text": "30 days [S3]",
+    "fetched": [
+      "S3",
+      "S4"
+    ],
+    "evicted": [
+      "S5",
+      "S0",
+      "S1",
+      "S2"
+    ],
+    "correct": true
+  },
+  "direct_passage_survives_eviction": {
+    "decision": "supported",
+    "fetched": [
+      "S3",
+      "S4"
+    ],
+    "evicted": [
+      "S0",
+      "S1",
+      "S2"
+    ],
+    "correct": true
+  }
+}

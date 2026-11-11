@@ -7,6 +7,13 @@ lab.common.real_encoders.real_qa in place of lab.common.qa.answer_question.
 Provenance tagging itself (lab.common.provenance.tag_statement,
 answer_from_context_or_abstain) is unchanged deterministic code; only the
 span that feeds it now comes from the real checkpoint.
+
+RETIRED (2026-11-11): lab.common.provenance was deleted -- see EXP-013's
+own RETIRED note (lab/exp_013_provenance/run.py) for the full reasoning;
+the same applies here unchanged, since this experiment only reruns
+EXP-013's fixture with a different QA checkpoint, not different
+provenance logic. Kept as the historical record (results.json
+unaffected); running this script again will now ImportError.
 """
 
 from __future__ import annotations

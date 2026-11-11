@@ -148,13 +148,6 @@ def query_variants(ask: str, phrases: list[str], subquestions: list[str]) -> lis
     return out[:8]
 
 
-def pseudo_relevance(top_passage: str, limit: int = 4) -> list[str]:
-    counts: dict[str, int] = {}
-    for tok in content_tokens(top_passage):
-        counts[tok] = counts.get(tok, 0) + 1
-    return sorted(counts, key=lambda t: (-counts[t], t))[:limit]
-
-
 def analyze(ask: str) -> dict:
     task = classify_task(ask)
     depth = classify_depth(ask, task)

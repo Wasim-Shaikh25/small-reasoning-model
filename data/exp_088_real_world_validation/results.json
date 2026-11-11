@@ -12,13 +12,13 @@
       "per_exception": [
         {
           "status": "holds",
-          "best_entail": 0.7944,
+          "best_entail": 0.7943,
           "best_contradict": 0.0039
         },
         {
           "status": "unknown",
-          "best_entail": 0.0804,
-          "best_contradict": 0.0286
+          "best_entail": 0.0806,
+          "best_contradict": 0.0287
         },
         {
           "status": "unknown",
@@ -35,16 +35,16 @@
         {
           "status": "not_holds",
           "best_entail": 0.0014,
-          "best_contradict": 0.9703
+          "best_contradict": 0.9702
         },
         {
           "status": "holds",
-          "best_entail": 0.937,
+          "best_entail": 0.9371,
           "best_contradict": 0.0041
         },
         {
           "status": "unknown",
-          "best_entail": 0.0695,
+          "best_entail": 0.0694,
           "best_contradict": 0.0085
         }
       ]
@@ -57,16 +57,16 @@
         {
           "status": "unknown",
           "best_entail": 0.0042,
-          "best_contradict": 0.0046
+          "best_contradict": 0.0047
         },
         {
           "status": "unknown",
-          "best_entail": 0.2638,
-          "best_contradict": 0.0155
+          "best_entail": 0.2637,
+          "best_contradict": 0.0154
         },
         {
           "status": "unknown",
-          "best_entail": 0.6914,
+          "best_entail": 0.691,
           "best_contradict": 0.0083
         }
       ]
@@ -83,7 +83,7 @@
         },
         {
           "status": "unknown",
-          "best_entail": 0.0579,
+          "best_entail": 0.058,
           "best_contradict": 0.013
         },
         {
@@ -94,7 +94,7 @@
       ]
     }
   },
-  "results_prose": "3/4 cases' measured status matched the real-world expected conclusion, with no wording retried or tuned after seeing a score. consent_ico_gym: expected='holds', measured='holds' (matches_expected=True) -- per-exception: [holds(e=0.7944,c=0.0039), unknown(e=0.0804,c=0.0286), unknown(e=0.0081,c=0.0056)] | vital_interests_ico_unconscious: expected='holds', measured='holds' (matches_expected=True) -- per-exception: [not_holds(e=0.0014,c=0.9703), holds(e=0.937,c=0.0041), unknown(e=0.0695,c=0.0085)] | legal_claims_ico_tribunal: expected='holds', measured='unknown' (matches_expected=False) -- per-exception: [unknown(e=0.0042,c=0.0046), unknown(e=0.2638,c=0.0155), unknown(e=0.6914,c=0.0083)] | violation_aepd_eurocollege: expected='unknown', measured='unknown' (matches_expected=True) -- per-exception: [unknown(e=0.0054,c=0.0076), unknown(e=0.0579,c=0.013), unknown(e=0.0107,c=0.0086)]",
+  "results_prose": "3/4 cases' measured status matched the real-world expected conclusion, with no wording retried or tuned after seeing a score. consent_ico_gym: expected='holds', measured='holds' (matches_expected=True) -- per-exception: [holds(e=0.7943,c=0.0039), unknown(e=0.0806,c=0.0287), unknown(e=0.0081,c=0.0056)] | vital_interests_ico_unconscious: expected='holds', measured='holds' (matches_expected=True) -- per-exception: [not_holds(e=0.0014,c=0.9702), holds(e=0.9371,c=0.0041), unknown(e=0.0694,c=0.0085)] | legal_claims_ico_tribunal: expected='holds', measured='unknown' (matches_expected=False) -- per-exception: [unknown(e=0.0042,c=0.0047), unknown(e=0.2637,c=0.0154), unknown(e=0.691,c=0.0083)] | violation_aepd_eurocollege: expected='unknown', measured='unknown' (matches_expected=True) -- per-exception: [unknown(e=0.0054,c=0.0076), unknown(e=0.058,c=0.013), unknown(e=0.0107,c=0.0086)]",
   "conclusion": "On real worked examples fetched from the UK ICO's own published guidance and a real AEPD enforcement decision -- never reworded to mirror GDPR Art 9's own clause phrasing, never tuned against the model's score -- 3/4 cases matched the expected real-world conclusion. At least one real-world scenario did not match the expected conclusion -- see metrics.per_exception for the exact entailment/contradiction scores measured. This is the honest finding EXP-085's hand-tuned validation could not surface: check_exception's entailment gate may not generalize past text engineered to closely mirror the exception clause's own wording, which is exactly the brittleness EXP-085's own follow-ups already flagged as a real risk on natural (not hand-tuned) context text.",
   "scale_down": "Four real scenarios (three ICO worked examples plus one enforcement decision), not a broad corpus of case law -- a real validation of the mechanism's entailment gate against authoritative, unmodified source language, not a comprehensive legal benchmark. Each ICO scenario is restated as a short declarative summary close to the source's own wording rather than quoted at full length -- reproducing the full guidance page verbatim was neither necessary nor appropriate to copy at length.",
   "referenced_files": [
@@ -108,7 +108,7 @@
     "If any case's measured status did not match its expected real-world conclusion (see metrics), the real next step is NOT to reword that case's context text to force a match -- that would repeat exactly the tuning this exploration exists to avoid. It is either accepting check_exception's current entailment gate as genuinely limited to lexically-close evidence, or testing whether a different NLI checkpoint / a sentence-splitting preprocessing step (EXP-083's own named follow-up) closes the gap -- a separate, measured exploration either way.",
     "Only one real-world sentence was tested per exception; a single sentence is also EXP-083's and EXP-085's own known scale-down (check_exception reads one premise at a time) -- a longer real passage with the relevant evidence buried among unrelated sentences was not tested here either."
   ],
-  "elapsed_sec": 3379.3296,
-  "peak_rss_mb": 586.56,
+  "elapsed_sec": 11.9216,
+  "peak_rss_mb": 2801.8,
   "models_used": "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli (per-exception entailment via the existing, unmodified check_exception/check_exceptions). No generative model. No new dependency."
 }

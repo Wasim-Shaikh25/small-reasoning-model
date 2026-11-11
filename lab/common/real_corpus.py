@@ -99,9 +99,3 @@ def save_documents(documents: list[dict]) -> str:
     return str(DOCS_PATH.relative_to(ROOT))
 
 
-def load_documents() -> list[dict]:
-    if not DOCS_PATH.exists():
-        raise FileNotFoundError(
-            f"{DOCS_PATH} is missing. Run lab/exp_025_real_documents/run.py first to fetch the real document collection."
-        )
-    return json.loads(DOCS_PATH.read_text())

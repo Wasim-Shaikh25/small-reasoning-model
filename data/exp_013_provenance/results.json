@@ -30,6 +30,6 @@
     "data/exp_013_provenance/results.json"
   ],
   "follow_ups": [],
-  "elapsed_sec": 0.0026,
-  "peak_rss_mb": 19.84
+  "elapsed_sec": 0.0021,
+  "peak_rss_mb": 19.66
 }

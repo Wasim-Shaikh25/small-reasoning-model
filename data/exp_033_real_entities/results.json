@@ -8,12 +8,12 @@
     "n_sentences": 12,
     "n_gold_entities": 19,
     "rule_tagger": {
-      "precision": 0.52,
-      "recall": 0.6842,
-      "f1": 0.5909,
-      "tp": 13,
-      "fp": 12,
-      "fn": 6
+      "precision": 0.8,
+      "recall": 0.6316,
+      "f1": 0.7059,
+      "tp": 12,
+      "fp": 3,
+      "fn": 7
     },
     "real_pretrained_ner": {
       "precision": 0.6957,
@@ -23,8 +23,8 @@
       "fp": 7,
       "fn": 3
     },
-    "f1_lift": 0.171,
-    "recall_lift": 0.1579,
+    "f1_lift": 0.056,
+    "recall_lift": 0.2105,
     "real_model_card": {
       "ner_model": "en_core_web_sm",
       "ner_source": "https://github.com/explosion/spacy-models (pip wheel, GitHub release asset)",
@@ -42,7 +42,7 @@
       "substitution_is_exact_blueprint_model": false
     }
   },
-  "results_prose": "On 12 real sentences with 19 hand-labeled PERSON/ORG spans, the rule tagger (built for lease fixtures, EXP-008) gets precision 0.52, recall 0.6842, F1 0.5909. The real pretrained spaCy NER (OntoNotes-trained) gets precision 0.6957, recall 0.8421, F1 0.7619. F1 lift from the real pretrained model: +0.1710.",
+  "results_prose": "On 12 real sentences with 19 hand-labeled PERSON/ORG spans, the rule tagger (built for lease fixtures, EXP-008) gets precision 0.8, recall 0.6316, F1 0.7059. The real pretrained spaCy NER (OntoNotes-trained) gets precision 0.6957, recall 0.8421, F1 0.7619. F1 lift from the real pretrained model: +0.0560.",
   "conclusion": "The rule tagger was written against lease-fixture patterns (two-capitalized-word names, Pvt Ltd/Inc suffixes, a fixed exclusion list for false positives like 'New Delhi'). On real open-domain news text it both misses organization abbreviations it has no pattern for (ZIANA, IBC, UIC, Coffee Board) and can mistag place names its exclusion list does not cover as PERSON. The real pretrained OntoNotes NER generalizes across domains without hand-written patterns, which is exactly the generalization gap FORBIDDEN.md's own substitute list predicted. This closes the EXP-033 rerun todo for entity tagging, measured with spaCy rather than GLiNER or dslim/bert-base-NER.",
   "scale_down": "12 hand-labeled sentences, not a held-out annotated corpus (EXP-008 used 52 lines on the lease domain). GLiNER, dslim/bert-base-NER, and libpostal remain unloaded because huggingface.co is blocked by this sandbox's egress policy; see real_model_card. Address/GPE detection is out of scope for this head-to-head since the rule tagger has no general place category.",
   "referenced_files": [
@@ -59,7 +59,7 @@
     "Hand-label a larger gold sentence set (EXP-008-sized, 50+) for a more stable F1 estimate.",
     "If huggingface.co access is ever granted, rerun with GLiNER and dslim/bert-base-NER and compare against this spaCy result."
   ],
-  "elapsed_sec": 0.6716,
-  "peak_rss_mb": 249.04,
+  "elapsed_sec": 1.3284,
+  "peak_rss_mb": 433.01,
   "models_used": "Real pretrained spaCy en_core_web_sm NER (CNN tagger trained on OntoNotes 5) compared against the unmodified EXP-008 rule tagger. GLiNER, dslim/bert-base-NER, and libpostal were not loaded: huggingface.co is blocked in this sandbox (403 CONNECT, policy denial). This is a real, reachable, non-generative pretrained model, not the exact blueprint checkpoint. See lab/common/real_models.py:model_card()."
 }

@@ -352,8 +352,8 @@
       "first": "The withdrawal of consent shall not affect the lawfulness of processing based on consent before its withdrawal.",
       "second": "It shall be as easy to withdraw as to give consent.",
       "similarity": 0.7018,
-      "opening_connective": "as",
-      "opening_connective_operator": "causal",
+      "opening_connective": null,
+      "opening_connective_operator": null,
       "flagged": false
     },
     {

@@ -47,6 +47,6 @@
   "follow_ups": [
     "Re-measure Recall@k on a larger corpus with an on-disk index once one is added. Do not add a generative retriever."
   ],
-  "elapsed_sec": 0.0386,
-  "peak_rss_mb": 125.79
+  "elapsed_sec": 0.0491,
+  "peak_rss_mb": 152.64
 }

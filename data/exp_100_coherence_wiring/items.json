@@ -1,0 +1,29 @@
+{
+  "jump_document": "Ravi Sharma\nRavi Sharma lives at 14 MG Road, Pune 411001. [C0]\nAlso, Ravi Sharma mentioned that the weather forecast predicts heavy rain in Mumbai next week. [C1]",
+  "jump_coherence_flags": [
+    {
+      "leaf_id": "E0000",
+      "index": 0,
+      "first": "Ravi Sharma lives at 14 MG Road, Pune 411001.",
+      "second": "Also, Ravi Sharma mentioned that the weather forecast predicts heavy rain in Mumbai next week.",
+      "similarity": 0.6064,
+      "opening_connective": null,
+      "opening_connective_operator": null,
+      "flagged": true
+    }
+  ],
+  "clean_document": "Ravi Sharma\nRavi Sharma lives at 14 MG Road, Pune 411001. [C0]\nAlso, Ravi Sharma also works at ABC Pvt Ltd in Pune. [C1]",
+  "clean_coherence_flags": [],
+  "plain_english_coherence_flags": [
+    {
+      "leaf_id": "E0000",
+      "index": 0,
+      "first": "Ravi Sharma Ravi Sharma lives at 14 MG Road, Pune 411001.",
+      "second": "Also, Ravi Sharma mentioned that the weather forecast predicts heavy rain in Mumbai next week.",
+      "similarity": 0.583,
+      "opening_connective": null,
+      "opening_connective_operator": null,
+      "flagged": true
+    }
+  ]
+}

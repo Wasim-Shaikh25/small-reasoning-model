@@ -35,7 +35,7 @@
     "data/exp_038_real_provenance_qa/results.json"
   ],
   "follow_ups": [],
-  "elapsed_sec": 72.5675,
-  "peak_rss_mb": 819.34,
+  "elapsed_sec": 9.6569,
+  "peak_rss_mb": 774.67,
   "models_used": "deepset/deberta-v3-base-squad2, a local checkpoint loaded with transformers (not an API call). The provenance gate downstream of it is unchanged deterministic code."
 }
