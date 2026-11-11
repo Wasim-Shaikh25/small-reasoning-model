@@ -49,7 +49,7 @@
     "data/exp_039_real_cross_domain_qa/results.json"
   ],
   "follow_ups": [],
-  "elapsed_sec": 9.2138,
-  "peak_rss_mb": 773.35,
+  "elapsed_sec": 9.2806,
+  "peak_rss_mb": 774.93,
   "models_used": "deepset/deberta-v3-base-squad2, a local checkpoint loaded with transformers (not an API call)."
 }

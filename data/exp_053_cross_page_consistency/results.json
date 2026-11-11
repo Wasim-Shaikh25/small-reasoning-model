@@ -30,7 +30,7 @@
     "data/exp_078_longform_consistency/results.json"
   ],
   "follow_ups": [],
-  "elapsed_sec": 7.5027,
-  "peak_rss_mb": 2685.76,
+  "elapsed_sec": 7.4008,
+  "peak_rss_mb": 2686.0,
   "models_used": "lab.common.rules.extract_fact_triple (spaCy dependency parse, deterministic, unchanged). No generative model, no new dependency."
 }

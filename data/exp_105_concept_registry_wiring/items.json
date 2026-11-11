@@ -1,0 +1,44 @@
+{
+  "concept_match": {
+    "decision": "supported",
+    "text": "# give me a timeline of events\n\n- **passage_id**: P3; **span**: 1 January 2024; **start**: 28; **end**: 42; **label**: date; **sentence**: A second filing occurred on 1 January 2024 under Section 9.\n- **passage_id**: P1; **span**: 2 March 2024; **start**: 25; **end**: 37; **label**: date; **sentence**: The purchase was made on 2 March 2024.\n- **passage_id**: P2; **span**: 5 April 2024; **start**: 24; **end**: 36; **label**: date; **sentence**: The notice was filed on 5 April 2024 under Section 12.\n",
+    "trace_step": {
+      "step": "concept_match",
+      "concept": "timeline",
+      "score": 1.0,
+      "method": "alias"
+    },
+    "dependency_tree_node": [
+      {
+        "id": "concept:timeline",
+        "kind": "concept_match",
+        "summary": "matched taught concept 'timeline' via alias (score 1.0)",
+        "depends_on": [
+          "P1",
+          "P2",
+          "P3"
+        ]
+      }
+    ],
+    "citations": [
+      "P1",
+      "P2",
+      "P3"
+    ],
+    "correct": true
+  },
+  "no_registry_baseline": {
+    "decision": "supported",
+    "text": "30 days [Q1]",
+    "correct": true
+  },
+  "registered_but_unrelated_ask": {
+    "decision": "supported",
+    "text": "30 days [Q1]",
+    "correct": true
+  },
+  "ask_matches_nothing_known_primitive": {
+    "decision": "inconclusive",
+    "correct": true
+  }
+}

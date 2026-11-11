@@ -90,6 +90,12 @@ Every tool this calls is a primitive already built and separately measured:
     many pages of cross-page memory one document-write call holds in RAM
     at once -- three separate, independently-opt-in RAM primitives, not
     one mechanism wearing three names.
+  - lab.common.concept_tools (2026-11-11, `concepts=`/`records=`): the
+    teach-tool concept registry (lab/common/concepts/*.yaml, empty by
+    default) checked first, ahead of plan_stages -- a true no-op for any
+    ask that doesn't match something actually taught, since the shipped
+    registry starts empty; see reason()'s own docstring for why a match
+    takes dispatch priority over the stages below.
   - lab.common.article_tool (2026-11-11, `notes=`): a genuinely different
     question shape ("structure these notes, grounded only in these
     sources" instead of "answer this ask from these passages") dispatched
@@ -470,6 +476,8 @@ def reason(
     working_memory_ram_budget: int | None = None,
     working_memory_overflow_path: str | None = None,
     notes: str | None = None,
+    concepts: list[dict] | None = None,
+    records: list[dict] | None = None,
 ) -> dict:
     """Thin outer wrapper around `_reason_once` (the function this
     docstring used to belong to, unchanged below) adding the two
@@ -600,6 +608,19 @@ def reason(
     of `"supported"` if `write_article_tool` found a relationship cycle
     across the input (e.g. A paid B, B paid C, C paid A). A no-op for
     every existing caller, which never sets this.
+
+    `concepts`/`records` (2026-11-11, both default None): thread straight
+    through to `lab.common.concept_tools.match_concept`/`teach_and_run`.
+    `concepts=None` means "whatever is registered on disk under
+    lab/common/concepts/" (`load_concepts()`'s own scan, empty by default
+    -- a fresh install teaches its own); passing a list overrides that
+    scan the same way `lab.common.engine.run`'s own `concepts` parameter
+    does, e.g. for a caller/tenant with its own taught-concept set.
+    `records` are already-structured rows (e.g. party data) alongside
+    `passages`' raw text -- see `concept_tools`'s own module docstring
+    for `ctx`'s exact shape. A no-op for every ask that doesn't match
+    anything registered, which is every ask today unless something has
+    actually been taught.
     """
     if use_spellfix:
         from lab.common.spellfix import fix_sentence_joint
@@ -621,6 +642,8 @@ def reason(
         working_memory_ram_budget=working_memory_ram_budget,
         working_memory_overflow_path=working_memory_overflow_path,
         notes=notes,
+        concepts=concepts,
+        records=records,
     )
     round_num = 1
     while connector is not None and round_num < retrieve_budget and result["decision"] in ("inconclusive", "ungrounded"):
@@ -642,6 +665,8 @@ def reason(
             working_memory_ram_budget=working_memory_ram_budget,
             working_memory_overflow_path=working_memory_overflow_path,
             notes=notes,
+            concepts=concepts,
+            records=records,
         )
         retried["trace"] = result["trace"] + [{"step": "retrieve_more", "round": round_num, "connector_top_k": connector_top_k}] + retried["trace"]
         result = retried
@@ -668,7 +693,7 @@ def reason(
     return result
 
 
-def _reason_once(ask: str, passages: list[dict], use_real_ner: bool = False, connector=None, connector_top_k: int = 5, use_real_qa: bool = False, use_real_nli: bool = False, plain_english: bool = False, template_id: str | None = None, decision_findings_only: bool = False, working_set_budget: int | None = None, memory_path: str | None = None, working_memory_ram_budget: int | None = None, working_memory_overflow_path: str | None = None, notes: str | None = None) -> dict:
+def _reason_once(ask: str, passages: list[dict], use_real_ner: bool = False, connector=None, connector_top_k: int = 5, use_real_qa: bool = False, use_real_nli: bool = False, plain_english: bool = False, template_id: str | None = None, decision_findings_only: bool = False, working_set_budget: int | None = None, memory_path: str | None = None, working_memory_ram_budget: int | None = None, working_memory_overflow_path: str | None = None, notes: str | None = None, concepts: list[dict] | None = None, records: list[dict] | None = None) -> dict:
     """One single pass of the signal-chain below -- called directly by
     reason() above, once per retry round. `use_real_ner=True` threads
     through to every lab.common.entities.
@@ -820,6 +845,40 @@ def _reason_once(ask: str, passages: list[dict], use_real_ner: bool = False, con
             # call), reported rather than silently dropped, same posture
             # consistency_flags/coherence_flags already take.
             trace.append({"step": "memory_recall", "hits": recalled})
+
+    # lab.common.concept_tools (2026-11-10, "the teach-tool concept
+    # registry"): a caller-extensible alternative to every stage below --
+    # a new capability is taught by adding a YAML file under
+    # lab/common/concepts/, never by writing new Python. match_concept
+    # checks the ask against whatever is registered (load_concepts()'s
+    # own on-disk scan when `concepts` is not given, exactly as
+    # lab.common.engine.run already does) and is a true no-op whenever
+    # nothing is registered -- the shipped registry starts empty by
+    # design, so this never changes behavior for an ask that doesn't
+    # match a concept anyone actually taught, with no flag required to
+    # keep it off. A match takes priority over the stage-planning below
+    # (same "an explicit, more specific signal wins" precedent
+    # document_write's own intent signal already sets), since the
+    # concept registry's own alias/embedding match is itself a
+    # confidence-gated decision about what this ask is asking for.
+    from lab.common.concept_tools import match_concept, teach_and_run
+
+    concept_match = match_concept(ask, concepts)
+    if concept_match["concept"] is not None:
+        from lab.common.render import render_md
+
+        concept_name = concept_match["concept"].get("concept")
+        ctx = {"passages": passages, "records": records or []}
+        outcome = teach_and_run(ask, ctx, concepts=concepts)
+        trace.append({"step": "concept_match", "concept": concept_name, "score": concept_match["score"], "method": concept_match["method"]})
+        if not outcome["ok"]:
+            return _finish(ask, trace, "inconclusive", ABSTAIN_TEXT, set(), reason=outcome["reason"], dependency_tree=dep_nodes)
+        rows = outcome["result"] if isinstance(outcome["result"], list) else [outcome["result"]]
+        cited = {row["passage_id"] for row in rows if isinstance(row, dict) and row.get("passage_id")}
+        _add_dependency(dep_nodes, f"concept:{concept_name}", "concept_match", f"matched taught concept {concept_name!r} via {concept_match['method']} (score {concept_match['score']})", sorted(cited))
+        trace.append({"step": "concept_result", "ok": True, "rows": len(rows)})
+        return _finish(ask, trace, "supported", render_md(outcome["result"], ask), cited, dependency_tree=dep_nodes)
+
     stage_plan = plan_stages(ask, passages, use_real_ner=use_real_ner)
     trace.append({"step": "plan", **stage_plan})
     # From here on, whether a block below EXECUTES is always decided by

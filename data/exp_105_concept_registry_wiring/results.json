@@ -1,0 +1,70 @@
+{
+  "id": "EXP-105",
+  "title": "lab.common.concept_tools wired into brain.reason ahead of plan_stages, a true no-op until a concept is actually taught",
+  "status": "closed",
+  "goal": "Close the gap the concept-registry's own original exploration explicitly left open ('not wired into brain.reason ... a new, separate entry point, not a replacement for the existing pipeline'), asked directly: this is the project's own single stated controller, and a taught capability should be reachable through it, not only through the separate lab.common.engine.run.",
+  "method": "The shipped 'timeline' example concept (never auto-loaded by load_concepts(), passed explicitly here) answers a real timeline ask through reason(), checking decision, trace, dependency_tree, and derived citations. Three negative/boundary cases: nothing registered at all (today's shipped default); the concept registered but the ask is unrelated; and an ask matching no known concept or primitive.",
+  "metrics": {
+    "concept_match": {
+      "decision": "supported",
+      "text": "# give me a timeline of events\n\n- **passage_id**: P3; **span**: 1 January 2024; **start**: 28; **end**: 42; **label**: date; **sentence**: A second filing occurred on 1 January 2024 under Section 9.\n- **passage_id**: P1; **span**: 2 March 2024; **start**: 25; **end**: 37; **label**: date; **sentence**: The purchase was made on 2 March 2024.\n- **passage_id**: P2; **span**: 5 April 2024; **start**: 24; **end**: 36; **label**: date; **sentence**: The notice was filed on 5 April 2024 under Section 12.\n",
+      "trace_step": {
+        "step": "concept_match",
+        "concept": "timeline",
+        "score": 1.0,
+        "method": "alias"
+      },
+      "dependency_tree_node": [
+        {
+          "id": "concept:timeline",
+          "kind": "concept_match",
+          "summary": "matched taught concept 'timeline' via alias (score 1.0)",
+          "depends_on": [
+            "P1",
+            "P2",
+            "P3"
+          ]
+        }
+      ],
+      "citations": [
+        "P1",
+        "P2",
+        "P3"
+      ],
+      "correct": true
+    },
+    "no_registry_baseline": {
+      "decision": "supported",
+      "text": "30 days [Q1]",
+      "correct": true
+    },
+    "registered_but_unrelated_ask": {
+      "decision": "supported",
+      "text": "30 days [Q1]",
+      "correct": true
+    },
+    "ask_matches_nothing_known_primitive": {
+      "decision": "inconclusive",
+      "correct": true
+    }
+  },
+  "results_prose": "The shipped 'timeline' example concept, passed explicitly, answers 'give me a timeline of events' through the real reason() entry point: decision='supported', matched via 'alias' (score 1.0), citations=['P1', 'P2', 'P3'] -- all 3 source passages, derived from the concept result's own passage_id fields, not guessed. With nothing registered at all (today's shipped default), an ordinary lookup ask takes the exact same path as before this wiring existed: decision='supported', zero concept_match step in trace. With the timeline concept registered but the ask being an unrelated ordinary lookup, the concept's own alias/embedding match correctly does not fire: decision='supported', text unchanged -- registering one concept does not hijack every other ask. An ask matching no taught concept and no registered primitive (concepts list given, but nothing aliases to it): decision='inconclusive', the same abstain-don't-guess path, not a crash.",
+  "conclusion": "lab.common.concept_tools is now reachable from lab.common.brain.reason (concepts=/records=, both default None, checked ahead of plan_stages, zero regression for every existing caller since the shipped registry ships empty). The dispatch is correctly scoped both ways: a genuine match answers through the real controller with real citations, and a non-match -- whether because nothing is registered or because the registered concept simply isn't what this particular ask is asking for -- falls straight through to the completely ordinary pipeline, never hijacking an unrelated ask just because some concept happens to be loaded.",
+  "scale_down": "One shipped example concept (timeline), one real match, three negative cases -- a proof the dispatch, citation derivation, and fall-through all work correctly, not a benchmark of concept_tools' own matching accuracy at scale (CONCEPT_TAU's embedding fallback remains provisional, same status this module's own docstring already gives it).",
+  "referenced_files": [
+    "lab/exp_105_concept_registry_wiring/run.py",
+    "lab/common/brain.py",
+    "lab/common/concept_tools.py",
+    "lab/common/render.py",
+    "lab/common/concepts/examples/timeline.yaml",
+    "data/exp_105_concept_registry_wiring/results.json"
+  ],
+  "follow_ups": [
+    "records= (the ctx['records'] half of concept_tools' own input shape, for already-structured rows like party data) is threaded through but not exercised by this exploration -- only a passages-based concept (timeline) was tested; a records-based concept (e.g. parties_name_address) through reason() is a real, untested case.",
+    "Dispatch priority when both a taught concept AND document_write's own wants_document() signal could plausibly apply to the same ask was not tested -- concept-matching runs first unconditionally in the current wiring, so a confident concept match always wins; whether that is the right priority for every future taught concept, versus e.g. letting an explicit template_id/notes= caller signal override it, is a judgment call for whoever teaches a concept that could overlap.",
+    "lab.common.engine.run itself (the separate, still-live sibling entry point this closes part of the gap with) is untouched by this change -- a caller going through engine.run still gets its own connector_config/render output shapes; this wiring only adds a second way to reach concept_tools' own matching+execution, through reason(), not a merge of the two entry points."
+  ],
+  "elapsed_sec": 10.9692,
+  "peak_rss_mb": 2801.36,
+  "models_used": "None for alias matching (exact substring); bge_embed (dense similarity) only for the embedding fallback when no alias matches, same real model concept_tools already used standalone, unconditionally called by this wiring only when it would have been called anyway."
+}
