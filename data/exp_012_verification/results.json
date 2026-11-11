@@ -47,6 +47,6 @@
     "data/exp_012_verification/results.json"
   ],
   "follow_ups": [],
-  "elapsed_sec": 0.0465,
-  "peak_rss_mb": 31.64
+  "elapsed_sec": 0.0425,
+  "peak_rss_mb": 32.2
 }

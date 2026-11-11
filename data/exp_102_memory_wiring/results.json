@@ -61,7 +61,7 @@
     "memory.mark_conflicted is not wired -- nothing today compares a freshly-extracted answer against a still-valid recalled note and flags disagreement; this would parallel lab.common.working_memory's cross-page contradiction check but for cross-call facts instead.",
     "memory_recall is reported in trace only, never used to answer directly or skip extraction -- the same 'report, don't act on it yet' posture coherence_flags/contract_violations started with; a future pass could decide whether a valid, high-confidence recall should ever short-circuit re-extraction."
   ],
-  "elapsed_sec": 13.3221,
-  "peak_rss_mb": 2801.07,
+  "elapsed_sec": 13.7616,
+  "peak_rss_mb": 2801.51,
   "models_used": "None -- memory.py's write/recall/revalidate is pure deterministic SQLite + string/hash comparison; the lookup_fallback answer it wraps uses whichever extractor the caller already selected (use_real_qa or the classical default), unchanged by this wiring."
 }

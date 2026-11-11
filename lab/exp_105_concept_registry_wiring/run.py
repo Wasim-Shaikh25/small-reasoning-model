@@ -27,6 +27,18 @@ even when an unrelated concept IS registered (the taught concept's own
 alias/embedding match correctly does not fire on an ask it was never
 taught to answer, so registering one concept does not hijack every
 other ask).
+
+UPDATE (2026-11-11, same day, later): asked directly why brain.py called
+`concept_tools.match_concept`/`teach_and_run` and `render.render_md`
+directly instead of going through `lab.common.engine`, duplicating the
+same match-execute-render sequence `engine.run` already implements.
+Fixed: that sequence was pulled out of `engine.run` into `lab.common.
+engine.answer_from_concepts`, and `brain.py` now calls that function
+(the same one `engine.run` calls after resolving its own YAML
+connector), instead of reaching past `engine.py` into its own
+dependencies. Re-ran this exploration's own checks after the refactor --
+byte-identical results (see `metrics` and the module's own checks below,
+unchanged by this update).
 """
 
 from __future__ import annotations
@@ -45,6 +57,7 @@ from lab.common.harness import Run
 FILES = [
     "lab/exp_105_concept_registry_wiring/run.py",
     "lab/common/brain.py",
+    "lab/common/engine.py",
     "lab/common/concept_tools.py",
     "lab/common/render.py",
     "lab/common/concepts/examples/timeline.yaml",

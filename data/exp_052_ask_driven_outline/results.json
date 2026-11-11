@@ -27,6 +27,6 @@
   ],
   "follow_ups": [],
   "elapsed_sec": 0.0013,
-  "peak_rss_mb": 165.47,
+  "peak_rss_mb": 165.66,
   "models_used": "lab.common.entities.detect_primary with use_real_ner=False (rule-based person/organization detection, deterministic). No generative model -- this exploration deliberately does not invoke the rewriter (EXP-077/078 already measured that separately)."
 }

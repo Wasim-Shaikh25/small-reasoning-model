@@ -42,7 +42,7 @@
     "The full Flint-style role extraction (Actor/Activation-Condition/Act/Object) remains unscoped -- determine first whether a fine-tuned role model/dataset is actually downloadable, or whether it must be built heuristically from dependency labels, before attempting it, per this todo's own original conclusion.",
     "Wire classify_deontic's output into lab.common.inference so a rule's own modal strength (obligation vs permission) can eventually affect how its consequence is treated, which nothing in lab.common.inference does today."
   ],
-  "elapsed_sec": 11.3998,
-  "peak_rss_mb": 2685.21,
+  "elapsed_sec": 11.3821,
+  "peak_rss_mb": 2684.87,
   "models_used": "spaCy en_core_web_sm dependency parser (lab.common.rules._parser, already a dependency, deterministic). No generative model, no new dependency."
 }

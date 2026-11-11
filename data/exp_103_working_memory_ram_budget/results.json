@@ -58,7 +58,7 @@
     "page_archive's lookup is an exact (subject, verb_lemma) key match, the same access pattern lab.common.memory's notes table already uses -- it deliberately does not use lab.common.nested_index's hierarchical/semantic navigation, which answers a different question (what is this branch ABOUT) that cross-page consistency checking has never needed. If a future need arises to search archived pages by topic rather than by exact claim, that is a real, separate extension, not implied by this one.",
     "No eviction policy beyond strict oldest-first exists (no 'pin this page' concept, unlike lab.common.paged.WorkingSet's relevance-based eviction for retrieval) -- for cross-page consistency checking specifically, recency is not actually the right signal (an old page is exactly as able to conflict with a new one as a recent page is), but the archive's exact-key lookup already makes that largely moot: an archived page is still fully checkable, just not held in RAM, so no page's claim is ever truly lost regardless of eviction order."
   ],
-  "elapsed_sec": 11.2983,
+  "elapsed_sec": 11.464,
   "peak_rss_mb": 2802.05,
   "models_used": "None -- page_archive is deterministic SQLite with an index on (subject, verb_lemma); no model of any kind is involved in archiving or recall."
 }

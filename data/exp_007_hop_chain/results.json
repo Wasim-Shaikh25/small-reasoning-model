@@ -29,6 +29,6 @@
     "data/exp_007_hop_chain/results.json"
   ],
   "follow_ups": [],
-  "elapsed_sec": 0.0454,
-  "peak_rss_mb": 31.58
+  "elapsed_sec": 0.045,
+  "peak_rss_mb": 31.7
 }

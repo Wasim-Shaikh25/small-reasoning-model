@@ -49,7 +49,7 @@
   "follow_ups": [
     "Rerun EXP-012's support re-check and EXP-017's bidirectional-NLI fidelity gate with this same real_nli function (EXP-037, EXP-041) now that it is proven to load and score correctly."
   ],
-  "elapsed_sec": 24.6928,
-  "peak_rss_mb": 1406.13,
+  "elapsed_sec": 14.8786,
+  "peak_rss_mb": 1406.56,
   "models_used": "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli, a local checkpoint loaded with transformers (not an API call). This is the real blueprint NLI judge (ARCHITECTURE.md section 8), not a substitute. It is never used to write answer text, only to score entail/neutral/contradict for a premise/hypothesis pair."
 }

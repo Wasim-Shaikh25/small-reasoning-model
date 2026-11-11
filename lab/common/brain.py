@@ -90,12 +90,16 @@ Every tool this calls is a primitive already built and separately measured:
     many pages of cross-page memory one document-write call holds in RAM
     at once -- three separate, independently-opt-in RAM primitives, not
     one mechanism wearing three names.
-  - lab.common.concept_tools (2026-11-11, `concepts=`/`records=`): the
-    teach-tool concept registry (lab/common/concepts/*.yaml, empty by
-    default) checked first, ahead of plan_stages -- a true no-op for any
-    ask that doesn't match something actually taught, since the shipped
-    registry starts empty; see reason()'s own docstring for why a match
-    takes dispatch priority over the stages below.
+  - lab.common.engine.answer_from_concepts (2026-11-11, `concepts=`/
+    `records=`): the teach-tool concept registry (lab/common/concepts/
+    *.yaml, empty by default), reached through the SAME match-execute-
+    render sequence lab.common.engine.run itself uses -- brain.py calls
+    into engine.py, never around it into concept_tools/render directly,
+    so that sequence is implemented exactly once. Checked first, ahead
+    of plan_stages -- a true no-op for any ask that doesn't match
+    something actually taught, since the shipped registry starts empty;
+    see reason()'s own docstring for why a match takes dispatch priority
+    over the stages below.
   - lab.common.article_tool (2026-11-11, `notes=`): a genuinely different
     question shape ("structure these notes, grounded only in these
     sources" instead of "answer this ask from these passages") dispatched
@@ -849,35 +853,38 @@ def _reason_once(ask: str, passages: list[dict], use_real_ner: bool = False, con
     # lab.common.concept_tools (2026-11-10, "the teach-tool concept
     # registry"): a caller-extensible alternative to every stage below --
     # a new capability is taught by adding a YAML file under
-    # lab/common/concepts/, never by writing new Python. match_concept
-    # checks the ask against whatever is registered (load_concepts()'s
-    # own on-disk scan when `concepts` is not given, exactly as
-    # lab.common.engine.run already does) and is a true no-op whenever
-    # nothing is registered -- the shipped registry starts empty by
-    # design, so this never changes behavior for an ask that doesn't
-    # match a concept anyone actually taught, with no flag required to
-    # keep it off. A match takes priority over the stage-planning below
-    # (same "an explicit, more specific signal wins" precedent
-    # document_write's own intent signal already sets), since the
-    # concept registry's own alias/embedding match is itself a
-    # confidence-gated decision about what this ask is asking for.
-    from lab.common.concept_tools import match_concept, teach_and_run
+    # lab/common/concepts/, never by writing new Python. This goes
+    # through lab.common.engine.answer_from_concepts -- the same match-
+    # execute-render sequence engine.run itself uses -- rather than
+    # calling concept_tools/render directly, so there is exactly one
+    # place that sequence is implemented; brain.py calls INTO engine.py,
+    # it does not duplicate engine.py's own job (2026-11-11, asked
+    # directly: brain keeps full control of *whether* to dispatch here at
+    # all, engine owns *how* a matched concept actually gets executed and
+    # rendered). A true no-op whenever nothing is registered -- the
+    # shipped registry starts empty by design, so this never changes
+    # behavior for an ask that doesn't match a concept anyone actually
+    # taught, with no flag required to keep it off. A match takes
+    # priority over the stage-planning below (same "an explicit, more
+    # specific signal wins" precedent document_write's own intent signal
+    # already sets), since the concept registry's own alias/embedding
+    # match is itself a confidence-gated decision about what this ask is
+    # asking for.
+    from lab.common.engine import answer_from_concepts
 
-    concept_match = match_concept(ask, concepts)
+    ctx = {"passages": passages, "records": records or []}
+    concept_outcome = answer_from_concepts(ask, ctx, concepts=concepts, output_format="md")
+    concept_match = concept_outcome["match"]
     if concept_match["concept"] is not None:
-        from lab.common.render import render_md
-
         concept_name = concept_match["concept"].get("concept")
-        ctx = {"passages": passages, "records": records or []}
-        outcome = teach_and_run(ask, ctx, concepts=concepts)
         trace.append({"step": "concept_match", "concept": concept_name, "score": concept_match["score"], "method": concept_match["method"]})
-        if not outcome["ok"]:
-            return _finish(ask, trace, "inconclusive", ABSTAIN_TEXT, set(), reason=outcome["reason"], dependency_tree=dep_nodes)
-        rows = outcome["result"] if isinstance(outcome["result"], list) else [outcome["result"]]
+        if not concept_outcome["ok"]:
+            return _finish(ask, trace, "inconclusive", ABSTAIN_TEXT, set(), reason=concept_outcome["reason"], dependency_tree=dep_nodes)
+        rows = concept_outcome["result"] if isinstance(concept_outcome["result"], list) else [concept_outcome["result"]]
         cited = {row["passage_id"] for row in rows if isinstance(row, dict) and row.get("passage_id")}
         _add_dependency(dep_nodes, f"concept:{concept_name}", "concept_match", f"matched taught concept {concept_name!r} via {concept_match['method']} (score {concept_match['score']})", sorted(cited))
         trace.append({"step": "concept_result", "ok": True, "rows": len(rows)})
-        return _finish(ask, trace, "supported", render_md(outcome["result"], ask), cited, dependency_tree=dep_nodes)
+        return _finish(ask, trace, "supported", concept_outcome["rendered"], cited, dependency_tree=dep_nodes)
 
     stage_plan = plan_stages(ask, passages, use_real_ner=use_real_ner)
     trace.append({"step": "plan", **stage_plan})

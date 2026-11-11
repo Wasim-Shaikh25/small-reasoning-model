@@ -33,7 +33,7 @@
     "lab/exp_060_unified_brain/run.py"
   ],
   "follow_ups": [],
-  "elapsed_sec": 13.0243,
-  "peak_rss_mb": 2801.15,
+  "elapsed_sec": 16.45,
+  "peak_rss_mb": 2799.85,
   "models_used": "Same as EXP-089/026: spaCy dependency parser (unchanged) + MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli via the existing, unmodified check_exception/check_exceptions. No generative model."
 }

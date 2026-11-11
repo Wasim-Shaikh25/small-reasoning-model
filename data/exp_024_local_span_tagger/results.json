@@ -36,7 +36,7 @@
     "data/exp_080_real_ner_rerun/results.json"
   ],
   "follow_ups": [],
-  "elapsed_sec": 8.5527,
-  "peak_rss_mb": 2798.72,
+  "elapsed_sec": 7.6843,
+  "peak_rss_mb": 2798.88,
   "models_used": "Multinomial logistic regression (sklearn) trained only on labels already stored in this repository. spaCy en_core_web_sm's POS tagger (lab.common.rules._parser, already a dependency) for features -- its NER component is never read. No pretrained NER model, no generative model."
 }
