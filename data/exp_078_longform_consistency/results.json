@@ -44,7 +44,7 @@
     "extract_fact_triple's prepositional-object fallback (this exploration's prerequisite fix) still misses some constructions -- a compound date ('5 January 2024') extracted as just '5' in one spot-check -- worth a dedicated pass if dates become a consistency-check target, not just addresses/employers.",
     "Not yet wired into lab.common.brain.reason as a signal -- this module is callable standalone, not yet reachable through the same entry point every other capability in this repo goes through."
   ],
-  "elapsed_sec": 12.4679,
-  "peak_rss_mb": 2800.34,
+  "elapsed_sec": 12.6696,
+  "peak_rss_mb": 2800.39,
   "models_used": "flan-t5-small via lab.common.rewriter_backends (rewriter role only, fidelity-gated, falling back to deterministic text per leaf on any failure, exactly as EXP-048 measured) -- the pipeline is model-agnostic (EXP-076) and works with any registered checkpoint."
 }

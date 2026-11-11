@@ -41,7 +41,7 @@
   "follow_ups": [
     "No explicit 'reference_date' is threaded through from brain.reason() -- it always defaults to real wall-clock time. A real document's own 'as of' date (if stated) should override this, not attempted here."
   ],
-  "elapsed_sec": 15.8606,
-  "peak_rss_mb": 2800.48,
+  "elapsed_sec": 16.3969,
+  "peak_rss_mb": 2800.96,
   "models_used": "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli via the existing, unmodified check_exception, for event-relative bounds only. dateparser (already a dependency, lab.common.calc.parse_date, deterministic) for absolute dates. No generative model."
 }

@@ -62,7 +62,7 @@
     "The decision label 'supported_with_flags' is reused for a relationship-cycle flag here, the same label document_write's own consistency_flags use for a different kind of flag (cross-page contradiction) -- both mean 'answered, but look closer', which is correct, but a caller inspecting trace needs to check which stage ran (write_article vs longform_write) to know which kind of flag it actually is, not just the top-level decision string.",
     "write_article_tool's own CLI entry point (reading a JSON payload from stdin/argv) is untouched and still works standalone -- this wiring only adds a second way to reach the same function, through reason(), without removing or changing the first."
   ],
-  "elapsed_sec": 10.5558,
-  "peak_rss_mb": 2802.7,
+  "elapsed_sec": 10.4374,
+  "peak_rss_mb": 2801.27,
   "models_used": "None -- write_article_tool's own pipeline (notes_to_findings, the one-finding-at-a-time deterministic splice, assemble, relationship_graph's cycle detection) is fully deterministic as of 2026-11-11 (rewriter_backends's module docstring); no model of any kind is involved in this dispatch."
 }

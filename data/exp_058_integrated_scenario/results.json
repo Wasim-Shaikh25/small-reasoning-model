@@ -54,7 +54,7 @@
     "Add a third, harder case: a story where the role noun appears but negated ('is not a contractor') or where two people in the same story could both match, to test the role check and disambiguation under more adversarial phrasing.",
     "Wire role_matches's substring check through the NLI judge instead, now that EXP-056 showed naive wiring needs care -- measure before assuming it helps."
   ],
-  "elapsed_sec": 0.0201,
+  "elapsed_sec": 0.0191,
   "peak_rss_mb": 166.8,
   "models_used": "No generative model. lab.common.index's hybrid retriever (TF-IDF + BM25, the same classical substitute EXP-004/015/029/040 measured) for disambiguation; lab.common.entities' rule taggers (EXP-009) for name/address; deterministic arithmetic and rule matching for the rest."
 }

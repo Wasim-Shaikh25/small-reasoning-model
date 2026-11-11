@@ -1,0 +1,24 @@
+{
+  "list_arguments_true": {
+    "decision": "supported",
+    "text": "# list every argument\n\n- **rule_passage**: R1; **fact_passage**: F1; **rule_text**: If someone murders a person, it is a punishable crime.; **fact_text**: Arjun murdered Neha.; **consequence**: it is a punishable crime\n- **rule_passage**: R2; **fact_passage**: F2; **rule_text**: If a person steals property, it is a punishable offense.; **fact_text**: Vikram stole a car.; **consequence**: it is a punishable offense\n",
+    "citations": [
+      "F1",
+      "F2",
+      "R1",
+      "R2"
+    ],
+    "found": 2,
+    "dependency_tree_argument_nodes": 2,
+    "correct": true
+  },
+  "no_grounded_arguments_found": {
+    "decision": "inconclusive",
+    "found": 0,
+    "correct": true
+  },
+  "list_arguments_omitted_baseline": {
+    "decision": "supported",
+    "correct": true
+  }
+}

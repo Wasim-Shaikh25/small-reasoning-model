@@ -98,7 +98,7 @@
             "status": "not_in_effect",
             "method": "absolute_date",
             "resolved_date": "2020-01-01T00:00:00",
-            "reference_date": "2026-11-11T23:07:30.038355"
+            "reference_date": "2026-11-12T00:03:58.282880"
           },
           "phrase": "until"
         }
@@ -242,7 +242,7 @@
             "status": "in_effect",
             "method": "absolute_date",
             "resolved_date": "2030-01-01T00:00:00",
-            "reference_date": "2026-11-11T23:07:30.709314"
+            "reference_date": "2026-11-12T00:03:58.958837"
           },
           "phrase": "until"
         }

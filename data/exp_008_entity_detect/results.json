@@ -79,6 +79,6 @@
   "follow_ups": [
     "If hard-slice F1 is not enough, train a span tagger only on locally labeled spans. Do not download a pretrained NER model."
   ],
-  "elapsed_sec": 0.0043,
-  "peak_rss_mb": 159.68
+  "elapsed_sec": 0.0044,
+  "peak_rss_mb": 159.25
 }

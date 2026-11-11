@@ -109,6 +109,11 @@ Every tool this calls is a primitive already built and separately measured:
   - lab.common.calc: arithmetic, EXP-007/014.
   - lab.common.rules: verb-trigger and threshold rule application,
     EXP-057/058/059 (including the role-match guard EXP-058 added).
+  - `_list_grounded_arguments` (2026-11-11, `list_arguments=`): every
+    grounded (rule, fact) match across the whole passage set, not just
+    the one targeted rule the line above resolves for one ask -- ported
+    from the deleted lab.common.method_teaching, see reason()'s own
+    docstring.
   - lab.common.qa: the fallback single-slot extractor, EXP-005.
   - lab.common.verify / lab.common.nli: the same fidelity/entailment checks
     used everywhere else in this repo.
@@ -208,6 +213,59 @@ def _find_verb_rules_with_passages(passages: list[dict]) -> list[tuple[dict, dic
         if rule:
             pairs.append((rule, passage))
     return pairs
+
+
+def _list_grounded_arguments(passages: list[dict]) -> list[dict]:
+    """Every (rule, fact) pair among `passages` where the rule's trigger
+    verb lemma actually matches the fact's verb lemma (`apply_rule`) --
+    "grounded" here means exactly that: a rule that parses but matches no
+    fact, or a fact that matches no rule, never produces an argument.
+    Deliberately enumerates EVERY matching pair across every verb rule in
+    `passages`, not just one -- the rest of this module's rule_application
+    stage resolves a single targeted rule for one specific ask; this is
+    the separate "list every side's valid argument across the whole
+    passage set" operation (ported 2026-11-11 from the deleted
+    lab.common.method_teaching._list_grounded_arguments, which the
+    project's own teach-a-concept registry superseded for everything
+    EXCEPT this one capability -- see that history for why it's being
+    added here directly rather than as a concept: it is not
+    data-parameterizable the way concept_tools' primitives are, it is a
+    second, distinct mode of `apply_rule` itself).
+
+    Scoped the same way the original was: verb-triggered rules only
+    (`parse_conditional_rule`, via `_find_verb_rules_with_passages`), not
+    threshold rules, and `apply_rule`'s exact lemma match, not
+    `semantic_apply_rule`'s paraphrase-robust NLI check. Does NOT run
+    `check_exceptions`/`split_exceptions`' own exception-gate check the
+    single-rule path below does -- a listed argument's consequence may
+    still be blocked by an unlisted exception elsewhere in the same
+    passages; this reports every lemma-grounded match, not a final,
+    exception-adjudicated verdict, the same honest scope the original
+    module's own docstring already stated ("'strong' here means exactly
+    'grounded, actually fires'").
+    """
+    facts = []
+    for passage in passages:
+        if parse_conditional_rule(passage.get("text", "")) or parse_threshold_rule(passage.get("text", "")):
+            continue
+        fact = extract_fact_triple(passage.get("text", ""))
+        if fact and fact.get("verb_lemma"):
+            facts.append((fact, passage))
+    arguments = []
+    for rule, rule_passage in _find_verb_rules_with_passages(passages):
+        for fact, fact_passage in facts:
+            applied = apply_rule(rule, fact)
+            if applied["matched"]:
+                arguments.append(
+                    {
+                        "rule_passage": rule_passage["id"],
+                        "fact_passage": fact_passage["id"],
+                        "rule_text": rule["raw"],
+                        "fact_text": fact["raw"],
+                        "consequence": applied["consequence"],
+                    }
+                )
+    return arguments
 
 
 STAGE_REGISTRY = (
@@ -482,6 +540,7 @@ def reason(
     notes: str | None = None,
     concepts: list[dict] | None = None,
     records: list[dict] | None = None,
+    list_arguments: bool = False,
 ) -> dict:
     """Thin outer wrapper around `_reason_once` (the function this
     docstring used to belong to, unchanged below) adding the two
@@ -625,6 +684,21 @@ def reason(
     for `ctx`'s exact shape. A no-op for every ask that doesn't match
     anything registered, which is every ask today unless something has
     actually been taught.
+
+    `list_arguments` (2026-11-11, default False): checked ahead of the
+    concept registry and plan_stages, same "explicit flag beats an
+    ask-inferred signal" precedent `notes` already sets. Ported from the
+    deleted `lab.common.method_teaching._list_grounded_arguments` (see
+    `_list_grounded_arguments`'s own docstring for exactly what it does
+    and does not check) -- every verb rule among `passages` matched
+    against every fact among `passages`, not just the one targeted rule
+    `rule_application`'s own stage resolves for this specific ask.
+    Returns every grounded match as `text` (rendered via `lab.common.
+    render.render_md`, the same renderer the concept registry uses), one
+    `grounded_argument` dependency_tree node per match, citations the
+    union of every rule/fact passage involved. `"inconclusive"` (never a
+    crash or a guess) when nothing is found. A no-op for every existing
+    caller, which never sets this.
     """
     if use_spellfix:
         from lab.common.spellfix import fix_sentence_joint
@@ -648,6 +722,7 @@ def reason(
         notes=notes,
         concepts=concepts,
         records=records,
+        list_arguments=list_arguments,
     )
     round_num = 1
     while connector is not None and round_num < retrieve_budget and result["decision"] in ("inconclusive", "ungrounded"):
@@ -671,6 +746,7 @@ def reason(
             notes=notes,
             concepts=concepts,
             records=records,
+            list_arguments=list_arguments,
         )
         retried["trace"] = result["trace"] + [{"step": "retrieve_more", "round": round_num, "connector_top_k": connector_top_k}] + retried["trace"]
         result = retried
@@ -697,7 +773,7 @@ def reason(
     return result
 
 
-def _reason_once(ask: str, passages: list[dict], use_real_ner: bool = False, connector=None, connector_top_k: int = 5, use_real_qa: bool = False, use_real_nli: bool = False, plain_english: bool = False, template_id: str | None = None, decision_findings_only: bool = False, working_set_budget: int | None = None, memory_path: str | None = None, working_memory_ram_budget: int | None = None, working_memory_overflow_path: str | None = None, notes: str | None = None, concepts: list[dict] | None = None, records: list[dict] | None = None) -> dict:
+def _reason_once(ask: str, passages: list[dict], use_real_ner: bool = False, connector=None, connector_top_k: int = 5, use_real_qa: bool = False, use_real_nli: bool = False, plain_english: bool = False, template_id: str | None = None, decision_findings_only: bool = False, working_set_budget: int | None = None, memory_path: str | None = None, working_memory_ram_budget: int | None = None, working_memory_overflow_path: str | None = None, notes: str | None = None, concepts: list[dict] | None = None, records: list[dict] | None = None, list_arguments: bool = False) -> dict:
     """One single pass of the signal-chain below -- called directly by
     reason() above, once per retry round. `use_real_ner=True` threads
     through to every lab.common.entities.
@@ -849,6 +925,33 @@ def _reason_once(ask: str, passages: list[dict], use_real_ner: bool = False, con
             # call), reported rather than silently dropped, same posture
             # consistency_flags/coherence_flags already take.
             trace.append({"step": "memory_recall", "hits": recalled})
+
+    if list_arguments:
+        # Explicit caller flag (default False), checked ahead of the
+        # concept registry and plan_stages -- an unambiguous "scan
+        # everything for every grounded argument" request, not an
+        # ask-inferred signal, so it takes priority the same way `notes`
+        # does. Operates on the full passage set (direct + connector-
+        # fetched, after working_set_budget's eviction above), unlike
+        # `notes`'s own mode -- this IS an "evidence scanning" operation,
+        # so it should see whatever connector_fetch already added, same
+        # as the normal rule_application stage would.
+        arguments = _list_grounded_arguments(passages)
+        trace.append({"step": "list_grounded_arguments", "found": len(arguments)})
+        if not arguments:
+            return _finish(ask, trace, "inconclusive", ABSTAIN_TEXT, set(), reason="no_grounded_arguments_found", dependency_tree=dep_nodes)
+        cited = {a["rule_passage"] for a in arguments} | {a["fact_passage"] for a in arguments}
+        for i, a in enumerate(arguments):
+            _add_dependency(
+                dep_nodes,
+                f"argument:{i}",
+                "grounded_argument",
+                f"{a['fact_text']!r} grounds {a['rule_text']!r} -> {a['consequence']}",
+                [a["rule_passage"], a["fact_passage"]],
+            )
+        from lab.common.render import render_md
+
+        return _finish(ask, trace, "supported", render_md(arguments, ask), cited, dependency_tree=dep_nodes)
 
     # lab.common.concept_tools (2026-11-10, "the teach-tool concept
     # registry"): a caller-extensible alternative to every stage below --
