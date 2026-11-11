@@ -134,6 +134,8 @@ def write_long_document(
     template_id: str | None = None,
     use_real_nli: bool = False,
     plain_english: bool = False,
+    ram_budget: int | None = None,
+    overflow_path: str | None = None,
 ) -> dict:
     """Writes one long document from `findings`, page by page, checking
     cross-page consistency as it goes.
@@ -178,6 +180,15 @@ def write_long_document(
     for exactly what is and isn't attempted). Recorded per-leaf in
     `rewrite_diagnostics` as `plain_english_result`; never applied to a
     leaf with no findings (nothing to simplify).
+
+    `ram_budget`/`overflow_path` (both default None, zero behavior change
+    when omitted): bound how many pages lab.common.working_memory.
+    WorkingMemory keeps in RAM at once for a document long enough that
+    this would otherwise grow without limit -- see that module's own
+    docstring ("Follow-up 2026-11-11") for exactly what gets archived and
+    how a cross-page contradiction against an archived page is still
+    caught. `overflow_path` without `ram_budget` has nothing to do,
+    since nothing is ever evicted.
 
     Returns {"document_result", "consistency_flags", "coherence_flags",
     "rewrite_diagnostics", "working_memory"} -- `consistency_flags` is
@@ -225,7 +236,7 @@ def write_long_document(
         leftover_leaves = build_outline(leftover_findings, task) if leftover_findings else []
         outline = entity_leaves + leftover_leaves
 
-    memory = WorkingMemory()
+    memory = WorkingMemory(ram_budget=ram_budget, overflow_path=overflow_path)
     rendered_units = []
     rewrite_diagnostics = []
     consistency_flags = []

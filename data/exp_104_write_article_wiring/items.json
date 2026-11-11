@@ -1,0 +1,41 @@
+{
+  "article_mode": {
+    "decision": "supported_with_flags",
+    "citations": [
+      "S1",
+      "S2",
+      "S3"
+    ],
+    "coverage": {
+      "present": 8,
+      "missing": [],
+      "coverage": 1.0
+    },
+    "cycles_found": 1,
+    "dependency_tree_nodes": [
+      {
+        "id": "article",
+        "kind": "write_article",
+        "summary": "written from 3 source(s) plus caller-supplied notes",
+        "depends_on": [
+          "S1",
+          "S2",
+          "S3"
+        ]
+      }
+    ],
+    "correct": true
+  },
+  "malformed_input": {
+    "decision": "inconclusive",
+    "errors": [
+      "'notes' must be a non-empty string"
+    ],
+    "correct": true
+  },
+  "notes_omitted_baseline": {
+    "decision": "supported",
+    "text": "30 days [P1]",
+    "correct": true
+  }
+}

@@ -85,7 +85,7 @@
     "Rescore this same rerun with EXP-080's containment-based matching instead of EXP-009's exact-text _find() before trusting the 0.1667 wrong-resolution number as a real regression -- it is very likely mostly a scoring-methodology mismatch, not missed detections, per the mechanism confirmed in this exploration's conclusion.",
     "EXP-080's 19-span fixture already shows dslim/bert-base-NER beating the regex tagger on precision/recall with containment scoring; that remains the more informative comparison of the two taggers on their own."
   ],
-  "elapsed_sec": 8.6206,
-  "peak_rss_mb": 817.09,
+  "elapsed_sec": 8.4448,
+  "peak_rss_mb": 815.28,
   "models_used": "dslim/bert-base-NER (person/organization mentions, substituting for GLiNER -- package not installed), BAAI/bge-small-en-v1.5 (pair-matcher similarity feature). Logistic regression and rapidfuzz are unchanged classical components, kept as the todo specifies. Not generative."
 }

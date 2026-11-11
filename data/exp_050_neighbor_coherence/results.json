@@ -31,12 +31,12 @@
     "lab/common/connectives.py",
     "lab/common/real_encoders.py",
     "lab/common/textutil.py",
-    "lab/exp_081_real_document_pipeline/run.py"
+    "lab/common/fixtures.py"
   ],
   "follow_ups": [
     "Wire sequence_coherence into lab.common.assemble.build_outline itself so a flagged leaf is actually reordered or surfaced during real document assembly, not just measured standalone."
   ],
-  "elapsed_sec": 19.2669,
-  "peak_rss_mb": 2932.16,
+  "elapsed_sec": 20.7579,
+  "peak_rss_mb": 2925.04,
   "models_used": "bge-small-en-v1.5 (lab.common.real_encoders.bge_similarity, already loaded for EXP-040/042) for the similarity signal; spaCy en_core_web_sm dependency parser via lab.common.connectives.find_connectives (extended, deterministic) for the connective signal. No generative model."
 }

@@ -80,14 +80,14 @@
     "lab/exp_090_connective_detection/run.py",
     "lab/common/connectives.py",
     "lab/common/textutil.py",
-    "lab/exp_081_real_document_pipeline/run.py"
+    "lab/common/fixtures.py"
   ],
   "follow_ups": [
     "Wiring each operator's reasoning semantics into check_exceptions/forward_chain is the next, deliberately separate step: CONDITION_NEGATIVE keeps today's holds-blocks logic; CONCESSION needs the OPPOSITE polarity (never blocks, even if its own clause holds); TEMPORAL_BOUND needs a genuinely new reasoning mode (about WHEN, which this project's current holds/not_holds/unknown status model does not represent at all); CAUSAL must never be treated as a gate, only as evidence/justification attached to a derived fact.",
     "The operator table covers ~20 of 149 DiMLex-Eng connectives -- extending coverage (and testing whether the same three structural patterns hold for the remaining ~129) is a real, boundable next step, not an open-ended one, since the full inventory is already catalogued externally.",
     "find_connectives has not been tested on a sentence with more than one connective interacting (e.g. 'unless A, provided that B, until C') -- the real GDPR document run above may or may not contain such a sentence; check gdpr_document_findings for any sentence with multiple connectives before assuming single-connective-per-sentence is the common case."
   ],
-  "elapsed_sec": 11.7782,
-  "peak_rss_mb": 2802.02,
+  "elapsed_sec": 11.6595,
+  "peak_rss_mb": 2685.45,
   "models_used": "spaCy en_core_web_sm dependency parser (structural connective detection, deterministic) plus a small, documented, closed-class lemma/phrase-to-operator lookup table grounded in DiMLex-Eng/PDTB. No generative model, no new dependency, no NLI call in this exploration -- detection and classification only, no truth-judgment over any clause's content."
 }

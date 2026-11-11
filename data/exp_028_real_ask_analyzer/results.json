@@ -66,7 +66,7 @@
   "follow_ups": [
     "If GLiNER is ever safe to install in an isolated environment, rerun the entity-on-ask diagnostic with it directly instead of the dslim/bert-base-NER substitute."
   ],
-  "elapsed_sec": 50.159,
-  "peak_rss_mb": 1616.67,
+  "elapsed_sec": 53.0689,
+  "peak_rss_mb": 1615.75,
   "models_used": "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli (zero-shot task-type classification), BAAI/bge-small-en-v1.5 (KeyBERT-style keyphrase similarity), dslim/bert-base-NER (NER-on-ask, substituting for GLiNER -- the `gliner` package is not installed in this shared environment). All local checkpoints, not API calls. Not generative."
 }

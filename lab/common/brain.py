@@ -72,15 +72,30 @@ Every tool this calls is a primitive already built and separately measured:
     long-form document writing and cross-page consistency checking,
     EXP-052/053/078 -- the controller's own bounded "RAM" WITHIN one
     document-write call, never the full data, only pointers and short
-    digests back to it.
+    digests back to it. As of 2026-11-11 that RAM is itself bounded
+    (`working_memory_ram_budget=`/`working_memory_overflow_path=`): a
+    page older than the budget is archived to lab.common.page_archive
+    (disk, indexed by exact subject+verb) and dropped from RAM, the same
+    way a person writing a long document keeps only a recent working set
+    actively in mind and files everything older away as reference
+    material, not re-held or re-read start to finish.
   - lab.common.memory (2026-11-11, `memory_path=`): the controller's
     persistent, cross-CALL counterpart -- a verified lookup-fallback
     answer is written as a revalidated note, keyed by its source
     passage's own content hash, so a later call can recall it without
     re-extracting, but only if that passage's text is still present and
     unchanged; never trusted blindly. lab.common.paged.WorkingSet
-    (`working_set_budget=`) is the third RAM primitive -- bounding how
-    many passages a single connector fetch can add to one call.
+    (`working_set_budget=`) bounds how many passages a single connector
+    fetch can add to one call; lab.common.page_archive (above) bounds how
+    many pages of cross-page memory one document-write call holds in RAM
+    at once -- three separate, independently-opt-in RAM primitives, not
+    one mechanism wearing three names.
+  - lab.common.article_tool (2026-11-11, `notes=`): a genuinely different
+    question shape ("structure these notes, grounded only in these
+    sources" instead of "answer this ask from these passages") dispatched
+    to directly, bypassing stage-planning/connector-fetch/memory entirely
+    -- see `reason()`'s own docstring for why this, not a new
+    stage alongside document_write, is the honest shape for it.
   - lab.common.calc: arithmetic, EXP-007/014.
   - lab.common.rules: verb-trigger and threshold rule application,
     EXP-057/058/059 (including the role-match guard EXP-058 added).
@@ -452,6 +467,9 @@ def reason(
     decision_findings_only: bool = False,
     working_set_budget: int | None = None,
     memory_path: str | None = None,
+    working_memory_ram_budget: int | None = None,
+    working_memory_overflow_path: str | None = None,
+    notes: str | None = None,
 ) -> dict:
     """Thin outer wrapper around `_reason_once` (the function this
     docstring used to belong to, unchanged below) adding the two
@@ -552,6 +570,36 @@ def reason(
     `coherence_flags`/`contract_violations` started with before any
     later decision to act on them. `memory.mark_conflicted` is not wired
     at all -- a named follow-up, not done.
+
+    `working_memory_ram_budget`/`working_memory_overflow_path` (2026-11-11,
+    both default None, zero regression): thread through to
+    `write_long_document`'s own params of the same name when
+    `document_write` is this ask's stage -- see `lab.common.working_memory`'s
+    module docstring ("Follow-up 2026-11-11") for what they bound (how many
+    pages of the controller's own cross-page memory stay in RAM at once
+    while a long document is being written) and what gets archived to disk
+    instead of held there unboundedly. A no-op for any ask that doesn't
+    reach the document-writing stage, or when left at its default.
+
+    `notes` (2026-11-11, default None, zero regression): the project
+    owner's own prior design note (`exp_098_write_article`'s follow_ups,
+    written before this wiring existed) called `lab.common.article_tool.
+    write_article_tool` "not reachable from lab.common.brain.reason...
+    a different question shape (write a document from notes) than
+    reason() does (answer a question from documents)" and suggested it
+    stay a sibling entry point if ever wired at all. Revisited and wired
+    in anyway, as directly asked: when `notes` (raw, possibly messy free
+    text) is given, `_reason_once` dispatches straight to
+    `write_article_tool` -- `passages` become its `sources` verbatim,
+    `ask` plays no role (the tool never reads one), and none of the
+    normal stage-planning/connector-fetch/memory-recall machinery below
+    runs at all, since none of it answers this mode's actual question
+    ("structure these notes, grounded only in these sources"). Returns
+    the rendered article as `text`, cited source ids (parsed from its own
+    `[id]` markers) as `citations`, and `"supported_with_flags"` instead
+    of `"supported"` if `write_article_tool` found a relationship cycle
+    across the input (e.g. A paid B, B paid C, C paid A). A no-op for
+    every existing caller, which never sets this.
     """
     if use_spellfix:
         from lab.common.spellfix import fix_sentence_joint
@@ -570,6 +618,9 @@ def reason(
         decision_findings_only=decision_findings_only,
         working_set_budget=working_set_budget,
         memory_path=memory_path,
+        working_memory_ram_budget=working_memory_ram_budget,
+        working_memory_overflow_path=working_memory_overflow_path,
+        notes=notes,
     )
     round_num = 1
     while connector is not None and round_num < retrieve_budget and result["decision"] in ("inconclusive", "ungrounded"):
@@ -588,6 +639,9 @@ def reason(
             decision_findings_only=decision_findings_only,
             working_set_budget=working_set_budget,
             memory_path=memory_path,
+            working_memory_ram_budget=working_memory_ram_budget,
+            working_memory_overflow_path=working_memory_overflow_path,
+            notes=notes,
         )
         retried["trace"] = result["trace"] + [{"step": "retrieve_more", "round": round_num, "connector_top_k": connector_top_k}] + retried["trace"]
         result = retried
@@ -614,7 +668,7 @@ def reason(
     return result
 
 
-def _reason_once(ask: str, passages: list[dict], use_real_ner: bool = False, connector=None, connector_top_k: int = 5, use_real_qa: bool = False, use_real_nli: bool = False, plain_english: bool = False, template_id: str | None = None, decision_findings_only: bool = False, working_set_budget: int | None = None, memory_path: str | None = None) -> dict:
+def _reason_once(ask: str, passages: list[dict], use_real_ner: bool = False, connector=None, connector_top_k: int = 5, use_real_qa: bool = False, use_real_nli: bool = False, plain_english: bool = False, template_id: str | None = None, decision_findings_only: bool = False, working_set_budget: int | None = None, memory_path: str | None = None, working_memory_ram_budget: int | None = None, working_memory_overflow_path: str | None = None, notes: str | None = None) -> dict:
     """One single pass of the signal-chain below -- called directly by
     reason() above, once per retry round. `use_real_ner=True` threads
     through to every lab.common.entities.
@@ -696,6 +750,32 @@ def _reason_once(ask: str, passages: list[dict], use_real_ner: bool = False, con
     """
     trace = []
     dep_nodes: list[dict] = []
+    if notes is not None:
+        # A genuinely different question shape from everything below:
+        # "structure these notes, grounded only in these sources" rather
+        # than "answer this ask from these passages" -- `ask` plays no
+        # role (lab.common.article_tool.write_article_tool never reads
+        # it), so this is a hard, explicit dispatch on the caller's own
+        # signal (notes given at all), not something inferred from the
+        # ask's wording the way document_write's own signal is. Bypasses
+        # connector-fetch/working_set/memory_recall entirely -- those all
+        # answer "what passages are relevant to the ask", a question this
+        # mode does not ask; `passages` here are exactly the sources to
+        # cite, nothing more should be added to or pruned from that list
+        # on this mode's behalf.
+        from lab.common.article_tool import write_article_tool
+        from lab.common.verify import citation_markers
+
+        sources = [{"id": p["id"], "text": p.get("text", "") or ""} for p in passages]
+        result = write_article_tool({"notes": notes, "sources": sources})
+        trace.append({"step": "write_article", "ok": result["ok"], "errors": result["errors"]})
+        if not result["ok"]:
+            return _finish(ask, trace, "inconclusive", ABSTAIN_TEXT, set(), reason="; ".join(result["errors"]), dependency_tree=dep_nodes)
+        _add_dependency(dep_nodes, "article", "write_article", f"written from {len(sources)} source(s) plus caller-supplied notes", [s["id"] for s in sources])
+        trace.append({"step": "write_article_result", "coverage": result["coverage"], "citations": result["citations"], "relationships": result["relationships"]})
+        cited = set(citation_markers(result["article"]))
+        decision = "supported_with_flags" if result["relationships"]["cycles"] else "supported"
+        return _finish(ask, trace, decision, result["article"], cited, dependency_tree=dep_nodes)
     if connector is not None:
         connector_entities = [m["text"] for m in detect_primary(ask, use_real_ner=use_real_ner) if m["label"] in ("person", "organization")]
         external_passages = fetch_context_passages(connector, ask, ask_entities=connector_entities, top_k=connector_top_k)
@@ -818,7 +898,17 @@ def _reason_once(ask: str, passages: list[dict], use_real_ner: bool = False, con
                     findings.append(f)
         else:
             findings = findings_from_chunks([p for p in passages if p.get("text")])
-        doc_result = write_long_document(ask, findings, task=plan["task_type"], use_real_ner=use_real_ner, use_real_nli=use_real_nli, plain_english=plain_english, template_id=template_id)
+        doc_result = write_long_document(
+            ask,
+            findings,
+            task=plan["task_type"],
+            use_real_ner=use_real_ner,
+            use_real_nli=use_real_nli,
+            plain_english=plain_english,
+            template_id=template_id,
+            ram_budget=working_memory_ram_budget,
+            overflow_path=working_memory_overflow_path,
+        )
         trace.append(
             {
                 "step": "longform_write",

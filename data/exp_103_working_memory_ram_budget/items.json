@@ -1,0 +1,38 @@
+{
+  "unit_test": {
+    "final_ram_pages": [
+      "L3",
+      "L4"
+    ],
+    "ram_budget_respected": true,
+    "archived_page_count": 3,
+    "flags": [
+      {
+        "leaf_id": "L4",
+        "subject": "Ravi",
+        "verb_lemma": "work",
+        "new_object": "PQR",
+        "conflicts_with_leaf_id": "L0",
+        "prior_object": "ABC"
+      }
+    ],
+    "archived_page_contradiction_caught": true,
+    "dependency_tree_leaf_count": 5,
+    "dependency_tree_covers_all_pages": true
+  },
+  "end_to_end_via_brain_reason": {
+    "budgeted_decision": "supported",
+    "budgeted_ram_budget": 2,
+    "budgeted_in_ram_pages": 2,
+    "budgeted_archived_page_count": 3,
+    "budgeted_dependency_tree_leaf_count": 5,
+    "baseline_decision": "supported",
+    "baseline_ram_budget": null,
+    "baseline_in_ram_pages": 5,
+    "baseline_archived_page_count": 0,
+    "baseline_dependency_tree_leaf_count": 5
+  },
+  "e2e_ram_capped": true,
+  "e2e_provenance_complete": true,
+  "e2e_baseline_unaffected": true
+}

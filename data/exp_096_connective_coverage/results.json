@@ -34,7 +34,7 @@
     "lab/exp_096_connective_coverage/run.py",
     "lab/common/connectives.py",
     "lab/common/textutil.py",
-    "lab/exp_081_real_document_pipeline/run.py",
+    "lab/common/fixtures.py",
     "lab/exp_090_connective_detection/run.py"
   ],
   "follow_ups": [
@@ -48,7 +48,7 @@
     "in spite of: three-token idiom ('in spite OF'); only partially fits the existing two-token _IN_IDIOMS extension point",
     "regardless of: three-token idiom with its own 'regardless' as advmod, not prep -- a different shape from 'in spite of'"
   ],
-  "elapsed_sec": 11.6342,
-  "peak_rss_mb": 2802.86,
+  "elapsed_sec": 11.3054,
+  "peak_rss_mb": 2685.11,
   "models_used": "spaCy en_core_web_sm dependency parser via lab.common.connectives.find_connectives (unchanged detection code, new table entries only). No generative model."
 }

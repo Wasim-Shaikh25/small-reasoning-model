@@ -42,6 +42,20 @@ A caller writing a document where that recall-first posture is wrong
 for the source material (dense regulatory/legal text with one recurring
 generic subject) opts in; nothing about the original behavior changes
 for a caller that doesn't.
+
+Follow-up (2026-11-11): `self.pages` itself -- one digest per leaf,
+never full text -- still grows without limit for as long as a document
+is being written, held entirely in RAM. `ram_budget`/`overflow_path`
+(both default None, zero behavior change when omitted) bound that: once
+more than `ram_budget` pages are held, the OLDEST is archived to
+`lab.common.page_archive` (a disk-backed, indexed-by-exact-subject+verb
+store, not a copy held nowhere) and dropped from RAM. The same mechanism
+a person writing a long document actually uses -- a short, recent
+working set actively in mind, everything older filed away and consulted
+again only on a specific question, never re-read start to finish.
+`find_prior_claims` and `dependency_tree` both transparently see the
+archive too, so a contradiction against a page written thousands of
+leaves ago is still caught, not silently lost once it ages out of RAM.
 """
 
 from __future__ import annotations
@@ -79,12 +93,30 @@ def _triples_for(text: str) -> list[dict]:
 
 
 class WorkingMemory:
-    def __init__(self):
+    def __init__(self, ram_budget: int | None = None, overflow_path: str | None = None):
         self.trace: list[dict] = []
         self.citations: set[str] = set()
         self.facts: dict = {}
-        # Long-form only: one compact entry per page/leaf already written.
+        # Long-form only: one compact entry per page/leaf still in the
+        # active (RAM) working set -- bounded by ram_budget when given,
+        # unbounded (today's existing behavior) when it is None.
         self.pages: list[dict] = []
+        self.ram_budget = ram_budget
+        self.overflow_path = overflow_path
+        self._archive_conn = None
+        if overflow_path is not None:
+            from lab.common.page_archive import connect as _archive_connect
+
+            self._archive_conn = _archive_connect(overflow_path)
+
+    def _evict_oldest_if_over_budget(self) -> None:
+        if self.ram_budget is None or len(self.pages) <= self.ram_budget:
+            return
+        oldest = self.pages.pop(0)
+        if self._archive_conn is not None:
+            from lab.common.page_archive import archive_page
+
+            archive_page(self._archive_conn, oldest["leaf_id"], oldest["triples"], oldest["citation_ids"])
 
     def check_and_remember_page(self, leaf_id: str, text: str, citation_ids: list[str], use_real_nli: bool = False) -> list[dict]:
         """Called once per leaf as a long document is written, in order.
@@ -130,18 +162,26 @@ class WorkingMemory:
                     )
         self.pages.append({"leaf_id": leaf_id, "triples": new_triples, "citation_ids": list(citation_ids)})
         self.citations.update(citation_ids)
+        self._evict_oldest_if_over_budget()
         return flags
 
     def find_prior_claims(self, subject: str, verb_lemma: str) -> list[dict]:
         """Every earlier page's triple with this exact (subject, verb) --
         the set a new page's claim about the same subject+verb must agree
         with, or be flagged against (lab.common.longform's consistency
-        check calls this, not a copy of this matching logic)."""
+        check calls this, not a copy of this matching logic). Checks the
+        active (RAM) pages first, then -- if any page has aged out to disk
+        -- lab.common.page_archive's own exact-key index, so a page's
+        archival never silently drops it out of this check."""
         hits = []
         for page in self.pages:
             for triple in page["triples"]:
                 if triple["subject"] and triple["subject"].lower() == subject.lower() and triple["verb_lemma"] == verb_lemma:
                     hits.append({"leaf_id": page["leaf_id"], "triple": triple})
+        if self._archive_conn is not None:
+            from lab.common.page_archive import find_claims
+
+            hits.extend(find_claims(self._archive_conn, subject, verb_lemma))
         return hits
 
     def dependency_tree(self) -> list[dict]:
@@ -157,8 +197,18 @@ class WorkingMemory:
         one place this module already connects one page's truth to
         another's, surfaced explicitly instead of only being inferable
         from reading `consistency_flags` by hand.
+
+        Includes archived (disk-overflowed) pages too, read back from
+        lab.common.page_archive rather than only the pages still in RAM
+        -- a page that aged out of the working set is still a page this
+        document wrote, and still belongs in its provenance tree.
         """
-        return [{"id": f"leaf:{p['leaf_id']}", "kind": "document_leaf", "summary": f"leaf {p['leaf_id']} ({len(p['triples'])} extracted claims)", "depends_on": list(p["citation_ids"])} for p in self.pages]
+        all_page_dicts = list(self.pages)
+        if self._archive_conn is not None:
+            from lab.common.page_archive import all_pages
+
+            all_page_dicts = all_pages(self._archive_conn) + all_page_dicts
+        return [{"id": f"leaf:{p['leaf_id']}", "kind": "document_leaf", "summary": f"leaf {p['leaf_id']} ({len(p['triples'])} extracted claims)", "depends_on": list(p["citation_ids"])} for p in all_page_dicts]
 
     def to_dict(self) -> dict:
         return {
@@ -166,4 +216,13 @@ class WorkingMemory:
             "citations": sorted(self.citations),
             "facts": self.facts,
             "pages": [{"leaf_id": p["leaf_id"], "triples": p["triples"], "citation_ids": p["citation_ids"]} for p in self.pages],
+            "ram_budget": self.ram_budget,
+            "archived_page_count": self._archived_page_count(),
         }
+
+    def _archived_page_count(self) -> int:
+        if self._archive_conn is None:
+            return 0
+        from lab.common.page_archive import all_pages
+
+        return len(all_pages(self._archive_conn))
