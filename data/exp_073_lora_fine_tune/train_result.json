@@ -1,9 +1,0 @@
-{
-  "output_dir": "C:\\python_project\\small-reasoning-model\\data\\exp_073_lora_fine_tune\\adapter",
-  "trainable_params": 344064,
-  "total_params": 77305216,
-  "trainable_fraction": 0.004451,
-  "train_loss": 0.74867049853007,
-  "epochs": 2,
-  "n_train_examples": 60
-}

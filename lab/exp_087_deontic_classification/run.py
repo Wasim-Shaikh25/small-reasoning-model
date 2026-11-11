@@ -37,14 +37,14 @@ sys.path.insert(0, str(ROOT))
 from lab.common.deontic import classify_deontic
 from lab.common.harness import Run
 from lab.common.textutil import sentences
-from lab.exp_081_real_document_pipeline.run import GDPR_TEXT
+from lab.common.fixtures import GDPR_TEXT
 
 FILES = [
     "lab/exp_087_deontic_classification/run.py",
     "lab/common/deontic.py",
     "lab/common/rules.py",
     "lab/common/textutil.py",
-    "lab/exp_081_real_document_pipeline/run.py",
+    "lab/common/fixtures.py",
 ]
 
 CASES = [

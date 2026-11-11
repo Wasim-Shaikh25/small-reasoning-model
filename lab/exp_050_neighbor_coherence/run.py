@@ -31,7 +31,7 @@ sys.path.insert(0, str(ROOT))
 from lab.common.coherence import sequence_coherence
 from lab.common.harness import Run
 from lab.common.textutil import sentences
-from lab.exp_081_real_document_pipeline.run import GDPR_TEXT
+from lab.common.fixtures import GDPR_TEXT
 
 FILES = [
     "lab/exp_050_neighbor_coherence/run.py",
@@ -39,7 +39,7 @@ FILES = [
     "lab/common/connectives.py",
     "lab/common/real_encoders.py",
     "lab/common/textutil.py",
-    "lab/exp_081_real_document_pipeline/run.py",
+    "lab/common/fixtures.py",
 ]
 
 CASES = [

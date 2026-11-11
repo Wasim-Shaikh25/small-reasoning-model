@@ -70,13 +70,13 @@ sys.path.insert(0, str(ROOT))
 from lab.common.harness import Run
 from lab.common.inference import forward_chain
 from lab.common.rules import extract_fact_triple, parse_conditional_rule
-from lab.exp_081_real_document_pipeline.run import GDPR_TEXT
+from lab.common.fixtures import GDPR_TEXT
 
 FILES = [
     "lab/exp_085_multi_exception_scoping/run.py",
     "lab/common/inference.py",
     "lab/common/rules.py",
-    "lab/exp_081_real_document_pipeline/run.py",
+    "lab/common/fixtures.py",
     "lab/exp_083_symbolic_inference/run.py",
     "data/exp_083_symbolic_inference/results.json",
     "data/exp_085_multi_exception_scoping/results.json",

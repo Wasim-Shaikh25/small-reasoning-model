@@ -49,13 +49,13 @@ sys.path.insert(0, str(ROOT))
 from lab.common.connectives import Operator, find_connectives
 from lab.common.harness import Run
 from lab.common.textutil import sentences
-from lab.exp_081_real_document_pipeline.run import GDPR_TEXT
+from lab.common.fixtures import GDPR_TEXT
 
 FILES = [
     "lab/exp_096_connective_coverage/run.py",
     "lab/common/connectives.py",
     "lab/common/textutil.py",
-    "lab/exp_081_real_document_pipeline/run.py",
+    "lab/common/fixtures.py",
     "lab/exp_090_connective_detection/run.py",
 ]
 

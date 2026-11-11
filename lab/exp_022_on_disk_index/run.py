@@ -32,13 +32,13 @@ sys.path.insert(0, str(ROOT))
 from lab.common.harness import Run
 from lab.common.index import Index
 from lab.common.textutil import sentences
-from lab.exp_081_real_document_pipeline.run import GDPR_TEXT
+from lab.common.fixtures import GDPR_TEXT
 
 FILES = [
     "lab/exp_022_on_disk_index/run.py",
     "lab/common/index.py",
     "lab/common/textutil.py",
-    "lab/exp_081_real_document_pipeline/run.py",
+    "lab/common/fixtures.py",
     "data/exp_022_on_disk_index/index.pkl",
 ]
 
