@@ -1,7 +1,7 @@
 """EXP-042: repetition-detection rerun with the real bge-small-en-v1.5 embedder.
 
 Re-measures EXP-018's near-duplicate-unit detection with
-lab.common.real_encoders.bge_cosine_matrix in place of
+lab.tests.support.bge_cosine_matrix in place of
 lab.common.assemble.repetition_pairs's TfidfVectorizer cosine, on the
 identical assembled documents (200, 1000, and 5000 templated findings).
 The unit text itself is unchanged -- it is still copied verbatim from
@@ -22,7 +22,9 @@ sys.path.insert(0, str(ROOT))
 
 from lab.common.assemble import assemble
 from lab.common.harness import Run
-from lab.common.real_encoders import BGE_MODEL_NAME, bge_cosine_matrix
+from lab.tests.fixtures_support import findings
+from lab.common.real_encoders import BGE_MODEL_NAME
+from lab.tests.support import bge_cosine_matrix
 
 FILES = [
     "lab/tests/exp_042_real_repetition/run.py",
@@ -31,27 +33,10 @@ FILES = [
     "lab/common/harness.py",
     "data/exp_018_longform/results.json",
     "data/exp_042_real_repetition/results.json",
+    "lab/tests/support.py",
+    "lab/tests/fixtures_support.py",
+
 ]
-
-
-def findings(n: int, duplicate: bool = False) -> list[dict]:
-    rows = []
-    for i in range(n):
-        rows.append(
-            {
-                "finding_id": f"F{i:05d}",
-                "statement": f"The value of item {i} is {i * 3}.",
-                "citation": f"C{i:05d}",
-                "evidence_id": f"C{i:05d}",
-                "sort_key": i,
-            }
-        )
-    if duplicate and n > 8:
-        for offset in range(4):
-            rows[4 + offset]["statement"] = rows[offset]["statement"]
-    if n > 8:
-        rows[8]["statement"] = "R. Sharma holds item 8, and the value of item 8 is 24."
-    return rows
 
 
 def strip_unit(unit: str) -> str:
@@ -155,7 +140,7 @@ def main():
             "Identical to EXP-018's sizes (200, 1000, 5000 templated findings with planted verbatim "
             "duplicates), assembled by the unchanged deterministic lab.common.assemble.assemble. The "
             "resulting document's units are re-scored for pairwise similarity by "
-            "lab.common.real_encoders.bge_cosine_matrix (same citation-marker and 'Section N' stripping as "
+            "lab.tests.support.bge_cosine_matrix (same citation-marker and 'Section N' stripping as "
             "assemble.repetition_pairs) instead of TfidfVectorizer cosine, at the same 0.92 threshold."
         ),
         metrics=metrics,

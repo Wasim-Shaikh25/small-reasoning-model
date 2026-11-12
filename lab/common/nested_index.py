@@ -23,8 +23,6 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-from lab.common.index import Index
-
 # A genuine TF-IDF match always has a strictly positive dense score (shared
 # non-stopword vocabulary, however small a fraction); true noise is exactly
 # 0.0 (disjoint sparse vectors dot-product to exactly zero). Exposed as a
@@ -93,63 +91,8 @@ def _fill_summaries(node: NestedNode) -> None:
     node.summary_text = " ".join(f"{child.title} {child.summary_text}" for child in node.children)
 
 
-def navigate(ask: str, root: NestedNode, top_k: int = 1, min_dense_score: float = MIN_DENSE_SCORE) -> dict:
-    """Descend the tree one level at a time, scoring each level's children
-    against the ask with the hybrid retriever, until a leaf is reached.
-
-    Returns {"path": [...], "leaf": NestedNode | None, "leaf_passages": [...]}.
-    `path` is the full node-by-node trace -- every level's candidates and
-    which one was chosen -- so the navigation is auditable even though it
-    never involves a language model. Abstains (leaf=None) if a level's
-    children can't be scored at all (e.g. an empty branch), or if the best
-    candidate's *raw* dense (TF-IDF cosine) score is not strictly positive.
-
-    Why a near-zero floor and not a magnitude-based one: a fixed absolute
-    floor (0.05, even 0.01) does not survive scale -- as a chapter's summary
-    grows (more leaves concatenated into it), a genuine needle's distinctive
-    vocabulary becomes a shrinking fraction of the text, and the correct
-    candidate's dense score shrinks with it (measured 0.64 -> 0.017 -> 0.0056
-    across EXP-065's three sizes for the identical needle). A magnitude floor
-    tuned on the small case wrongly rejects the correct answer at the larger
-    ones. What does not shrink with scale is the *separation*: a genuine
-    match, however diluted, always has a strictly positive dense score
-    (TF-IDF cosine over any shared non-stopword vocabulary, however small a
-    fraction of the summary), while a truly unrelated ask gives an exact
-    mathematical 0.0 for every candidate -- disjoint sparse vectors have a
-    dot product of exactly zero, not a small positive number. Why dense and
-    not the blended `score`: the blended score is min-max normalized per
-    level, so the single best candidate is stretched toward 1.0 even when
-    nothing actually matches -- confirmed directly (EXP-065's off-topic ask
-    scored 0.5 that way). The raw sparse (BM25) leg is also unreliable here
-    because index.tokenize has no stopword filter, so "what"/"is"/"the"
-    alone produce a nonzero BM25 score on pure noise.
-    """
-    trace = []
-    node = root
-    while not node.is_leaf:
-        candidates = [{"id": child.node_id, "text": child.summary_text} for child in node.children]
-        child_level = node.children[0].level
-        index = Index(candidates)
-        hits = index.search(ask, top_k=top_k)
-        if not hits:
-            return {"path": trace, "leaf": None, "leaf_passages": [], "abstain_reason": f"no {child_level} candidates to score"}
-        if hits[0]["dense"] < min_dense_score:
-            return {
-                "path": trace,
-                "leaf": None,
-                "leaf_passages": [],
-                "abstain_reason": f"no {child_level} scored above the dense-similarity floor (best: {hits[0]['dense']:.4f} < {min_dense_score})",
-            }
-        best_id = hits[0]["passage"]["id"]
-        chosen = next(child for child in node.children if child.node_id == best_id)
-        trace.append(
-            {
-                "level": chosen.level,
-                "chosen": chosen.title,
-                "chosen_id": chosen.node_id,
-                "score": round(hits[0]["score"], 4),
-                "candidates_considered": len(candidates),
-            }
-        )
-        node = chosen
-    return {"path": trace, "leaf": node, "leaf_passages": node.leaf_passages}
+# The lexical-only `navigate` descent that used to live here moved to
+# lab.tests.support on 2026-11-12 -- lab.common.brain's hierarchical_navigate
+# stage calls navigate_dual (lab.common.semantic_index), not this. navigate
+# stays reachable from lab.tests.support for EXP-065/067/070's own
+# comparison against navigate_dual.

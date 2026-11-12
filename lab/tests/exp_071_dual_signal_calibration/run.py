@@ -28,8 +28,8 @@ ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT))
 
 from lab.common.harness import Run
-from lab.common.nested_index import build_nested_index
 from lab.common.semantic_index import navigate_dual
+from lab.tests.fixtures_support import build_fixture_tree
 
 FILES = [
     "lab/tests/exp_071_dual_signal_calibration/run.py",
@@ -38,6 +38,8 @@ FILES = [
     "data/exp_068_abstention_fixes/results.json",
     "data/exp_070_hierarchical_dual_signal/results.json",
     "data/exp_071_dual_signal_calibration/results.json",
+    "lab/tests/fixtures_support.py",
+
 ]
 
 FIXTURES = [
@@ -113,19 +115,6 @@ OFF_TOPIC_ASKS = [
     "What's the best recipe for banana bread?",
     "How do I train for a marathon?",
 ]
-
-
-def build_fixture_tree(fixture: dict, sections_per_chapter: int = 3, leaves_per_section: int = 8):
-    items = []
-    uid = 0
-    for chapter, filler in fixture["chapters"].items():
-        for section_idx in range(sections_per_chapter):
-            for leaf_idx in range(leaves_per_section):
-                is_needle = chapter == fixture["needle_chapter"] and section_idx == fixture["needle_section_idx"] and leaf_idx == leaves_per_section // 2
-                text = fixture["needle"] if is_needle else f"{filler} Item {leaf_idx} filed under section {section_idx}."
-                items.append({"id": f"P{uid:05d}", "text": text, "chapter": chapter, "section": f"{chapter}-{section_idx}", "is_needle": is_needle})
-                uid += 1
-    return build_nested_index(items, ["chapter", "section"])
 
 
 def evaluate_ask(ask: str, root, expect_match: bool) -> dict:

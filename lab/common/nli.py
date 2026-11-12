@@ -1,4 +1,7 @@
-"""Lexical support/contradiction judge. A scaled substitute for a DeBERTa NLI cross-encoder."""
+"""Lexical support/contradiction judge. A scaled substitute for a DeBERTa NLI cross-encoder.
+
+label_of/aggregate moved to lab.tests.support on 2026-11-12 -- lab.common.
+brain imports only `judge` from this module, never those two."""
 
 from __future__ import annotations
 
@@ -42,21 +45,3 @@ def judge(premise: str, hypothesis: str) -> dict[str, float]:
         contra_s = 0.05
     probs = _softmax({"entail": entail_s, "neutral": neutral_s, "contradict": contra_s})
     return {k: round(v, 4) for k, v in probs.items()}
-
-
-def label_of(probs: dict[str, float]) -> str:
-    return max(probs, key=probs.get)
-
-
-def aggregate(prob_list: list[dict[str, float]]) -> dict[str, float]:
-    if not prob_list:
-        return {"entail": 0.0, "neutral": 1.0, "contradict": 0.0, "entail_max": 0.0, "contradict_max": 0.0}
-    keys = ("entail", "neutral", "contradict")
-    mean = {k: sum(p[k] for p in prob_list) / len(prob_list) for k in keys}
-    return {
-        "entail": round(mean["entail"], 4),
-        "neutral": round(mean["neutral"], 4),
-        "contradict": round(mean["contradict"], 4),
-        "entail_max": round(max(p["entail"] for p in prob_list), 4),
-        "contradict_max": round(max(p["contradict"] for p in prob_list), 4),
-    }

@@ -17,6 +17,10 @@ fetching or reading this data.
 The selected subset (documents.json) is written to data/exp_025_real_documents/
 so later explorations load it without a network call and so the exact real
 text used is auditable in the repository.
+
+Moved from lab/common/ to lab/tests/ on 2026-11-12: every function here is
+EXP-025/EXP-029's own one-time fixture-fetching code, never called by
+lab.common.brain/engine -- this is test setup, not production.
 """
 
 from __future__ import annotations

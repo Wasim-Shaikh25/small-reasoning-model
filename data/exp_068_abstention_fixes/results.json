@@ -2,7 +2,7 @@
   "id": "EXP-068",
   "title": "Closing EXP-067's three named gaps: flat abstention, single-child navigation, and margin calibration",
   "status": "closed",
-  "goal": "Fix and re-measure, not just patch, the three concrete gaps named right after EXP-067: lab.common.brain's flat disambiguation branch had no abstention at all; lab.common.semantic_index.navigate_semantic could not handle a level with only one candidate; and MIN_SEMANTIC_MARGIN=0.03 was a single first measurement, not a validated constant.",
+  "goal": "Fix and re-measure, not just patch, the three concrete gaps named right after EXP-067: lab.common.brain's flat disambiguation branch had no abstention at all; lab.tests.support.navigate_semantic could not handle a level with only one candidate; and MIN_SEMANTIC_MARGIN=0.03 was a single first measurement, not a validated constant.",
   "method": "Part A: brain.reason run on EXP-058/060's integrated fixture (2 regression cases) plus a new off-topic case and a new flat-document paraphrase case, through the new dual lexical+semantic signal logic. Part B: navigate_semantic run on a single-level, single-child tree, with a genuine ask and an off-topic ask, to exercise the new dense-floor fallback. Part C: margin sweep across 3 independently-worded tree fixtures (72 leaves each), each with an exact-wording ask, a paraphrase ask, and 3 off-topic asks, collecting the top1-vs-runner-up margin at every level visited (ignoring abstention, for measurement purposes) to check whether MIN_SEMANTIC_MARGIN actually separates genuine matches from real noise.",
   "metrics": {
     "part_a_flat_disambiguation": {
@@ -66,7 +66,9 @@
     "data/exp_058_integrated_scenario/results.json",
     "data/exp_060_unified_brain/results.json",
     "data/exp_067_semantic_navigation/results.json",
-    "data/exp_068_abstention_fixes/results.json"
+    "data/exp_068_abstention_fixes/results.json",
+    "lab/tests/support.py",
+    "lab/tests/fixtures_support.py"
   ],
   "follow_ups": [
     "RESOLVED in EXP-069: brain.py's _wants_identity/_wants_total were literal keyword checks ('name'+'address', a fixed total-cue word list) -- a paraphrased ask could pass disambiguation correctly (proven working here) and still fail because intent detection itself didn't recognize it. Replaced with lab.common.intent_signals (bge exemplar similarity), tested cross-domain. This file was rerun after that fix, which is why the paraphrase case passes end to end now.",
@@ -74,7 +76,7 @@
     "If MIN_SEMANTIC_MARGIN is adjusted, rerun EXP-066/067 to confirm nothing regresses.",
     "The single-child fallback still can't catch a paraphrased ask the way the margin check can -- only exercised against an exact/off-topic pair here, not a paraphrase against a lone candidate."
   ],
-  "elapsed_sec": 25.3521,
-  "peak_rss_mb": 2800.96,
+  "elapsed_sec": 22.0698,
+  "peak_rss_mb": 2800.78,
   "models_used": "bge-small-en-v1.5 for all semantic scoring (retrieval only, no generation); TF-IDF/BM25 (lab.common.index) for the lexical signal and the single-child fallback floor."
 }

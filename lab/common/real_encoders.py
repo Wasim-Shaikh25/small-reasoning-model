@@ -64,14 +64,6 @@ def bge_similarity(a: str, b: str) -> float:
     return float(np.dot(vecs[0], vecs[1]))
 
 
-def bge_cosine_matrix(texts: list[str]) -> np.ndarray:
-    """Pairwise cosine similarity for a batch of texts (embeddings are already unit-norm)."""
-    if not texts:
-        return np.zeros((0, 0), dtype="float32")
-    vecs = bge_embed(texts)
-    return vecs @ vecs.T
-
-
 def qa_pipeline():
     global _qa_pipeline
     if _qa_pipeline is None:
@@ -161,15 +153,8 @@ def real_entities(text: str) -> list[dict]:
     ]
 
 
-def real_bidirectional_nli(source: str, output: str, tau: float = 0.55) -> dict:
-    """lab.common.verify.bidirectional_nli's shape, scored by the real DeBERTa-v3 MNLI checkpoint."""
-    forward = real_nli(source, output)
-    backward = real_nli(output, source)
-    return {
-        "forward": forward,
-        "backward": backward,
-        "ok": forward["entail"] >= tau and backward["entail"] >= tau,
-    }
+# bge_cosine_matrix and real_bidirectional_nli moved to lab.tests.support
+# on 2026-11-12 -- only exp_041/exp_042 ever called them, never lab.common.
 
 
 def model_card() -> dict:

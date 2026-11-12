@@ -102,9 +102,10 @@
     "lab/common/qa.py",
     "lab/common/textutil.py",
     "lab/common/harness.py",
-    "data/exp_015_paged_memory/results.json"
+    "data/exp_015_paged_memory/results.json",
+    "lab/tests/fixtures_support.py"
   ],
   "follow_ups": [],
-  "elapsed_sec": 0.1096,
-  "peak_rss_mb": 155.45
+  "elapsed_sec": 0.4303,
+  "peak_rss_mb": 162.33
 }

@@ -20,14 +20,15 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT))
 
-from lab.common.harness import Run, score_qa
+from lab.common.harness import Run
+from lab.tests.support import score_qa
 from lab.common.qa import answer_with_agreement
-from lab.common.real_squad import N_ITEMS, build_subset, save_subset
+from lab.tests.real_squad import N_ITEMS, build_subset, save_subset
 from lab.common.textutil import normalize
 
 FILES = [
     "lab/tests/exp_047_real_squad_qa/run.py",
-    "lab/common/real_squad.py",
+    "lab/tests/real_squad.py",
     "lab/common/qa.py",
     "lab/common/harness.py",
     "lab/common/textutil.py",
@@ -35,6 +36,8 @@ FILES = [
     "data/exp_047_real_squad_qa/squad_subset.json",
     "data/exp_047_real_squad_qa/items.json",
     "data/exp_047_real_squad_qa/results.json",
+    "lab/tests/support.py",
+
 ]
 
 TAU = 0.34

@@ -44,6 +44,7 @@ from lab.common.nli import judge
 from lab.common.real_index import RealIndex
 from lab.common.real_models import model_card, real_entities
 from lab.common.textutil import normalize, sentences
+from lab.tests.fixtures_support import load_real_document_chunks as load_chunks
 
 FILES = [
     "lab/tests/exp_032_real_multihop/run.py",
@@ -57,21 +58,14 @@ FILES = [
     "data/exp_025_real_documents/chunks.json",
     "data/exp_032_real_multihop/bridge_items.json",
     "data/exp_032_real_multihop/results.json",
+    "lab/tests/fixtures_support.py",
+
 ]
 
 GENERIC_STOP = {"producer", "coffee", "exchange", "reuters", "the united states", "united states"}
 MIN_DOCS = 2
 TOP_N_BRIDGES = 10
 HOP_TOP_K = 5
-
-
-def load_chunks() -> list[dict]:
-    path = ROOT / "data" / "exp_025_real_documents" / "chunks.json"
-    if not path.exists():
-        raise FileNotFoundError(f"{path} is missing. Run lab/tests/exp_025_real_documents/run.py first.")
-    import json
-
-    return json.loads(path.read_text())
 
 
 def _contains(pred_texts: set[str], target: str) -> bool:
@@ -210,7 +204,7 @@ def run_chain(
 
 def main():
     run = Run("EXP-032", "exp_032_real_multihop")
-    chunks = load_chunks()
+    chunks = load_chunks(ROOT)
     doc_id_of = {c["chunk_id"]: c["doc_id"] for c in chunks}
 
     items = find_bridge_items(chunks)

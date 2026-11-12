@@ -33,11 +33,12 @@
     "lab/common/textutil.py",
     "lab/common/harness.py",
     "data/exp_006_nli_judge/items.json",
-    "data/exp_006_nli_judge/results.json"
+    "data/exp_006_nli_judge/results.json",
+    "lab/tests/support.py"
   ],
   "follow_ups": [
     "Add an explicit qualification parser in code if exception accuracy stays too low for the tasks you care about. Do not add a generative NLI model."
   ],
   "elapsed_sec": 0.0066,
-  "peak_rss_mb": 18.69
+  "peak_rss_mb": 158.64
 }

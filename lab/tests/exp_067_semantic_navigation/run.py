@@ -9,7 +9,7 @@ lab.common.brain's flat disambiguation) is classical TF-IDF+BM25, not real
 embeddings, even though the real bge-small-en-v1.5 checkpoint has been
 loaded and measured standalone since EXP-030. This tests the direct
 question raised in review: does swapping in real embeddings help, and does
-margin-based abstention (lab.common.semantic_index.navigate_semantic) hold
+margin-based abstention (lab.tests.support.navigate_semantic) hold
 up on the off-topic negative control the way lab.common.nested_index's
 near-zero floor does -- given that floor's own reasoning (disjoint TF-IDF
 vectors dot-product to exactly 0.0) does not hold for embeddings, where
@@ -30,8 +30,9 @@ ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT))
 
 from lab.common.harness import Run
-from lab.common.nested_index import build_nested_index, navigate
-from lab.common.semantic_index import navigate_semantic
+from lab.common.nested_index import build_nested_index
+from lab.tests.fixtures_support import build_items as _build_items
+from lab.tests.support import navigate, navigate_semantic
 
 FILES = [
     "lab/tests/exp_067_semantic_navigation/run.py",
@@ -42,6 +43,9 @@ FILES = [
     "lab/common/harness.py",
     "data/exp_065_nested_navigation/results.json",
     "data/exp_067_semantic_navigation/results.json",
+    "lab/tests/support.py",
+    "lab/tests/fixtures_support.py",
+
 ]
 
 NEEDLE = "The AGM authorization PIN for board members is 77319."
@@ -76,24 +80,7 @@ ASKS = {
 
 
 def build_items(sections_per_chapter: int, leaves_per_section: int) -> list[dict]:
-    items = []
-    uid = 0
-    for chapter in CHAPTERS:
-        for section_idx in range(sections_per_chapter):
-            for leaf_idx in range(leaves_per_section):
-                is_needle = chapter == NEEDLE_CHAPTER and section_idx == NEEDLE_SECTION_IDX and leaf_idx == leaves_per_section // 2
-                text = NEEDLE if is_needle else f"{CHAPTER_FILLER[chapter]} Item {leaf_idx} filed under section {section_idx}."
-                items.append(
-                    {
-                        "id": f"P{uid:05d}",
-                        "text": text,
-                        "chapter": chapter,
-                        "section": f"{chapter}-{section_idx}",
-                        "is_needle": is_needle,
-                    }
-                )
-                uid += 1
-    return items
+    return _build_items(CHAPTERS, CHAPTER_FILLER, NEEDLE, sections_per_chapter, leaves_per_section, NEEDLE_CHAPTER, NEEDLE_SECTION_IDX)
 
 
 def evaluate(path: list[dict], leaf_passages: list[dict]) -> dict:
@@ -215,8 +202,8 @@ def main():
         ),
         method=(
             "One 3-chapter, 3-section-per-chapter, 8-leaf-per-section tree (72 leaves), one needle planted in "
-            "Governance/section 1. Three asks run through both lab.common.nested_index.navigate (TF-IDF, "
-            "near-zero floor) and lab.common.semantic_index.navigate_semantic (bge cosine, margin-based "
+            "Governance/section 1. Three asks run through both lab.tests.support.navigate (TF-IDF, "
+            "near-zero floor) and lab.tests.support.navigate_semantic (bge cosine, margin-based "
             "abstention, min_margin=0.03): an exact-wording ask, a paraphrased ask sharing almost no exact "
             "wording with the needle, and an off-topic ask with no real match in the tree."
         ),

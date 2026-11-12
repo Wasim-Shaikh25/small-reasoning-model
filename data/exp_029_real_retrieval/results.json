@@ -64,17 +64,19 @@
     "lab/common/real_index.py",
     "lab/common/real_models.py",
     "lab/common/index.py",
-    "lab/common/real_corpus.py",
+    "lab/tests/real_corpus.py",
     "lab/common/harness.py",
     "data/exp_025_real_documents/chunks.json",
     "data/exp_029_real_retrieval/queries.json",
-    "data/exp_029_real_retrieval/results.json"
+    "data/exp_029_real_retrieval/results.json",
+    "lab/tests/support.py",
+    "lab/tests/fixtures_support.py"
   ],
   "follow_ups": [
     "If huggingface.co access is ever granted in this sandbox, rerun with the actual bge-small-en-v1.5 checkpoint and compare against this spaCy result.",
     "Add a cross-encoder reranking pass once a real reranker checkpoint is reachable."
   ],
-  "elapsed_sec": 4.8557,
-  "peak_rss_mb": 633.61,
+  "elapsed_sec": 4.4509,
+  "peak_rss_mb": 638.81,
   "models_used": "Real pretrained spaCy en_core_web_md static word vectors (GloVe-style, trained on a web/news crawl) for the dense leg, fused with the unchanged in-process Okapi BM25 sparse leg. bge-small-en-v1.5, Qdrant, and bge-reranker-v2-m3 were not loaded: huggingface.co is blocked in this sandbox (403 CONNECT, policy denial). This is a real, reachable, non-generative encoder, not the exact blueprint checkpoint. See lab/common/real_models.py:model_card()."
 }

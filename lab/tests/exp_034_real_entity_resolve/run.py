@@ -32,7 +32,7 @@ sys.path.insert(0, str(ROOT))
 
 from sklearn.linear_model import LogisticRegression
 
-from lab.common.chunking import chunk_document
+from lab.tests.fixtures_support import doc_chunks as _chunks, find_mention as _find
 from lab.common.entities import (
     ExampleStore,
     _close,
@@ -59,6 +59,8 @@ FILES = [
     "data/exp_009_entity_resolve/results.json",
     "data/exp_034_real_entity_resolve/docs.json",
     "data/exp_034_real_entity_resolve/results.json",
+    "lab/tests/fixtures_support.py",
+
 ]
 
 DOCS = [
@@ -84,18 +86,6 @@ PAIR_TRAIN = [
 ]
 
 
-def _chunks(doc: dict) -> list[dict]:
-    chunks = chunk_document(doc["text"], doc["id"], min_words=3, max_words=80)
-    if chunks:
-        return chunks
-    return [{"chunk_id": f"{doc['id']}-p1-c1", "id": f"{doc['id']}-p1-c1", "text": doc["text"]}]
-
-
-def _find(mentions: list[dict], text: str) -> dict | None:
-    for mention in mentions:
-        if normalize(mention["text"]) == normalize(text):
-            return mention
-    return None
 
 
 def resolve_mentions_real(chunks: list[dict], store: ExampleStore | None = None, max_rounds: int = 3) -> list[dict]:

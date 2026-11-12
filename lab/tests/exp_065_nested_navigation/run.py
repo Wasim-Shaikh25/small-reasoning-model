@@ -24,7 +24,9 @@ ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT))
 
 from lab.common.harness import Run
-from lab.common.nested_index import build_nested_index, navigate
+from lab.common.nested_index import build_nested_index
+from lab.tests.fixtures_support import build_items as _build_items
+from lab.tests.support import navigate
 
 FILES = [
     "lab/tests/exp_065_nested_navigation/run.py",
@@ -33,6 +35,9 @@ FILES = [
     "lab/common/harness.py",
     "data/exp_015_paged_memory/results.json",
     "data/exp_065_nested_navigation/results.json",
+    "lab/tests/support.py",
+    "lab/tests/fixtures_support.py",
+
 ]
 
 NEEDLE = "The violet quorum code for the annual general meeting is 41827."
@@ -46,16 +51,7 @@ CHAPTERS = list(CHAPTER_FILLER)
 
 
 def build_items(sections_per_chapter: int, leaves_per_section: int, needle_chapter: str, needle_section: int) -> list[dict]:
-    items = []
-    uid = 0
-    for chapter in CHAPTERS:
-        for section_idx in range(sections_per_chapter):
-            for leaf_idx in range(leaves_per_section):
-                is_needle = chapter == needle_chapter and section_idx == needle_section and leaf_idx == leaves_per_section // 2
-                text = NEEDLE if is_needle else f"{CHAPTER_FILLER[chapter]} Item {leaf_idx} filed under section {section_idx}."
-                items.append({"id": f"P{uid:05d}", "text": text, "chapter": chapter, "section": f"{chapter}-{section_idx}", "is_needle": is_needle})
-                uid += 1
-    return items
+    return _build_items(CHAPTERS, CHAPTER_FILLER, NEEDLE, sections_per_chapter, leaves_per_section, needle_chapter, needle_section)
 
 
 def run_size(sections_per_chapter: int, leaves_per_section: int) -> dict:
@@ -155,7 +151,7 @@ def main():
         ),
         method=(
             "lab.common.nested_index.build_nested_index groups flat records into a tree by chapter then "
-            "section. lab.common.nested_index.navigate descends one level at a time, using "
+            "section. lab.tests.support.navigate descends one level at a time, using "
             "lab.common.index.Index (the same hybrid retriever already measured) to score only that "
             "level's children against the ask, producing an explicit path trace. Tested at 3 tree sizes "
             "(27/150/450 leaves) with a single distinctive needle planted in one section of the Finance "

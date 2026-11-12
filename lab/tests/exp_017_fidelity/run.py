@@ -9,8 +9,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT))
 
-from lab.common.harness import Run, fidelity
-from lab.common.verify import bidirectional_nli, entity_number_check, modality_preserved
+from lab.common.harness import Run
+from lab.common.verify import entity_number_check, modality_preserved
+from lab.tests.support import bidirectional_nli, fidelity
 
 FILES = [
     "lab/tests/exp_017_fidelity/run.py",
@@ -20,6 +21,8 @@ FILES = [
     "lab/common/textutil.py",
     "data/exp_017_fidelity/items.json",
     "data/exp_017_fidelity/results.json",
+    "lab/tests/support.py",
+
 ]
 
 CLAIMS = [

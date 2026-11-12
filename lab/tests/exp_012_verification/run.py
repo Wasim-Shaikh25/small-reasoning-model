@@ -8,16 +8,15 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT))
 
-from lab.common.calc import add_period
 from lab.common.harness import Run
-from lab.common.verify import (
+from lab.common.verify import qualifier_added, quote_check
+from lab.tests.support import (
+    add_period,
     calculation_check,
     conflict_across,
     contradiction_queries,
     coverage_check,
     output_validator,
-    qualifier_added,
-    quote_check,
     second_span_agrees,
     support_check,
 )
@@ -31,6 +30,8 @@ FILES = [
     "lab/common/textutil.py",
     "lab/common/harness.py",
     "data/exp_012_verification/results.json",
+    "lab/tests/support.py",
+
 ]
 
 

@@ -9,10 +9,11 @@ ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT))
 
 from lab.common.harness import Run
-from lab.common.index import Index
-from lab.common.nli import judge, label_of
+from lab.common.nli import judge
 from lab.common.qa import answer_question
-from lab.common.textutil import normalize, numbers
+from lab.common.textutil import normalize
+from lab.tests.fixtures_support import resolve_gap as _resolve_gap
+from lab.tests.support import label_of
 
 FILES = [
     "lab/tests/exp_010_gap_resolution/run.py",
@@ -23,6 +24,9 @@ FILES = [
     "lab/common/harness.py",
     "data/exp_010_gap_resolution/items.json",
     "data/exp_010_gap_resolution/results.json",
+    "lab/tests/support.py",
+    "lab/tests/fixtures_support.py",
+
 ]
 
 ITEMS = [
@@ -42,38 +46,7 @@ ITEMS = [
 
 
 def resolve_gap(item: dict, max_rounds: int = 3) -> dict:
-    passages = [{"id": f"P{i}", "text": text} for i, text in enumerate(item["passages"])]
-    index = Index(passages)
-    alternatives = []
-    for rnd in range(max_rounds):
-        query = item["queries"][min(rnd, len(item["queries"]) - 1)]
-        hits = index.rerank(query, index.search(query, top_k=6), keep=6)
-        ctx = [hit["passage"] for hit in hits]
-        qa = answer_question(item["question"], ctx, tau=0.34)
-        spans = []
-        for passage in ctx:
-            one = answer_question(item["question"], [passage], tau=0.34)
-            if one["span"]:
-                spans.append(one["span"])
-        unique = {normalize(span) for span in spans}
-        if len(unique) > 1:
-            alternatives.extend(sorted(unique))
-            continue
-        if item["gap"] == "vague_criterion" and not (qa["span"] and numbers(qa["span"])):
-            if qa["span"]:
-                alternatives.append(qa["span"])
-            continue
-        if qa["span"] and qa.get("score", 0) >= 0.34:
-            support = judge(ctx[0]["text"] if ctx else "", f"The answer is {qa['span']}.")
-            if label_of(support) != "contradict":
-                return {"status": "resolved", "span": qa["span"], "round": rnd, "evidence_id": qa["passage_id"]}
-        if qa["span"]:
-            alternatives.append(qa["span"])
-    if item["gap"] == "vague_criterion":
-        return {"status": "ambiguous", "span": None, "alternatives": alternatives}
-    if alternatives and item["gap"] == "conflicting_values":
-        return {"status": "ambiguous", "span": None, "alternatives": alternatives}
-    return {"status": "ambiguous" if alternatives else "unresolved", "span": None, "alternatives": alternatives}
+    return _resolve_gap(item, answer_question, judge, label_of, max_rounds=max_rounds)
 
 
 def main():

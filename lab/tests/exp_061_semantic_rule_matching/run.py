@@ -8,7 +8,7 @@ document looks like: a real fact is phrased however its author phrased it,
 which is rarely the rule's own verb. This exploration tests exactly that
 gap directly, with paraphrased facts that share no verb lemma with their
 rule, and measures lab.common.rules.apply_rule (exact lemma match) against
-the new lab.common.rules.semantic_apply_rule (real NLI entailment, EXP-031's
+the new lab.tests.support.semantic_apply_rule (real NLI entailment, EXP-031's
 checkpoint) on the identical cases.
 """
 
@@ -22,7 +22,8 @@ sys.path.insert(0, str(ROOT))
 
 from lab.common.harness import Run
 from lab.common.real_encoders import NLI_MODEL_NAME
-from lab.common.rules import apply_rule, extract_fact_triple, parse_conditional_rule, semantic_apply_rule
+from lab.common.rules import apply_rule, extract_fact_triple, parse_conditional_rule
+from lab.tests.support import semantic_apply_rule
 
 FILES = [
     "lab/tests/exp_061_semantic_rule_matching/run.py",
@@ -32,6 +33,8 @@ FILES = [
     "data/exp_057_rule_application/results.json",
     "data/exp_059_cross_domain_rules/results.json",
     "data/exp_061_semantic_rule_matching/results.json",
+    "lab/tests/support.py",
+
 ]
 
 CASES = [
@@ -146,7 +149,7 @@ def main():
             "shares no verb lemma with the rule but means the same thing), unrelated negative controls, and "
             "near-miss controls (related but insufficient to satisfy the rule). Each case is scored by both "
             "lab.common.rules.apply_rule (exact lemma equality) and the new "
-            "lab.common.rules.semantic_apply_rule (one-directional NLI entailment from the fact to the "
+            "lab.tests.support.semantic_apply_rule (one-directional NLI entailment from the fact to the "
             "rule's condition clause, using MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli, the same checkpoint "
             "EXP-031/041/056 already measured)."
         ),

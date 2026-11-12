@@ -12,6 +12,10 @@ personal data" rule.
 
 The official file is hosted on raw.githubusercontent.com (the SQuAD-explorer
 repository), which is reachable in this sandbox, unlike huggingface.co.
+
+Moved from lab/common/ to lab/tests/ on 2026-11-12: every function here is
+EXP-047's own one-time fixture-fetching code, never called by lab.common.
+brain/engine -- this is test setup, not production.
 """
 
 from __future__ import annotations

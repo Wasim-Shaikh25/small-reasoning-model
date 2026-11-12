@@ -51,6 +51,7 @@ sys.path.insert(0, str(ROOT))
 from lab.common.harness import Run
 from lab.common.inference import forward_chain
 from lab.common.rules import extract_fact_triple, parse_conditional_rule
+from lab.tests.fixtures_support import signature_set as _signature_set
 
 FILES = [
     "lab/tests/exp_083_symbolic_inference/run.py",
@@ -60,16 +61,14 @@ FILES = [
     "data/exp_059_cross_domain_rules/results.json",
     "data/exp_061_semantic_rule_matching/results.json",
     "data/exp_083_symbolic_inference/results.json",
+    "lab/tests/fixtures_support.py",
+
 ]
 
 FACT_TEXT = "Rohan killed Arun."
 RULE_TEXT = "If anyone kills another person, it is a crime and he will go to jail."
 CHAIN_RULE_TEXT = "If a person goes to jail, their license will be suspended."
 EXCEPTION_RULE_TEXT = "If a person kills another person, it is a crime, unless it was self-defense."
-
-
-def _signature_set(facts: list[dict]) -> set[tuple]:
-    return {(f["subject"], f["verb_lemma"], f.get("object")) for f in facts if f.get("subject")}
 
 
 def main():

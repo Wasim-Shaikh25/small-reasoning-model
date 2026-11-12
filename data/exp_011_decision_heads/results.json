@@ -77,9 +77,11 @@
     "lab/common/harness.py",
     "lab/common/textutil.py",
     "data/exp_011_decision_heads/items.json",
-    "data/exp_011_decision_heads/results.json"
+    "data/exp_011_decision_heads/results.json",
+    "lab/tests/support.py",
+    "lab/tests/fixtures_support.py"
   ],
   "follow_ups": [],
-  "elapsed_sec": 0.1398,
-  "peak_rss_mb": 157.2
+  "elapsed_sec": 0.0886,
+  "peak_rss_mb": 163.61
 }

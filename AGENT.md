@@ -20,13 +20,22 @@ lab/
   config/           budgets and the model-substitute map, JSON
   tests/
     exp_NNN_slug/   one exploration, entry point run.py
+    support.py      shared test-support utilities (see below)
+    fixtures_support.py  shared test fixtures/scenario drivers (see below)
+    real_corpus.py, real_squad.py  one-time real-dataset fetchers, test-only
   run_all.py        runs every exploration
   render_explorations.py
 data/
   exp_NNN_slug/     inputs and results for that exploration
 ```
 
-The architecture document's `src/` tree maps to `lab/common/` in this POC. `lab/common/` is the production code -- everything reachable from `lab.common.brain.reason`, `lab.common.engine.run`, or any other public entry point. `lab/tests/exp_NNN_slug/` is the Java-style test tree: every exploration lives here, and each one may only *use* `lab/common`'s public functions to prove or measure what it can do -- it must never define its own shared/reusable logic. Logic more than one experiment needs independently belongs in `lab/common`, not copied between `exp_NNN_slug` folders. Do not create a second parallel source tree. Datasets live in `data/` (unchanged by the `lab/tests/` split -- `data/exp_NNN_slug/` stays directly under `data/`, since it holds fixtures/results, not code).
+The architecture document's `src/` tree maps to `lab/common/` in this POC. `lab/common/` is the production code -- everything reachable from `lab.common.brain.reason`, `lab.common.engine.run`, or any other public entry point. `lab/tests/exp_NNN_slug/` is the Java-style test tree: every exploration lives here, and each one may only *use* `lab/common`'s public functions to prove or measure what it can do -- it must never define its own shared/reusable logic. `lab/common/` may never import from `lab/tests/`, in either direction -- the dependency only ever runs test -> common.
+
+Logic more than one experiment needs independently has two homes, chosen by what the logic actually is, not by how many experiments share it:
+- **Genuine production logic** a caller never promoted into `lab/common` belongs there now -- import it from both experiments instead of keeping local copies.
+- **Test-only code** (scoring/metrics, fixture/scenario generators, chunking/lookup helpers used only to set up a test) belongs in `lab/tests/support.py` (metrics and secondary code paths lab.common.brain itself doesn't call -- an abandoned-in-production navigator, a never-wired rule-application mode, etc.) or `lab/tests/fixtures_support.py` (fixture builders and scenario drivers). These two files are the one sanctioned exception to "never define its own shared/reusable logic" in `lab/tests/`: they hold support code, not reasoning logic that competes with `lab/common`, the same way a Java project's `src/test` tree has its own shared test-utility classes.
+
+Do not create a second parallel source tree. Datasets live in `data/` (unchanged by the `lab/tests/` split -- `data/exp_NNN_slug/` stays directly under `data/`, since it holds fixtures/results, not code).
 
 ## Naming
 

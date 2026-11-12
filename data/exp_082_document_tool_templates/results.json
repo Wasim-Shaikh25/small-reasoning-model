@@ -3,7 +3,7 @@
   "title": "A tool/template registry for document formatting: legal and study, selection and ordering proven, routing measured honestly",
   "status": "closed",
   "goal": "Prove the project owner's tool/template idea -- declare a document's real formatting rules as data (sections, per-section instructions), select the right tool and template from the ask alone, route findings to the section they actually belong to, and write the resulting document in the template's own order -- on two independent domains (legal, study), starting deliberately small (one template per tool) rather than assuming it scales to many before proving it works on one.",
-  "method": "Two fixtures, each with its own ask and 3-4 findings clearly belonging to different template sections: a tenant-rent legal notice (lab.common.templates/legal/legal_notice.json, 4 sections) and a photosynthesis lecture-notes case (lab.common.templates/study/college_notes.json, 3 sections). For each: lab.common.doc_tools.select_tool/select_template picks a tool and template from the ask by bge cosine similarity against each candidate's own description (reusing lab.common.intent_signals' exact mechanism); assign_findings_to_sections routes each finding to its best-matching section the same way; lab.common.longform.write_long_document(template_id=...) builds and rewrites the resulting outline end to end.",
+  "method": "Two fixtures, each with its own ask and 3-4 findings clearly belonging to different template sections: a tenant-rent legal notice (lab.common.templates/legal/legal_notice.json, 4 sections) and a photosynthesis lecture-notes case (lab.common.templates/study/college_notes.json, 3 sections). For each: lab.tests.support.select_tool/select_template picks a tool and template from the ask by bge cosine similarity against each candidate's own description (reusing lab.common.intent_signals' exact mechanism); assign_findings_to_sections routes each finding to its best-matching section the same way; lab.common.longform.write_long_document(template_id=...) builds and rewrites the resulting outline end to end.",
   "metrics": {
     "registered_tools": [
       "legal",
@@ -38,7 +38,8 @@
     "lab/common/templates/legal/legal_notice.json",
     "lab/common/templates/study/_tool.json",
     "lab/common/templates/study/college_notes.json",
-    "data/exp_082_document_tool_templates/results.json"
+    "data/exp_082_document_tool_templates/results.json",
+    "lab/tests/support.py"
   ],
   "follow_ups": [
     "Per-finding section routing is real but imperfect (4/4 legal, 2/3 study) -- the one miss is a genuinely ambiguous sentence (a definition phrased as a process), and a hand-tuning attempt to fix it by rewording content_description made routing worse, not better (collapsed back to 1/3). A more reliable fix is a larger, more varied fixture set to measure against, not more guessing at single-section wording against one example.",
@@ -47,7 +48,7 @@
     "Template selection has never been tested on an ask that doesn't clearly belong to either registered tool (e.g. a company-policy or email-draft ask, tools not yet registered) -- worth a negative case once a third tool exists, to see what select_tool returns when nothing is a good match.",
     "assign_findings_to_sections has no abstention: every finding is forced into its best-scoring section even if that similarity is low. A finding that belongs to neither tool's templates at all was not tested here."
   ],
-  "elapsed_sec": 15.0236,
-  "peak_rss_mb": 2936.85,
+  "elapsed_sec": 13.2166,
+  "peak_rss_mb": 2935.55,
   "models_used": "bge-small-en-v1.5 (lab.common.real_encoders, tool/template/section selection -- non-generative similarity scoring) + flan-t5-small (bounded rewriter role on the resulting leaves, fidelity-gated, diagnostics recorded but not this exploration's measured target)."
 }

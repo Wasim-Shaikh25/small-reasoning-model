@@ -165,9 +165,11 @@
     "lab/common/textutil.py",
     "lab/common/harness.py",
     "data/exp_010_gap_resolution/items.json",
-    "data/exp_010_gap_resolution/results.json"
+    "data/exp_010_gap_resolution/results.json",
+    "lab/tests/support.py",
+    "lab/tests/fixtures_support.py"
   ],
   "follow_ups": [],
-  "elapsed_sec": 0.1085,
-  "peak_rss_mb": 151.63
+  "elapsed_sec": 0.1041,
+  "peak_rss_mb": 159.34
 }

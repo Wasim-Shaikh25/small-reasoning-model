@@ -2,7 +2,7 @@
 the one gap the single-path flat/hierarchical resolution structurally
 cannot close.
 
-lab.common.nested_index.navigate / lab.common.semantic_index.navigate_dual
+lab.tests.support.navigate / lab.common.semantic_index.navigate_dual
 commit to one path through a tree and return exactly one leaf's passages --
 proven useful at every scale tested (EXP-065 onward), but by construction
 unable to answer an ask needing a fact from chapter A and a different fact
@@ -26,7 +26,8 @@ sys.path.insert(0, str(ROOT))
 
 from lab.common.brain import reason
 from lab.common.harness import Run
-from lab.common.nested_index import build_nested_index, navigate
+from lab.common.nested_index import build_nested_index
+from lab.tests.support import navigate
 
 FILES = [
     "lab/tests/exp_075_graph_cross_reference/run.py",
@@ -34,6 +35,8 @@ FILES = [
     "lab/common/brain.py",
     "data/exp_070_hierarchical_dual_signal/results.json",
     "data/exp_075_graph_cross_reference/results.json",
+    "lab/tests/support.py",
+
 ]
 
 PASSAGES = [
@@ -122,7 +125,7 @@ def main():
             "A 2-chapter, 4-section fixture (Employees: Ravi, Meera; Company Registry: ABC, Zenith) where the "
             "ask needs Ravi's own address (Employees/Ravi) plus his employer's registration city (Company "
             "Registry/ABC) -- two chapters apart. Run through brain.reason, with a direct counterfactual "
-            "(lab.common.nested_index.navigate alone, no graph expansion) proving the single-path mechanism's "
+            "(lab.tests.support.navigate alone, no graph expansion) proving the single-path mechanism's "
             "resolved leaf never includes the registry fact on its own."
         ),
         metrics=metrics,

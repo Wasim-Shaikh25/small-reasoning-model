@@ -66,7 +66,8 @@
     "data/exp_057_rule_application/results.json",
     "data/exp_059_cross_domain_rules/results.json",
     "data/exp_061_semantic_rule_matching/results.json",
-    "data/exp_083_symbolic_inference/results.json"
+    "data/exp_083_symbolic_inference/results.json",
+    "lab/tests/fixtures_support.py"
   ],
   "follow_ups": [
     "Not yet tested on a rule with more than one exception combined by OR (GDPR Art 9's actual shape: four listed exceptions, any one of which blocks the prohibition) -- split_exception only handles a single trailing 'unless' clause, not a disjunction of several.",
@@ -74,7 +75,7 @@
     "check_exception's NLI call reads the whole context sentence as one premise; a longer passage with the exception's evidence buried in one clause among many was not tested -- EXP-056/069's sentence-splitting approach for ask-relevance may be needed here too if this scales to real documents.",
     "Not yet wired into lab.common.brain.reason as a signal -- this module is callable standalone, the same gap lab.common.longform had before EXP-079 wired it in."
   ],
-  "elapsed_sec": 17.9841,
-  "peak_rss_mb": 2685.48,
+  "elapsed_sec": 10.9863,
+  "peak_rss_mb": 2792.73,
   "models_used": "spaCy en_core_web_sm dependency parser (fact/rule/consequence extraction, non-generative, deterministic) + MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli (exception entailment, one bounded judgment per check, non-generative). No generative model anywhere in this exploration."
 }

@@ -71,6 +71,7 @@ from lab.common.harness import Run
 from lab.common.inference import forward_chain
 from lab.common.rules import extract_fact_triple, parse_conditional_rule
 from lab.common.fixtures import GDPR_TEXT
+from lab.tests.fixtures_support import signature_set as _signature_set
 
 FILES = [
     "lab/tests/exp_085_multi_exception_scoping/run.py",
@@ -80,6 +81,8 @@ FILES = [
     "lab/tests/exp_083_symbolic_inference/run.py",
     "data/exp_083_symbolic_inference/results.json",
     "data/exp_085_multi_exception_scoping/results.json",
+    "lab/tests/fixtures_support.py",
+
 ]
 
 _EXCEPTION_SENTENCE_RE = re.compile(r"This prohibition shall not apply if (.+?)\.")
@@ -95,10 +98,6 @@ RULE_TEXT = (
     f"If anyone processes special category data, it is unlawful, unless "
     f"{CONSENT_EXCEPTION}; {VITAL_INTERESTS_EXCEPTION}; or {LEGAL_CLAIMS_EXCEPTION}."
 )
-
-
-def _signature_set(facts: list[dict]) -> set[tuple]:
-    return {(f["subject"], f["verb_lemma"], f.get("object")) for f in facts if f.get("subject")}
 
 
 def _per_exception_statuses(derived: list[dict]) -> list[str] | None:

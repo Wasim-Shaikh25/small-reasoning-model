@@ -18,9 +18,9 @@ ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT))
 
 from lab.common.harness import Run
-from lab.common.index import recall_at_k
 from lab.common.real_bge_index import RealBgeIndex
 from lab.common.real_encoders import BGE_MODEL_NAME
+from lab.tests.fixtures_support import needle_recall as _needle_recall
 
 FILES = [
     "lab/tests/exp_040_real_paged_retrieval/run.py",
@@ -30,32 +30,15 @@ FILES = [
     "lab/common/harness.py",
     "data/exp_015_paged_memory/results.json",
     "data/exp_040_real_paged_retrieval/results.json",
+    "lab/tests/fixtures_support.py",
+
 ]
 
 NEEDLE = "The violet quorum code is 41827."
 
 
-def haystack(pages: int, needle_at: int) -> list[dict]:
-    rows = []
-    for i in range(pages):
-        if i == needle_at:
-            text = f"Page {i}. {NEEDLE} Filler words about gardens and schedules follow this sentence."
-        else:
-            text = (
-                f"Page {i}. The committee discussed item {i} and filed a routine note about chairs, "
-                "rosters, and the weekly market. No code is printed on this page."
-            )
-        rows.append({"id": f"PG{i:04d}", "text": text, "page": i})
-    return rows
-
-
 def needle_recall(pages: int) -> dict:
-    rows = haystack(pages, pages // 2)
-    index = RealBgeIndex(rows)
-    hits = index.search("violet quorum code", top_k=5)
-    ids = [hit["passage"]["id"] for hit in hits]
-    gold = {f"PG{pages // 2:04d}"}
-    return {"pages": pages, "recall_at_5": recall_at_k(ids, gold, 5), "top": ids[:3]}
+    return _needle_recall(pages, NEEDLE, RealBgeIndex)
 
 
 def main():

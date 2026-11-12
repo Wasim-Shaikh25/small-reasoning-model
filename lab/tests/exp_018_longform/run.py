@@ -12,6 +12,7 @@ sys.path.insert(0, str(ROOT))
 
 from lab.common.assemble import assemble
 from lab.common.harness import Run, peak_rss_mb
+from lab.tests.fixtures_support import findings
 
 FILES = [
     "lab/tests/exp_018_longform/run.py",
@@ -21,27 +22,9 @@ FILES = [
     "lab/common/harness.py",
     "data/exp_018_longform/spec.json",
     "data/exp_018_longform/results.json",
+    "lab/tests/fixtures_support.py",
+
 ]
-
-
-def findings(n: int, duplicate: bool = False) -> list[dict]:
-    rows = []
-    for i in range(n):
-        rows.append(
-            {
-                "finding_id": f"F{i:05d}",
-                "statement": f"The value of item {i} is {i * 3}.",
-                "citation": f"C{i:05d}",
-                "evidence_id": f"C{i:05d}",
-                "sort_key": i,
-            }
-        )
-    if duplicate and n > 8:
-        for offset in range(4):
-            rows[4 + offset]["statement"] = rows[offset]["statement"]
-    if n > 8:
-        rows[8]["statement"] = "R. Sharma holds item 8, and the value of item 8 is 24."
-    return rows
 
 
 def main():

@@ -22,7 +22,7 @@ ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT))
 
 from lab.common.harness import Run
-from lab.common.nli import label_of
+from lab.tests.support import label_of
 from lab.common.real_encoders import NLI_MODEL_NAME, real_nli
 
 FILES = [
@@ -33,6 +33,8 @@ FILES = [
     "data/exp_006_nli_judge/results.json",
     "data/exp_031_real_nli_judge/items.json",
     "data/exp_031_real_nli_judge/results.json",
+    "lab/tests/support.py",
+
 ]
 
 TEMPLATES = {

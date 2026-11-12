@@ -69,14 +69,15 @@
     "lab/common/harness.py",
     "data/exp_025_real_documents/chunks.json",
     "data/exp_032_real_multihop/bridge_items.json",
-    "data/exp_032_real_multihop/results.json"
+    "data/exp_032_real_multihop/results.json",
+    "lab/tests/fixtures_support.py"
   ],
   "follow_ups": [
     "Extend to 3-hop chains once a second bridge relation per item is available in this corpus.",
     "If huggingface.co access is ever granted, swap in bge-small-en-v1.5 and deepset/deberta-v3-base-squad2 and compare against both stacks measured here.",
     "Grow TOP_N_BRIDGES and the document count once EXP-022's on-disk index lands."
   ],
-  "elapsed_sec": 26.3506,
-  "peak_rss_mb": 683.54,
+  "elapsed_sec": 7.7759,
+  "peak_rss_mb": 683.82,
   "models_used": "Real-model stack: spaCy en_core_web_md static vectors for dense retrieval (RealIndex, EXP-029) and spaCy en_core_web_sm NER (EXP-033), both real pretrained, non-generative, reachable without huggingface.co. Classical stack: TF-IDF+BM25 (EXP-004) and the rule tagger (EXP-008), unchanged, run here only as the comparison baseline. deepset/deberta-v3-base-squad2 and bge-small-en-v1.5, the blueprint's proposed models for this rerun, were not loaded: huggingface.co is blocked in this sandbox (403 CONNECT, policy denial). See lab/common/real_models.py:model_card()."
 }

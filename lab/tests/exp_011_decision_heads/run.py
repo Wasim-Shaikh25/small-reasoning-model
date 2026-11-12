@@ -9,10 +9,12 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT))
 
-from lab.common.harness import Run, fidelity
-from lab.common.nli import aggregate, judge
+from lab.common.harness import Run
+from lab.common.nli import judge
 from lab.common.qa import answer_question
 from lab.common.textutil import numbers
+from lab.tests.fixtures_support import DECISION_HEAD_SLOTS as SLOTS, decision_head_reliability as reliability, decision_head_scenario as scenario
+from lab.tests.support import aggregate, fidelity
 from sklearn.calibration import CalibratedClassifierCV
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
@@ -25,35 +27,10 @@ FILES = [
     "lab/common/textutil.py",
     "data/exp_011_decision_heads/items.json",
     "data/exp_011_decision_heads/results.json",
+    "lab/tests/support.py",
+    "lab/tests/fixtures_support.py",
+
 ]
-
-SLOTS = [
-    ("notice period", ["30 days", "45 days", "60 days"]),
-    ("security deposit", ["INR 50000", "INR 75000", "INR 10000"]),
-    ("rent", ["INR 25000", "INR 40000", "INR 15000"]),
-    ("cure period", ["10 days", "5 days", "20 days"]),
-    ("bond interest", ["7 percent", "12 percent", "3 percent"]),
-    ("dose", ["40 mg", "10 mg", "80 mg"]),
-]
-
-
-def scenario(rng: random.Random, kind: str) -> dict:
-    slot, values = rng.choice(SLOTS)
-    truth, other = rng.sample(values, 2)
-    if kind == "supported":
-        passage = f"The {slot} is {truth}."
-        claim_span = truth
-        label = "supported"
-    elif kind == "contradicted":
-        passage = f"The {slot} is {truth}."
-        claim_span = other
-        label = "contradicted"
-    else:
-        passage = "The garden has roses and a stone bench."
-        claim_span = truth
-        label = "inconclusive"
-    return {"slot": slot, "passage": passage, "claim_span": claim_span, "label": label, "question": f"What is the {slot}?"}
-
 
 def features(item: dict) -> list[float]:
     passages = [{"id": "P", "text": item["passage"]}]
@@ -79,22 +56,6 @@ def features(item: dict) -> list[float]:
         0.0,
         2.0,
     ]
-
-
-def reliability(probs, labels, positive: str, bins: int = 5) -> list[dict]:
-    indexed = list(enumerate(probs))
-    width = 1 / bins
-    rows = []
-    for b in range(bins):
-        lo, hi = b * width, (b + 1) * width
-        chosen = [(i, p) for i, p in indexed if (p >= lo and p < hi) or (b == bins - 1 and p == 1)]
-        if not chosen:
-            rows.append({"bin": [round(lo, 2), round(hi, 2)], "n": 0, "mean_p": None, "empirical": None})
-            continue
-        mean_p = sum(p for _, p in chosen) / len(chosen)
-        empirical = sum(1 for i, _ in chosen if labels[i] == positive) / len(chosen)
-        rows.append({"bin": [round(lo, 2), round(hi, 2)], "n": len(chosen), "mean_p": round(mean_p, 4), "empirical": round(empirical, 4)})
-    return rows
 
 
 def main():

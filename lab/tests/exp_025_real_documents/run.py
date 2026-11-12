@@ -1,7 +1,7 @@
 """EXP-025: attach a real, public, non-confidential document collection.
 
 Fetches real Reuters-21578 news wire stories (via NLTK's data distribution,
-downloaded directly over HTTPS -- see lab/common/real_corpus.py for why not
+downloaded directly over HTTPS -- see lab/tests/real_corpus.py for why not
 nltk.download) and runs them through the same structure-aware chunker used
 everywhere else in this POC. No model, classical or neural, is loaded here:
 this exploration is only about the data, matching its scope in EXPLORATIONS.md.
@@ -17,12 +17,12 @@ sys.path.insert(0, str(ROOT))
 
 from lab.common.chunking import chunk_document
 from lab.common.harness import Run
-from lab.common.real_corpus import CATEGORY, N_DOCS, fetch_documents, save_documents
+from lab.tests.real_corpus import CATEGORY, N_DOCS, fetch_documents, save_documents
 from lab.common.textutil import word_count
 
 FILES = [
     "lab/tests/exp_025_real_documents/run.py",
-    "lab/common/real_corpus.py",
+    "lab/tests/real_corpus.py",
     "lab/common/chunking.py",
     "lab/common/textutil.py",
     "lab/common/harness.py",
@@ -84,7 +84,7 @@ def main():
         goal="Ingest a public, non-confidential document set with the same chunker and index used elsewhere, keeping the engine domain-agnostic, per OBJECTIVE.md.",
         method=(
             "Downloaded the Reuters-21578 corpus zip directly from raw.githubusercontent.com/nltk/nltk_data "
-            "(NLTK's own downloader refuses to run behind this sandbox's HTTPS proxy; see lab/common/real_corpus.py). "
+            "(NLTK's own downloader refuses to run behind this sandbox's HTTPS proxy; see lab/tests/real_corpus.py). "
             f"Selected the first {N_DOCS} training-split documents, sorted by file id, in the '{CATEGORY}' category -- "
             "a deterministic, reproducible selection, not a random sample. Cleaned wire-service line wrapping into "
             "paragraphs without altering content. Ran the existing lab/common/chunking.chunk_document on each real "

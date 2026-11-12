@@ -33,7 +33,7 @@ from __future__ import annotations
 
 import re
 
-from lab.common.calc import compare_numbers, sum_amounts
+from lab.common.calc import compare_numbers
 
 RULE_RE = re.compile(
     r"^\s*if\s+(?P<subject>.+?)\s+(?P<verb_phrase>.+?),\s*(?P<consequence>.+?)\.?\s*$",
@@ -197,29 +197,14 @@ def apply_threshold_rule(rule: dict, computed_value: float) -> dict:
     }
 
 
-def sum_amounts_for_subject(passages: list[dict], amount_re) -> dict:
-    """Sum every amount span found across a subject's own passages (lab.common.calc.sum_amounts),
-    recording which passage each amount came from so the total stays citable, not just a number.
-    """
-    spans = []
-    sources = []
-    for passage in passages:
-        for found in amount_re.findall(passage.get("text", "")):
-            spans.append(found)
-            sources.append(passage.get("id"))
-    result = sum_amounts(spans)
-    result["sources"] = sources
-    return result
-
-
 def apply_rule(rule: dict, fact: dict) -> dict:
     """The one comparison this module makes: do the rule's and the fact's verb lemmas match.
 
     Exact: catches "murders"/"murdered" (same lemma) but not "unlawfully took
     her life" (different lemma, same meaning). Fast, no model, no network --
     the right default when the fact is phrased close to the rule. See
-    `semantic_apply_rule` for the paraphrase-robust alternative, which costs
-    a real NLI call.
+    `lab.tests.support.semantic_apply_rule` for the paraphrase-robust
+    alternative, which costs a real NLI call.
     """
     matched = rule["trigger_lemma"] == fact["verb_lemma"]
     return {
@@ -230,88 +215,9 @@ def apply_rule(rule: dict, fact: dict) -> dict:
     }
 
 
-def semantic_apply_rule(rule: dict, fact_text: str, tau: float = 0.75) -> dict:
-    """Does the fact satisfy the rule's condition, by meaning rather than by shared verb.
-
-    `apply_rule`'s lemma check is exact-match brittle: a fact phrased without
-    the rule's trigger verb at all ("Arjun unlawfully took Neha's life" for a
-    rule triggered on "murders") fails it even though the fact plainly
-    satisfies the rule. This checks one-directional entailment instead --
-    does the specific fact entail that the rule's general condition holds --
-    using the real DeBERTa-v3 MNLI checkpoint (lab.common.real_encoders,
-    already measured in EXP-031/041/056), not lexical overlap. Still one
-    bounded judgment (one NLI call, one threshold), just a more capable one
-    than lemma equality. The direction matters: the condition does not
-    entail the fact (a general rule doesn't imply any one specific
-    instance), only the fact entails the condition is satisfied.
-    """
-    from lab.common.real_encoders import real_nli
-
-    probs = real_nli(fact_text, rule["condition_text"])
-    matched = probs["entail"] >= tau and probs["contradict"] < 0.2
-    return {
-        "matched": matched,
-        "condition_text": rule["condition_text"],
-        "fact_text": fact_text,
-        "nli": probs,
-        "consequence": rule["consequence"] if matched else None,
-    }
-
-
-def answer_rule_question(ask: str, passages: list[dict]) -> dict:
-    """Find a rule and a fact among the given passages, apply the rule, answer the ask.
-
-    `passages`: [{"id": ..., "text": ...}, ...], the same shape every other
-    retrieval-facing function in this repo uses, so citations carry through.
-    Abstains (decision "inconclusive") if no rule sentence, no fact sentence
-    with a concrete (non-generic) subject, or no verb match is found --
-    never guesses a yes/no from the ask's wording alone.
-    """
-    rule = rule_passage = None
-    fact = fact_passage = None
-    for passage in passages:
-        text = passage.get("text", "")
-        if rule is None:
-            candidate = parse_conditional_rule(text)
-            if candidate:
-                rule, rule_passage = candidate, passage
-                continue
-        if fact is None:
-            candidate = extract_fact_triple(text)
-            if candidate and candidate["subject"] and candidate["subject"].lower() not in {
-                "it", "someone", "anyone", "somebody", "something",
-            }:
-                fact, fact_passage = candidate, passage
-    if rule is None or fact is None:
-        return {
-            "decision": "inconclusive",
-            "reason": "missing_rule" if rule is None else "missing_fact",
-            "rule": rule,
-            "fact": fact,
-            "text": "Insufficient evidence.",
-        }
-    result = apply_rule(rule, fact)
-    if not result["matched"]:
-        return {
-            "decision": "inconclusive",
-            "reason": "no_verb_match",
-            "rule": rule,
-            "fact": fact,
-            "applied": result,
-            "text": "Insufficient evidence.",
-        }
-    rule_cite = rule_passage.get("id", "rule")
-    fact_cite = fact_passage.get("id", "fact")
-    text = (
-        f"{fact['raw']} [{fact_cite}] This matches the rule's trigger ({result['trigger_lemma']}): "
-        f"{rule['raw']} [{rule_cite}] Therefore, {rule['consequence']}."
-    )
-    return {
-        "decision": "supported",
-        "reason": "verb_match",
-        "rule": rule,
-        "fact": fact,
-        "applied": result,
-        "text": text,
-        "citations": [rule_cite, fact_cite],
-    }
+# semantic_apply_rule (paraphrase-robust NLI matching) and
+# answer_rule_question (a standalone find-rule+find-fact+apply+render demo
+# pipeline) moved to lab.tests.support on 2026-11-12 -- lab.common.brain's
+# rule_application stage calls apply_rule (exact lemma match) directly and
+# has its own dispatch/citation logic; neither function here was ever
+# called from lab.common itself.

@@ -1,7 +1,7 @@
 """EXP-051: sentence role-tagging classifier (direct answer / supporting
 evidence / background / contradiction).
 
-Replaces lab.common.verify.coverage_check's binary found/missing/
+Replaces lab.tests.support.coverage_check's binary found/missing/
 conflicted status with a 4-way role label per shortlisted sentence, so
 the page-wise writer knows HOW to use a sentence, not just whether it
 passed verification -- the "mark how to use them" step of AGENT.md's

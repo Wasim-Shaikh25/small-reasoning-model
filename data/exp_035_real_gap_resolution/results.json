@@ -170,10 +170,12 @@
     "lab/common/harness.py",
     "data/exp_010_gap_resolution/results.json",
     "data/exp_035_real_gap_resolution/items.json",
-    "data/exp_035_real_gap_resolution/results.json"
+    "data/exp_035_real_gap_resolution/results.json",
+    "lab/tests/support.py",
+    "lab/tests/fixtures_support.py"
   ],
   "follow_ups": [],
-  "elapsed_sec": 85.7191,
-  "peak_rss_mb": 1818.46,
+  "elapsed_sec": 16.4082,
+  "peak_rss_mb": 1824.18,
   "models_used": "deepset/deberta-v3-base-squad2 (extractive QA), MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli (NLI support check). Local checkpoints, not API calls. Not generative."
 }

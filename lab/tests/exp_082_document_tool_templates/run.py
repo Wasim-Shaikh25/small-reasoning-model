@@ -9,10 +9,10 @@ owner eventually wants.
 
 What this actually tests, on two independent fixtures (a legal-notice
 scenario, a photosynthesis lecture-notes scenario):
-  1. lab.common.doc_tools.select_tool picks the right tool (legal vs
+  1. lab.tests.support.select_tool picks the right tool (legal vs
      study) from the ask alone, by description similarity -- a closed-set
      decision among registered tools, not a keyword match.
-  2. lab.common.doc_tools.select_template picks the right template within
+  2. lab.tests.support.select_template picks the right template within
      that tool.
   3. lab.common.doc_tools.assign_findings_to_sections routes each finding
      to the template section its own content actually matches (the
@@ -43,7 +43,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT))
 
-from lab.common.doc_tools import assign_findings_to_sections, list_tools, load_template, select_template, select_tool
+from lab.common.doc_tools import assign_findings_to_sections, list_tools, load_template
+from lab.tests.support import select_template, select_tool
 from lab.common.harness import Run
 from lab.common.longform import write_long_document
 
@@ -56,6 +57,8 @@ FILES = [
     "lab/common/templates/study/_tool.json",
     "lab/common/templates/study/college_notes.json",
     "data/exp_082_document_tool_templates/results.json",
+    "lab/tests/support.py",
+
 ]
 
 LEGAL_ASK = "Draft a legal notice to a tenant over unpaid rent."
@@ -207,7 +210,7 @@ def main():
             "Two fixtures, each with its own ask and 3-4 findings clearly belonging to different template "
             "sections: a tenant-rent legal notice (lab.common.templates/legal/legal_notice.json, 4 sections) "
             "and a photosynthesis lecture-notes case (lab.common.templates/study/college_notes.json, 3 "
-            "sections). For each: lab.common.doc_tools.select_tool/select_template picks a tool and template "
+            "sections). For each: lab.tests.support.select_tool/select_template picks a tool and template "
             "from the ask by bge cosine similarity against each candidate's own description (reusing lab."
             "common.intent_signals' exact mechanism); assign_findings_to_sections routes each finding to its "
             "best-matching section the same way; lab.common.longform.write_long_document(template_id=...) "

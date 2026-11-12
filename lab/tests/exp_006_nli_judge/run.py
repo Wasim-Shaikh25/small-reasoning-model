@@ -9,7 +9,8 @@ ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT))
 
 from lab.common.harness import Run
-from lab.common.nli import judge, label_of
+from lab.common.nli import judge
+from lab.tests.support import label_of
 
 FILES = [
     "lab/tests/exp_006_nli_judge/run.py",
@@ -18,6 +19,8 @@ FILES = [
     "lab/common/harness.py",
     "data/exp_006_nli_judge/items.json",
     "data/exp_006_nli_judge/results.json",
+    "lab/tests/support.py",
+
 ]
 
 TEMPLATES = {

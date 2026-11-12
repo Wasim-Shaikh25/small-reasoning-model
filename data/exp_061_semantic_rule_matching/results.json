@@ -3,7 +3,7 @@
   "title": "Semantic (NLI) rule matching survives paraphrase where exact-lemma matching fails",
   "status": "closed",
   "goal": "Directly test the objection that lab/common/rules.py's exact-lemma matching only works on sentences phrased to match its own pattern, not on a messy real document's own wording, and measure whether real NLI entailment (semantic_apply_rule) closes that gap without costing accuracy on the harder near-miss cases.",
-  "method": "10 cases across 4 domains and 4 kinds: exact-phrasing baselines, genuine paraphrases (the fact shares no verb lemma with the rule but means the same thing), unrelated negative controls, and near-miss controls (related but insufficient to satisfy the rule). Each case is scored by both lab.common.rules.apply_rule (exact lemma equality) and the new lab.common.rules.semantic_apply_rule (one-directional NLI entailment from the fact to the rule's condition clause, using MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli, the same checkpoint EXP-031/041/056 already measured).",
+  "method": "10 cases across 4 domains and 4 kinds: exact-phrasing baselines, genuine paraphrases (the fact shares no verb lemma with the rule but means the same thing), unrelated negative controls, and near-miss controls (related but insufficient to satisfy the rule). Each case is scored by both lab.common.rules.apply_rule (exact lemma equality) and the new lab.tests.support.semantic_apply_rule (one-directional NLI entailment from the fact to the rule's condition clause, using MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli, the same checkpoint EXP-031/041/056 already measured).",
   "metrics": {
     "model": "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli",
     "n": 10,
@@ -114,14 +114,15 @@
     "lab/common/harness.py",
     "data/exp_057_rule_application/results.json",
     "data/exp_059_cross_domain_rules/results.json",
-    "data/exp_061_semantic_rule_matching/results.json"
+    "data/exp_061_semantic_rule_matching/results.json",
+    "lab/tests/support.py"
   ],
   "follow_ups": [
     "A larger paraphrase set, including adversarial near-misses, would give a stabler accuracy estimate than 2 cases per kind.",
     "Wire semantic_apply_rule into lab.common.brain as the default rule-matching step (with apply_rule as a cheap first check, escalating to the NLI call only when the lemma check fails), so the brain itself gets this robustness, not just this standalone test.",
     "EXP-056 already showed NLI-based checks can misfire when wired against the wrong comparison target (the whole-document ask). This result and that one together argue the entailment direction and the comparison target both have to be chosen deliberately, not assumed safe just because the underlying model is real."
   ],
-  "elapsed_sec": 16.7597,
-  "peak_rss_mb": 2684.16,
+  "elapsed_sec": 8.9515,
+  "peak_rss_mb": 2791.9,
   "models_used": "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli, a local checkpoint loaded with transformers (not an API call), the same real NLI judge EXP-031 measured. Used here for one bounded judgment (does this fact entail this rule's condition), not as a general-purpose reasoner."
 }

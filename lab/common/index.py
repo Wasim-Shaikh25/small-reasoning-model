@@ -186,17 +186,3 @@ def _filters_ok(passage: dict, filters: dict) -> bool:
         elif current != value:
             return False
     return True
-
-
-def recall_at_k(retrieved_ids: list[str], gold_ids: set[str], k: int) -> float:
-    if not gold_ids:
-        return 0.0
-    hit = set(retrieved_ids[:k]) & gold_ids
-    return len(hit) / len(gold_ids)
-
-
-def mrr(retrieved_ids: list[str], gold_ids: set[str]) -> float:
-    for i, pid in enumerate(retrieved_ids, start=1):
-        if pid in gold_ids:
-            return 1.0 / i
-    return 0.0

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import re
-from datetime import datetime, timedelta
+from datetime import datetime
 
 import dateparser
 
@@ -14,30 +14,8 @@ def parse_date(text: str) -> datetime | None:
     return dateparser.parse(text, settings={"STRICT_PARSING": False})
 
 
-def add_period(start_text: str, period_text: str) -> dict:
-    start = parse_date(start_text)
-    if start is None:
-        return {"ok": False, "error": "unparsed_date", "inputs": [start_text, period_text]}
-    days = re.search(r"(\d+)\s*day", period_text or "", re.I)
-    months = re.search(r"(\d+)\s*month", period_text or "", re.I)
-    if days:
-        end = start + timedelta(days=int(days.group(1)))
-        rule = "end = start + N days"
-    elif months:
-        month = start.month - 1 + int(months.group(1))
-        year = start.year + month // 12
-        month = month % 12 + 1
-        end = start.replace(year=year, month=month)
-        rule = "end = start + N calendar months"
-    else:
-        return {"ok": False, "error": "unparsed_period", "inputs": [start_text, period_text]}
-    return {
-        "ok": True,
-        "result": end.strftime("%d %B %Y"),
-        "inputs": {"start": start_text, "period": period_text},
-        "rule": rule,
-        "provenance": "inference",
-    }
+# add_period moved to lab.tests.support on 2026-11-12 -- never called by
+# lab.common itself, only exp_007/exp_012's own date-math fixtures.
 
 
 def compare_numbers(a: str, b: str) -> dict:

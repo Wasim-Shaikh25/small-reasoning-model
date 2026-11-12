@@ -3,7 +3,7 @@
   "title": "Fidelity bidirectional-NLI rerun with the real DeBERTa-v3 MNLI checkpoint",
   "status": "closed",
   "goal": "Re-measure EXP-017's bidirectional-NLI fidelity check with MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli in place of the lexical judge.",
-  "method": "The same claims and paragraphs EXP-017 used, run once each through the identity-copy renderer (whitespace normalization only, no paraphrase -- the renderer does not generate text). lab.common.real_encoders.real_bidirectional_nli replaces lab.common.verify.bidirectional_nli: same forward/backward entailment-threshold structure, scored by the real MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli checkpoint instead of the lexical judge.",
+  "method": "The same claims and paragraphs EXP-017 used, run once each through the identity-copy renderer (whitespace normalization only, no paraphrase -- the renderer does not generate text). lab.tests.support.real_bidirectional_nli replaces lab.tests.support.bidirectional_nli: same forward/backward entailment-threshold structure, scored by the real MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli checkpoint instead of the lexical judge.",
   "metrics": {
     "model": "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli",
     "renders": 13,
@@ -23,10 +23,11 @@
     "lab/common/harness.py",
     "lab/common/verify.py",
     "data/exp_017_fidelity/results.json",
-    "data/exp_041_real_fidelity_nli/results.json"
+    "data/exp_041_real_fidelity_nli/results.json",
+    "lab/tests/support.py"
   ],
   "follow_ups": [],
-  "elapsed_sec": 13.426,
-  "peak_rss_mb": 1404.77,
+  "elapsed_sec": 7.0873,
+  "peak_rss_mb": 1410.61,
   "models_used": "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli, a local checkpoint loaded with transformers (not an API call). Rewriter role is out of scope for this rerun; the renderer stays the unchanged deterministic copy."
 }

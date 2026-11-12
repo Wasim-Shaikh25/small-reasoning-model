@@ -3,7 +3,7 @@
   "title": "Rule application: a given conditional rule applied to a given fact",
   "status": "closed",
   "goal": "Build and measure the reasoning primitive raised directly in review: given a rule in context ('if X, then Y') and a fact in context, answer a question by matching the fact against the rule's trigger and applying its consequence -- without training or calling a generative model, using only the existing spaCy dependency parser already loaded for real-model NER (EXP-032/033) to extract each sentence's verb.",
-  "method": "lab.common.rules.parse_conditional_rule extracts an 'if <subject>, <verb phrase>, <consequence>' rule's trigger verb lemma via dependency parse. lab.common.rules.extract_fact_triple extracts a fact sentence's subject/verb lemma/object the same way. lab.common.rules.apply_rule compares the two verb lemmas -- the one judgment this module makes. lab.common.rules.answer_rule_question scans the given passages for the first rule and the first fact with a concrete subject, applies the rule if the verbs match, and returns the consequence with citations to both passages; it abstains (decision 'inconclusive') if no rule, no concrete fact, or no verb match is found, rather than guessing from the ask's own wording.",
+  "method": "lab.common.rules.parse_conditional_rule extracts an 'if <subject>, <verb phrase>, <consequence>' rule's trigger verb lemma via dependency parse. lab.common.rules.extract_fact_triple extracts a fact sentence's subject/verb lemma/object the same way. lab.common.rules.apply_rule compares the two verb lemmas -- the one judgment this module makes. lab.tests.support.answer_rule_question scans the given passages for the first rule and the first fact with a concrete subject, applies the rule if the verbs match, and returns the consequence with citations to both passages; it abstains (decision 'inconclusive') if no rule, no concrete fact, or no verb match is found, rather than guessing from the ask's own wording.",
   "metrics": {
     "n": 5,
     "accuracy": 1.0,
@@ -53,14 +53,15 @@
     "lab/common/rules.py",
     "lab/common/real_models.py",
     "lab/common/harness.py",
-    "data/exp_057_rule_application/results.json"
+    "data/exp_057_rule_application/results.json",
+    "lab/tests/support.py"
   ],
   "follow_ups": [
     "EXP-026's qualifier-rule todo (except/unless/provided that) applies here too: a rule with an exception clause would currently be matched and applied without checking whether the exception fires.",
     "Wire this into lab/common/engine.run_task as a new task_type once the ask analyzer (lab/common/ask.py) can detect a rule-application question, so it isn't a separate standalone path.",
     "Test against passage sets with more than one candidate rule or fact to measure disambiguation, not just presence/absence."
   ],
-  "elapsed_sec": 8.9473,
-  "peak_rss_mb": 2684.42,
+  "elapsed_sec": 6.2396,
+  "peak_rss_mb": 2792.35,
   "models_used": "No model decides the outcome. spaCy's en_core_web_sm dependency parser (already loaded for EXP-032/033's real-model NER, lab/common/real_models.py) extracts each sentence's main verb -- a narrow syntactic sub-task, not a reasoning judgment. The rule match and the final answer are deterministic code."
 }

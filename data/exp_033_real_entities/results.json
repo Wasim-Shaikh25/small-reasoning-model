@@ -53,13 +53,15 @@
     "lab/common/harness.py",
     "data/exp_025_real_documents/documents.json",
     "data/exp_033_real_entities/gold.json",
-    "data/exp_033_real_entities/results.json"
+    "data/exp_033_real_entities/results.json",
+    "lab/tests/support.py",
+    "lab/tests/fixtures_support.py"
   ],
   "follow_ups": [
     "Hand-label a larger gold sentence set (EXP-008-sized, 50+) for a more stable F1 estimate.",
     "If huggingface.co access is ever granted, rerun with GLiNER and dslim/bert-base-NER and compare against this spaCy result."
   ],
-  "elapsed_sec": 6.4459,
-  "peak_rss_mb": 431.8,
+  "elapsed_sec": 1.965,
+  "peak_rss_mb": 437.12,
   "models_used": "Real pretrained spaCy en_core_web_sm NER (CNN tagger trained on OntoNotes 5) compared against the unmodified EXP-008 rule tagger. GLiNER, dslim/bert-base-NER, and libpostal were not loaded: huggingface.co is blocked in this sandbox (403 CONNECT, policy denial). This is a real, reachable, non-generative pretrained model, not the exact blueprint checkpoint. See lab/common/real_models.py:model_card()."
 }

@@ -324,7 +324,7 @@ def match_concept(ask: str, concepts: list[dict] | None = None) -> dict:
     """Exact alias substring match first (unambiguous, free); embedding
     similarity against each concept's own `describes` text as a fallback
     for an ask that doesn't literally contain a taught alias -- same
-    `bge_embed` mechanism `lab.common.doc_tools.select_template` already
+    `bge_embed` mechanism `lab.tests.support.select_template` already
     uses for template selection, reused rather than a new scheme.
     """
     concepts = concepts if concepts is not None else load_concepts()

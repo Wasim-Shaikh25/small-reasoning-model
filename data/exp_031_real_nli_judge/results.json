@@ -44,12 +44,13 @@
     "lab/common/harness.py",
     "data/exp_006_nli_judge/results.json",
     "data/exp_031_real_nli_judge/items.json",
-    "data/exp_031_real_nli_judge/results.json"
+    "data/exp_031_real_nli_judge/results.json",
+    "lab/tests/support.py"
   ],
   "follow_ups": [
     "Rerun EXP-012's support re-check and EXP-017's bidirectional-NLI fidelity gate with this same real_nli function (EXP-037, EXP-041) now that it is proven to load and score correctly."
   ],
-  "elapsed_sec": 120.3865,
-  "peak_rss_mb": 1405.48,
+  "elapsed_sec": 14.0184,
+  "peak_rss_mb": 1410.8,
   "models_used": "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli, a local checkpoint loaded with transformers (not an API call). This is the real blueprint NLI judge (ARCHITECTURE.md section 8), not a substitute. It is never used to write answer text, only to score entail/neutral/contradict for a premise/hypothesis pair."
 }

@@ -1,6 +1,6 @@
 """Deterministic ask-relevance scoring: does a candidate text actually address the ask?
 
-This is the check the fidelity gate was missing: lab.common.harness.fidelity and
+This is the check the fidelity gate was missing: lab.tests.support.fidelity and
 lab.common.real_rewriter.fidelity_gate confirm a rewrite didn't drop or invent a
 fact relative to its *source findings*, but nothing confirmed the output still
 answers the *ask* that produced those findings in the first place. A small model

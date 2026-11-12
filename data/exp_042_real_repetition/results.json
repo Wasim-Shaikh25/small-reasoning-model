@@ -3,7 +3,7 @@
   "title": "Repetition detection rerun with the real bge-small-en-v1.5 embedder",
   "status": "closed",
   "goal": "Re-measure EXP-018's near-duplicate-unit detection with bge-small-en-v1.5 in place of TF-IDF cosine, on the identical assembled documents.",
-  "method": "Identical to EXP-018's sizes (200, 1000, 5000 templated findings with planted verbatim duplicates), assembled by the unchanged deterministic lab.common.assemble.assemble. The resulting document's units are re-scored for pairwise similarity by lab.common.real_encoders.bge_cosine_matrix (same citation-marker and 'Section N' stripping as assemble.repetition_pairs) instead of TfidfVectorizer cosine, at the same 0.92 threshold.",
+  "method": "Identical to EXP-018's sizes (200, 1000, 5000 templated findings with planted verbatim duplicates), assembled by the unchanged deterministic lab.common.assemble.assemble. The resulting document's units are re-scored for pairwise similarity by lab.tests.support.bge_cosine_matrix (same citation-marker and 'Section N' stripping as assemble.repetition_pairs) instead of TfidfVectorizer cosine, at the same 0.92 threshold.",
   "metrics": {
     "model": "BAAI/bge-small-en-v1.5",
     "sizes": [
@@ -19328,12 +19328,14 @@
     "lab/common/assemble.py",
     "lab/common/harness.py",
     "data/exp_018_longform/results.json",
-    "data/exp_042_real_repetition/results.json"
+    "data/exp_042_real_repetition/results.json",
+    "lab/tests/support.py",
+    "lab/tests/fixtures_support.py"
   ],
   "follow_ups": [
     "A paraphrased (not verbatim) repetition probe would better separate bge from TF-IDF than this fixture does."
   ],
-  "elapsed_sec": 24.9583,
-  "peak_rss_mb": 545.96,
+  "elapsed_sec": 19.8281,
+  "peak_rss_mb": 553.64,
   "models_used": "BAAI/bge-small-en-v1.5, a local checkpoint loaded with sentence-transformers (not an API call). The unit text itself is still produced by the unchanged deterministic assembler; FLAN-T5 as the unit writer is out of scope here, per EXP-046."
 }

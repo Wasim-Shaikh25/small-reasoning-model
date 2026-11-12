@@ -32,7 +32,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT))
 
-from lab.common.harness import Run, prf
+from lab.common.harness import Run
+from lab.tests.support import prf
 from lab.common.rules import _parser
 from lab.tests.exp_008_entity_detect.run import HARD, _easy_lines, _gold_set
 from sklearn.linear_model import LogisticRegression
@@ -45,6 +46,8 @@ FILES = [
     "lab/tests/exp_080_real_ner_rerun/run.py",
     "data/exp_008_entity_detect/results.json",
     "data/exp_080_real_ner_rerun/results.json",
+    "lab/tests/support.py",
+
 ]
 
 LABELS = ("O", "person", "organization", "address", "amount", "date", "defined term")

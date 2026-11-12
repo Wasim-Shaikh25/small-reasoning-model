@@ -3,7 +3,7 @@
   "title": "Cross-chapter fact combination via an entity co-occurrence graph",
   "status": "closed",
   "goal": "Prove lab.common.graph_index closes the one gap single-path flat/hierarchical navigation cannot by design: combining a fact from one chapter with a different fact, about the same named entity, from a completely separate chapter -- through the same brain.reason(ask, passages) entry point, not a new call shape.",
-  "method": "A 2-chapter, 4-section fixture (Employees: Ravi, Meera; Company Registry: ABC, Zenith) where the ask needs Ravi's own address (Employees/Ravi) plus his employer's registration city (Company Registry/ABC) -- two chapters apart. Run through brain.reason, with a direct counterfactual (lab.common.nested_index.navigate alone, no graph expansion) proving the single-path mechanism's resolved leaf never includes the registry fact on its own.",
+  "method": "A 2-chapter, 4-section fixture (Employees: Ravi, Meera; Company Registry: ABC, Zenith) where the ask needs Ravi's own address (Employees/Ravi) plus his employer's registration city (Company Registry/ABC) -- two chapters apart. Run through brain.reason, with a direct counterfactual (lab.tests.support.navigate alone, no graph expansion) proving the single-path mechanism's resolved leaf never includes the registry fact on its own.",
   "metrics": {
     "decision": "supported",
     "contains_expected_facts": true,
@@ -19,13 +19,14 @@
     "lab/common/graph_index.py",
     "lab/common/brain.py",
     "data/exp_070_hierarchical_dual_signal/results.json",
-    "data/exp_075_graph_cross_reference/results.json"
+    "data/exp_075_graph_cross_reference/results.json",
+    "lab/tests/support.py"
   ],
   "follow_ups": [
     "max_hops=2 is a fixed constant in brain.py's call; not yet tested whether a 3+ hop chain (entity A -> org B -> parent org C) is ever needed or whether 2 hops starts pulling in too much on a denser real document.",
     "Entity matching is lab.common.entities' exact-text regex detection (EXP-009), not a resolved-coreference graph (lab.common.entities.resolve_mentions exists for spelling variants but isn't used here) -- 'Ravi Sharma' and 'R. Sharma' would be two different graph nodes, not one."
   ],
-  "elapsed_sec": 14.6795,
-  "peak_rss_mb": 2799.07,
+  "elapsed_sec": 12.2342,
+  "peak_rss_mb": 2798.3,
   "models_used": "None. Entity detection is the same classical regex substitute used everywhere else in this repo (lab.common.entities); graph traversal is plain breadth-first search."
 }

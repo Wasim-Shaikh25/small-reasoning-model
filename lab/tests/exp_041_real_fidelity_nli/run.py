@@ -2,8 +2,8 @@
 
 Re-measures EXP-017's bidirectional-NLI pass rate (the second of its four
 fidelity checks, alongside number preservation, added-content, and modal
-error) with lab.common.real_encoders.real_bidirectional_nli in place of
-lab.common.verify.bidirectional_nli's lexical judge. Number/modal checks
+error) with lab.tests.support.real_bidirectional_nli in place of
+lab.tests.support.bidirectional_nli's lexical judge. Number/modal checks
 and the deterministic renderer are unchanged -- only the entailment scorer
 underneath the bidirectional-NLI check changes. The rewriter stays the
 unchanged deterministic copy; FLAN-T5 is not part of this rerun (that is
@@ -20,9 +20,10 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT))
 
-from lab.common.harness import Run, fidelity
-from lab.common.real_encoders import NLI_MODEL_NAME, real_bidirectional_nli
+from lab.common.harness import Run
+from lab.common.real_encoders import NLI_MODEL_NAME
 from lab.common.verify import entity_number_check, modality_preserved
+from lab.tests.support import fidelity, real_bidirectional_nli
 
 FILES = [
     "lab/tests/exp_041_real_fidelity_nli/run.py",
@@ -31,6 +32,8 @@ FILES = [
     "lab/common/verify.py",
     "data/exp_017_fidelity/results.json",
     "data/exp_041_real_fidelity_nli/results.json",
+    "lab/tests/support.py",
+
 ]
 
 CLAIMS = [
@@ -101,7 +104,7 @@ def main():
         method=(
             "The same claims and paragraphs EXP-017 used, run once each through the identity-copy renderer "
             "(whitespace normalization only, no paraphrase -- the renderer does not generate text). "
-            "lab.common.real_encoders.real_bidirectional_nli replaces lab.common.verify.bidirectional_nli: "
+            "lab.tests.support.real_bidirectional_nli replaces lab.tests.support.bidirectional_nli: "
             "same forward/backward entailment-threshold structure, scored by the real MoritzLaurer/"
             "DeBERTa-v3-base-mnli-fever-anli checkpoint instead of the lexical judge."
         ),

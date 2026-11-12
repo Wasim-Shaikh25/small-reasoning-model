@@ -8,10 +8,10 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT))
 
-from lab.common.chunking import chunk_document
 from lab.common.entities import ExampleStore, pair_features, resolve_mentions, same_entity_pairs, train_pair_matcher
 from lab.common.harness import Run
 from lab.common.textutil import normalize
+from lab.tests.fixtures_support import doc_chunks as _chunks, find_mention as _find
 
 FILES = [
     "lab/tests/exp_009_entity_resolve/run.py",
@@ -22,6 +22,8 @@ FILES = [
     "lab/common/harness.py",
     "data/exp_009_entity_resolve/docs.json",
     "data/exp_009_entity_resolve/results.json",
+    "lab/tests/fixtures_support.py",
+
 ]
 
 DOCS = [
@@ -74,20 +76,6 @@ PAIR_TRAIN = [
     {"left": {"text": "John Adeyemi", "context": "agent", "address": None, "role": "Agent"}, "right": {"text": "Owen Blake", "context": "lender", "address": None, "role": "Lender"}, "same": 0},
     {"left": {"text": "Sara Khan", "context": "guarantor", "address": None, "role": "Guarantor"}, "right": {"text": "Sara Khan", "context": "guarantor signed", "address": None, "role": "Guarantor"}, "same": 1},
 ]
-
-
-def _chunks(doc: dict) -> list[dict]:
-    chunks = chunk_document(doc["text"], doc["id"], min_words=3, max_words=80)
-    if chunks:
-        return chunks
-    return [{"chunk_id": f"{doc['id']}-p1-c1", "id": f"{doc['id']}-p1-c1", "text": doc["text"]}]
-
-
-def _find(mentions: list[dict], text: str) -> dict | None:
-    for mention in mentions:
-        if normalize(mention["text"]) == normalize(text):
-            return mention
-    return None
 
 
 def main():

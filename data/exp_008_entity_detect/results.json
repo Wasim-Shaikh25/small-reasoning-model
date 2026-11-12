@@ -74,11 +74,12 @@
     "lab/common/harness.py",
     "lab/common/nli.py",
     "data/exp_008_entity_detect/lines.json",
-    "data/exp_008_entity_detect/results.json"
+    "data/exp_008_entity_detect/results.json",
+    "lab/tests/support.py"
   ],
   "follow_ups": [
     "If hard-slice F1 is not enough, train a span tagger only on locally labeled spans. Do not download a pretrained NER model."
   ],
-  "elapsed_sec": 0.0057,
-  "peak_rss_mb": 158.8
+  "elapsed_sec": 0.0051,
+  "peak_rss_mb": 166.32
 }

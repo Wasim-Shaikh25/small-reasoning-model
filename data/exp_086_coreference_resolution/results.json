@@ -291,7 +291,7 @@
     "If this is wired into lab/common/brain.py's real ingest path, resolve_document should run once per document before lab.common.ingest.chunk_document splits it into passages, not per-passage (a pronoun's antecedent could sit in a different passage than its mention).",
     "The current substitution picks a cluster's first non-pronoun mention as canonical even when that mention is itself a pronoun-free but still ambiguous noun phrase (e.g. 'the manager' vs a named person) -- not measured here, since none of these 16 items hit that case."
   ],
-  "elapsed_sec": 20.4886,
-  "peak_rss_mb": 2820.21,
+  "elapsed_sec": 15.1021,
+  "peak_rss_mb": 2821.11,
   "models_used": "biu-nlp/f-coref (fastcoref 2.1.6), a local checkpoint loaded with transformers inside this project's own .venv (transformers pinned to 4.46.3, datasets 2.19.2, huggingface_hub 0.25.2, tokenizers 0.20.3 in that venv specifically, for compatibility with fastcoref's own internals -- the shared system interpreter's transformers/datasets/huggingface_hub are untouched). Mention-ranking, not generative; does not touch FORBIDDEN.md."
 }

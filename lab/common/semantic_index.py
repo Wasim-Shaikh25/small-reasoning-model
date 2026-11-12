@@ -108,75 +108,10 @@ class SemanticIndex:
         return ranked[:top_k]
 
 
-def navigate_semantic(ask: str, root, min_margin: float = MIN_SEMANTIC_MARGIN) -> dict:
-    """Same shape and descent logic as lab.common.nested_index.navigate, but
-    scored by bge cosine similarity and abstaining on a small top1-vs-runner-up
-    margin instead of an absolute floor.
-
-    Margin needs at least 2 children to mean anything; with exactly 1 child
-    there is no runner-up to compare against, so a margin can't be computed
-    at all. Rather than proceeding unconditionally (the original gap), this
-    falls back to the one check that doesn't need a second candidate: the
-    same TF-IDF dense-score floor lab.common.nested_index uses (MIN_DENSE_SCORE),
-    scored on this single child against the ask. That floor's own logic
-    (disjoint vocabulary dot-products to exactly 0.0) holds regardless of how
-    many candidates there are, which is exactly why it can plug the gap the
-    margin check leaves open here -- it just can't catch a paraphrase the way
-    the margin check can, which is why it's the fallback and not the primary
-    mechanism when a real choice exists.
-    """
-    trace = []
-    node = root
-    while not node.is_leaf:
-        candidates = [{"id": child.node_id, "text": child.summary_text} for child in node.children]
-        child_level = node.children[0].level
-
-        if len(candidates) == 1:
-            dense = Index(candidates).search(ask, top_k=1)[0]["dense"]
-            if dense < MIN_DENSE_SCORE:
-                return {
-                    "path": trace,
-                    "leaf": None,
-                    "leaf_passages": [],
-                    "abstain_reason": (
-                        f"only one {child_level} candidate and it scored at the dense-similarity floor "
-                        f"(dense {dense:.4f} < {MIN_DENSE_SCORE}) -- no margin was computable to check instead"
-                    ),
-                }
-            chosen = node.children[0]
-            trace.append({"level": chosen.level, "chosen": chosen.title, "chosen_id": chosen.node_id, "score": None, "margin": None, "candidates_considered": 1, "fallback": "single_candidate_dense_floor"})
-            node = chosen
-            continue
-
-        index = SemanticIndex(candidates)
-        hits = index.search(ask, top_k=2)
-        if not hits:
-            return {"path": trace, "leaf": None, "leaf_passages": [], "abstain_reason": f"no {child_level} candidates to score"}
-        margin = hits[0]["score"] - hits[1]["score"]
-        if margin < min_margin:
-            return {
-                "path": trace,
-                "leaf": None,
-                "leaf_passages": [],
-                "abstain_reason": (
-                    f"no {child_level} clearly separated from the runner-up "
-                    f"(margin {margin:.4f} < {min_margin}, top score {hits[0]['score']:.4f})"
-                ),
-            }
-        best_id = hits[0]["passage"]["id"]
-        chosen = next(child for child in node.children if child.node_id == best_id)
-        trace.append(
-            {
-                "level": chosen.level,
-                "chosen": chosen.title,
-                "chosen_id": chosen.node_id,
-                "score": round(hits[0]["score"], 4),
-                "margin": round(margin, 4),
-                "candidates_considered": len(candidates),
-            }
-        )
-        node = chosen
-    return {"path": trace, "leaf": node, "leaf_passages": node.leaf_passages}
+# navigate_semantic (semantic-only descent) moved to lab.tests.support on
+# 2026-11-12 -- lab.common.brain's hierarchical_navigate stage calls
+# navigate_dual (below) only. navigate_semantic stays reachable from
+# lab.tests.support for EXP-067/068's own comparison against navigate_dual.
 
 
 def navigate_dual(ask: str, root, min_dense_score: float = MIN_DENSE_SCORE, min_margin: float = MIN_SEMANTIC_MARGIN) -> dict:
@@ -184,7 +119,9 @@ def navigate_dual(ask: str, root, min_dense_score: float = MIN_DENSE_SCORE, min_
     signals that must agree, instead of either one alone.
 
     Until this function existed, lab.common.brain's hierarchical branch used
-    lab.common.nested_index.navigate -- lexical (TF-IDF) only, so it could
+    the lexical-only navigate function (originally lab.common.nested_index.
+    navigate, moved to lab.tests.support on 2026-11-12 once navigate_dual
+    superseded it here) -- lexical (TF-IDF) only, so it could
     navigate exact-wording asks but had no way to catch a paraphrased one
     (the same gap EXP-067 measured and fixed for flat disambiguation, never
     carried over to the hierarchical path). navigate_semantic (above) then

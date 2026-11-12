@@ -21,10 +21,11 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT))
 
-from lab.common.entities import agreement, detect_primary, detect_secondary
-from lab.common.harness import Run, prf
+from lab.common.harness import Run
 from lab.common.real_models import model_card, real_entities
 from lab.common.textutil import normalize
+from lab.tests.fixtures_support import contains_match as _contains_match, rule_tagger_spans as _rule_tagger_spans
+from lab.tests.support import prf
 
 FILES = [
     "lab/tests/exp_033_real_entities/run.py",
@@ -35,6 +36,9 @@ FILES = [
     "data/exp_025_real_documents/documents.json",
     "data/exp_033_real_entities/gold.json",
     "data/exp_033_real_entities/results.json",
+    "lab/tests/support.py",
+    "lab/tests/fixtures_support.py",
+
 ]
 
 # Hand-labeled against the real sentences themselves (not invented): PERSON and
@@ -154,23 +158,9 @@ GOLD = [
 ]
 
 
-def _rule_tagger_spans(sentence: str) -> set[str]:
-    mentions = agreement(detect_primary(sentence), detect_secondary(sentence))
-    out = set()
-    for m in mentions:
-        if m["label"] in ("person", "organization"):
-            out.add(normalize(m["text"]))
-    return out
-
-
 def _real_ner_spans(sentence: str) -> set[str]:
     ents = real_entities(sentence)
     return {normalize(e["text"]) for e in ents if e["label"] in ("PERSON", "ORG")}
-
-
-def _contains_match(pred: set[str], gold_text: str) -> bool:
-    g = normalize(gold_text)
-    return any(g == p or g in p or p in g for p in pred)
 
 
 def main():

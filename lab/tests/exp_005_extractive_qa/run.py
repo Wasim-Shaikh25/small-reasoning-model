@@ -8,7 +8,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT))
 
-from lab.common.harness import Run, score_qa
+from lab.common.harness import Run
+from lab.tests.support import score_qa
 from lab.common.qa import answer_with_agreement
 from lab.common.textutil import normalize
 
@@ -19,6 +20,8 @@ FILES = [
     "lab/common/textutil.py",
     "data/exp_005_extractive_qa/items.json",
     "data/exp_005_extractive_qa/results.json",
+    "lab/tests/support.py",
+
 ]
 
 TAU = 0.34

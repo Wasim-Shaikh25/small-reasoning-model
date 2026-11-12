@@ -34,21 +34,22 @@
   "scale_down": "300 of the dev set's roughly 12,000 questions, not the full set. One real distractor passage per question, not the 3-10 passages Experiment B specifies. No pretrained QA checkpoint is loaded (deepset/deberta-v3-base-squad2 is EXP-030, still todo, blocked on huggingface.co access).",
   "referenced_files": [
     "lab/tests/exp_047_real_squad_qa/run.py",
-    "lab/common/real_squad.py",
+    "lab/tests/real_squad.py",
     "lab/common/qa.py",
     "lab/common/harness.py",
     "lab/common/textutil.py",
     "data/exp_005_extractive_qa/results.json",
     "data/exp_047_real_squad_qa/squad_subset.json",
     "data/exp_047_real_squad_qa/items.json",
-    "data/exp_047_real_squad_qa/results.json"
+    "data/exp_047_real_squad_qa/results.json",
+    "lab/tests/support.py"
   ],
   "follow_ups": [
     "Run the full dev set (not just the first 300) for a stable estimate.",
     "If huggingface.co access is ever granted, rerun this exact subset with deepset/deberta-v3-base-squad2 (EXP-030) for a true model-vs-model comparison on identical real data.",
     "Add the 3-10 passage distractor count Experiment B specifies, once more real passages per question are sourced."
   ],
-  "elapsed_sec": 0.4515,
-  "peak_rss_mb": 38.58,
+  "elapsed_sec": 0.3289,
+  "peak_rss_mb": 176.9,
   "models_used": "No model, classical or neural, is loaded by this exploration beyond lab/common/qa.py's existing lexical extractors (unchanged from EXP-005). This is a real-data rerun: the SQuAD2 dev set is real and unmodified; the method is EXP-005's own. deepset/deberta-v3-base-squad2, the blueprint's named checkpoint for this role, remains unloaded because huggingface.co is blocked in this sandbox."
 }

@@ -3,7 +3,7 @@
 Directly tests the example raised in review: context provides a rule
 ("If someone murders a person, it is a punishable crime.") and a fact
 ("Arjun murdered Neha."), and the ask is whether that's a punishable crime.
-lab.common.rules.answer_rule_question finds the rule, finds the fact,
+lab.tests.support.answer_rule_question finds the rule, finds the fact,
 compares one verb lemma, and answers with citations to both -- or abstains
 if no rule, no concrete fact, or no match is found. No model decides the
 outcome; spaCy's dependency parser (already a project dependency) only
@@ -19,7 +19,7 @@ ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT))
 
 from lab.common.harness import Run
-from lab.common.rules import answer_rule_question
+from lab.tests.support import answer_rule_question
 
 FILES = [
     "lab/tests/exp_057_rule_application/run.py",
@@ -27,6 +27,8 @@ FILES = [
     "lab/common/real_models.py",
     "lab/common/harness.py",
     "data/exp_057_rule_application/results.json",
+    "lab/tests/support.py",
+
 ]
 
 CASES = [
@@ -134,7 +136,7 @@ def main():
             "rule's trigger verb lemma via dependency parse. lab.common.rules.extract_fact_triple extracts a "
             "fact sentence's subject/verb lemma/object the same way. lab.common.rules.apply_rule compares the "
             "two verb lemmas -- the one judgment this module makes. "
-            "lab.common.rules.answer_rule_question scans the given passages for the first rule and the first "
+            "lab.tests.support.answer_rule_question scans the given passages for the first rule and the first "
             "fact with a concrete subject, applies the rule if the verbs match, and returns the consequence "
             "with citations to both passages; it abstains (decision 'inconclusive') if no rule, no concrete "
             "fact, or no verb match is found, rather than guessing from the ask's own wording."

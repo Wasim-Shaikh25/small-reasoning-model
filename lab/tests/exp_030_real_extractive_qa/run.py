@@ -22,7 +22,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT))
 
-from lab.common.harness import Run, score_qa
+from lab.common.harness import Run
+from lab.tests.support import score_qa
 from lab.common.real_encoders import QA_MODEL_NAME, real_qa
 from lab.common.textutil import normalize
 
@@ -34,6 +35,8 @@ FILES = [
     "data/exp_005_extractive_qa/results.json",
     "data/exp_030_real_extractive_qa/items.json",
     "data/exp_030_real_extractive_qa/results.json",
+    "lab/tests/support.py",
+
 ]
 
 ITEMS = [

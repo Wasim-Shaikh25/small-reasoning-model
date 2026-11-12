@@ -9,7 +9,7 @@ an off-topic ask (previously a confident wrong guess, now must abstain) and a
 flat-document paraphrase ask (lexical alone would likely miss it; semantic
 should not).
 
-Part B -- lab.common.semantic_index.navigate_semantic's single-candidate
+Part B -- lab.tests.support.navigate_semantic's single-candidate
 level. A tree built with exactly one section so no margin can be computed at
 that level, tested with a genuine ask (must proceed) and an off-topic ask
 (must abstain via the dense-score fallback).
@@ -35,7 +35,9 @@ from lab.common.brain import reason
 from lab.common.harness import Run
 from lab.common.index import Index
 from lab.common.nested_index import MIN_DENSE_SCORE, build_nested_index
-from lab.common.semantic_index import MIN_SEMANTIC_MARGIN, SemanticIndex, navigate_semantic
+from lab.common.semantic_index import MIN_SEMANTIC_MARGIN, SemanticIndex
+from lab.tests.fixtures_support import build_fixture_tree
+from lab.tests.support import navigate_semantic
 
 FILES = [
     "lab/tests/exp_068_abstention_fixes/run.py",
@@ -48,6 +50,9 @@ FILES = [
     "data/exp_060_unified_brain/results.json",
     "data/exp_067_semantic_navigation/results.json",
     "data/exp_068_abstention_fixes/results.json",
+    "lab/tests/support.py",
+    "lab/tests/fixtures_support.py",
+
 ]
 
 # ---------------------------------------------------------------------------
@@ -205,19 +210,6 @@ OFF_TOPIC_ASKS = [
     "What's the best recipe for banana bread?",
     "How do I train for a marathon?",
 ]
-
-
-def build_fixture_tree(fixture: dict, sections_per_chapter: int = 3, leaves_per_section: int = 8):
-    items = []
-    uid = 0
-    for chapter, filler in fixture["chapters"].items():
-        for section_idx in range(sections_per_chapter):
-            for leaf_idx in range(leaves_per_section):
-                is_needle = chapter == fixture["needle_chapter"] and section_idx == fixture["needle_section_idx"] and leaf_idx == leaves_per_section // 2
-                text = fixture["needle"] if is_needle else f"{filler} Item {leaf_idx} filed under section {section_idx}."
-                items.append({"id": f"P{uid:05d}", "text": text, "chapter": chapter, "section": f"{chapter}-{section_idx}", "is_needle": is_needle})
-                uid += 1
-    return build_nested_index(items, ["chapter", "section"])
 
 
 def margins_for_ask(ask: str, root) -> list[dict]:
@@ -403,7 +395,7 @@ def main():
         goal=(
             "Fix and re-measure, not just patch, the three concrete gaps named right after EXP-067: "
             "lab.common.brain's flat disambiguation branch had no abstention at all; "
-            "lab.common.semantic_index.navigate_semantic could not handle a level with only one candidate; "
+            "lab.tests.support.navigate_semantic could not handle a level with only one candidate; "
             "and MIN_SEMANTIC_MARGIN=0.03 was a single first measurement, not a validated constant."
         ),
         method=(

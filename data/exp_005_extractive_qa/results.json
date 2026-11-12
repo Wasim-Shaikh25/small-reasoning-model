@@ -26,9 +26,10 @@
     "lab/common/harness.py",
     "lab/common/textutil.py",
     "data/exp_005_extractive_qa/items.json",
-    "data/exp_005_extractive_qa/results.json"
+    "data/exp_005_extractive_qa/results.json",
+    "lab/tests/support.py"
   ],
   "follow_ups": [],
-  "elapsed_sec": 0.009,
-  "peak_rss_mb": 19.04
+  "elapsed_sec": 0.0054,
+  "peak_rss_mb": 158.57
 }

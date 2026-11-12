@@ -1,12 +1,13 @@
-"""Run harness: timers, RSS, and the pure scoring functions from the architecture."""
+"""Run harness: timers and RSS. The pure scoring functions that used to live
+here (prf/score_qa/fidelity) moved to lab.tests.support on 2026-11-12 --
+every caller was an experiment grading its own result, never lab.common
+itself."""
 
 from __future__ import annotations
 
 import json
 import time
 from pathlib import Path
-
-from lab.common.textutil import modals, normalize, numbers, span_in_passage
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -27,44 +28,6 @@ def peak_rss_mb() -> float:
         return round(peak_bytes / (1024 * 1024), 2)
     except ImportError:
         return 0.0
-
-
-def prf(pred: set, gold: set) -> dict[str, float]:
-    tp = len(pred & gold)
-    p = tp / max(1, len(pred))
-    r = tp / max(1, len(gold))
-    f = 2 * p * r / max(1e-9, p + r)
-    return {"precision": round(p, 4), "recall": round(r, 4), "f1": round(f, 4), "tp": tp}
-
-
-def score_qa(item: dict, qa_out: dict) -> dict[str, bool]:
-    answerable = item["answerable"]
-    abstained = qa_out["no_answer"] >= item["tau_no_answer"] or qa_out["span"] is None
-    passages = item["passages"]
-    passage = passages.get(qa_out.get("passage_id"), "")
-    exact = (
-        answerable
-        and not abstained
-        and normalize(qa_out["span"]) == normalize(item["gold"])
-    )
-    return {
-        "correct_abstain": (not answerable) and abstained,
-        "false_answer": (not answerable) and not abstained,
-        "missed_answer": answerable and abstained,
-        "exact_match": exact,
-        "span_valid": (not abstained) and span_in_passage(qa_out["span"], passage),
-    }
-
-
-def fidelity(src: str, out: str) -> dict:
-    sn, on = set(numbers(src)), set(numbers(out))
-    sm = sorted(modals(src))
-    om = sorted(modals(out))
-    return {
-        "numbers_dropped": sorted(sn - on),
-        "numbers_added": sorted(on - sn),
-        "modal_changed": sm != om,
-    }
 
 
 class Run:

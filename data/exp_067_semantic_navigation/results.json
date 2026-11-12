@@ -3,7 +3,7 @@
   "title": "Real embeddings (bge) vs. TF-IDF/BM25 for hierarchical navigation",
   "status": "closed",
   "goal": "Measure, head to head on the identical tree, whether real bge embeddings out-navigate classical TF-IDF/BM25 on a paraphrased ask, and whether a margin-based abstention check (top1-vs-runner-up gap) correctly abstains on an off-topic ask given that embeddings lack the near-zero-score property lab.common.nested_index's floor relies on.",
-  "method": "One 3-chapter, 3-section-per-chapter, 8-leaf-per-section tree (72 leaves), one needle planted in Governance/section 1. Three asks run through both lab.common.nested_index.navigate (TF-IDF, near-zero floor) and lab.common.semantic_index.navigate_semantic (bge cosine, margin-based abstention, min_margin=0.03): an exact-wording ask, a paraphrased ask sharing almost no exact wording with the needle, and an off-topic ask with no real match in the tree.",
+  "method": "One 3-chapter, 3-section-per-chapter, 8-leaf-per-section tree (72 leaves), one needle planted in Governance/section 1. Three asks run through both lab.tests.support.navigate (TF-IDF, near-zero floor) and lab.tests.support.navigate_semantic (bge cosine, margin-based abstention, min_margin=0.03): an exact-wording ask, a paraphrased ask sharing almost no exact wording with the needle, and an off-topic ask with no real match in the tree.",
   "metrics": {
     "total_leaves": 72,
     "sections_per_chapter": 3,
@@ -35,14 +35,16 @@
     "lab/common/real_encoders.py",
     "lab/common/harness.py",
     "data/exp_065_nested_navigation/results.json",
-    "data/exp_067_semantic_navigation/results.json"
+    "data/exp_067_semantic_navigation/results.json",
+    "lab/tests/support.py",
+    "lab/tests/fixtures_support.py"
   ],
   "follow_ups": [
     "If this measured a real paraphrase advantage, extend lab.common.brain's flat disambiguation branch with the same {lexical, semantic} dual-signal approach, not just a single scoring method.",
     "navigate_semantic has no handling for a level with only 1 child (no margin computable); test a tree shape that exercises that gap before any production use.",
     "Sweep min_margin across more off-topic and near-miss asks before picking a production value; 0.03 here is a first measured choice, not a tuned one."
   ],
-  "elapsed_sec": 13.0912,
-  "peak_rss_mb": 513.61,
+  "elapsed_sec": 9.5147,
+  "peak_rss_mb": 519.26,
   "models_used": "bge-small-en-v1.5 (BAAI), the same real checkpoint loaded since EXP-030, used for retrieval scoring only -- no generative model anywhere in this exploration."
 }

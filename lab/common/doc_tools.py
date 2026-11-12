@@ -20,12 +20,13 @@ be proven correct on a couple of real cases before the catalog grows (the
 same "measured, not assumed" discipline every other capability in this repo
 was built under).
 
-Selection (`select_tool`, `select_template`) reuses lab.common.
-intent_signals' exact mechanism: bge cosine similarity between the ask and
-each candidate's own description, picking the best match -- not a new,
-separate scheme. A tool/template is picked by its own documented purpose,
-the same way wants_document picks a signal by matching the ask's form, not
-by a keyword list.
+Selection (`select_tool`, `select_template` -- moved to lab.tests.support on
+2026-11-12, EXP-082's own entry point only, never called by lab.common)
+reused lab.common.intent_signals' exact mechanism: bge cosine similarity
+between the ask and each candidate's own description, picking the best
+match -- not a new, separate scheme. A tool/template is picked by its own
+documented purpose, the same way wants_document picks a signal by matching
+the ask's form, not by a keyword list.
 
 Follow-up (2026-11-10): HANDOFF.md's redesign proposal named the other
 missing piece -- "extend [the template registry] so each template
@@ -102,46 +103,6 @@ def load_template(template_id: str, tool: str | None = None) -> dict:
         if template["id"] == template_id:
             return template
     raise ValueError(f"No registered template {template_id!r}" + (f" under tool {tool!r}" if tool else "") + f". Known: {[t['id'] for t in list_templates(tool)]}")
-
-
-def _best_match(ask: str, candidates: list[dict], text_key: str) -> dict:
-    if not candidates:
-        return {"match": None, "score": 0.0, "ranked": []}
-    descriptions = [c[text_key] for c in candidates]
-    vecs = bge_embed([ask, *descriptions])
-    ask_vec, cand_vecs = vecs[0], vecs[1:]
-    scores = cand_vecs @ ask_vec
-    ranked = sorted(zip(candidates, scores.tolist()), key=lambda pair: pair[1], reverse=True)
-    best_candidate, best_score = ranked[0]
-    return {
-        "match": best_candidate,
-        "score": round(float(best_score), 4),
-        "ranked": [{"id": c.get("id", c.get("tool")), "score": round(float(s), 4)} for c, s in ranked],
-    }
-
-
-def select_tool(ask: str) -> dict:
-    """Which registered tool this ask best matches, by description
-    similarity -- a closed-set choice among named tools, not generation.
-    Returns {"tool", "score", "ranked"}; "tool" is None if no tool is
-    registered at all.
-    """
-    result = _best_match(ask, list_tools(), "description")
-    return {"tool": result["match"]["tool"] if result["match"] else None, "score": result["score"], "ranked": result["ranked"]}
-
-
-def select_template(ask: str, tool: str | None = None) -> dict:
-    """Which registered template (optionally within one tool) this ask
-    best matches. Returns {"template_id", "tool", "score", "ranked"}.
-    """
-    result = _best_match(ask, list_templates(tool), "description")
-    match = result["match"]
-    return {
-        "template_id": match["id"] if match else None,
-        "tool": match["tool"] if match else None,
-        "score": result["score"],
-        "ranked": result["ranked"],
-    }
 
 
 def assign_findings_to_sections(template: dict, findings: list[dict]) -> tuple[list[dict], list[dict]]:

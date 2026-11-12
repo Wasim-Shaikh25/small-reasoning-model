@@ -8,7 +8,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT))
 
-from lab.common.calc import add_period
+from lab.tests.support import add_period
 from lab.common.harness import Run
 from lab.common.qa import answer_question
 from lab.common.textutil import normalize
@@ -22,6 +22,8 @@ FILES = [
     "lab/common/harness.py",
     "data/exp_007_hop_chain/items.json",
     "data/exp_007_hop_chain/results.json",
+    "lab/tests/support.py",
+
 ]
 
 ITEMS = [

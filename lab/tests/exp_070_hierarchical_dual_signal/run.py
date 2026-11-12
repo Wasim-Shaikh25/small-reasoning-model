@@ -41,8 +41,8 @@ sys.path.insert(0, str(ROOT))
 from lab.common.brain import reason
 from lab.common.harness import Run
 from lab.common.nested_index import build_nested_index
-from lab.common.nested_index import navigate as navigate_lexical_only
 from lab.common.semantic_index import navigate_dual
+from lab.tests.support import navigate as navigate_lexical_only
 
 FILES = [
     "lab/tests/exp_070_hierarchical_dual_signal/run.py",
@@ -53,6 +53,8 @@ FILES = [
     "data/exp_066_brain_nested_navigation/results.json",
     "data/exp_067_semantic_navigation/results.json",
     "data/exp_070_hierarchical_dual_signal/results.json",
+    "lab/tests/support.py",
+
 ]
 
 PASSAGES = [
@@ -219,7 +221,7 @@ def main():
             "Contractors/Priya). 5 cases: 2 exact-wording regressions, 2 new paraphrased asks (avoiding "
             "'contractor'/'sales manager'/'total'/'name'/'address' entirely), 1 off-topic negative control. "
             "Each case run through brain.reason (now using navigate_dual) and, as a direct counterfactual, "
-            "through the old lexical-only lab.common.nested_index.navigate standalone on the same tree and "
+            "through the old lexical-only lab.tests.support.navigate standalone on the same tree and "
             "ask, to measure what would have happened before this wiring."
         ),
         metrics=metrics,

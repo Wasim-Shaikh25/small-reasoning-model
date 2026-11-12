@@ -3,7 +3,7 @@
   "title": "Nested (hierarchical) navigation over a structured document",
   "status": "closed",
   "goal": "Build and measure multi-level navigation (chapter -> section -> leaf) over a synthetic structured document, so the system can search a 1000-page document level by level instead of flattening it, and confirm the navigation decision stays with the embeddings/retrieval layer, never the generative rewriter.",
-  "method": "lab.common.nested_index.build_nested_index groups flat records into a tree by chapter then section. lab.common.nested_index.navigate descends one level at a time, using lab.common.index.Index (the same hybrid retriever already measured) to score only that level's children against the ask, producing an explicit path trace. Tested at 3 tree sizes (27/150/450 leaves) with a single distinctive needle planted in one section of the Finance chapter, plus one off-topic ask as a negative control.",
+  "method": "lab.common.nested_index.build_nested_index groups flat records into a tree by chapter then section. lab.tests.support.navigate descends one level at a time, using lab.common.index.Index (the same hybrid retriever already measured) to score only that level's children against the ask, producing an explicit path trace. Tested at 3 tree sizes (27/150/450 leaves) with a single distinctive needle planted in one section of the Finance chapter, plus one off-topic ask as a negative control.",
   "metrics": {
     "sizes": [
       {
@@ -98,14 +98,16 @@
     "lab/common/index.py",
     "lab/common/harness.py",
     "data/exp_015_paged_memory/results.json",
-    "data/exp_065_nested_navigation/results.json"
+    "data/exp_065_nested_navigation/results.json",
+    "lab/tests/support.py",
+    "lab/tests/fixtures_support.py"
   ],
   "follow_ups": [
     "Carry the same near-zero (not magnitude) abstention floor into lab.common.brain's flat disambiguation step, which still has no abstention threshold at all.",
     "Wire this into lab.common.brain as a second disambiguation mode, used when passages carry multiple hierarchy-level tags instead of one flat 'group' tag -- not yet done, this exploration only proves the navigation mechanism standalone.",
     "Test with 3+ levels of hierarchy and with more than one needle to navigate to in the same ask."
   ],
-  "elapsed_sec": 0.0639,
-  "peak_rss_mb": 152.85,
+  "elapsed_sec": 0.0477,
+  "peak_rss_mb": 159.8,
   "models_used": "No model decides navigation. lab.common.index's hybrid retriever (TF-IDF + BM25, unchanged) scores each level; the same classical substitute every retrieval exploration in this project has used."
 }

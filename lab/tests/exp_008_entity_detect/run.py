@@ -9,7 +9,8 @@ ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT))
 
 from lab.common.entities import agreement, detect_primary, detect_secondary, parse_address
-from lab.common.harness import Run, prf
+from lab.common.harness import Run
+from lab.tests.support import prf
 from lab.common.qa import answer_question
 from lab.common.textutil import find_span, normalize
 
@@ -22,6 +23,8 @@ FILES = [
     "lab/common/nli.py",
     "data/exp_008_entity_detect/lines.json",
     "data/exp_008_entity_detect/results.json",
+    "lab/tests/support.py",
+
 ]
 
 EASY_PEOPLE = ["Ravi Sharma", "Anita Desai", "Meera Iyer", "Kapil Menon", "Sara Khan", "Owen Blake", "Priya Nair", "John Adeyemi"]

@@ -25,8 +25,10 @@ sys.path.insert(0, str(ROOT))
 import json
 
 from lab.common.harness import Run
-from lab.common.index import Index, mrr, recall_at_k
-from lab.common.real_corpus import DOCS_PATH
+from lab.common.index import Index
+from lab.tests.support import mrr, recall_at_k
+from lab.tests.fixtures_support import load_real_document_chunks as load_chunks
+from lab.tests.real_corpus import DOCS_PATH
 from lab.common.real_index import RealIndex
 from lab.common.real_models import model_card
 
@@ -35,23 +37,19 @@ FILES = [
     "lab/common/real_index.py",
     "lab/common/real_models.py",
     "lab/common/index.py",
-    "lab/common/real_corpus.py",
+    "lab/tests/real_corpus.py",
     "lab/common/harness.py",
     "data/exp_025_real_documents/chunks.json",
     "data/exp_029_real_retrieval/queries.json",
     "data/exp_029_real_retrieval/results.json",
+    "lab/tests/support.py",
+    "lab/tests/fixtures_support.py",
+
 ]
 
 
 def _mean(values: list[float]) -> float:
     return round(sum(values) / len(values), 4) if values else 0.0
-
-
-def load_chunks() -> list[dict]:
-    path = ROOT / "data" / "exp_025_real_documents" / "chunks.json"
-    if not path.exists():
-        raise FileNotFoundError(f"{path} is missing. Run lab/tests/exp_025_real_documents/run.py first.")
-    return json.loads(path.read_text())
 
 
 def build_summary_queries(chunks: list[dict]) -> list[dict]:
@@ -102,7 +100,7 @@ def _score(index, passages: list[dict], queries: list[dict]) -> dict:
 
 def main():
     run = Run("EXP-029", "exp_029_real_retrieval")
-    chunks = load_chunks()
+    chunks = load_chunks(ROOT)
     documents = json.loads(DOCS_PATH.read_text())
     passages = [{"id": c["chunk_id"], "chunk_id": c["chunk_id"], "text": c["text"], "doc_id": c["doc_id"]} for c in chunks]
 

@@ -23,12 +23,12 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT))
 
-from lab.common.entities import agreement, detect_primary, detect_secondary
 from lab.common.harness import Run
 from lab.common.real_encoders import model_card
 from lab.common.real_ner import detect_real
 from lab.common.textutil import normalize
 from lab.tests.exp_033_real_entities.run import GOLD
+from lab.tests.fixtures_support import contains_match as _contains_match, rule_tagger_spans as _rule_tagger_spans
 
 FILES = [
     "lab/tests/exp_080_real_ner_rerun/run.py",
@@ -39,22 +39,14 @@ FILES = [
     "data/exp_033_real_entities/gold.json",
     "data/exp_033_real_entities/results.json",
     "data/exp_080_real_ner_rerun/results.json",
+    "lab/tests/fixtures_support.py",
+
 ]
-
-
-def _rule_tagger_spans(sentence: str) -> set[str]:
-    mentions = agreement(detect_primary(sentence), detect_secondary(sentence))
-    return {normalize(m["text"]) for m in mentions if m["label"] in ("person", "organization")}
 
 
 def _dslim_spans(sentence: str) -> set[str]:
     mentions = detect_real(sentence)
     return {normalize(m["text"]) for m in mentions if m["label"] in ("person", "organization")}
-
-
-def _contains_match(pred: set[str], gold_text: str) -> bool:
-    g = normalize(gold_text)
-    return any(g == p or g in p or p in g for p in pred)
 
 
 def _prf(tp, fp, fn):
