@@ -18,14 +18,16 @@ semantic-similarity question, which embeddings answer reliably, not a
 multi-step reasoning question, which is what was being asked of a 270M-
 500M generative model every time, unnecessarily.
 
-`resolve()` and `fix_sentence()` below are kept as the superseded,
-less-reliable generative alternatives (closed-candidate-set-then-ask-the-
-model, and whole-sentence-free-rewrite-then-validate, respectively) --
-not deleted, since this project's practice is to keep a tested, failed
-design visible with its evidence rather than erase the trail. Both
+`resolve()` and `fix_sentence()` -- the superseded, less-reliable
+generative alternatives (closed-candidate-set-then-ask-the-model, and
+whole-sentence-free-rewrite-then-validate, respectively) -- were kept
+around for a while with their evidence rather than erased, per this
+project's practice of keeping a tested, failed design visible. Both
 scored at or below 50% on these same cases across five independent
 prompt/architecture/checkpoint combinations; see AUDIT.md, "the fix:
 embedding-based disambiguation, zero generative model calls" (2026-11-09).
+Deleted 2026-11-12 (confirmed zero callers anywhere, not even a test) --
+the historical record stays in git log, not as dead code in this file.
 
 Three bugs fixed along the way, all found by actually running this
 against real text rather than assuming it would work:
@@ -52,9 +54,6 @@ against real text rather than assuming it would work:
 
 from __future__ import annotations
 
-import json
-
-_KEEP_ORIGINAL = "KEEP_ORIGINAL"
 _vocab: set[str] | None = None
 
 
@@ -158,59 +157,6 @@ def candidates_for(word: str, max_distance: int = 1) -> list[str]:
         if _damerau_levenshtein(lower, v) <= max_distance:
             out.append(v)
     return sorted(out)
-
-
-def fix_sentence(sentence: str, checkpoint: str = "gemma3:270m", max_drift: int = 2) -> dict:
-    """Whole-sentence rewrite, word-level validated.
-
-    `resolve()` above isolates one word and asks the model to pick among
-    pre-vetted candidates -- tested live and found genuinely unreliable
-    (gemma3:270m and Qwen2.5-0.5B-Instruct both scored under 50% on the
-    hard, multi-candidate cases across two prompt framings each; see
-    AUDIT.md, 2026-11-09). The isolated word has no sentence context left
-    once pulled out, and that turns out to matter more than expected.
-
-    This instead lets the model read and rewrite the WHOLE sentence (the
-    framing that already correctly fixed "peopel"->"people" earlier this
-    session, because it had the rest of the sentence to work with), then
-    validates the result WORD BY WORD: a changed word is only accepted if
-    it is a real vocabulary word AND within `max_drift` true edits of what
-    was actually typed. A word-count mismatch (something dropped or
-    added, not just misspelled) rejects the whole rewrite outright. This
-    is the same shape as this project's other generate-then-gate designs
-    (`real_rewriter.fidelity_gate`) -- the model proposes with context,
-    a cheap deterministic check decides whether to trust each specific
-    change, so it can't silently swap in something unrelated even when it
-    tries to.
-    """
-    from lab.common.real_rewriter_ollama import generate
-
-    prompt = (
-        "Fix only the spelling and grammar of this sentence. Do not add, "
-        "remove, or change any fact, name, number, or claim. Output only "
-        "the corrected sentence, nothing else.\n\n"
-        f"Sentence: {sentence}\nCorrected:"
-    )
-    generated = generate(prompt, max_tokens=120).strip()
-    orig_words, new_words = sentence.split(), generated.split()
-    if len(orig_words) != len(new_words):
-        return {"text": sentence, "accepted": False, "reason": "word_count_changed", "changes": []}
-
-    vocab = _load_vocab()
-    final, changes = [], []
-    for orig, new in zip(orig_words, new_words):
-        orig_clean = orig.strip(".,!?\"'").lower()
-        new_clean = new.strip(".,!?\"'").lower()
-        if orig_clean == new_clean:
-            final.append(orig)
-            continue
-        if new_clean in vocab and _damerau_levenshtein(orig_clean, new_clean) <= max_drift:
-            final.append(new)
-            changes.append({"from": orig, "to": new, "accepted": True})
-        else:
-            final.append(orig)
-            changes.append({"from": orig, "to": new, "accepted": False, "reason": "not_real_word_or_too_different"})
-    return {"text": " ".join(final), "accepted": True, "changes": changes}
 
 
 def _cosine(a, b) -> float:
@@ -319,48 +265,3 @@ def fix_sentence_joint(sentence: str, max_distance: int = 1) -> dict:
         final_words[i] = choice
         picks[f"w{i}"] = {"choice": choice, "score": round(score, 4)}
     return {"text": " ".join(final_words), "picks": picks, "ambiguous": ambiguous}
-
-
-def resolve(word: str, sentence: str, candidates: list[str], checkpoint: str = "gemma3:270m") -> dict:
-    """Returns {"word", "changed", "reason", "candidates"}.
-
-    `reason` is one of: "already_valid" (not reached here, candidates==[]
-    means no fix needed, handled by the caller), "no_candidates" (not a
-    recognized typo shape, left alone), "unambiguous" (exactly one real
-    word that close, no model call made), "model_chose", "model_declined",
-    "model_unparseable" (constrained output didn't parse -- fails closed,
-    original word kept, same discipline as every other fallback in this
-    project).
-    """
-    if not candidates:
-        return {"word": word, "changed": False, "reason": "no_candidates", "candidates": []}
-    if len(candidates) == 1:
-        return {"word": candidates[0], "changed": True, "reason": "unambiguous", "candidates": candidates}
-
-    from lab.common.real_rewriter_ollama import _post_with_retry
-
-    schema = {
-        "type": "object",
-        "properties": {"choice": {"type": "string", "enum": candidates + [_KEEP_ORIGINAL]}},
-        "required": ["choice"],
-    }
-    blanked = sentence.replace(word, "____", 1)
-    prompt = (
-        f"Fill in the blank with the ONE word from the list that makes the "
-        f"most sense. If none of them make sense, answer {_KEEP_ORIGINAL}.\n\n"
-        f"Sentence: {blanked}\n"
-        f"Word list: {', '.join(candidates)}\n"
-        f"Which word fills the blank?"
-    )
-    resp = _post_with_retry({
-        "model": checkpoint, "prompt": prompt, "stream": False, "format": schema,
-        "options": {"num_predict": 40, "temperature": 0, "seed": 0},
-    })
-    resp.raise_for_status()
-    try:
-        choice = json.loads(resp.json()["response"])["choice"]
-    except (json.JSONDecodeError, KeyError):
-        return {"word": word, "changed": False, "reason": "model_unparseable", "candidates": candidates}
-    if choice == _KEEP_ORIGINAL or choice not in candidates:
-        return {"word": word, "changed": False, "reason": "model_declined", "candidates": candidates}
-    return {"word": choice, "changed": True, "reason": "model_chose", "candidates": candidates}

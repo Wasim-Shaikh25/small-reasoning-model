@@ -1,0 +1,50 @@
+{
+  "id": "EXP-109",
+  "title": "sum_amounts_for_subject wired into total_computation, replacing the inline scan it duplicated",
+  "status": "closed",
+  "goal": "DRY up total_computation's own inline amount-scanning loop (found to be functionally identical to lab.common.rules.sum_amounts_for_subject, just reimplemented by hand) into one shared, directly-callable function.",
+  "method": "brain.reason's own total_computation output checked against a direct call to sum_amounts_for_subject on the identical passages, with and without a mixed-in rule-shaped passage, confirming they agree and that the rule-exclusion default matches brain.py's existing, already-measured behavior.",
+  "metrics": {
+    "brain_total_via_shared_function": {
+      "decision": "supported",
+      "text": "total 150 [P1, P2].",
+      "correct": true
+    },
+    "brain_total_excludes_rule_passage": {
+      "decision": "supported",
+      "text": "total 150 [P1, P2].",
+      "correct": true
+    },
+    "direct_call_matches_brain": {
+      "total": 150.0,
+      "sources": [
+        "P1",
+        "P2"
+      ],
+      "correct": true
+    },
+    "direct_call_skips_rule_passage_by_default": {
+      "total": 150.0,
+      "correct": true
+    },
+    "direct_call_skip_rule_passages_false": {
+      "total": 675.0,
+      "correct": true
+    }
+  },
+  "results_prose": "brain.reason's total_computation stage over two fact passages ($100 + $50): 'total 150 [P1, P2].'. With a threshold-rule passage mixed in (its own $500/$25 must NOT be counted as line items): 'total 150 [P1, P2].' -- still 150, the rule's own numbers correctly excluded. Calling sum_amounts_for_subject directly on the same passages gives the identical total/sources brain.py's stage produced (150.0, ['P1', 'P2']), confirming one real implementation, not two independently-written scans that happen to agree today. skip_rule_passages=False recovers the OLD (pre-2026-11-10-fix, lab.tests.support-era) behavior of counting everything, 675.0 -- available for a caller who genuinely wants that, but never brain.py's own default.",
+  "conclusion": "lab.common.rules.sum_amounts_for_subject -- moved to lab.tests.support as test-only, moved back once this DRY gap was found -- is now the one implementation of the cross-passage amount scan total_computation needs, with the rule-passage exclusion brain.py's stage already required folded in via skip_rule_passages=True (the default). brain.py no longer carries its own copy of this scan.",
+  "scale_down": "Two fact passages, one rule passage -- a proof the shared function reproduces brain.py's exact prior behavior, not a new capability measurement (calc.sum_amounts's own arithmetic was already proven in EXP-007/014).",
+  "referenced_files": [
+    "lab/tests/exp_109_total_computation_shared_sum/run.py",
+    "lab/common/brain.py",
+    "lab/common/rules.py",
+    "lab/common/calc.py",
+    "lab/common/entities.py",
+    "data/exp_109_total_computation_shared_sum/results.json"
+  ],
+  "follow_ups": [],
+  "elapsed_sec": 10.1035,
+  "peak_rss_mb": 2799.46,
+  "models_used": "None -- regex span extraction and arithmetic, both deterministic, unchanged by this refactor."
+}

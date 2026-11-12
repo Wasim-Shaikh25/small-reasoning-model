@@ -1,0 +1,26 @@
+{
+  "coreference_pairs_omitted_baseline": {
+    "decision": "supported",
+    "text": "R. Sharma, MG Road [P1].",
+    "correct": true
+  },
+  "coreference_pairs_given_merges_alias": {
+    "decision": "supported",
+    "text": "Ravi Sharma, MG Road [P2].",
+    "merged": [
+      "R. Sharma",
+      "Ravi Sharma"
+    ],
+    "chosen": "Ravi Sharma",
+    "citations": [
+      "P1",
+      "P2"
+    ],
+    "correct": true
+  },
+  "different_people_same_surname_not_merged": {
+    "baseline_text": "Amit Sharma, Lake Road [P3].",
+    "with_pairs_text": "Amit Sharma, Lake Road [P3].",
+    "correct": true
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "id": "EXP-113",
+  "title": "ingest_and_store/ingest_and_upsert wired into brain.reason as an opt-in ingest_text= parameter",
+  "status": "closed",
+  "goal": "Close EXP-099's own named gap: nothing in lab/ builds a Store from a real raw document before querying it -- every existing caller already has passages/a pre-built connector in hand.",
+  "method": "Raw text ingested into a brand-new collection (first-build path) and immediately queried in the same call. Raw text ingested into an already-seeded collection (append path), checking both the new and the original fact are independently reachable afterward. ingest_text omitted on an ordinary connector-only call, checking zero behavior change.",
+  "metrics": {
+    "ingest_into_fresh_collection": {
+      "decision": "supported",
+      "text": "45 days [CHUNK0000]",
+      "ingest_step": {
+        "step": "ingest_text",
+        "collection": "coll_113_fresh",
+        "chars": 46
+      },
+      "correct": true
+    },
+    "ingest_upserted_into_existing_collection": {
+      "decision": "supported",
+      "text": "60 days [CHUNK0000]",
+      "correct": true
+    },
+    "original_seed_still_reachable_after_upsert": {
+      "decision": "supported",
+      "text": "20000 rupees [S1]",
+      "correct": true
+    },
+    "ingest_text_omitted_baseline": {
+      "decision": "supported",
+      "text": "30 days [B1]",
+      "correct": true
+    }
+  },
+  "results_prose": "A brand-new, never-built collection with ingest_text given: 'supported', '45 days [CHUNK0000]' -- the raw text was chunked and built into a fresh Store (ingest_and_store's own path), then immediately queryable in the same call. A collection ALREADY seeded with a different fact: ingesting new text via ingest_and_upsert reaches '60 days [CHUNK0000]', and the ORIGINAL seeded fact is still separately reachable afterward ('20000 rupees [S1]') -- append, not replace. ingest_text omitted entirely on an ordinary connector-only call: '30 days [B1]', zero ingest_text trace step -- completely unaffected.",
+  "conclusion": "lab.common.store.ingest_and_store/ingest_and_upsert -- present with zero callers anywhere, the exact gap EXP-099 named directly -- are now reachable from lab.common.brain.reason itself via ingest_text=, choosing the first-build vs. append path the same way Store.exists() already would. Every caller that never sets it takes the exact same path as before this wiring existed.",
+  "scale_down": "One short document per case -- a proof the ingest-then-query sequencing and first-build/append dispatch work end to end, not a benchmark of chunk_document's own chunking quality at real-document scale (already exercised in EXP-081/088).",
+  "referenced_files": [
+    "lab/tests/exp_113_store_ingest_wiring/run.py",
+    "lab/common/brain.py",
+    "lab/common/store.py",
+    "lab/common/ingest.py",
+    "data/exp_113_store_ingest_wiring/results.json"
+  ],
+  "follow_ups": [
+    "A multi-round retrieve_budget retry never re-ingests (ingest_text is explicitly passed as None on every retried _reason_once call) -- deliberate, to avoid upserting the same text more than once, but means a retry round cannot ingest MORE text mid-retry even if that were ever wanted."
+  ],
+  "elapsed_sec": 10.4231,
+  "peak_rss_mb": 2799.23,
+  "models_used": "None by default (the lexical Index leg) -- Store.build/upsert's own use_bge/use_graph opt-ins are unused here, unchanged from how Store already worked."
+}

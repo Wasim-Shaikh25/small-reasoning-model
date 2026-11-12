@@ -1,0 +1,28 @@
+{
+  "brain_total_via_shared_function": {
+    "decision": "supported",
+    "text": "total 150 [P1, P2].",
+    "correct": true
+  },
+  "brain_total_excludes_rule_passage": {
+    "decision": "supported",
+    "text": "total 150 [P1, P2].",
+    "correct": true
+  },
+  "direct_call_matches_brain": {
+    "total": 150.0,
+    "sources": [
+      "P1",
+      "P2"
+    ],
+    "correct": true
+  },
+  "direct_call_skips_rule_passage_by_default": {
+    "total": 150.0,
+    "correct": true
+  },
+  "direct_call_skip_rule_passages_false": {
+    "total": 675.0,
+    "correct": true
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "auto_select_omitted_baseline": {
+    "decision": "supported",
+    "auto_select_fired": false,
+    "correct": true
+  },
+  "auto_select_enabled": {
+    "decision": "supported",
+    "tool_selected": "legal",
+    "template_selected": "legal_notice",
+    "score": 0.6346,
+    "correct": true
+  },
+  "explicit_template_id_takes_precedence": {
+    "decision": "supported",
+    "auto_select_fired": false,
+    "correct": true
+  }
+}

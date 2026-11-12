@@ -1,0 +1,18 @@
+{
+  "genuine_conflict": {
+    "call1_decision": "supported",
+    "call2_decision": "supported",
+    "conflict_steps_found": 1,
+    "note_marked_conflicted": true,
+    "correct": true
+  },
+  "repeated_agreeing_recall": {
+    "conflict_steps_found": 0,
+    "all_notes_still_verified": true,
+    "correct": true
+  },
+  "memory_path_omitted_baseline": {
+    "decision": "supported",
+    "correct": true
+  }
+}

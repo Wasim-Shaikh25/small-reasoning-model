@@ -1,0 +1,27 @@
+{
+  "ingest_into_fresh_collection": {
+    "decision": "supported",
+    "text": "45 days [CHUNK0000]",
+    "ingest_step": {
+      "step": "ingest_text",
+      "collection": "coll_113_fresh",
+      "chars": 46
+    },
+    "correct": true
+  },
+  "ingest_upserted_into_existing_collection": {
+    "decision": "supported",
+    "text": "60 days [CHUNK0000]",
+    "correct": true
+  },
+  "original_seed_still_reachable_after_upsert": {
+    "decision": "supported",
+    "text": "20000 rupees [S1]",
+    "correct": true
+  },
+  "ingest_text_omitted_baseline": {
+    "decision": "supported",
+    "text": "30 days [B1]",
+    "correct": true
+  }
+}

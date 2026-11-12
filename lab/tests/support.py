@@ -1,6 +1,6 @@
 """Shared test-support utilities: scoring/metrics, and the handful of
 secondary code paths (an abandoned-in-production navigator, a never-wired
-rule-application mode, a never-wired output gate) that experiments still
+output gate, a whole-pipeline demo entry point) that experiments still
 exercise directly even though lab.common.brain's own pipeline doesn't call
 them.
 
@@ -14,12 +14,11 @@ run.py scripts grading or exercising brain's output.
 
 from __future__ import annotations
 
-from lab.common.doc_tools import list_templates, list_tools
 from lab.common.index import Index
 from lab.common.nested_index import MIN_DENSE_SCORE, NestedNode
 from lab.common.nli import judge
 from lab.common.qa import spans_overlap
-from lab.common.calc import parse_date, sum_amounts
+from lab.common.calc import parse_date
 from lab.common.real_encoders import bge_embed, real_nli
 from lab.common.relevance import ask_relevance
 from lab.common.rules import apply_rule, extract_fact_triple, parse_conditional_rule
@@ -217,35 +216,13 @@ def navigate_semantic(ask: str, root: NestedNode, min_margin: float = MIN_SEMANT
 
 
 # ---------------------------------------------------------------------------
-# lab.common.rules: a second, never-wired rule-application mode
-# (semantic/paraphrase matching, and a whole-pipeline demo entry point).
-# lab.common.brain's rule_application stage uses apply_rule (exact lemma
-# match) only.
+# lab.common.rules: a whole-pipeline demo entry point (find-rule+find-fact+
+# apply+render in one call). sum_amounts_for_subject and semantic_apply_rule
+# moved back to lab.common.rules on 2026-11-12 (same day) once brain.py was
+# wired to call them -- this one stays here, lab.common.brain's
+# rule_application stage has its own dispatch/citation logic and never
+# calls this standalone demo pipeline.
 # ---------------------------------------------------------------------------
-
-
-def sum_amounts_for_subject(passages: list[dict], amount_re) -> dict:
-    spans = []
-    sources = []
-    for passage in passages:
-        for found in amount_re.findall(passage.get("text", "")):
-            spans.append(found)
-            sources.append(passage.get("id"))
-    result = sum_amounts(spans)
-    result["sources"] = sources
-    return result
-
-
-def semantic_apply_rule(rule: dict, fact_text: str, tau: float = 0.75) -> dict:
-    probs = real_nli(fact_text, rule["condition_text"])
-    matched = probs["entail"] >= tau and probs["contradict"] < 0.2
-    return {
-        "matched": matched,
-        "condition_text": rule["condition_text"],
-        "fact_text": fact_text,
-        "nli": probs,
-        "consequence": rule["consequence"] if matched else None,
-    }
 
 
 def answer_rule_question(ask: str, passages: list[dict]) -> dict:
@@ -386,46 +363,6 @@ def output_validator(text: str, findings_text: str, citations: list[str], decisi
         "modals_ok": modals_ok,
         "caveat_ok": caveat_ok,
         "ask_relevance": relevance,
-    }
-
-
-# ---------------------------------------------------------------------------
-# lab.common.doc_tools: tool/template selection by description similarity.
-# Only check_section_contract/check_template_contracts (wired into
-# lab.common.longform) and list_tools/list_templates/load_template are
-# production-used; select_tool/select_template never are.
-# ---------------------------------------------------------------------------
-
-
-def _best_match(ask: str, candidates: list[dict], text_key: str) -> dict:
-    if not candidates:
-        return {"match": None, "score": 0.0, "ranked": []}
-    descriptions = [c[text_key] for c in candidates]
-    vecs = bge_embed([ask, *descriptions])
-    ask_vec, cand_vecs = vecs[0], vecs[1:]
-    scores = cand_vecs @ ask_vec
-    ranked = sorted(zip(candidates, scores.tolist()), key=lambda pair: pair[1], reverse=True)
-    best_candidate, best_score = ranked[0]
-    return {
-        "match": best_candidate,
-        "score": round(float(best_score), 4),
-        "ranked": [{"id": c.get("id", c.get("tool")), "score": round(float(s), 4)} for c, s in ranked],
-    }
-
-
-def select_tool(ask: str) -> dict:
-    result = _best_match(ask, list_tools(), "description")
-    return {"tool": result["match"]["tool"] if result["match"] else None, "score": result["score"], "ranked": result["ranked"]}
-
-
-def select_template(ask: str, tool: str | None = None) -> dict:
-    result = _best_match(ask, list_templates(tool), "description")
-    match = result["match"]
-    return {
-        "template_id": match["id"] if match else None,
-        "tool": match["tool"] if match else None,
-        "score": result["score"],
-        "ranked": result["ranked"],
     }
 
 

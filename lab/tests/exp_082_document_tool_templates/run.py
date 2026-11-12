@@ -43,8 +43,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT))
 
-from lab.common.doc_tools import assign_findings_to_sections, list_tools, load_template
-from lab.tests.support import select_template, select_tool
+from lab.common.doc_tools import assign_findings_to_sections, list_tools, load_template, select_template, select_tool
 from lab.common.harness import Run
 from lab.common.longform import write_long_document
 
@@ -57,8 +56,6 @@ FILES = [
     "lab/common/templates/study/_tool.json",
     "lab/common/templates/study/college_notes.json",
     "data/exp_082_document_tool_templates/results.json",
-    "lab/tests/support.py",
-
 ]
 
 LEGAL_ASK = "Draft a legal notice to a tenant over unpaid rent."

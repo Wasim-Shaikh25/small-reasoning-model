@@ -114,15 +114,14 @@
     "lab/common/harness.py",
     "data/exp_057_rule_application/results.json",
     "data/exp_059_cross_domain_rules/results.json",
-    "data/exp_061_semantic_rule_matching/results.json",
-    "lab/tests/support.py"
+    "data/exp_061_semantic_rule_matching/results.json"
   ],
   "follow_ups": [
     "A larger paraphrase set, including adversarial near-misses, would give a stabler accuracy estimate than 2 cases per kind.",
     "Wire semantic_apply_rule into lab.common.brain as the default rule-matching step (with apply_rule as a cheap first check, escalating to the NLI call only when the lemma check fails), so the brain itself gets this robustness, not just this standalone test.",
     "EXP-056 already showed NLI-based checks can misfire when wired against the wrong comparison target (the whole-document ask). This result and that one together argue the entailment direction and the comparison target both have to be chosen deliberately, not assumed safe just because the underlying model is real."
   ],
-  "elapsed_sec": 8.9515,
-  "peak_rss_mb": 2791.9,
+  "elapsed_sec": 11.852,
+  "peak_rss_mb": 2686.34,
   "models_used": "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli, a local checkpoint loaded with transformers (not an API call), the same real NLI judge EXP-031 measured. Used here for one bounded judgment (does this fact entail this rule's condition), not as a general-purpose reasoner."
 }

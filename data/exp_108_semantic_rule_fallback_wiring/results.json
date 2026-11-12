@@ -1,0 +1,51 @@
+{
+  "id": "EXP-108",
+  "title": "semantic_apply_rule wired into rule_application as a use_real_nli-gated fallback for apply_rule's exact-lemma miss",
+  "status": "closed",
+  "goal": "Close the gap EXP-061 measured standalone but never wired: a fact phrased without the rule's own trigger verb lemma falls through to lookup_fallback today, even when it clearly satisfies the rule's condition by meaning.",
+  "method": "A paraphrased fact (no shared lemma) checked with the flag omitted (today's exact behavior, abstains) and set (resolves via the new fallback). An exact-lemma fact checked with the flag set, to confirm it still takes the ordinary path, never the fallback. A genuinely unrelated fact checked with the flag set, to confirm abstention still works when nothing actually matches.",
+  "metrics": {
+    "use_real_nli_omitted_baseline": {
+      "decision": "inconclusive",
+      "correct": true
+    },
+    "paraphrased_fact_with_flag": {
+      "decision": "supported",
+      "citations": [
+        "F1",
+        "R1"
+      ],
+      "semantic_match_nli": {
+        "entail": 0.8916,
+        "neutral": 0.106,
+        "contradict": 0.0024
+      },
+      "correct": true
+    },
+    "exact_match_unaffected_by_flag": {
+      "decision": "supported",
+      "method": "verb",
+      "correct": true
+    },
+    "truly_unrelated_fact_still_abstains": {
+      "decision": "inconclusive",
+      "correct": true
+    }
+  },
+  "results_prose": "A fact phrased without the rule's trigger verb lemma, use_real_nli omitted (today's default): 'inconclusive' -- apply_rule's exact-lemma search finds no fact_passage, same as before this wiring existed. The SAME case with use_real_nli=True: 'supported', matched via the new 'verb_semantic' trace kind, citations=['F1', 'R1']. An EXACT-lemma fact with use_real_nli=True still resolves through the ordinary exact-match path ('verb' kind), never the semantic fallback -- the fallback only ever runs after the exact search already failed. A genuinely unrelated fact still correctly abstains even with the flag set.",
+  "conclusion": "lab.common.rules.semantic_apply_rule -- measured standalone in EXP-061, never wired into the live rule_application stage -- now runs as an explicit fallback when apply_rule's exact-lemma search finds no fact_passage at all, gated on the EXISTING use_real_nli flag (no new parameter). Zero regression: every caller who leaves use_real_nli at its default, or whose fact already shares the rule's trigger lemma, takes the exact same path as before this wiring existed.",
+  "scale_down": "One rule, one paraphrased fact, one exact fact, one unrelated fact -- a proof the dispatch/gating/citation wiring works end to end, not a benchmark of the real NLI checkpoint's own paraphrase-matching precision at scale (already measured separately in EXP-061/EXP-031).",
+  "referenced_files": [
+    "lab/tests/exp_108_semantic_rule_fallback_wiring/run.py",
+    "lab/common/brain.py",
+    "lab/common/rules.py",
+    "lab/common/real_encoders.py",
+    "data/exp_108_semantic_rule_fallback_wiring/results.json"
+  ],
+  "follow_ups": [
+    "The fallback does not run forward_chain (multi-rule chaining) the way the exact-match path does for a derived fact -- a semantically-matched fact that itself triggers a second rule stops after the first consequence, a deliberate scope limit, not an oversight."
+  ],
+  "elapsed_sec": 12.2843,
+  "peak_rss_mb": 2799.42,
+  "models_used": "lab.common.real_encoders.real_nli (DeBERTa-v3-base-mnli-fever-anli), only when the caller already set use_real_nli=True -- the classical lab.common.nli.judge remains the default judge_fn for any other (test/direct) caller of semantic_apply_rule."
+}

@@ -1,0 +1,47 @@
+{
+  "id": "EXP-112",
+  "title": "Store.expand_entity wired into graph_expand, opt-in via expand_via_store_graph=, merged with the existing in-memory expansion",
+  "status": "closed",
+  "goal": "Close the gap: graph_expand's in-memory graph is rebuilt fresh from whatever passages are already in hand every call, so it can never reach an entity hop beyond that -- Store.expand_entity walks a graph persisted over the WHOLE collection instead, and had zero callers anywhere.",
+  "method": "connector_top_k=0 isolates the graph-only path (no generic search contribution) so any passage reached beyond the one directly given can only come from entity-graph expansion. Checked with the flag omitted (in-memory only, G2 unreached), enabled (G2 reached via the persisted Store graph), and enabled against a Store with no persisted graph at all (correct no-op, not an error).",
+  "metrics": {
+    "expand_via_store_graph_omitted_baseline": {
+      "citations": [
+        "G1"
+      ],
+      "reached_g2": false,
+      "correct": true
+    },
+    "expand_via_store_graph_enabled": {
+      "decision": "supported",
+      "text": "ABC Pvt Ltd is located in Pune. [G2]. Ravi Sharma [G1].",
+      "citations": [
+        "G1",
+        "G2"
+      ],
+      "reached_g2": true,
+      "correct": true
+    },
+    "enabled_but_store_has_no_persisted_graph": {
+      "citations": [
+        "G1"
+      ],
+      "reached_g2": false,
+      "correct": true
+    }
+  },
+  "results_prose": "Only G1 given directly, connector_top_k=0 (no generic-search contribution): with expand_via_store_graph omitted (default), the in-memory-only expansion reaches citations=['G1'] -- G2 unreached, since the ephemeral graph built from G1 alone has nowhere to hop to. Enabled: citations=['G1', 'G2'], text='ABC Pvt Ltd is located in Pune. [G2]. Ravi Sharma [G1].' -- G2 reached purely through Store.expand_entity's walk of the PERSISTED graph (built at Store.build time over both passages). The same flag against a Store built WITHOUT use_graph=True correctly reaches nothing extra -- Store.graph is None, so the new code path is a no-op, not an error.",
+  "conclusion": "lab.common.store.Store.expand_entity -- present since the Store module existed with zero callers anywhere -- now extends brain.reason's graph_expand stage beyond what the in-memory ephemeral graph alone can reach, when the caller opts in (expand_via_store_graph=True) and the connector is a Store with a persisted graph. Every other caller (flag omitted, or no persisted graph) takes the exact same path as before this wiring existed.",
+  "scale_down": "One entity, one hop, two passages -- a proof the merge/dispatch/citation wiring works end to end, not a benchmark of graph_index.expand_from_entity's own multi-hop precision at a larger real graph (already exercised in EXP-075).",
+  "referenced_files": [
+    "lab/tests/exp_112_store_graph_expand_wiring/run.py",
+    "lab/common/brain.py",
+    "lab/common/store.py",
+    "lab/common/graph_index.py",
+    "data/exp_112_store_graph_expand_wiring/results.json"
+  ],
+  "follow_ups": [],
+  "elapsed_sec": 10.2952,
+  "peak_rss_mb": 2800.05,
+  "models_used": "None -- graph traversal and lexical span extraction, both deterministic."
+}

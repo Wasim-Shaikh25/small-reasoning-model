@@ -1,0 +1,41 @@
+{
+  "id": "EXP-107",
+  "title": "memory.mark_conflicted wired into brain.reason's existing memory_path= mechanism",
+  "status": "closed",
+  "goal": "Close the named gap: memory_recall already reports a prior valid note every call, but nothing ever compared it against what THIS call found. Wire mark_conflicted so a genuine disagreement is recorded, not silently dropped.",
+  "method": "Two reason() calls sharing one SQLite memory store: the second supplies the first's own source passage again plus a directly conflicting new one, checking the conflict is detected and recorded. A second pair of calls recalls the SAME fact twice (no disagreement), checking the mechanism stays silent. A third, memory_path-omitted baseline checks zero behavior change for every existing caller.",
+  "metrics": {
+    "genuine_conflict": {
+      "call1_decision": "supported",
+      "call2_decision": "supported",
+      "conflict_steps_found": 1,
+      "note_marked_conflicted": true,
+      "correct": true
+    },
+    "repeated_agreeing_recall": {
+      "conflict_steps_found": 0,
+      "all_notes_still_verified": true,
+      "correct": true
+    },
+    "memory_path_omitted_baseline": {
+      "decision": "supported",
+      "correct": true
+    }
+  },
+  "results_prose": "Call 1 writes a verified note from P1 (30 days). Call 2 supplies P1 again plus a directly conflicting P2 (6 months) for the same ask: 'supported', with exactly 1 memory_conflict_detected trace step(s), and P1's own note flips to verification_status='conflicted' in the SQLite store. A second scenario recalling the SAME unchanged fact twice (no real disagreement) produces zero conflict steps and leaves every note 'verified' -- the mechanism does not fire on agreement. memory_path omitted entirely: zero behavior change, no memory_conflict_detected step possible.",
+  "conclusion": "lab.common.memory.mark_conflicted -- present since 2026-11-11 with zero callers anywhere -- is now wired into lab.common.brain.reason's existing memory_path= lookup_fallback path. A genuine disagreement between a still-valid recalled note and a freshly extracted answer for the same ask is recorded on the older note, not silently dropped or silently overwritten; an ordinary repeated, agreeing recall is correctly left untouched.",
+  "scale_down": "One fact, one conflicting fact, two calls -- a proof the detection/recording wiring works end to end, not a measurement of lab.common.nli.judge's own contradiction-detection precision at scale (already a known, documented limitation of the classical judge, unchanged by this wiring).",
+  "referenced_files": [
+    "lab/tests/exp_107_memory_conflict_wiring/run.py",
+    "lab/common/brain.py",
+    "lab/common/memory.py",
+    "lab/common/nli.py",
+    "data/exp_107_memory_conflict_wiring/results.json"
+  ],
+  "follow_ups": [
+    "mark_conflicted records the conflict on the note but memory.recall's own hit shape does not yet surface a note's conflicts list back to the caller -- a later recall of a conflicted note still reports it the same way as any other valid hit, just with a DB-side verification_status='conflicted' a caller would have to query separately to see."
+  ],
+  "elapsed_sec": 10.8163,
+  "peak_rss_mb": 2800.05,
+  "models_used": "lab.common.nli.judge (classical, deterministic: token coverage + number/polarity checks) -- no generative or real pretrained model involved."
+}

@@ -49,8 +49,7 @@ sys.path.insert(0, str(ROOT))
 from lab.common.entities import AMOUNT_RE, detect_primary, parse_address
 from lab.common.harness import Run
 from lab.common.index import Index
-from lab.common.rules import apply_threshold_rule, parse_threshold_rule
-from lab.tests.support import sum_amounts_for_subject
+from lab.common.rules import apply_threshold_rule, parse_threshold_rule, sum_amounts_for_subject
 
 FILES = [
     "lab/tests/exp_058_integrated_scenario/run.py",
@@ -61,8 +60,6 @@ FILES = [
     "lab/common/harness.py",
     "data/exp_057_rule_application/results.json",
     "data/exp_058_integrated_scenario/results.json",
-    "lab/tests/support.py",
-
 ]
 
 PASSAGES = [

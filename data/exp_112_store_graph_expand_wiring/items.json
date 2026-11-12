@@ -1,0 +1,26 @@
+{
+  "expand_via_store_graph_omitted_baseline": {
+    "citations": [
+      "G1"
+    ],
+    "reached_g2": false,
+    "correct": true
+  },
+  "expand_via_store_graph_enabled": {
+    "decision": "supported",
+    "text": "ABC Pvt Ltd is located in Pune. [G2]. Ravi Sharma [G1].",
+    "citations": [
+      "G1",
+      "G2"
+    ],
+    "reached_g2": true,
+    "correct": true
+  },
+  "enabled_but_store_has_no_persisted_graph": {
+    "citations": [
+      "G1"
+    ],
+    "reached_g2": false,
+    "correct": true
+  }
+}

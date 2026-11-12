@@ -21,12 +21,14 @@ same "measured, not assumed" discipline every other capability in this repo
 was built under).
 
 Selection (`select_tool`, `select_template` -- moved to lab.tests.support on
-2026-11-12, EXP-082's own entry point only, never called by lab.common)
-reused lab.common.intent_signals' exact mechanism: bge cosine similarity
-between the ask and each candidate's own description, picking the best
-match -- not a new, separate scheme. A tool/template is picked by its own
-documented purpose, the same way wants_document picks a signal by matching
-the ask's form, not by a keyword list.
+2026-11-12 as EXP-082's own entry point only, moved back the same day once
+lab.common.brain's `notes=` dispatch was wired to call them when the caller
+gives no explicit template) reused lab.common.intent_signals' exact
+mechanism: bge cosine similarity between the ask and each candidate's own
+description, picking the best match -- not a new, separate scheme. A
+tool/template is picked by its own documented purpose, the same way
+wants_document picks a signal by matching the ask's form, not by a
+keyword list.
 
 Follow-up (2026-11-10): HANDOFF.md's redesign proposal named the other
 missing piece -- "extend [the template registry] so each template
@@ -188,6 +190,38 @@ def check_section_contract(section: dict, findings: list[dict]) -> dict:
             violations.append(f"missing at least one of fact type(s) {required_labels_any} (none of its findings mention any)")
 
     return {"section": section["title"], "ok": not violations, "violations": violations}
+
+
+def _best_match(ask: str, candidates: list[dict], text_key: str) -> dict:
+    if not candidates:
+        return {"match": None, "score": 0.0, "ranked": []}
+    descriptions = [c[text_key] for c in candidates]
+    vecs = bge_embed([ask, *descriptions])
+    ask_vec, cand_vecs = vecs[0], vecs[1:]
+    scores = cand_vecs @ ask_vec
+    ranked = sorted(zip(candidates, scores.tolist()), key=lambda pair: pair[1], reverse=True)
+    best_candidate, best_score = ranked[0]
+    return {
+        "match": best_candidate,
+        "score": round(float(best_score), 4),
+        "ranked": [{"id": c.get("id", c.get("tool")), "score": round(float(s), 4)} for c, s in ranked],
+    }
+
+
+def select_tool(ask: str) -> dict:
+    result = _best_match(ask, list_tools(), "description")
+    return {"tool": result["match"]["tool"] if result["match"] else None, "score": result["score"], "ranked": result["ranked"]}
+
+
+def select_template(ask: str, tool: str | None = None) -> dict:
+    result = _best_match(ask, list_templates(tool), "description")
+    match = result["match"]
+    return {
+        "template_id": match["id"] if match else None,
+        "tool": match["tool"] if match else None,
+        "score": result["score"],
+        "ranked": result["ranked"],
+    }
 
 
 def check_template_contracts(template: dict, sections_with_findings: list[dict]) -> list[dict]:

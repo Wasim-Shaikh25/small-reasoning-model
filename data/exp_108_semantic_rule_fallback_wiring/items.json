@@ -1,0 +1,28 @@
+{
+  "use_real_nli_omitted_baseline": {
+    "decision": "inconclusive",
+    "correct": true
+  },
+  "paraphrased_fact_with_flag": {
+    "decision": "supported",
+    "citations": [
+      "F1",
+      "R1"
+    ],
+    "semantic_match_nli": {
+      "entail": 0.8916,
+      "neutral": 0.106,
+      "contradict": 0.0024
+    },
+    "correct": true
+  },
+  "exact_match_unaffected_by_flag": {
+    "decision": "supported",
+    "method": "verb",
+    "correct": true
+  },
+  "truly_unrelated_fact_still_abstains": {
+    "decision": "inconclusive",
+    "correct": true
+  }
+}

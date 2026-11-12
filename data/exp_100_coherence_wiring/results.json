@@ -37,7 +37,7 @@
     "coherence_flags is reported but nothing downstream (brain.py's trace, or a caller) surfaces it to a reader yet, same 'report, don't yet act on it' posture contract_violations started with before this -- a next step could decide whether a flagged leaf should be reordered, annotated inline, or just left in the trace for now.",
     "Only checked within a single leaf (two findings, same entity) -- a leaf with 3+ findings where the jump is in the middle of the sequence, or a leaf built from the template_id path instead of entity-grouping, is untested here."
   ],
-  "elapsed_sec": 10.9758,
-  "peak_rss_mb": 2797.79,
+  "elapsed_sec": 10.6413,
+  "peak_rss_mb": 2799.26,
   "models_used": "bge-small-en-v1.5 (lab.common.real_encoders, coherence.py's own similarity leg) -- non-generative; template_rewriter.splice_unit (deterministic) renders every leaf, no generative model anywhere in this path as of the 2026-11-11 rewriter withdrawal."
 }

@@ -1,0 +1,44 @@
+{
+  "id": "EXP-110",
+  "title": "select_tool/select_template wired into document_write as an opt-in auto-selector for template_id",
+  "status": "closed",
+  "goal": "Close the gap: template_id already lets a caller name a template, but nothing ever picked one FOR the caller from the ask itself.",
+  "method": "A legal-notice-shaped ask run three ways: the new flag omitted (baseline, unaffected), enabled with no explicit template (auto-selects legal_notice), and enabled alongside an explicit template_id (the caller's own choice still wins, no auto-select step fires).",
+  "metrics": {
+    "auto_select_omitted_baseline": {
+      "decision": "supported",
+      "auto_select_fired": false,
+      "correct": true
+    },
+    "auto_select_enabled": {
+      "decision": "supported",
+      "tool_selected": "legal",
+      "template_selected": "legal_notice",
+      "score": 0.6346,
+      "correct": true
+    },
+    "explicit_template_id_takes_precedence": {
+      "decision": "supported",
+      "auto_select_fired": false,
+      "correct": true
+    }
+  },
+  "results_prose": "auto_select_template omitted (default): 'supported', no auto_select_template trace step -- today's exact behavior (outline from entity-grouping, no template). Enabled: 'supported', auto-selected tool='legal' template_id='legal_notice' (score=0.6346) from the ask alone, no template named by the caller. Enabled BUT with an explicit template_id also given: 'supported', zero auto_select_template step -- the caller's own explicit choice is never overridden.",
+  "conclusion": "lab.common.doc_tools.select_tool/select_template -- EXP-082's own standalone entry point, never reachable from brain.reason -- now auto-selects a registered template for the document_write stage when the caller opts in (auto_select_template=True) and leaves template_id at its default. A caller who already names a template, or leaves the new flag at its default False, is completely unaffected.",
+  "scale_down": "Two registered templates (legal, study, per EXP-082's own registry), one ask -- a proof the dispatch/precedence wiring works end to end, not a benchmark of select_tool/select_template's own matching accuracy at a larger template catalog (already measured in EXP-082).",
+  "referenced_files": [
+    "lab/tests/exp_110_auto_select_template_wiring/run.py",
+    "lab/common/brain.py",
+    "lab/common/doc_tools.py",
+    "lab/common/longform.py",
+    "lab/common/templates/legal/_tool.json",
+    "lab/common/templates/legal/legal_notice.json",
+    "data/exp_110_auto_select_template_wiring/results.json"
+  ],
+  "follow_ups": [
+    "No minimum-score floor: a low-confidence match still gets auto-selected rather than falling back to entity-grouping. EXP-082 itself never needed one (its own fixture always had a real match); a caller relying on auto_select_template for an ask that matches no registered template well would get a weak pick instead of the old entity-grouping fallback."
+  ],
+  "elapsed_sec": 10.8746,
+  "peak_rss_mb": 2798.41,
+  "models_used": "lab.common.real_encoders.bge_embed (bge cosine similarity) -- same mechanism select_tool/select_template already used in EXP-082, unchanged."
+}

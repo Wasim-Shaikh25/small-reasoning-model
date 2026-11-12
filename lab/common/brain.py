@@ -135,7 +135,7 @@ from lab.common.inference import check_exceptions, forward_chain, instantiate_co
 from lab.common.intent_signals import wants_document, wants_identity, wants_rule_application, wants_total
 from lab.common.nested_index import MIN_DENSE_SCORE, build_nested_index
 from lab.common.qa import answer_with_agreement, answer_with_real_qa
-from lab.common.rules import apply_rule, apply_threshold_rule, extract_fact_triple, parse_conditional_rule, parse_threshold_rule
+from lab.common.rules import apply_rule, apply_threshold_rule, extract_fact_triple, parse_conditional_rule, parse_threshold_rule, semantic_apply_rule, sum_amounts_for_subject
 from lab.common.semantic_index import MIN_LEXICAL_MARGIN, MIN_SEMANTIC_MARGIN, SemanticIndex, navigate_dual
 from lab.common.temporal import check_temporal_bound, find_temporal_bound
 from lab.common.textutil import content_tokens, normalize
@@ -541,6 +541,10 @@ def reason(
     concepts: list[dict] | None = None,
     records: list[dict] | None = None,
     list_arguments: bool = False,
+    auto_select_template: bool = False,
+    coreference_pairs: list[dict] | None = None,
+    expand_via_store_graph: bool = False,
+    ingest_text: str | None = None,
 ) -> dict:
     """Thin outer wrapper around `_reason_once` (the function this
     docstring used to belong to, unchanged below) adding the two
@@ -699,6 +703,45 @@ def reason(
     union of every rule/fact passage involved. `"inconclusive"` (never a
     crash or a guess) when nothing is found. A no-op for every existing
     caller, which never sets this.
+
+    `auto_select_template` (2026-11-12, default False): `document_write`
+    stage only, and only when the caller also leaves `template_id` at its
+    default (None) -- picks a registered `lab.common.doc_tools` template
+    via `select_tool`/`select_template`'s own bge-similarity match against
+    `ask`, instead of silently falling back to entity-grouping. A no-op
+    whenever this is left False, or `template_id` was given explicitly, or
+    no registered template scores a real match.
+
+    `coreference_pairs` (2026-11-12, default None): `identity_extraction`
+    stage only. When given (labeled same/different-entity training pairs,
+    `lab.common.entities.train_pair_matcher`'s own fixture shape), runs
+    `resolve_mentions`/`same_entity_pairs` over the resolved scope and
+    prefers a fuller name over a short-form alias found to be the same
+    entity (e.g. "Ravi Sharma" over "R. Sharma") -- closing the gap EXP-075
+    documented. No shipped default training set: this project's own
+    "measured, not assumed" rule means a generic default coreference model
+    isn't fabricated here without real labeled data to justify it, so this
+    stays a no-op (today's exact-text behavior, unchanged) unless a caller
+    supplies its own pairs.
+
+    `expand_via_store_graph` (2026-11-12, default False): `graph_expand`
+    stage only, and only when `connector` is a `lab.common.store.Store`
+    with a persisted entity graph (`use_graph=True` at build time) --
+    additionally calls `Store.expand_entity` to reach entities beyond
+    what the in-memory ephemeral graph (built fresh from this call's own
+    `passages`) can, merging any newly found passages the same "widen
+    scope, cite, never silently drop" way the existing graph_expand code
+    already does. A no-op whenever this is left False (today's exact
+    behavior: only the ephemeral in-memory graph is ever consulted).
+
+    `ingest_text` (2026-11-12, default None): only meaningful together
+    with `connector` set to a `lab.common.store.Store`. When given, the
+    raw text is chunked and ingested into that Store (via `ingest_and_store`
+    for a collection with nothing persisted yet, `ingest_and_upsert` for
+    one that already has a persisted index) BEFORE the normal connector-
+    fetch/retrieval below runs -- closing the gap EXP-099 named: nothing in
+    `lab/` previously built a Store from a real raw document before
+    querying it. A no-op whenever this is left None.
     """
     if use_spellfix:
         from lab.common.spellfix import fix_sentence_joint
@@ -723,6 +766,10 @@ def reason(
         concepts=concepts,
         records=records,
         list_arguments=list_arguments,
+        auto_select_template=auto_select_template,
+        coreference_pairs=coreference_pairs,
+        expand_via_store_graph=expand_via_store_graph,
+        ingest_text=ingest_text,
     )
     round_num = 1
     while connector is not None and round_num < retrieve_budget and result["decision"] in ("inconclusive", "ungrounded"):
@@ -747,6 +794,10 @@ def reason(
             concepts=concepts,
             records=records,
             list_arguments=list_arguments,
+            auto_select_template=auto_select_template,
+            coreference_pairs=coreference_pairs,
+            expand_via_store_graph=expand_via_store_graph,
+            ingest_text=None,  # already ingested on round 1 above; never re-ingest the same text on a retry round
         )
         retried["trace"] = result["trace"] + [{"step": "retrieve_more", "round": round_num, "connector_top_k": connector_top_k}] + retried["trace"]
         result = retried
@@ -773,7 +824,7 @@ def reason(
     return result
 
 
-def _reason_once(ask: str, passages: list[dict], use_real_ner: bool = False, connector=None, connector_top_k: int = 5, use_real_qa: bool = False, use_real_nli: bool = False, plain_english: bool = False, template_id: str | None = None, decision_findings_only: bool = False, working_set_budget: int | None = None, memory_path: str | None = None, working_memory_ram_budget: int | None = None, working_memory_overflow_path: str | None = None, notes: str | None = None, concepts: list[dict] | None = None, records: list[dict] | None = None, list_arguments: bool = False) -> dict:
+def _reason_once(ask: str, passages: list[dict], use_real_ner: bool = False, connector=None, connector_top_k: int = 5, use_real_qa: bool = False, use_real_nli: bool = False, plain_english: bool = False, template_id: str | None = None, decision_findings_only: bool = False, working_set_budget: int | None = None, memory_path: str | None = None, working_memory_ram_budget: int | None = None, working_memory_overflow_path: str | None = None, notes: str | None = None, concepts: list[dict] | None = None, records: list[dict] | None = None, list_arguments: bool = False, auto_select_template: bool = False, coreference_pairs: list[dict] | None = None, expand_via_store_graph: bool = False, ingest_text: str | None = None) -> dict:
     """One single pass of the signal-chain below -- called directly by
     reason() above, once per retry round. `use_real_ner=True` threads
     through to every lab.common.entities.
@@ -881,6 +932,25 @@ def _reason_once(ask: str, passages: list[dict], use_real_ner: bool = False, con
         cited = set(citation_markers(result["article"]))
         decision = "supported_with_flags" if result["relationships"]["cycles"] else "supported"
         return _finish(ask, trace, decision, result["article"], cited, dependency_tree=dep_nodes)
+    if ingest_text is not None and connector is not None:
+        # Closes EXP-099's own named gap: nothing in lab/ previously built a
+        # Store from a real raw document before querying it -- every
+        # caller already had passages/a pre-built connector in hand.
+        # ingest_and_store for a collection with nothing persisted yet,
+        # ingest_and_upsert for one that already has a persisted index --
+        # same first-build-vs-append distinction Store.get_or_build/upsert
+        # already draw, just reached from reason() directly now. Runs
+        # BEFORE connector_fetch below so the just-ingested text is part
+        # of what that fetch can retrieve.
+        from lab.common.store import Store, ingest_and_store, ingest_and_upsert
+
+        if isinstance(connector, Store):
+            base_dir = connector.dir.parent
+            if connector.exists():
+                connector = ingest_and_upsert(connector.collection, ingest_text, base_dir=base_dir)
+            else:
+                connector = ingest_and_store(connector.collection, ingest_text, base_dir=base_dir)
+            trace.append({"step": "ingest_text", "collection": connector.collection, "chars": len(ingest_text)})
     if connector is not None:
         connector_entities = [m["text"] for m in detect_primary(ask, use_real_ner=use_real_ner) if m["label"] in ("person", "organization")]
         external_passages = fetch_context_passages(connector, ask, ask_entities=connector_entities, top_k=connector_top_k)
@@ -1067,6 +1137,26 @@ def _reason_once(ask: str, passages: list[dict], use_real_ner: bool = False, con
                     findings.append(f)
         else:
             findings = findings_from_chunks([p for p in passages if p.get("text")])
+        effective_template_id = template_id
+        if auto_select_template and effective_template_id is None:
+            # Wired (2026-11-12), opt-in only: template_id already lets a
+            # caller NAME a registered lab.common.doc_tools template, but
+            # today nothing picks one FOR the caller -- omitting it always
+            # fell back to entity-grouping. select_tool/select_template's
+            # own bge-similarity match against `ask` (the same mechanism
+            # assign_findings_to_sections already uses to route findings
+            # within a chosen template) picks the best-fitting registered
+            # template, when one scores a real match. Only consulted when
+            # template_id is left at its default -- a caller who already
+            # names one explicitly is completely unaffected.
+            from lab.common.doc_tools import select_template, select_tool
+
+            tool_pick = select_tool(ask)
+            if tool_pick["tool"] is not None:
+                template_pick = select_template(ask, tool=tool_pick["tool"])
+                if template_pick["template_id"] is not None:
+                    effective_template_id = template_pick["template_id"]
+                    trace.append({"step": "auto_select_template", "tool": tool_pick["tool"], "template_id": effective_template_id, "score": template_pick["score"]})
         doc_result = write_long_document(
             ask,
             findings,
@@ -1074,7 +1164,7 @@ def _reason_once(ask: str, passages: list[dict], use_real_ner: bool = False, con
             use_real_ner=use_real_ner,
             use_real_nli=use_real_nli,
             plain_english=plain_english,
-            template_id=template_id,
+            template_id=effective_template_id,
             ram_budget=working_memory_ram_budget,
             overflow_path=working_memory_overflow_path,
         )
@@ -1221,13 +1311,39 @@ def _reason_once(ask: str, passages: list[dict], use_real_ner: bool = False, con
         scoped_ids = {p["id"] for p in scoped}
         for entity_text in ask_entities:
             expansion = expand_from_entity(entity_text, graph, passages_by_id, max_hops=2)
-            new_passages = [p for p in expansion["passages"] if p["id"] not in scoped_ids]
+            expansion_passages = list(expansion["passages"])
+            expansion_path = list(expansion["path"])
+            if expand_via_store_graph:
+                # Wired (2026-11-12), opt-in only: the ephemeral graph above
+                # is rebuilt fresh from THIS call's own in-memory `passages`
+                # every time, so it can never reach further than what is
+                # already in hand. lab.common.store.Store.expand_entity
+                # walks a GRAPH PERSISTED ON DISK for this connector's
+                # collection instead, reaching entities beyond the current
+                # in-memory passage set the same way a GraphConnector's own
+                # connector_fetch already does for the ask's own entities --
+                # this closes the matching gap for graph_expand's SECOND
+                # hop, merged with (never replacing) the in-memory
+                # expansion above, same "widen, cite, never silently drop"
+                # discipline.
+                from lab.common.store import Store
+
+                if isinstance(connector, Store) and connector.graph is not None:
+                    store_expansion = connector.expand_entity(entity_text, max_hops=2)
+                    seen_ids = {p["id"] for p in expansion_passages}
+                    for p in store_expansion.get("passages", []):
+                        if p.get("id") not in seen_ids:
+                            seen_ids.add(p["id"])
+                            expansion_passages.append(p)
+                    if store_expansion.get("path"):
+                        expansion_path = expansion_path + store_expansion["path"]
+            new_passages = [p for p in expansion_passages if p["id"] not in scoped_ids]
             if new_passages:
                 scoped = scoped + new_passages
                 scoped_ids.update(p["id"] for p in new_passages)
-                trace.append({"step": "graph_expand", "entity": entity_text, "added_passage_ids": [p["id"] for p in new_passages], "path": expansion["path"]})
+                trace.append({"step": "graph_expand", "entity": entity_text, "added_passage_ids": [p["id"] for p in new_passages], "path": expansion_path})
                 prev_hop_id = None
-                for hop in expansion["path"]:
+                for hop in expansion_path:
                     hop_id = f"entity:{entity_text}:{hop['hop']}:{hop['entity']}"
                     _add_dependency(dep_nodes, hop_id, "entity_link", f"hop {hop['hop']}: {hop['entity']}" + (f" via {hop['via']}" if hop["via"] else " (expansion root)"), [prev_hop_id] if prev_hop_id else [])
                     prev_hop_id = hop_id
@@ -1275,6 +1391,34 @@ def _reason_once(ask: str, passages: list[dict], use_real_ner: bool = False, con
         other_text = " ".join(p["text"] for p in passages if p not in scoped)
         person = next((m for m in mentions if m["label"] == "person" and m["text"] not in other_text), None)
         person = person or next((m for m in mentions if m["label"] == "person"), None)
+        if coreference_pairs is not None and person is not None:
+            # Wired (2026-11-12), opt-in only: no shipped default training
+            # set (this project's "measured, not assumed" rule -- a generic
+            # default coreference model risks false merges on real
+            # documents this repo has no labeled data to validate against),
+            # so this stays a pure no-op (today's exact-text-only behavior)
+            # unless the caller supplies its own labeled same/different
+            # pairs. Closes the gap EXP-075 documented directly: "Ravi
+            # Sharma" and "R. Sharma" resolve to two different identities
+            # today because detect_primary is exact-text, never checked
+            # against each other for being the same person under a
+            # different surface form.
+            from lab.common.entities import resolve_mentions, same_entity_pairs, train_pair_matcher
+
+            coref_chunks = [{"chunk_id": p["id"], "text": p["text"]} for p in scoped]
+            resolved_mentions = resolve_mentions(coref_chunks)
+            person_mentions = [m for m in resolved_mentions if m["label"] == "person"]
+            if len(person_mentions) > 1:
+                pair_model = train_pair_matcher(coreference_pairs)
+                same_pairs = [pr for pr in same_entity_pairs(person_mentions, pair_model) if pr["decision"] == "same" and pr["left"] != pr["right"]]
+                alias_group = {pr["left"] for pr in same_pairs} | {pr["right"] for pr in same_pairs}
+                if person["text"] in alias_group:
+                    fuller = max(alias_group, key=len)
+                    if fuller != person["text"]:
+                        alias_chunk_ids = [m["chunk_id"] for m in person_mentions if m["text"] in alias_group and m.get("chunk_id")]
+                        trace.append({"step": "coreference_resolve", "merged": sorted(alias_group), "chosen": fuller})
+                        citations.update(alias_chunk_ids)
+                        person = {**person, "text": fuller}
         address = parse_address(full_text)
         name_cite = next((p["id"] for p in scoped if person and person["text"] in p["text"]), None)
         facts["name"] = person["text"] if person else None
@@ -1291,23 +1435,15 @@ def _reason_once(ask: str, passages: list[dict], use_real_ner: bool = False, con
     trace.append({"step": "intent_signal", "signal": "total", **total_signal})
     total_entry_index = None
     if "total_computation" in stage_plan["stages"]:
-        spans, sources = [], []
-        for p in scoped:
-            # Follow-up (2026-11-10): a rule-shaped passage (verb or
-            # threshold) is policy text, not a fact to sum -- its own
-            # numbers (a threshold, a fee) are not another line item.
-            # Found by direct testing: an ungrouped threshold rule sitting
-            # alongside ungrouped fact passages (no disambiguation group
-            # to filter it out, unlike every existing grouped fixture)
-            # had its own $500/$50 counted into the total, inflating it.
-            # Same exclusion _reason_once's own fact_passage lookup
-            # already applies for the identical reason (line ~925 above).
-            if parse_conditional_rule(p.get("text", "")) or parse_threshold_rule(p.get("text", "")):
-                continue
-            for found in AMOUNT_RE.findall(p["text"]):
-                spans.append(found)
-                sources.append(p["id"])
-        money = sum_amounts(spans)
+        # Wired (2026-11-12) to lab.common.rules.sum_amounts_for_subject
+        # instead of this scan re-implemented inline -- same exact
+        # behavior (rule-shaped passages excluded by default via
+        # `skip_rule_passages=True`, the 2026-11-10 follow-up's own fix
+        # for a threshold/fee amount wrongly counted as a line item,
+        # folded into the shared function so there is exactly one
+        # implementation of this scan, not two).
+        money = sum_amounts_for_subject(scoped, AMOUNT_RE)
+        sources = money["sources"]
         facts["total"] = money["total"]
         citations.update(sources)
         trace.append({"step": "compute_total", "total": money["total"], "sources": sources})
@@ -1556,9 +1692,59 @@ def _reason_once(ask: str, passages: list[dict], use_real_ner: bool = False, con
                 # compared against it -- the verb-branch analog of the
                 # threshold branch's "no computed total to compare" case
                 # above, now equally self-explaining.
-                trace.append({"step": "apply_rule", "skipped": "no matching fact passage found", "kind": "verb"})
-                _add_dependency(dep_nodes, f"rule:{rule_passage['id']}", "rule", rule["raw"], [rule_passage["id"]])
-                _add_dependency(dep_nodes, f"conclusion:{rule_passage['id']}:no_fact", "conclusion", "policy could not be evaluated: no matching fact found", [f"rule:{rule_passage['id']}"])
+                #
+                # Wired (2026-11-12): before giving up, try lab.common.rules.
+                # semantic_apply_rule -- a fact phrased without the rule's own
+                # trigger verb lemma ("unlawfully took her life" vs
+                # "murders") still matches BY MEANING, which apply_rule's
+                # exact-lemma search above can never find no matter how the
+                # candidates are filtered. Gated on use_real_nli (default
+                # False, zero regression for every existing caller): this
+                # module's established rule that a "real model" capability
+                # only ever runs when the caller already opted in, same as
+                # _check_cross_passage_contradiction's own real_nli swap.
+                semantic_fact_passage = None
+                semantic_applied = None
+                if use_real_nli:
+                    from lab.common.real_encoders import real_nli
+
+                    for candidate_passage in scoped:
+                        if parse_conditional_rule(candidate_passage.get("text", "")) or parse_threshold_rule(candidate_passage.get("text", "")):
+                            continue
+                        semantic_result = semantic_apply_rule(rule, candidate_passage["text"], judge_fn=real_nli)
+                        if semantic_result["matched"]:
+                            semantic_fact_passage = candidate_passage
+                            semantic_applied = semantic_result
+                            break
+                if semantic_fact_passage is not None:
+                    trace.append({"step": "apply_rule", "kind": "verb_semantic", "result": semantic_applied, "fact_passage": semantic_fact_passage["id"]})
+                    _add_dependency(dep_nodes, f"rule:{rule_passage['id']}", "rule", rule["raw"], [rule_passage["id"]])
+                    _add_dependency(dep_nodes, f"fact:{semantic_fact_passage['id']}", "fact", semantic_fact_passage["text"], [semantic_fact_passage["id"]])
+                    exception_context = [p["text"] for p in passages if p["id"] not in (rule_passage["id"], semantic_fact_passage["id"])]
+                    gate_result = _check_rule_gate(rule, exception_context)
+                    trace.append({"step": "check_exception", "result": gate_result})
+                    gate_node = f"gate:{rule_passage['id']}"
+                    _add_dependency(dep_nodes, gate_node, "gate_check", f"{gate_result['kind']} gate status={gate_result['status']}", [f"rule:{rule_passage['id']}", f"fact:{semantic_fact_passage['id']}"])
+                    if gate_result["status"] == "holds":
+                        reason_phrase = f"the rule's temporal bound ({gate_result['phrase']!r}) is not currently satisfied" if gate_result["kind"] == "temporal" else ("the rule's exception holds" if gate_result["polarity"] == "negative" else "the rule's condition is not satisfied")
+                        answer_parts.append(f"policy does not apply: {reason_phrase} ({rule['raw']!r}) [{rule_passage['id']}]")
+                        _add_dependency(dep_nodes, f"conclusion:{rule_passage['id']}:{semantic_fact_passage['id']}:blocked", "conclusion", f"policy blocked: {reason_phrase}", [gate_node])
+                    else:
+                        citations.update([rule_passage["id"], semantic_fact_passage["id"]])
+                        conditional = gate_result["status"] == "unknown"
+                        if conditional:
+                            rule_conditional = True
+                        unresolved_phrase = "the rule's temporal bound is unresolved" if gate_result["kind"] == "temporal" else ("the rule's exception is unresolved" if gate_result["polarity"] == "negative" else "the rule's condition is unresolved")
+                        suffix = f" ({unresolved_phrase} -- not confirmed either way)" if conditional else ""
+                        answer_parts.append(
+                            f"{semantic_fact_passage['text']} [{semantic_fact_passage['id']}] matches the rule's condition by meaning, not exact wording: "
+                            f"{rule['raw']} [{rule_passage['id']}] Therefore, {semantic_applied['consequence']}{suffix}."
+                        )
+                        _add_dependency(dep_nodes, f"conclusion:{rule_passage['id']}:{semantic_fact_passage['id']}:applied", "conclusion", f"policy applies: {semantic_applied['consequence']}{suffix}", [f"rule:{rule_passage['id']}", f"fact:{semantic_fact_passage['id']}", gate_node])
+                else:
+                    trace.append({"step": "apply_rule", "skipped": "no matching fact passage found", "kind": "verb"})
+                    _add_dependency(dep_nodes, f"rule:{rule_passage['id']}", "rule", rule["raw"], [rule_passage["id"]])
+                    _add_dependency(dep_nodes, f"conclusion:{rule_passage['id']}:no_fact", "conclusion", "policy could not be evaluated: no matching fact found", [f"rule:{rule_passage['id']}"])
 
     # Follow-up (2026-11-10): a rule's derived consequence (the fee a
     # threshold- or verb-rule's own text states) never used to reach
@@ -1613,10 +1799,32 @@ def _reason_once(ask: str, passages: list[dict], use_real_ner: bool = False, con
         _add_dependency(dep_nodes, f"conclusion:{qa['passage_id']}", "conclusion", f"{qa['span']!r}", [qa["passage_id"]])
         if memory_path is not None:
             from lab.common.memory import connect as _memory_connect
+            from lab.common.memory import mark_conflicted as _memory_mark_conflicted
             from lab.common.memory import write_note as _memory_write_note
+            from lab.common.nli import judge as _classical_judge
 
             passage_text = next((p["text"] for p in scoped if p["id"] == qa.get("passage_id")), "")
             _conn = _memory_connect(str(memory_path))
+            # Wired (2026-11-12): mark_conflicted was never called at all --
+            # memory_recall above only ever reported a prior valid note,
+            # never compared it against what THIS call just found. A valid
+            # hit from a DIFFERENT source passage than the one that just
+            # answered this ask, whose own statement NLI-contradicts this
+            # fresh passage text, is a genuine disagreement between two
+            # independently-verified notes -- recorded on the OLDER note so
+            # a later recall (and a human reviewing the memory store) can
+            # see it was flagged, never silently overwritten or dropped.
+            for hit in recalled:
+                if not hit.get("valid") or hit.get("chunk_id") == qa.get("passage_id"):
+                    continue
+                probs = _classical_judge(hit.get("statement", ""), passage_text)
+                if probs["contradict"] >= 0.45:
+                    _memory_mark_conflicted(
+                        _conn,
+                        hit["note_id"],
+                        {"ask": ask, "conflicting_chunk_id": qa["passage_id"], "conflicting_span": qa["span"], "nli": probs},
+                    )
+                    trace.append({"step": "memory_conflict_detected", "note_id": hit["note_id"], "conflicting_chunk_id": qa["passage_id"]})
             _memory_write_note(
                 _conn,
                 {

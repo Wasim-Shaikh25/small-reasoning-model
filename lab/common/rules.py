@@ -33,7 +33,7 @@ from __future__ import annotations
 
 import re
 
-from lab.common.calc import compare_numbers
+from lab.common.calc import compare_numbers, sum_amounts
 
 RULE_RE = re.compile(
     r"^\s*if\s+(?P<subject>.+?)\s+(?P<verb_phrase>.+?),\s*(?P<consequence>.+?)\.?\s*$",
@@ -215,9 +215,65 @@ def apply_rule(rule: dict, fact: dict) -> dict:
     }
 
 
-# semantic_apply_rule (paraphrase-robust NLI matching) and
-# answer_rule_question (a standalone find-rule+find-fact+apply+render demo
-# pipeline) moved to lab.tests.support on 2026-11-12 -- lab.common.brain's
-# rule_application stage calls apply_rule (exact lemma match) directly and
-# has its own dispatch/citation logic; neither function here was ever
-# called from lab.common itself.
+def sum_amounts_for_subject(passages: list[dict], amount_re, skip_rule_passages: bool = True) -> dict:
+    """Sum every amount span found across a subject's own passages
+    (lab.common.calc.sum_amounts), recording which passage each amount
+    came from so the total stays citable, not just a number.
+
+    Moved to lab.tests.support on 2026-11-12 (test-only at the time),
+    moved back 2026-11-12 (same day) once lab.common.brain's
+    total_computation stage was wired to call this directly instead of
+    re-implementing the same scan inline -- see that stage's own comment
+    for the one behavior difference this function didn't originally have
+    (excluding rule-shaped passages from the sum), now folded in here via
+    `skip_rule_passages` so there is exactly one implementation, not two.
+    """
+    spans = []
+    sources = []
+    for passage in passages:
+        text = passage.get("text", "") or ""
+        if skip_rule_passages and (parse_conditional_rule(text) or parse_threshold_rule(text)):
+            continue
+        for found in amount_re.findall(text):
+            spans.append(found)
+            sources.append(passage.get("id"))
+    result = sum_amounts(spans)
+    result["sources"] = sources
+    return result
+
+
+def semantic_apply_rule(rule: dict, fact_text: str, tau: float = 0.75, judge_fn=None) -> dict:
+    """Paraphrase-robust fallback for `apply_rule`'s exact-lemma match: an
+    NLI entailment check between the fact and the rule's condition text,
+    for a fact phrased without sharing the rule's trigger verb lemma
+    ("unlawfully took her life" vs "murders").
+
+    `judge_fn` defaults to the classical `lab.common.nli.judge` (same
+    {"entail","neutral","contradict"} shape as `lab.common.real_encoders.
+    real_nli`) -- a token-coverage proxy, not genuine paraphrase
+    understanding, so it is a deliberately weak default, consistent with
+    this project's rule that every "real model" capability stays opt-in
+    (see `_check_cross_passage_contradiction`'s identical judge_fn swap).
+    `lab.common.brain`'s rule_application stage only calls this at all
+    when the caller already set `use_real_nli=True`, passing `real_nli`
+    explicitly -- so the classical default here only matters for direct/
+    test callers, never silently substitutes a weak judge for a real one
+    in the one place this function is actually wired into production.
+
+    Moved to lab.tests.support on 2026-11-12 (test-only at the time, never
+    called from lab.common itself), moved back 2026-11-12 (same day) once
+    lab.common.brain's rule_application stage was wired to fall back to
+    this when `apply_rule`'s own lemma match fails.
+    """
+    from lab.common.nli import judge as _classical_judge
+
+    judge_fn = judge_fn or _classical_judge
+    probs = judge_fn(fact_text, rule["condition_text"])
+    matched = probs["entail"] >= tau and probs["contradict"] < 0.2
+    return {
+        "matched": matched,
+        "condition_text": rule["condition_text"],
+        "fact_text": fact_text,
+        "nli": probs,
+        "consequence": rule["consequence"] if matched else None,
+    }

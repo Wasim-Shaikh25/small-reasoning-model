@@ -21,9 +21,8 @@ ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT))
 
 from lab.common.harness import Run
-from lab.common.real_encoders import NLI_MODEL_NAME
-from lab.common.rules import apply_rule, extract_fact_triple, parse_conditional_rule
-from lab.tests.support import semantic_apply_rule
+from lab.common.real_encoders import NLI_MODEL_NAME, real_nli
+from lab.common.rules import apply_rule, extract_fact_triple, parse_conditional_rule, semantic_apply_rule
 
 FILES = [
     "lab/tests/exp_061_semantic_rule_matching/run.py",
@@ -33,8 +32,6 @@ FILES = [
     "data/exp_057_rule_application/results.json",
     "data/exp_059_cross_domain_rules/results.json",
     "data/exp_061_semantic_rule_matching/results.json",
-    "lab/tests/support.py",
-
 ]
 
 CASES = [
@@ -63,7 +60,7 @@ def main():
         rule = parse_conditional_rule(case["rule"])
         fact_triple = extract_fact_triple(case["fact"])
         exact = apply_rule(rule, fact_triple) if fact_triple else {"matched": False, "fact_verb_lemma": None}
-        semantic = semantic_apply_rule(rule, case["fact"])
+        semantic = semantic_apply_rule(rule, case["fact"], judge_fn=real_nli)
         rows.append(
             {
                 "id": case["id"],
