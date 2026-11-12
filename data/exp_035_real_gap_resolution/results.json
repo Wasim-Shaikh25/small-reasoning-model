@@ -175,7 +175,7 @@
     "lab/tests/fixtures_support.py"
   ],
   "follow_ups": [],
-  "elapsed_sec": 15.0553,
-  "peak_rss_mb": 1823.93,
+  "elapsed_sec": 15.334,
+  "peak_rss_mb": 1823.96,
   "models_used": "deepset/deberta-v3-base-squad2 (extractive QA), MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli (NLI support check). Local checkpoints, not API calls. Not generative."
 }

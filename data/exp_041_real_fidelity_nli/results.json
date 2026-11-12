@@ -27,7 +27,7 @@
     "lab/tests/support.py"
   ],
   "follow_ups": [],
-  "elapsed_sec": 6.9041,
-  "peak_rss_mb": 1411.11,
+  "elapsed_sec": 6.6476,
+  "peak_rss_mb": 1411.35,
   "models_used": "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli, a local checkpoint loaded with transformers (not an API call). Rewriter role is out of scope for this rerun; the renderer stays the unchanged deterministic copy."
 }

@@ -90,13 +90,14 @@ Every tool this calls is a primitive already built and separately measured:
     many pages of cross-page memory one document-write call holds in RAM
     at once -- three separate, independently-opt-in RAM primitives, not
     one mechanism wearing three names.
-  - lab.common.engine.answer_from_concepts (2026-11-11, `concepts=`/
-    `records=`): the teach-tool concept registry (lab/common/concepts/
-    *.yaml, empty by default), reached through the SAME match-execute-
-    render sequence lab.common.engine.run itself uses -- brain.py calls
-    into engine.py, never around it into concept_tools/render directly,
-    so that sequence is implemented exactly once. Checked first, ahead
-    of plan_stages -- a true no-op for any ask that doesn't match
+  - lab.common.engine.run(ctx=...) (2026-11-11, `concepts=`/`records=`;
+    2026-11-13, calls `run` itself rather than its nested
+    `answer_from_concepts` helper): the teach-tool concept registry
+    (lab/common/concepts/*.yaml, empty by default), reached through the
+    SAME public entry point lab.common.engine.run uses when it resolves
+    its own connector -- brain.py calls into engine.py, never around it
+    into concept_tools/render directly, so that sequence is implemented
+    exactly once. Checked first, ahead of plan_stages -- a true no-op for any ask that doesn't match
     something actually taught, since the shipped registry starts empty;
     see reason()'s own docstring for why a match takes dispatch priority
     over the stages below.
@@ -1027,26 +1028,28 @@ def _reason_once(ask: str, passages: list[dict], use_real_ner: bool = False, con
     # registry"): a caller-extensible alternative to every stage below --
     # a new capability is taught by adding a YAML file under
     # lab/common/concepts/, never by writing new Python. This goes
-    # through lab.common.engine.answer_from_concepts -- the same match-
-    # execute-render sequence engine.run itself uses -- rather than
-    # calling concept_tools/render directly, so there is exactly one
-    # place that sequence is implemented; brain.py calls INTO engine.py,
-    # it does not duplicate engine.py's own job (2026-11-11, asked
-    # directly: brain keeps full control of *whether* to dispatch here at
-    # all, engine owns *how* a matched concept actually gets executed and
-    # rendered). A true no-op whenever nothing is registered -- the
-    # shipped registry starts empty by design, so this never changes
-    # behavior for an ask that doesn't match a concept anyone actually
-    # taught, with no flag required to keep it off. A match takes
-    # priority over the stage-planning below (same "an explicit, more
-    # specific signal wins" precedent document_write's own intent signal
-    # already sets), since the concept registry's own alias/embedding
-    # match is itself a confidence-gated decision about what this ask is
-    # asking for.
-    from lab.common.engine import answer_from_concepts
+    # through lab.common.engine.run(ctx=...) -- the SAME public entry
+    # point engine.run uses when it resolves its own connector, just
+    # skipping that resolution since brain already has passages/records
+    # in hand -- rather than reaching past it into answer_from_concepts
+    # directly, so engine.py has exactly one front door (2026-11-13,
+    # asked directly: brain should call engine.run, not its own nested
+    # helper). brain.py calls INTO engine.py, it does not duplicate
+    # engine.py's own job (2026-11-11, asked directly: brain keeps full
+    # control of *whether* to dispatch here at all, engine owns *how* a
+    # matched concept actually gets executed and rendered). A true no-op
+    # whenever nothing is registered -- the shipped registry starts empty
+    # by design, so this never changes behavior for an ask that doesn't
+    # match a concept anyone actually taught, with no flag required to
+    # keep it off. A match takes priority over the stage-planning below
+    # (same "an explicit, more specific signal wins" precedent
+    # document_write's own intent signal already sets), since the concept
+    # registry's own alias/embedding match is itself a confidence-gated
+    # decision about what this ask is asking for.
+    from lab.common import engine as concept_engine
 
     ctx = {"passages": passages, "records": records or []}
-    concept_outcome = answer_from_concepts(ask, ctx, concepts=concepts, output_format="md")
+    concept_outcome = concept_engine.run(ask, ctx=ctx, concepts=concepts, output_format="md")
     concept_match = concept_outcome["match"]
     if concept_match["concept"] is not None:
         concept_name = concept_match["concept"].get("concept")

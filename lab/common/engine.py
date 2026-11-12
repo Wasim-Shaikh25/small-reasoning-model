@@ -25,13 +25,18 @@ def answer_from_concepts(
     out_path: str | None = None,
 ) -> dict:
     """The actual match-execute-render sequence, pulled out of `run` below
-    (2026-11-11) so a caller that already has `ctx` -- lab.common.brain.
-    reason, which already has `passages`/`records` in hand and has no use
-    for YAML connector resolution -- goes through the exact same sequence
-    `run` uses, instead of re-implementing it. This is the one place that
-    sequence exists; `run` only adds connector resolution on top of it,
-    and no other module should call `concept_tools.teach_and_run`/
+    (2026-11-11) so `run` can call it in both of its own modes (resolving a
+    connector, or taking an already-built `ctx` directly). This is the one
+    place that sequence exists; `run` only adds connector resolution on
+    top of it, and no other module should call `concept_tools.teach_and_run`/
     `lab.common.render` directly instead of coming through here.
+
+    An outside caller (lab.common.brain.reason included, as of 2026-11-13)
+    should call `run(ctx=...)`, not this function directly -- `run` is the
+    one public entry point regardless of whether the caller is handing in
+    a connector or a context it already built itself; this function is
+    its shared internal step either way, kept public only because `run`
+    itself depends on it, not as a second front door.
 
     `ctx` is `{"passages": [...], "records": [...]}` (see `concept_tools`'s
     own module docstring). `concepts`, if given, overrides the default
@@ -59,10 +64,11 @@ def answer_from_concepts(
 
 def run(
     ask: str,
-    connector: dict | str | Path,
+    connector: dict | str | Path | None = None,
     output_format: str = "json",
     out_path: str | None = None,
     concepts: list[dict] | None = None,
+    ctx: dict | None = None,
 ) -> dict:
     """`connector` is either a YAML path or an already-loaded config dict
     (inline/records/file/qdrant/graph -- see lab.common.connector_config).
@@ -72,10 +78,21 @@ def run(
     instead of relying on whatever is registered globally on disk; this
     is also how `lab/common/concepts/examples/` (never auto-loaded, see
     `concept_tools.load_concepts`) gets exercised for proof/test runs.
-    Resolves `connector` into `ctx`, then defers to `answer_from_concepts`
-    for the actual match-execute-render sequence -- see that function's
-    own docstring for the return shape.
+
+    `ctx`, if given (2026-11-13), is used as-is -- `{"passages": [...],
+    "records": [...]}`, already resolved -- and `connector` is skipped
+    entirely. This is how a caller that already has passages in hand
+    (lab.common.brain.reason) goes through this same public entry point
+    instead of reaching past it to call `answer_from_concepts` directly:
+    `run` stays the one place a caller comes in, whether it's handing in
+    a connector to resolve or a context it already built itself. Give
+    exactly one of `connector`/`ctx`.
+
+    Resolves `connector` into `ctx` when `ctx` isn't already given, then
+    defers to `answer_from_concepts` for the actual match-execute-render
+    sequence -- see that function's own docstring for the return shape.
     """
-    config = connector if isinstance(connector, dict) else load_connector_config(connector)
-    ctx = fetch_context(config)
+    if ctx is None:
+        config = connector if isinstance(connector, dict) else load_connector_config(connector)
+        ctx = fetch_context(config)
     return answer_from_concepts(ask, ctx, concepts=concepts, output_format=output_format, out_path=out_path)

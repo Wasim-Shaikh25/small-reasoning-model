@@ -35,7 +35,7 @@
   "follow_ups": [
     "mark_conflicted records the conflict on the note but memory.recall's own hit shape does not yet surface a note's conflicts list back to the caller -- a later recall of a conflicted note still reports it the same way as any other valid hit, just with a DB-side verification_status='conflicted' a caller would have to query separately to see."
   ],
-  "elapsed_sec": 10.8163,
-  "peak_rss_mb": 2800.05,
+  "elapsed_sec": 11.1311,
+  "peak_rss_mb": 2800.6,
   "models_used": "lab.common.nli.judge (classical, deterministic: token coverage + number/polarity checks) -- no generative or real pretrained model involved."
 }

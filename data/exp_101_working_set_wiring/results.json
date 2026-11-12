@@ -54,7 +54,7 @@
     "lab.common.paged.Notebook (sub-question row tracking, the other half of EXP-015) is still unwired -- this exploration only wires WorkingSet; Notebook's own purpose (tracking per-subquestion coverage) could parallel plan_stages' existing subquestions field, untested here.",
     "Relevance is ask_relevance's lexical coverage score, the same scale-down every other lexical-overlap gate in this repo already carries (a true paraphrase with no shared word stems scores low) -- untested against a connector with strong dense-only hits that a lexical score would undervalue."
   ],
-  "elapsed_sec": 10.556,
-  "peak_rss_mb": 2799.97,
+  "elapsed_sec": 11.3202,
+  "peak_rss_mb": 2799.98,
   "models_used": "None -- WorkingSet's eviction is deterministic; ask_relevance (lexical coverage) drives the relevance score, no model of any kind."
 }

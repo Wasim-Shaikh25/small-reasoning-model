@@ -44,7 +44,7 @@
     "data/exp_109_total_computation_shared_sum/results.json"
   ],
   "follow_ups": [],
-  "elapsed_sec": 10.1035,
-  "peak_rss_mb": 2799.46,
+  "elapsed_sec": 10.6728,
+  "peak_rss_mb": 2800.34,
   "models_used": "None -- regex span extraction and arithmetic, both deterministic, unchanged by this refactor."
 }

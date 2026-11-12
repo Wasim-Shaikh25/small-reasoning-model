@@ -38,7 +38,7 @@
   "follow_ups": [
     "No minimum-score floor: a low-confidence match still gets auto-selected rather than falling back to entity-grouping. EXP-082 itself never needed one (its own fixture always had a real match); a caller relying on auto_select_template for an ask that matches no registered template well would get a weak pick instead of the old entity-grouping fallback."
   ],
-  "elapsed_sec": 10.8746,
-  "peak_rss_mb": 2798.41,
+  "elapsed_sec": 10.7375,
+  "peak_rss_mb": 2798.92,
   "models_used": "lab.common.real_encoders.bge_embed (bge cosine similarity) -- same mechanism select_tool/select_template already used in EXP-082, unchanged."
 }

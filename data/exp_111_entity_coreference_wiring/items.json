@@ -20,7 +20,7 @@
   },
   "different_people_same_surname_not_merged": {
     "baseline_text": "Amit Sharma, Lake Road [P3].",
-    "with_pairs_text": "Amit Sharma, Lake Road [P3].",
-    "correct": true
+    "with_pairs_text": "Neha Sharma, Lake Road [P4].",
+    "correct": false
   }
 }

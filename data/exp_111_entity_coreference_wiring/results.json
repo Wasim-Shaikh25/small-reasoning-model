@@ -26,12 +26,12 @@
     },
     "different_people_same_surname_not_merged": {
       "baseline_text": "Amit Sharma, Lake Road [P3].",
-      "with_pairs_text": "Amit Sharma, Lake Road [P3].",
-      "correct": true
+      "with_pairs_text": "Neha Sharma, Lake Road [P4].",
+      "correct": false
     }
   },
   "results_prose": "The short-form mention ('R. Sharma') appears first; coreference_pairs omitted (default): 'R. Sharma, MG Road [P1].' -- today's exact ordering-based selection, unchanged. With coreference_pairs given: 'Ravi Sharma, MG Road [P2].', merged=['R. Sharma', 'Ravi Sharma'], chosen='Ravi Sharma' -- the fuller name correctly preferred, both source passages cited. Two genuinely different people sharing a surname (Amit Sharma, Neha Sharma, different addresses): identical answer with or without coreference_pairs -- the pair matcher's own different-address signal correctly keeps them apart, not merged just for sharing a surname.",
-  "conclusion": "lab.common.entities.resolve_mentions/train_pair_matcher/same_entity_pairs -- present since EXP-009 with zero callers from lab.common.brain -- now resolve a short-form alias to its fuller mention within identity_extraction when the caller opts in with coreference_pairs=, closing the exact gap EXP-075 documented. No shipped default training set, and no caller is affected unless it supplies its own labeled pairs.",
+  "conclusion": "At least one case did not behave as expected -- see metrics for exactly which.",
   "scale_down": "One alias pair, one distinct-people pair, a 5-row training fixture (EXP-009's own) -- a proof the dispatch/merge/citation wiring works end to end, not a benchmark of the pair matcher's own precision at a larger, more diverse real-document scale (a known, already-documented limitation of this primitive, unchanged by this wiring).",
   "referenced_files": [
     "lab/tests/exp_111_entity_coreference_wiring/run.py",
@@ -42,7 +42,7 @@
   "follow_ups": [
     "No shipped default coreference_pairs: a caller who wants this on must supply its own labeled training pairs -- a deliberate scope limit (this project's 'measured, not assumed' rule), not a missing feature."
   ],
-  "elapsed_sec": 10.5262,
-  "peak_rss_mb": 2800.15,
+  "elapsed_sec": 10.3833,
+  "peak_rss_mb": 2799.68,
   "models_used": "sklearn LogisticRegression (lab.common.entities.train_pair_matcher) -- the blueprint's own named pair-matcher model, unchanged from EXP-009."
 }

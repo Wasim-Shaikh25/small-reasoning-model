@@ -65,7 +65,7 @@
     "Dispatch priority when both a taught concept AND document_write's own wants_document() signal could plausibly apply to the same ask was not tested -- concept-matching runs first unconditionally in the current wiring, so a confident concept match always wins; whether that is the right priority for every future taught concept, versus e.g. letting an explicit template_id/notes= caller signal override it, is a judgment call for whoever teaches a concept that could overlap.",
     "lab.common.engine.run itself (the separate, still-live sibling entry point this closes part of the gap with) is untouched by this change -- a caller going through engine.run still gets its own connector_config/render output shapes; this wiring only adds a second way to reach concept_tools' own matching+execution, through reason(), not a merge of the two entry points."
   ],
-  "elapsed_sec": 10.3544,
-  "peak_rss_mb": 2801.36,
+  "elapsed_sec": 10.4702,
+  "peak_rss_mb": 2802.88,
   "models_used": "None for alias matching (exact substring); bge_embed (dense similarity) only for the embedding fallback when no alias matches, same real model concept_tools already used standalone, unconditionally called by this wiring only when it would have been called anyway."
 }

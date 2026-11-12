@@ -45,7 +45,7 @@
   "follow_ups": [
     "The fallback does not run forward_chain (multi-rule chaining) the way the exact-match path does for a derived fact -- a semantically-matched fact that itself triggers a second rule stops after the first consequence, a deliberate scope limit, not an oversight."
   ],
-  "elapsed_sec": 12.2843,
-  "peak_rss_mb": 2799.42,
+  "elapsed_sec": 12.3374,
+  "peak_rss_mb": 2799.32,
   "models_used": "lab.common.real_encoders.real_nli (DeBERTa-v3-base-mnli-fever-anli), only when the caller already set use_real_nli=True -- the classical lab.common.nli.judge remains the default judge_fn for any other (test/direct) caller of semantic_apply_rule."
 }

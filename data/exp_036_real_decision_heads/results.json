@@ -88,7 +88,7 @@
     "lab/tests/fixtures_support.py"
   ],
   "follow_ups": [],
-  "elapsed_sec": 70.7838,
-  "peak_rss_mb": 1829.2,
+  "elapsed_sec": 71.1245,
+  "peak_rss_mb": 1829.63,
   "models_used": "deepset/deberta-v3-base-squad2 (extractive QA feature), MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli (NLI feature). Local checkpoints, not API calls. Logistic regression (with Platt/sigmoid calibration) is the unchanged classical head."
 }

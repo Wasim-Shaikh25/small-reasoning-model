@@ -42,7 +42,7 @@
     "Scoped the same way the original method_teaching version was: verb-triggered rules only (parse_conditional_rule), apply_rule's exact lemma match, and no check_exceptions/split_exceptions exception-gating -- a listed argument's consequence may still be blocked by an unlisted exception elsewhere in the same passages. Extending this to threshold rules, semantic_apply_rule's paraphrase-robust NLI match, or exception-gating is a real, separate scope decision, not done here.",
     "No citation-count or corpus-size limit exists on this path -- a very large passage set with many rules and many facts does an O(rules x facts) scan; working_set_budget (if a connector is in play) bounds how many passages reach this point at all, but there is no independent cap on the scan itself."
   ],
-  "elapsed_sec": 10.6522,
-  "peak_rss_mb": 2798.9,
+  "elapsed_sec": 10.1851,
+  "peak_rss_mb": 2799.39,
   "models_used": "None -- parse_conditional_rule/extract_fact_triple/apply_rule are all deterministic (regex + dependency parse + lemma comparison); render_md (lab.common.render) formats the result, no model involved."
 }
