@@ -98,9 +98,9 @@
   "conclusion": "On real worked examples fetched from the UK ICO's own published guidance and a real AEPD enforcement decision -- never reworded to mirror GDPR Art 9's own clause phrasing, never tuned against the model's score -- 3/4 cases matched the expected real-world conclusion. At least one real-world scenario did not match the expected conclusion -- see metrics.per_exception for the exact entailment/contradiction scores measured. This is the honest finding EXP-085's hand-tuned validation could not surface: check_exception's entailment gate may not generalize past text engineered to closely mirror the exception clause's own wording, which is exactly the brittleness EXP-085's own follow-ups already flagged as a real risk on natural (not hand-tuned) context text.",
   "scale_down": "Four real scenarios (three ICO worked examples plus one enforcement decision), not a broad corpus of case law -- a real validation of the mechanism's entailment gate against authoritative, unmodified source language, not a comprehensive legal benchmark. Each ICO scenario is restated as a short declarative summary close to the source's own wording rather than quoted at full length -- reproducing the full guidance page verbatim was neither necessary nor appropriate to copy at length.",
   "referenced_files": [
-    "lab/exp_088_real_world_validation/run.py",
+    "lab/tests/exp_088_real_world_validation/run.py",
     "lab/common/inference.py",
-    "lab/exp_085_multi_exception_scoping/run.py",
+    "lab/tests/exp_085_multi_exception_scoping/run.py",
     "data/exp_085_multi_exception_scoping/results.json",
     "data/exp_088_real_world_validation/results.json"
   ],
@@ -108,7 +108,7 @@
     "If any case's measured status did not match its expected real-world conclusion (see metrics), the real next step is NOT to reword that case's context text to force a match -- that would repeat exactly the tuning this exploration exists to avoid. It is either accepting check_exception's current entailment gate as genuinely limited to lexically-close evidence, or testing whether a different NLI checkpoint / a sentence-splitting preprocessing step (EXP-083's own named follow-up) closes the gap -- a separate, measured exploration either way.",
     "Only one real-world sentence was tested per exception; a single sentence is also EXP-083's and EXP-085's own known scale-down (check_exception reads one premise at a time) -- a longer real passage with the relevant evidence buried among unrelated sentences was not tested here either."
   ],
-  "elapsed_sec": 14.4834,
-  "peak_rss_mb": 2686.69,
+  "elapsed_sec": 21.0918,
+  "peak_rss_mb": 2684.1,
   "models_used": "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli (per-exception entailment via the existing, unmodified check_exception/check_exceptions). No generative model. No new dependency."
 }

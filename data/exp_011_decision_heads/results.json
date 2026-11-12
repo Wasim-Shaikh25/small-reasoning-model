@@ -71,7 +71,7 @@
   "conclusion": "The heads learn the feature patterns in this generated set. The unsupported-claim target is evaluated at the validation threshold and reported on the held-out slice, not assumed.",
   "scale_down": "Training rows are generated from six slots rather than MNLI, ANLI, FEVER, SQuAD2, and HotpotQA. No neural encoder is run to build the features.",
   "referenced_files": [
-    "lab/exp_011_decision_heads/run.py",
+    "lab/tests/exp_011_decision_heads/run.py",
     "lab/common/qa.py",
     "lab/common/nli.py",
     "lab/common/harness.py",
@@ -80,6 +80,6 @@
     "data/exp_011_decision_heads/results.json"
   ],
   "follow_ups": [],
-  "elapsed_sec": 0.0839,
-  "peak_rss_mb": 157.77
+  "elapsed_sec": 0.1398,
+  "peak_rss_mb": 157.2
 }

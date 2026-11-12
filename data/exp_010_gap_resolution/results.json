@@ -158,7 +158,7 @@
   "conclusion": "The loop can close a gap only when a passage states the missing piece, and it refuses a single answer when two values or a vague criterion remain.",
   "scale_down": "Twelve items, two or three per gap type, replace the requested 10 items per gap type. Context is pasted, which is the Phase 0 setup.",
   "referenced_files": [
-    "lab/exp_010_gap_resolution/run.py",
+    "lab/tests/exp_010_gap_resolution/run.py",
     "lab/common/index.py",
     "lab/common/qa.py",
     "lab/common/nli.py",
@@ -168,6 +168,6 @@
     "data/exp_010_gap_resolution/results.json"
   ],
   "follow_ups": [],
-  "elapsed_sec": 0.0551,
-  "peak_rss_mb": 152.78
+  "elapsed_sec": 0.1085,
+  "peak_rss_mb": 151.63
 }

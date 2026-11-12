@@ -31,11 +31,11 @@
   "conclusion": "Connective coverage grew from 28 to 37 recognized phrases (CONNECTIVE_TABLE + DISCOURSE_ADVERBIAL_TABLE combined) through the same two already-built, already-tested structural patterns -- no new detection code, purely additive table entries. Equally important: 9 further candidates were measured and found NOT to fit either existing pattern, and were left out rather than misclassified -- extending coverage further needs new structural patterns (a ccomp-vs-mark discriminator for 'that'-clauses, multi-token compound prepositions), not just more table rows.",
   "scale_down": "Still a small, named subset of DiMLex-Eng's 149 (37 now, not all 149). The 9 dropped candidates are real, nameable future work (see follow_ups), not abandoned without reason. Hand-built sentences, not held-out novel phrasings of the same connectives.",
   "referenced_files": [
-    "lab/exp_096_connective_coverage/run.py",
+    "lab/tests/exp_096_connective_coverage/run.py",
     "lab/common/connectives.py",
     "lab/common/textutil.py",
     "lab/common/fixtures.py",
-    "lab/exp_090_connective_detection/run.py"
+    "lab/tests/exp_090_connective_detection/run.py"
   ],
   "follow_ups": [
     "assuming that: 'that' attaches via dep_=='ccomp', the excluded reported-speech-complementizer pattern (EXP-090)",
@@ -48,7 +48,7 @@
     "in spite of: three-token idiom ('in spite OF'); only partially fits the existing two-token _IN_IDIOMS extension point",
     "regardless of: three-token idiom with its own 'regardless' as advmod, not prep -- a different shape from 'in spite of'"
   ],
-  "elapsed_sec": 11.4202,
-  "peak_rss_mb": 2685.93,
+  "elapsed_sec": 15.4575,
+  "peak_rss_mb": 2684.29,
   "models_used": "spaCy en_core_web_sm dependency parser via lab.common.connectives.find_connectives (unchanged detection code, new table entries only). No generative model."
 }

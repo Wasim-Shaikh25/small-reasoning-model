@@ -38,7 +38,7 @@
   "conclusion": "Domain differences on this set come from wording, not from pretrained domain knowledge, because no pretrained model is loaded. The engine does comparison, counting, ordering, sum, conditional_if and fails conditional_unless_blocked.",
   "scale_down": "Four items in each of six domains replace 20 items in five domains. Ordering uses dateparser rather than a learned temporal model.",
   "referenced_files": [
-    "lab/exp_014_reasoning/run.py",
+    "lab/tests/exp_014_reasoning/run.py",
     "lab/common/qa.py",
     "lab/common/calc.py",
     "lab/common/textutil.py",
@@ -47,6 +47,6 @@
     "data/exp_014_reasoning/results.json"
   ],
   "follow_ups": [],
-  "elapsed_sec": 0.0477,
-  "peak_rss_mb": 31.94
+  "elapsed_sec": 0.0781,
+  "peak_rss_mb": 31.09
 }

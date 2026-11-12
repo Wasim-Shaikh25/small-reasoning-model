@@ -46,11 +46,11 @@
   "conclusion": "dslim/bert-base-NER, the actual blueprint-named checkpoint, outperforms both the rule tagger and the spaCy substitute EXP-033 used when HuggingFace was unreachable -- a real, direct three-way comparison, not an assumption that the originally-intended checkpoint would be better just because it's the one the blueprint named. EXP-033/034's gap is closed: the checkpoint was loaded but never actually called for this role until now.",
   "scale_down": "Same 12-sentence fixture as EXP-033 -- not a held-out annotated corpus, chosen for a direct, controlled comparison against an already-measured result rather than a fresh, larger evaluation.",
   "referenced_files": [
-    "lab/exp_080_real_ner_rerun/run.py",
+    "lab/tests/exp_080_real_ner_rerun/run.py",
     "lab/common/real_ner.py",
     "lab/common/real_encoders.py",
     "lab/common/entities.py",
-    "lab/exp_033_real_entities/run.py",
+    "lab/tests/exp_033_real_entities/run.py",
     "data/exp_033_real_entities/gold.json",
     "data/exp_033_real_entities/results.json",
     "data/exp_080_real_ner_rerun/results.json"
@@ -60,7 +60,7 @@
     "lab.common.real_ner.detect_real only maps PER/ORG -- dslim/bert-base-NER's LOC/MISC categories are dropped rather than mapped to this project's address/date/amount labels, which it was never trained to produce; address detection still depends entirely on the regex tagger.",
     "Not yet wired into lab.common.brain.reason's identity-extraction step (detect_primary is still what that step calls) -- this measures the checkpoint standalone, matching EXP-033's own scope, not a live pipeline swap."
   ],
-  "elapsed_sec": 2.3398,
-  "peak_rss_mb": 734.53,
+  "elapsed_sec": 2.9506,
+  "peak_rss_mb": 732.59,
   "models_used": "dslim/bert-base-NER (CoNLL-2003 token classifier, non-generative), via lab.common.real_encoders.real_entities, wired through lab.common.real_ner. No generative model."
 }

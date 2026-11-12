@@ -96,7 +96,7 @@
   "conclusion": "Recall of a distinctive needle stayed available at the sizes that fit in this process. Eviction removes an unpinned page, and the next request brings it back as a page fault. The notebook, not the raw haystack, is what the reduce step would read.",
   "scale_down": "Pages are short synthetic paragraphs, not scanned document pages. 1,000 pages were run. A multi-million-token archive was not.",
   "referenced_files": [
-    "lab/exp_015_paged_memory/run.py",
+    "lab/tests/exp_015_paged_memory/run.py",
     "lab/common/paged.py",
     "lab/common/index.py",
     "lab/common/qa.py",
@@ -105,6 +105,6 @@
     "data/exp_015_paged_memory/results.json"
   ],
   "follow_ups": [],
-  "elapsed_sec": 0.0729,
-  "peak_rss_mb": 156.71
+  "elapsed_sec": 0.1096,
+  "peak_rss_mb": 155.45
 }

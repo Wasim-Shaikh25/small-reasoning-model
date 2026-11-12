@@ -32,7 +32,7 @@
   "conclusion": "lab.common.rules.apply_rule's 'list every grounded argument across the whole passage set' mode -- ported from the deleted lab.common.method_teaching, the one capability it had that concept_tools did NOT supersede -- is now reachable directly from lab.common.brain.reason (list_arguments=, default False, zero regression for every existing caller). Unlike every other capability wired into brain.reason this session, this one needed no sibling module at all: it is built entirely from functions rule_application's own stage already imports and uses (parse_conditional_rule, extract_fact_triple, apply_rule), just run in a different mode (every pair, not the first match).",
   "scale_down": "2 rules, 3 facts -- a proof the dispatch, matching, and citation/dependency-tree bookkeeping work correctly end to end, not a benchmark of apply_rule's own lemma-match precision at a larger corpus scale (already a known, documented limitation of apply_rule itself, unchanged by this wiring).",
   "referenced_files": [
-    "lab/exp_106_grounded_arguments_wiring/run.py",
+    "lab/tests/exp_106_grounded_arguments_wiring/run.py",
     "lab/common/brain.py",
     "lab/common/rules.py",
     "lab/common/render.py",
@@ -42,7 +42,7 @@
     "Scoped the same way the original method_teaching version was: verb-triggered rules only (parse_conditional_rule), apply_rule's exact lemma match, and no check_exceptions/split_exceptions exception-gating -- a listed argument's consequence may still be blocked by an unlisted exception elsewhere in the same passages. Extending this to threshold rules, semantic_apply_rule's paraphrase-robust NLI match, or exception-gating is a real, separate scope decision, not done here.",
     "No citation-count or corpus-size limit exists on this path -- a very large passage set with many rules and many facts does an O(rules x facts) scan; working_set_budget (if a connector is in play) bounds how many passages reach this point at all, but there is no independent cap on the scan itself."
   ],
-  "elapsed_sec": 11.4051,
-  "peak_rss_mb": 2800.86,
+  "elapsed_sec": 14.4815,
+  "peak_rss_mb": 2798.92,
   "models_used": "None -- parse_conditional_rule/extract_fact_triple/apply_rule are all deterministic (regex + dependency parse + lemma comparison); render_md (lab.common.render) formats the result, no model involved."
 }

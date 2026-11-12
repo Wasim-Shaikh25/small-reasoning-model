@@ -26,14 +26,14 @@
   "conclusion": "The threshold-rule branch now checks exceptions/conditions exactly like the verb-rule branch already did, closing the gap EXP-089 named as a separate, un-fixed limit. Purely additive: every existing threshold-rule fixture (reran EXP-060/066/068/070, the explorations that actually exercise this branch through brain.reason) produced byte-identical output, since check_exceptions correctly returns 'no_exception' when there is nothing to check.",
   "scale_down": "Only verified against one hand-built threshold-rule-with-exception fixture, not a sweep across many threshold-rule phrasings. _role_matches's own role-mismatch check still runs first and is unaffected by this change -- a role mismatch still short-circuits before any exception check, same as before.",
   "referenced_files": [
-    "lab/exp_094_threshold_exception/run.py",
+    "lab/tests/exp_094_threshold_exception/run.py",
     "lab/common/brain.py",
     "lab/common/inference.py",
     "lab/common/rules.py",
-    "lab/exp_060_unified_brain/run.py"
+    "lab/tests/exp_060_unified_brain/run.py"
   ],
   "follow_ups": [],
-  "elapsed_sec": 13.2086,
-  "peak_rss_mb": 2801.57,
+  "elapsed_sec": 17.0996,
+  "peak_rss_mb": 2799.56,
   "models_used": "Same as EXP-089/026: spaCy dependency parser (unchanged) + MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli via the existing, unmodified check_exception/check_exceptions. No generative model."
 }

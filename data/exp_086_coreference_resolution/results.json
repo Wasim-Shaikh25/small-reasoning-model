@@ -3,7 +3,7 @@
   "title": "Cross-sentence coreference resolution (fastcoref) feeding fact extraction",
   "status": "closed",
   "goal": "Add fastcoref as a document-level pre-processing step, resolving he/it/they across sentence boundaries before lab/common/rules.py and lab/common/inference.py run per-sentence, falling back to the existing within-clause-only binding when fastcoref is unavailable or its resolution looks wrong -- never a hard failure.",
-  "method": "16 constructed two-or-three-sentence items (lab/exp_086_coreference_resolution/run.py, written to data/exp_086_coreference_resolution/items.json), 8 of them distractor/long-range cases with more than one plausible antecedent or an antecedent two sentences back. For each item, lab.common.rules.extract_fact_triple runs unchanged on the target sentence twice: once alone (baseline, no coreference step) and once after resolve_document() rewrites every pronoun mention in fastcoref's own clusters to that cluster's first non-pronoun mention. fastcoref itself (biu-nlp/f-coref) is loaded only inside this project's isolated venv -- see this file's own module docstring for why and the venv activation requirement.",
+  "method": "16 constructed two-or-three-sentence items (lab/tests/exp_086_coreference_resolution/run.py, written to data/exp_086_coreference_resolution/items.json), 8 of them distractor/long-range cases with more than one plausible antecedent or an antecedent two sentences back. For each item, lab.common.rules.extract_fact_triple runs unchanged on the target sentence twice: once alone (baseline, no coreference step) and once after resolve_document() rewrites every pronoun mention in fastcoref's own clusters to that cluster's first non-pronoun mention. fastcoref itself (biu-nlp/f-coref) is loaded only inside this project's isolated venv -- see this file's own module docstring for why and the venv activation requirement.",
   "metrics": {
     "n_items": 16,
     "fastcoref_available": true,
@@ -279,7 +279,7 @@
   "conclusion": "fastcoref measurably closes the gap EXP-086 named: a pronoun whose antecedent is in an earlier sentence is now correctly grounded most of the time on single-candidate items, with the distractor items showing this is a real, imperfect model decision (not every case resolves correctly) rather than a trivial string match. The fallback path (no cross-sentence edit at all) is confirmed structurally distinct from the resolved path by construction: baseline grounding is 0% by design, since a bare pronoun subject never equals its antecedent's own text.",
   "scale_down": "16 hand-written items, not a standard coreference benchmark (e.g. CoNLL-2012/GAP) -- built to exercise this project's own per-sentence fact-extraction gap specifically, not to reproduce fastcoref's own published cluster-F1 numbers. The resolution strategy here (first non-pronoun mention in a cluster, text substitution) is this project's own integration choice, not part of fastcoref itself, and only handles a single pronoun resolving to a single antecedent span -- nested or overlapping mentions are not covered.",
   "referenced_files": [
-    "lab/exp_086_coreference_resolution/run.py",
+    "lab/tests/exp_086_coreference_resolution/run.py",
     "lab/common/rules.py",
     "lab/common/inference.py",
     "lab/common/textutil.py",
@@ -291,7 +291,7 @@
     "If this is wired into lab/common/brain.py's real ingest path, resolve_document should run once per document before lab.common.ingest.chunk_document splits it into passages, not per-passage (a pronoun's antecedent could sit in a different passage than its mention).",
     "The current substitution picks a cluster's first non-pronoun mention as canonical even when that mention is itself a pronoun-free but still ambiguous noun phrase (e.g. 'the manager' vs a named person) -- not measured here, since none of these 16 items hit that case."
   ],
-  "elapsed_sec": 14.1038,
-  "peak_rss_mb": 2822.79,
+  "elapsed_sec": 20.4886,
+  "peak_rss_mb": 2820.21,
   "models_used": "biu-nlp/f-coref (fastcoref 2.1.6), a local checkpoint loaded with transformers inside this project's own .venv (transformers pinned to 4.46.3, datasets 2.19.2, huggingface_hub 0.25.2, tokenizers 0.20.3 in that venv specifically, for compatibility with fastcoref's own internals -- the shared system interpreter's transformers/datasets/huggingface_hub are untouched). Mention-ranking, not generative; does not touch FORBIDDEN.md."
 }

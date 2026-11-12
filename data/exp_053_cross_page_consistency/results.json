@@ -24,13 +24,13 @@
   "conclusion": "EXP-053's own named goal -- 'page 40 against page 4', not just an adjacent-page check -- is met: WorkingMemory's bounded per-page digest (subject-verb-object triples only, never full page text) still catches a contradiction 36 pages apart with zero false positives among 37 unrelated pages in between. The mechanism itself was already proven through the full pipeline by EXP-078 ('this closes EXP-053's gap directly', its own conclusion) -- this exploration closes EXP-053's own stub entry formally and checks the specific book-length distance its goal named, which EXP-078's 6-7 leaf fixture did not.",
   "scale_down": "Calls WorkingMemory directly, not through the full write_long_document pipeline with a generative rewriter on top -- EXP-077/078 already measured that combination separately at smaller scale; this exploration isolates the consistency-check mechanism itself at the distance its own goal named. 40 pages, one injected conflict, not an exhaustive search over conflict positions.",
   "referenced_files": [
-    "lab/exp_053_cross_page_consistency/run.py",
+    "lab/tests/exp_053_cross_page_consistency/run.py",
     "lab/common/working_memory.py",
     "lab/common/rules.py",
     "data/exp_078_longform_consistency/results.json"
   ],
   "follow_ups": [],
-  "elapsed_sec": 7.4702,
-  "peak_rss_mb": 2685.75,
+  "elapsed_sec": 15.3377,
+  "peak_rss_mb": 2683.36,
   "models_used": "lab.common.rules.extract_fact_triple (spaCy dependency parse, deterministic, unchanged). No generative model, no new dependency."
 }

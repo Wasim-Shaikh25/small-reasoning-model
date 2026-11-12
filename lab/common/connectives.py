@@ -22,7 +22,7 @@ a justification, never a gate that could block anything.
 
 Empirical grounding for the DETECTION patterns themselves (checked against
 spaCy's real output on 20 example sentences, one per connective, before
-writing this -- see lab/exp_090_connective_detection/run.py -- not assumed
+writing this -- see lab/tests/exp_090_connective_detection/run.py -- not assumed
 from the "mark+advcl" heuristic the literature itself warns has real
 attachment variance):
   - Most subordinators (if, unless, although, though, because, since,
@@ -109,7 +109,7 @@ COMBINATOR_TABLE: dict[str, str] = {"and": Operator.COMBINATOR_AND, "or": Operat
 # structural category from CONNECTIVE_TABLE's intra-sentential
 # subordinators -- "however"/"therefore" don't attach a dependent clause
 # to a head the way "unless" does; they're their sentence's own ROOT's
-# advmod child, checked empirically (lab/exp_050_neighbor_coherence/
+# advmod child, checked empirically (lab/tests/exp_050_neighbor_coherence/
 # run.py): "However"/"Therefore"/"Moreover"/"Nevertheless" each surface as
 # dep_=="advmod", head.dep_=="ROOT", token index 0 -- sentence-initial,
 # never mid-clause, which is exactly what rules out the false-positive
@@ -150,7 +150,7 @@ _IN_IDIOMS: dict[str, tuple[str, str] | None] = {"case": None, "addition": (Oper
 _MARK_HEAD_DEPS = {"advcl", "pcomp", "relcl"}
 # "ccomp" (a verb's own reported-speech/that-clause object, e.g. "demonstrate
 # THAT X", "ascertain WHETHER Y") deliberately excluded -- measured directly
-# against the real GDPR text (lab/exp_090_connective_detection/run.py): every
+# against the real GDPR text (lab/tests/exp_090_connective_detection/run.py): every
 # "mark"+"ccomp" match found there was a pure complementizer ("that",
 # "whether") introducing a verb's object clause, never a genuine discourse
 # connective, and none of this module's 20 target connectives ever surface

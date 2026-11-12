@@ -28,7 +28,7 @@
   "conclusion": "Template T1 is the strongest of the three on this set. Number mismatches and direct negation are handled more reliably than except/unless/provided qualifications.",
   "scale_down": "MNLI, ANLI, and ContractNLI were not downloaded. Thirty original pairs replace those dev subsets plus 40 custom items.",
   "referenced_files": [
-    "lab/exp_006_nli_judge/run.py",
+    "lab/tests/exp_006_nli_judge/run.py",
     "lab/common/nli.py",
     "lab/common/textutil.py",
     "lab/common/harness.py",
@@ -38,6 +38,6 @@
   "follow_ups": [
     "Add an explicit qualification parser in code if exception accuracy stays too low for the tasks you care about. Do not add a generative NLI model."
   ],
-  "elapsed_sec": 0.0047,
-  "peak_rss_mb": 19.38
+  "elapsed_sec": 0.0066,
+  "peak_rss_mb": 18.69
 }

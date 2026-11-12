@@ -48,7 +48,7 @@
   "conclusion": "Chunk metadata and extractive summaries behave as specified on this sample. The word-window settings used here are smaller than the 200 to 400 token production window so the sample still splits.",
   "scale_down": "One short document plus one generated long clause. Token counts are whitespace words, not a model tokenizer. Production target of 200 to 400 tokens was not the setting for the short sample.",
   "referenced_files": [
-    "lab/exp_003_chunking/run.py",
+    "lab/tests/exp_003_chunking/run.py",
     "lab/common/chunking.py",
     "lab/common/textutil.py",
     "lab/common/harness.py",
@@ -56,6 +56,6 @@
     "data/exp_003_chunking/results.json"
   ],
   "follow_ups": [],
-  "elapsed_sec": 0.0026,
-  "peak_rss_mb": 19.58
+  "elapsed_sec": 0.0035,
+  "peak_rss_mb": 18.72
 }

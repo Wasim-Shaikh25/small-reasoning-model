@@ -28,7 +28,7 @@
   "conclusion": "The paraphrase case is exactly where lexical and semantic retrieval diverge as expected: lexical/TF-IDF wrong_answer, semantic/bge correct on an ask sharing almost no exact wording with the needle. Margin-based abstention on real embeddings holds up on the off-topic negative control (semantic/bge outcome: correct_abstain), confirming the predicted fix for the floor's known failure mode on embeddings (unrelated text scores ~0.1-0.3 cosine, never near zero, so the near-zero floor used for TF-IDF would never fire on embeddings) -- a relative top1-vs-runner-up gap generalizes across both scoring methods where an absolute floor does not. This measured result supports combining both signals rather than replacing TF-IDF outright: lexical retrieval still resolved the exact-wording case correctly and is cheaper, while semantic retrieval is what's load-bearing specifically for paraphrase/synonym asks -- the two are complementary, not substitutes, matching the recommendation made before this was built.",
   "scale_down": "One tree size (72 leaves), one needle, one paraphrase pair -- a head-to-head proof, not a scale sweep (EXP-065 already measured TF-IDF scale separately).",
   "referenced_files": [
-    "lab/exp_067_semantic_navigation/run.py",
+    "lab/tests/exp_067_semantic_navigation/run.py",
     "lab/common/semantic_index.py",
     "lab/common/nested_index.py",
     "lab/common/index.py",
@@ -42,7 +42,7 @@
     "navigate_semantic has no handling for a level with only 1 child (no margin computable); test a tree shape that exercises that gap before any production use.",
     "Sweep min_margin across more off-topic and near-miss asks before picking a production value; 0.03 here is a first measured choice, not a tuned one."
   ],
-  "elapsed_sec": 8.143,
-  "peak_rss_mb": 515.12,
+  "elapsed_sec": 13.0912,
+  "peak_rss_mb": 513.61,
   "models_used": "bge-small-en-v1.5 (BAAI), the same real checkpoint loaded since EXP-030, used for retrieval scoring only -- no generative model anywhere in this exploration."
 }

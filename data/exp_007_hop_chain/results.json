@@ -19,7 +19,7 @@
   "conclusion": "The reliable hop depth on this small set, using a 0.5 accuracy cutoff, is 2. The controller should keep asks inside that depth and send arithmetic to the calculator.",
   "scale_down": "Twelve original chains replace HotpotQA plus 30 custom items. No pretrained QA model is loaded.",
   "referenced_files": [
-    "lab/exp_007_hop_chain/run.py",
+    "lab/tests/exp_007_hop_chain/run.py",
     "lab/common/qa.py",
     "lab/common/calc.py",
     "lab/common/nli.py",
@@ -29,6 +29,6 @@
     "data/exp_007_hop_chain/results.json"
   ],
   "follow_ups": [],
-  "elapsed_sec": 0.0614,
-  "peak_rss_mb": 32.0
+  "elapsed_sec": 0.1099,
+  "peak_rss_mb": 31.36
 }

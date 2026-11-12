@@ -41,7 +41,7 @@
   "conclusion": "Disambiguating between two multi-sentence stories by a cue in the ask (not a name), extracting a name and address, summing money mentioned across separate sentences, and applying a company policy threshold rule all chain correctly end to end, each step citable to its own source passage. The second case is the one worth dwelling on: Ravi Sharma's total (INR 45,000) is well over the policy's INR 30,000 threshold, and a rule engine that only checked the number would have incorrectly fired approval on him. Checking that his own story actually describes him with the policy's subject role ('a contractor') -- and finding it doesn't, he's a sales manager -- is what keeps the decision correct. A rule matching a number is not the same as a rule applying to the right person.",
   "scale_down": "Two stories, one policy, one role-class check. Real documents would have more distractors, multiple candidate policies, and roles stated less explicitly than 'is a contractor for Zenith Corp.' -- this is a scaled-down integration test of the chain, not a benchmark of its ceiling.",
   "referenced_files": [
-    "lab/exp_058_integrated_scenario/run.py",
+    "lab/tests/exp_058_integrated_scenario/run.py",
     "lab/common/rules.py",
     "lab/common/entities.py",
     "lab/common/index.py",
@@ -54,7 +54,7 @@
     "Add a third, harder case: a story where the role noun appears but negated ('is not a contractor') or where two people in the same story could both match, to test the role check and disambiguation under more adversarial phrasing.",
     "Wire role_matches's substring check through the NLI judge instead, now that EXP-056 showed naive wiring needs care -- measure before assuming it helps."
   ],
-  "elapsed_sec": 0.0191,
-  "peak_rss_mb": 166.8,
+  "elapsed_sec": 0.0507,
+  "peak_rss_mb": 166.2,
   "models_used": "No generative model. lab.common.index's hybrid retriever (TF-IDF + BM25, the same classical substitute EXP-004/015/029/040 measured) for disambiguation; lab.common.entities' rule taggers (EXP-009) for name/address; deterministic arithmetic and rule matching for the rest."
 }

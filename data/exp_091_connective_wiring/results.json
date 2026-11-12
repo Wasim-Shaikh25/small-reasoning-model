@@ -30,19 +30,19 @@
   "conclusion": "lab.common.inference.split_exception now locates a rule's exception clause via lab.common.connectives.find_connectives's structural CONDITION_NEGATIVE detection instead of a hardcoded regex on the single word 'unless'. The gap this closes is not hypothetical: case 2 is the exact failure mode measured before this change (the 'except' phrasing was silently invisible to the old code), and it is now caught through brain.reason itself, the one production entry point, with no regression on the 'unless' phrasing (case 1), the 'except that' phrasing (case 3), or the real multi-alternative GDPR Art 9 rule's OR-combination (case 4).",
   "scale_down": "Only CONDITION_NEGATIVE is wired -- CONCESSION (although/though/despite), TEMPORAL_BOUND (until/before/after), and CAUSAL (because/since) still have zero reasoning semantics in check_exceptions/forward_chain; EXP-090 named this split explicitly and it is not revisited here. The threshold-rule branch in brain.py (apply_threshold_rule) still never calls split_exceptions/ check_exceptions at all -- a separate, already-named gap, untouched by this change.",
   "referenced_files": [
-    "lab/exp_091_connective_wiring/run.py",
+    "lab/tests/exp_091_connective_wiring/run.py",
     "lab/common/inference.py",
     "lab/common/connectives.py",
     "lab/common/brain.py",
     "lab/common/rules.py",
-    "lab/exp_085_multi_exception_scoping/run.py",
-    "lab/exp_090_connective_detection/run.py"
+    "lab/tests/exp_085_multi_exception_scoping/run.py",
+    "lab/tests/exp_090_connective_detection/run.py"
   ],
   "follow_ups": [
     "Wire CONCESSION's opposite polarity (holds ANYWAY, never blocks) into check_exceptions/forward_chain -- the next connective class with a well-defined semantics, per EXP-090's own follow_ups.",
     "Give the threshold-rule branch in brain.py the same split_exceptions/check_exceptions call the verb-rule branch now has, for a threshold rule whose consequence carries an exception clause."
   ],
-  "elapsed_sec": 14.0693,
-  "peak_rss_mb": 2800.52,
+  "elapsed_sec": 20.0439,
+  "peak_rss_mb": 2799.94,
   "models_used": "spaCy en_core_web_sm dependency parser via lab.common.connectives.find_connectives (already built in EXP-090, unchanged here) plus the existing, unmodified MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli NLI call inside check_exception. No new model, no generative model."
 }

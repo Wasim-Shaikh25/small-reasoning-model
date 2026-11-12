@@ -37,7 +37,7 @@
   "conclusion": "The checks catch altered spans, conflicting numbers, bad arithmetic, and unsupported qualifiers on these fixtures. An instruction embedded in the passage is not treated as a quote.",
   "scale_down": "Fixture-level checks, not a full corpus replay.",
   "referenced_files": [
-    "lab/exp_012_verification/run.py",
+    "lab/tests/exp_012_verification/run.py",
     "lab/common/verify.py",
     "lab/common/calc.py",
     "lab/common/nli.py",
@@ -47,6 +47,6 @@
     "data/exp_012_verification/results.json"
   ],
   "follow_ups": [],
-  "elapsed_sec": 0.0431,
-  "peak_rss_mb": 32.06
+  "elapsed_sec": 0.1353,
+  "peak_rss_mb": 31.04
 }

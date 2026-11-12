@@ -31,7 +31,7 @@
   "conclusion": "Temporal bound reasoning is now a real, second reasoning primitive alongside condition/exception checking, reachable through brain.reason() itself: absolute dates resolve deterministically against the real reference time, event-relative bounds resolve via the same bounded NLI judgment check_exception already uses elsewhere (never duplicated), and direction (until/before vs after/once) correctly flips which outcome the same context produces -- case 5 is the real proof, not case 1-4 alone, since it shows the identical context giving the OPPOSITE result for the opposite direction.",
   "scale_down": "Event-relative resolution depends on the same lexical-NLI-model sensitivity to phrasing every other NLI-based check in this repo already carries (EXP-088 documented a real near-miss; this exploration's own fixture sentences were chosen to score clearly on the right side of tau, not swept across many phrasings). Absolute-date resolution uses real wall-clock 'now' as the default reference point when none is given -- deterministic for any one run, but this exploration's own test dates (2020/2030) were chosen with a wide safety margin rather than measuring exactly how close to 'now' the boundary can get before dateparser's own parsing becomes ambiguous.",
   "referenced_files": [
-    "lab/exp_097_temporal_reasoning/run.py",
+    "lab/tests/exp_097_temporal_reasoning/run.py",
     "lab/common/temporal.py",
     "lab/common/brain.py",
     "lab/common/inference.py",
@@ -41,7 +41,7 @@
   "follow_ups": [
     "No explicit 'reference_date' is threaded through from brain.reason() -- it always defaults to real wall-clock time. A real document's own 'as of' date (if stated) should override this, not attempted here."
   ],
-  "elapsed_sec": 16.3969,
-  "peak_rss_mb": 2800.96,
+  "elapsed_sec": 21.1358,
+  "peak_rss_mb": 2798.02,
   "models_used": "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli via the existing, unmodified check_exception, for event-relative bounds only. dateparser (already a dependency, lab.common.calc.parse_date, deterministic) for absolute dates. No generative model."
 }

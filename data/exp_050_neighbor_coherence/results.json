@@ -26,7 +26,7 @@
   "conclusion": "Both signals are measured, not asserted: bge similarity catches a genuine unsignaled topic jump (incoherent_unsignaled_jump), and a present discourse connective correctly suppresses the flag for a deliberate, signaled shift (coherent_signaled_shift) even when similarity is low. The real limit this exploration surfaces honestly: a connective's mere presence suppresses the flag regardless of whether the following content actually follows from it (incoherent_signaled_but_unrelated stays unflagged) -- this check catches unsignaled incoherence, not misused connectives, and should not be read as a general coherence judge.",
   "scale_down": "A present discourse connective suppresses the flag unconditionally -- it does not verify the connective is used correctly (incoherent_signaled_but_unrelated is a real, reported limit, not hidden). DISCOURSE_ADVERBIAL_TABLE covers 8 connectives (however/nevertheless/therefore/thus/consequently/hence/moreover/furthermore) plus 'in addition' -- a small, named set, not the full PDTB discourse-adverbial inventory. Not yet wired into lab.common.assemble.build_outline itself -- this exploration proves the check, wiring it into the actual outline-building loop is a separate step.",
   "referenced_files": [
-    "lab/exp_050_neighbor_coherence/run.py",
+    "lab/tests/exp_050_neighbor_coherence/run.py",
     "lab/common/coherence.py",
     "lab/common/connectives.py",
     "lab/common/real_encoders.py",
@@ -36,7 +36,7 @@
   "follow_ups": [
     "Wire sequence_coherence into lab.common.assemble.build_outline itself so a flagged leaf is actually reordered or surfaced during real document assembly, not just measured standalone."
   ],
-  "elapsed_sec": 21.8528,
-  "peak_rss_mb": 2924.44,
+  "elapsed_sec": 27.1697,
+  "peak_rss_mb": 2923.23,
   "models_used": "bge-small-en-v1.5 (lab.common.real_encoders.bge_similarity, already loaded for EXP-040/042) for the similarity signal; spaCy en_core_web_sm dependency parser via lab.common.connectives.find_connectives (extended, deterministic) for the connective signal. No generative model."
 }

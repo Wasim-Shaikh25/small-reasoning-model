@@ -20,13 +20,13 @@
   "conclusion": "EXP-052's real need -- a stable document skeleton instead of an arbitrary 4-per-leaf grouping -- is met in production by lab.common.longform._entity_outline, NOT by the ask-sub-question-decomposition approach the stub originally specified, which EXP-078 found and abandoned (it produced titles mismatched to their own leaf's content; the bucketing stayed arbitrary, only the label changed). Every leaf here is titled by the entity its own findings are actually about, and an entity-less finding correctly falls through to the existing count-based fallback rather than being forced into a group it doesn't belong to.",
   "scale_down": "4 findings, 2 entities -- enough to prove per-entity grouping and the leftover fallback both work, not a scale test (EXP-078 already measured this mechanism at 6-7 leaves with a real generative rewriter on top). Does not re-test the originally-proposed ask-sub-question approach itself -- that was EXP-078's own finding, cited here, not re-derived.",
   "referenced_files": [
-    "lab/exp_052_ask_driven_outline/run.py",
+    "lab/tests/exp_052_ask_driven_outline/run.py",
     "lab/common/longform.py",
     "lab/common/entities.py",
     "data/exp_078_longform_consistency/results.json"
   ],
   "follow_ups": [],
-  "elapsed_sec": 0.0014,
-  "peak_rss_mb": 165.42,
+  "elapsed_sec": 0.0024,
+  "peak_rss_mb": 164.09,
   "models_used": "lab.common.entities.detect_primary with use_real_ner=False (rule-based person/organization detection, deterministic). No generative model -- this exploration deliberately does not invoke the rewriter (EXP-077/078 already measured that separately)."
 }

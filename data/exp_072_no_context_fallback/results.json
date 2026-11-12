@@ -42,7 +42,7 @@
   "conclusion": "The no-context fallback works and, critically, stays exactly where FORBIDDEN.md's exception draws the line: a genuinely empty passages list gets an explicitly disclaimed, ungrounded answer, while a real retrieval miss -- passages were given, just none of them relevant -- still abstains exactly as it did before this branch existed. The two cases are structurally distinguished (checked before any retrieval runs, not by a confidence score), so there is no way for a struggling retrieval to slide into the ungrounded path and dodge abstention.",
   "scale_down": "3 no-context asks, 1 retrieval-miss case, 1 genuine case -- enough to prove the mechanism and its boundary, not a broad open-domain QA benchmark.",
   "referenced_files": [
-    "lab/exp_072_no_context_fallback/run.py",
+    "lab/tests/exp_072_no_context_fallback/run.py",
     "lab/common/open_domain.py",
     "lab/common/brain.py",
     "lab/common/prompt_contract.py",
@@ -53,7 +53,7 @@
     "Only gemma3:270m via Ollama tested for this role; flan-t5-small (also permitted by the exception) not yet measured here.",
     "The citation-marker rejection has only been exercised when the model happens not to fabricate one; a case that reliably provokes a fabricated marker (to prove the rejection actually fires) has not been constructed."
   ],
-  "elapsed_sec": 19.3817,
-  "peak_rss_mb": 2801.57,
+  "elapsed_sec": 26.8056,
+  "peak_rss_mb": 2800.23,
   "models_used": "gemma3:270m via Ollama, in the new no-context role (FORBIDDEN.md 2026-10-16) -- not the rewriter role, a third, separate, narrowly-scoped generative use."
 }

@@ -42,7 +42,7 @@
   "conclusion": "lab.common.store.Store works as a lab.common.brain.reason RAG backend end to end, through the existing connector= extension point, with zero new production code: build once, reload from disk in a new Store instance, hand it to reason() as connector=, and the right passage is retrieved and cited correctly for two different asks, while an off-topic ask that retrieves only irrelevant passages is correctly NOT answered as supported -- the connector supplies candidates, reason()'s own grounding logic still decides what counts as evidence. The same ask with no connector at all does not answer, isolating the Store's real contribution rather than crediting it for something reason() could already do. This closes the one concrete, confirmed gap in the project owner's own architecture description: 'our system fetch data from these places... this data should also be vectorised rag'.",
   "scale_down": "Four passages, one collection, two real asks plus one off-topic and one baseline -- a proof the wiring works end to end, not a retrieval-quality benchmark at corpus scale (lab.common.store's own module docstring already covers the RRF-fusion design rationale separately).",
   "referenced_files": [
-    "lab/exp_099_store_rag_wiring/run.py",
+    "lab/tests/exp_099_store_rag_wiring/run.py",
     "lab/common/store.py",
     "lab/common/brain.py",
     "lab/common/connectors.py",
@@ -53,7 +53,7 @@
     "connector_top_k=2 was chosen to keep the fixture's retrieval precision meaningful (so the right passage has to actually outrank the other Ravi passage, not just be included among four); untested at the larger top_k a real multi-hundred-passage collection would use.",
     "No caller in this repo builds a Store from real documents yet (lab.common.ingest.chunk_document + Store.build/ingest_and_store exist and are callable, but nothing in lab/ does this outside this exploration's own fixture) -- the next real step is a caller that ingests an actual document into a Store collection before any ask arrives, rather than building fixture passages inline."
   ],
-  "elapsed_sec": 13.3561,
-  "peak_rss_mb": 2932.36,
+  "elapsed_sec": 18.2119,
+  "peak_rss_mb": 2932.19,
   "models_used": "bge-small-en-v1.5 (lab.common.real_encoders, Store's dense leg) -- non-generative similarity scoring only; brain.reason's own classical lookup path answers from the retrieved passages, same as every other direct-passages caller."
 }

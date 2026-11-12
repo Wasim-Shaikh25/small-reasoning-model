@@ -38,11 +38,11 @@
   "conclusion": "Multi-exception OR-combination works on GDPR Art 9's own real exception text, not just a restated single-exception toy rule: any one of several listed alternatives blocks the consequence when it holds (proven on two different alternatives, not only the first), the consequence still derives -- visibly flagged conditional -- when every alternative is genuinely unresolved, and it derives cleanly once none holds and at least one alternative is confidently ruled out, without needing every alternative individually ruled out first. check_exception's own per-exception judgment is unchanged; check_exceptions only combines its existing three-way verdict across more than one condition, split on ';' so that a single alternative's own internal commas and 'or's (common in real statutory text) are never mistaken for a boundary between alternatives.",
   "scale_down": "One hand-composed rule sentence (parse_conditional_rule's one supported shape), not an automatic parse of GDPR Art 9's own real multi-sentence prohibition+exception wording -- that would need a genuinely different rule-sentence parser (closer to EXP-087's Flint-role scope), a separate and much larger piece of work, not required to prove the OR-combination mechanism itself. The repo's own GDPR_TEXT fixture has 3 listed exceptions for Art 9, not the 4 this project's own prior EXP-085 todo entry claimed (real GDPR Art 9 has a 4th paragraph, covering non-profit-body members' data, that this fixture does not include) -- measured against the fixture that actually exists in this repo, corrected here rather than restated uncritically. Four hand-built cases proving each named combination state, not a broad benchmark across many multi-exception rules.",
   "referenced_files": [
-    "lab/exp_085_multi_exception_scoping/run.py",
+    "lab/tests/exp_085_multi_exception_scoping/run.py",
     "lab/common/inference.py",
     "lab/common/rules.py",
     "lab/common/fixtures.py",
-    "lab/exp_083_symbolic_inference/run.py",
+    "lab/tests/exp_083_symbolic_inference/run.py",
     "data/exp_083_symbolic_inference/results.json",
     "data/exp_085_multi_exception_scoping/results.json"
   ],
@@ -53,7 +53,7 @@
     "check_exceptions's NLI call still reads one context sentence as one premise per alternative, the same known limit EXP-083 already named for the single-exception case -- a longer passage with one alternative's evidence buried among many unrelated clauses was not tested.",
     "The real DeBERTa-v3 MNLI checkpoint's entailment score for these two exception conditions (consent; vital interests) was measured to be sharply sensitive to lexical distance from the condition's own wording: a context sentence naming the specific data subject and restructuring the sentence (e.g. 'Processing was necessary to protect the vital interests of Aisha, who was physically incapable of giving consent.') scored entail=0.24-0.39, well under tau=0.75, while a near-verbatim restatement of the same fact (only tense-shifted) scored 0.91-0.99. Cases 2 and 3's context texts were tuned against the real model for exactly this reason, not picked blind. check_exception's entailment gate works only when the given context stays close to the exception's own phrasing -- a real document's evidence almost never will -- so this is a real brittleness, not an artifact of this exploration's fixtures, and a genuine blocker before trusting this mechanism on natural (not hand-tuned) context text."
   ],
-  "elapsed_sec": 13.7257,
-  "peak_rss_mb": 2686.06,
+  "elapsed_sec": 19.2053,
+  "peak_rss_mb": 2687.8,
   "models_used": "spaCy en_core_web_sm dependency parser (fact/rule extraction, unchanged, non-generative) + MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli (per-exception entailment via the existing, unmodified check_exception, one bounded judgment per alternative, non-generative). No generative model anywhere in this exploration."
 }

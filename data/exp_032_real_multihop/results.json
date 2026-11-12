@@ -59,7 +59,7 @@
   "conclusion": "This closes the EXP-032 rerun todo for multi-hop reasoning, though with a real retrieval+NER chain rather than deepset/deberta-v3-base-squad2 spans (huggingface.co is blocked in this sandbox; see real_model_card). The chain-level measurement shows where a real pretrained model stack helps and where it does not on this small real corpus: compare the per-hop rates above rather than reading a single number. All evidence in every chain is a real quote from the real document collection; no fact was invented to build these test items.",
   "scale_down": "10 bridge items over 25 real documents / 76 chunks, not a HotpotQA-scale benchmark. Two-hop chains only, matching the architecture's own measured ceiling in EXP-007 (3-hop accuracy was 0 there). bge-small-en-v1.5 and deepset/deberta-v3-base-squad2 remain unloaded; see real_model_card.",
   "referenced_files": [
-    "lab/exp_032_real_multihop/run.py",
+    "lab/tests/exp_032_real_multihop/run.py",
     "lab/common/real_index.py",
     "lab/common/real_models.py",
     "lab/common/index.py",
@@ -76,7 +76,7 @@
     "If huggingface.co access is ever granted, swap in bge-small-en-v1.5 and deepset/deberta-v3-base-squad2 and compare against both stacks measured here.",
     "Grow TOP_N_BRIDGES and the document count once EXP-022's on-disk index lands."
   ],
-  "elapsed_sec": 6.1262,
-  "peak_rss_mb": 683.77,
+  "elapsed_sec": 26.3506,
+  "peak_rss_mb": 683.54,
   "models_used": "Real-model stack: spaCy en_core_web_md static vectors for dense retrieval (RealIndex, EXP-029) and spaCy en_core_web_sm NER (EXP-033), both real pretrained, non-generative, reachable without huggingface.co. Classical stack: TF-IDF+BM25 (EXP-004) and the rule tagger (EXP-008), unchanged, run here only as the comparison baseline. deepset/deberta-v3-base-squad2 and bge-small-en-v1.5, the blueprint's proposed models for this rerun, were not loaded: huggingface.co is blocked in this sandbox (403 CONNECT, policy denial). See lab/common/real_models.py:model_card()."
 }

@@ -77,7 +77,7 @@
   "conclusion": "The SAME grammar-driven detection function correctly classified 20/20 different connectives (not 20 different hardcoded regexes), spanning all four PDTB classes and both combinators -- a real generalization past the single 'unless' keyword match this project used before. Run against the full real GDPR text (not the single hand-built rule sentence EXP-085/088/089 used), it surfaces real connective instances -- see data/exp_090_connective_detection/cases.json's gdpr_document_findings for every one, by sentence -- giving this project, for the first time, visibility into what logical structure the ACTUAL statute contains beyond the one exception-bearing Art 9 passage every prior exploration hand-picked. Detection and classification are proven; wiring each operator's own reasoning semantics (concession never blocks; temporal is not modeled; causal is never a gate) into the forward-chaining mechanism is explicitly a separate, later step, named in follow_ups, not done here.",
   "scale_down": "The 20 connective cases are the same sentences this exploration's own pre-build probe used to ground the detection patterns, not a held-out test -- held-out generalization to novel phrasings of the same connectives was not measured here. The operator table covers ~20 of DiMLex-Eng's 149 English connectives (the highest-frequency, least class-ambiguous ones across all four PDTB classes), not the full inventory. Two structural edge cases were found and are reported, not hidden: 'despite's governed clause sits outside its own pobj child's subtree in spaCy's parse (a real attachment quirk for gerund-after-preposition constructions), handled by a labeled fallback that returns the sentence's remainder rather than a clean clause span; and coordinating 'or' was measured attaching to a noun object rather than the sentence's ROOT verb when its two disjuncts are not both obviously full clauses -- detected correctly (operator assigned) but its own clause_text extraction inherits that same attachment ambiguity.",
   "referenced_files": [
-    "lab/exp_090_connective_detection/run.py",
+    "lab/tests/exp_090_connective_detection/run.py",
     "lab/common/connectives.py",
     "lab/common/textutil.py",
     "lab/common/fixtures.py"
@@ -87,7 +87,7 @@
     "The operator table covers ~20 of 149 DiMLex-Eng connectives -- extending coverage (and testing whether the same three structural patterns hold for the remaining ~129) is a real, boundable next step, not an open-ended one, since the full inventory is already catalogued externally.",
     "find_connectives has not been tested on a sentence with more than one connective interacting (e.g. 'unless A, provided that B, until C') -- the real GDPR document run above may or may not contain such a sentence; check gdpr_document_findings for any sentence with multiple connectives before assuming single-connective-per-sentence is the common case."
   ],
-  "elapsed_sec": 12.66,
-  "peak_rss_mb": 2686.93,
+  "elapsed_sec": 16.0522,
+  "peak_rss_mb": 2685.64,
   "models_used": "spaCy en_core_web_sm dependency parser (structural connective detection, deterministic) plus a small, documented, closed-class lemma/phrase-to-operator lookup table grounded in DiMLex-Eng/PDTB. No generative model, no new dependency, no NLI call in this exploration -- detection and classification only, no truth-judgment over any clause's content."
 }

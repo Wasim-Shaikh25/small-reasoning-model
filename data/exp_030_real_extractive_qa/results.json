@@ -30,7 +30,7 @@
   "conclusion": "The real deepset/deberta-v3-base-squad2 checkpoint is loaded and measured on EXP-005's own items, not assumed from a benchmark leaderboard number. The headline exact-match number (0.1786, versus EXP-005's 0.5357) looks like a sharp regression but is mostly a tokenization artifact, not a wrong-span problem: 20 of the 23 exact-match misses on answerable items are spans that match the gold answer exactly once a trailing period is stripped (for example predicting '30 days.' for a gold of '30 days') -- this checkpoint's span boundary includes the sentence's closing punctuation where the hand-written lexical extractor's rules strip it. The contained-span match (0.9286) already absorbs this and is the more honest comparison point than raw exact match here. The real difference worth keeping is unanswerable recall, down from 1.0 to 0.9167: the checkpoint's own handle_impossible_answer decision, not a tuned coverage threshold, is a qualitative difference from the lexical extractor.",
   "scale_down": "Same 40 hand-written items EXP-005 used, not the full SQuAD2 dev set (that is EXP-047, which already reran the lexical extractor on 300 real SQuAD2 questions).",
   "referenced_files": [
-    "lab/exp_030_real_extractive_qa/run.py",
+    "lab/tests/exp_030_real_extractive_qa/run.py",
     "lab/common/real_encoders.py",
     "lab/common/harness.py",
     "lab/common/textutil.py",
@@ -41,7 +41,7 @@
   "follow_ups": [
     "Rerun EXP-047's 300 real SQuAD2 dev questions with this same real_qa function for a true model-vs-model comparison on identical real data, as EXP-047 itself flagged."
   ],
-  "elapsed_sec": 14.8465,
-  "peak_rss_mb": 775.46,
+  "elapsed_sec": 37.0002,
+  "peak_rss_mb": 774.45,
   "models_used": "deepset/deberta-v3-base-squad2, a local checkpoint loaded with transformers (not an API call). This is the real blueprint extractive QA checkpoint (ARCHITECTURE.md section 8), not a substitute."
 }

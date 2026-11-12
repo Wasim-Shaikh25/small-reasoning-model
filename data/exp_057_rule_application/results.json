@@ -49,7 +49,7 @@
   "conclusion": "A general rule given in context can be applied to a specific fact given in context, and the result cited back to both, without a generative model and without training anything new -- a dependency parser's verb extraction plus one lemma comparison is enough for this shape of case. The system correctly abstains rather than answers when the fact doesn't match the rule's verb or when no rule sentence is present at all, instead of defaulting to a guess.",
   "scale_down": "One rule sentence shape ('If <subject>, <verb phrase>, <consequence>.') and single-clause facts with no qualifier. A rule with an exception ('...unless committed in self-defense') is not parsed here -- the same qualifier gap EXP-006/EXP-026 already named for the lexical NLI judge. Multiple candidate rules or facts in the same passage set are not disambiguated; the first of each is used.",
   "referenced_files": [
-    "lab/exp_057_rule_application/run.py",
+    "lab/tests/exp_057_rule_application/run.py",
     "lab/common/rules.py",
     "lab/common/real_models.py",
     "lab/common/harness.py",
@@ -60,7 +60,7 @@
     "Wire this into lab/common/engine.run_task as a new task_type once the ask analyzer (lab/common/ask.py) can detect a rule-application question, so it isn't a separate standalone path.",
     "Test against passage sets with more than one candidate rule or fact to measure disambiguation, not just presence/absence."
   ],
-  "elapsed_sec": 6.2694,
-  "peak_rss_mb": 2685.54,
+  "elapsed_sec": 8.9473,
+  "peak_rss_mb": 2684.42,
   "models_used": "No model decides the outcome. spaCy's en_core_web_sm dependency parser (already loaded for EXP-032/033's real-model NER, lab/common/real_models.py) extracts each sentence's main verb -- a narrow syntactic sub-task, not a reasoning judgment. The rule match and the final answer are deterministic code."
 }

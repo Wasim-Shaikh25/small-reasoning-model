@@ -60,7 +60,7 @@
   "conclusion": "The real pretrained dense leg is measured against the classical TF-IDF dense leg on the same real corpus and the same two query sets. See real_model_card in the metrics for exactly which checkpoint ran and why it is not bge-small-en-v1.5. The two tests disagree: on the substring sanity check both legs sit at the Recall@5/10 ceiling, matching EXP-004's own 'reranker lift 0.0' finding on an easy set. On the harder headline test the real pretrained static-vector leg scores lower than classical TF-IDF (Recall@5 and @10 both negative lift). A plausible reason: mean-pooling 300-d vectors over a short, all-caps wire headline likely washes out the few content words that matter, while TF-IDF's rare-term weighting keeps exact shared tokens (a name, a commodity) salient. This closes the EXP-029 rerun todo for the embeddings component -- it is no longer unrun -- but the honest result is that this particular real pretrained encoder did not outperform the classical substitute on real documents at this scale.",
   "scale_down": "25 real documents / 76 chunks, not a 1,000-page collection (EXP-022 on-disk index is still a separate todo). bge-small-en-v1.5, Qdrant sparse vectors, and bge-reranker-v2-m3 remain unloaded because huggingface.co is blocked by this sandbox's egress policy; see real_model_card.",
   "referenced_files": [
-    "lab/exp_029_real_retrieval/run.py",
+    "lab/tests/exp_029_real_retrieval/run.py",
     "lab/common/real_index.py",
     "lab/common/real_models.py",
     "lab/common/index.py",
@@ -74,7 +74,7 @@
     "If huggingface.co access is ever granted in this sandbox, rerun with the actual bge-small-en-v1.5 checkpoint and compare against this spaCy result.",
     "Add a cross-encoder reranking pass once a real reranker checkpoint is reachable."
   ],
-  "elapsed_sec": 3.2507,
-  "peak_rss_mb": 634.92,
+  "elapsed_sec": 4.8557,
+  "peak_rss_mb": 633.61,
   "models_used": "Real pretrained spaCy en_core_web_md static word vectors (GloVe-style, trained on a web/news crawl) for the dense leg, fused with the unchanged in-process Okapi BM25 sparse leg. bge-small-en-v1.5, Qdrant, and bge-reranker-v2-m3 were not loaded: huggingface.co is blocked in this sandbox (403 CONNECT, policy denial). This is a real, reachable, non-generative encoder, not the exact blueprint checkpoint. See lab/common/real_models.py:model_card()."
 }

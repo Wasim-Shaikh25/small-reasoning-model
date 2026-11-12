@@ -71,7 +71,7 @@
   "conclusion": "The long-form signal is now reachable through the same single entry point (lab.common.brain.reason) every other capability in this repo goes through, not a standalone function -- and, more importantly, wiring it in did not disturb any existing short-answer behavior: every lookup ask already measured by an earlier exploration still resolves exactly as it did before this signal existed. EXP-052/053's named gaps are closed end to end, not just as isolated modules.",
   "scale_down": "7 asks total -- enough to prove the wiring and its most important regression boundary, not an exhaustive sweep of every existing exploration's asks.",
   "referenced_files": [
-    "lab/exp_079_longform_signal/run.py",
+    "lab/tests/exp_079_longform_signal/run.py",
     "lab/common/brain.py",
     "lab/common/intent_signals.py",
     "lab/common/longform.py",
@@ -82,7 +82,7 @@
     "DOCUMENT_TAU=0.75 is a first measured value from a small sample (EXP-069-style multi-domain calibration not yet done for this signal) -- the same caveat every other first-measured threshold in this repo carries.",
     "Not yet tested: an ask that genuinely wants both a short answer AND implies document-length output in the same compound sentence -- which signal should win is not yet a decided, measured case."
   ],
-  "elapsed_sec": 15.6006,
-  "peak_rss_mb": 2799.88,
+  "elapsed_sec": 18.8471,
+  "peak_rss_mb": 2799.15,
   "models_used": "bge-small-en-v1.5 for the document-intent signal (retrieval-style similarity scoring only); flan-t5-small for the rewriter role inside longform (measured separately, EXP-048 onward). No new generative use."
 }

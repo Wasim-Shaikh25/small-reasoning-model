@@ -33,7 +33,7 @@
   "conclusion": "The same lexical extractor and the same 0.34 threshold that scored well on EXP-005's clean, hand-written items falls short of the Phase 0 unanswerable-recall target on real, adversarially written SQuAD2 questions, unlike on EXP-005's custom set. SQuAD2's unanswerable questions are deliberately phrased to closely resemble an answerable one over the same passage (for example, a question that swaps 'gave their name to Normandy' for a subtly different, unsupported claim); the lexical coverage scorer has no way to tell a close paraphrase of a supported claim from an unsupported one, so it answers when it should abstain. This closes the SQuAD2 data gap that EXP-005's scale-down note flagged: the architecture's own Experiment B data spec is now exercised, with the lexical extractor as the measured method -- not a DeBERTa/RoBERTa SQuAD2 checkpoint, which EXP-030 (still todo) would require and which huggingface.co being blocked in this sandbox prevents loading.",
   "scale_down": "300 of the dev set's roughly 12,000 questions, not the full set. One real distractor passage per question, not the 3-10 passages Experiment B specifies. No pretrained QA checkpoint is loaded (deepset/deberta-v3-base-squad2 is EXP-030, still todo, blocked on huggingface.co access).",
   "referenced_files": [
-    "lab/exp_047_real_squad_qa/run.py",
+    "lab/tests/exp_047_real_squad_qa/run.py",
     "lab/common/real_squad.py",
     "lab/common/qa.py",
     "lab/common/harness.py",
@@ -48,7 +48,7 @@
     "If huggingface.co access is ever granted, rerun this exact subset with deepset/deberta-v3-base-squad2 (EXP-030) for a true model-vs-model comparison on identical real data.",
     "Add the 3-10 passage distractor count Experiment B specifies, once more real passages per question are sourced."
   ],
-  "elapsed_sec": 0.2975,
-  "peak_rss_mb": 38.98,
+  "elapsed_sec": 0.4515,
+  "peak_rss_mb": 38.58,
   "models_used": "No model, classical or neural, is loaded by this exploration beyond lab/common/qa.py's existing lexical extractors (unchanged from EXP-005). This is a real-data rerun: the SQuAD2 dev set is real and unmodified; the method is EXP-005's own. deepset/deberta-v3-base-squad2, the blueprint's named checkpoint for this role, remains unloaded because huggingface.co is blocked in this sandbox."
 }

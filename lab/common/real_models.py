@@ -63,8 +63,8 @@ def parser_pipeline():
     `ner_pipeline()` below loads -- the two were split out (2026-11-10)
     specifically so upgrading the parser used for live reasoning never
     silently changes `ner_pipeline()`'s own, already-measured, closed
-    output (lab/exp_032_real_multihop/run.py and
-    lab/exp_033_real_entities/run.py import that exact function by name
+    output (lab/tests/exp_032_real_multihop/run.py and
+    lab/tests/exp_033_real_entities/run.py import that exact function by name
     as part of their own frozen reproducibility record).
     """
     global _parser_pipeline
@@ -106,8 +106,8 @@ def real_entities(text: str) -> list[dict]:
     labels remapped to person/organization, a `score` field this one
     lacks) -- and that is the one lab.common.real_ner.py/entities.py
     actually use live, via brain.reason(use_real_ner=True). THIS function
-    is kept only because lab/exp_032_real_multihop/run.py and
-    lab/exp_033_real_entities/run.py import it directly by this exact
+    is kept only because lab/tests/exp_032_real_multihop/run.py and
+    lab/tests/exp_033_real_entities/run.py import it directly by this exact
     name as part of their own closed reproducibility record -- do not
     rename it, and do not import `real_entities` "from the models module"
     by habit; double-check which module before relying on it for NER.

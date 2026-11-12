@@ -36,19 +36,19 @@
   "conclusion": "The plan is computed and logged before any stage executes, and it correctly predicts which of the two genuinely different rule-application methods reason() is about to run: 'forward_chain' only when the ask signals compliance-checking AND a second rule actually exists to chain into (case 1, where the multi-step Rohan/Arun/license derivation is now reachable through brain.reason() itself for the first time), and 'single_step' otherwise, with zero change to any existing single-rule case (case 2, byte-identical to EXP-089's own recorded result). Case 3 confirms the plan doesn't name a stage that doesn't apply.",
   "scale_down": "The plan's stage names describe WHAT will run, not a full execution DAG with dependencies -- reason()'s actual control flow (disambiguate before identity/total/rule, document exclusive) is still hardcoded in reason() itself, not driven by iterating over the plan's stage list. Only the rule-application stage has two distinct methods; document/identity/total/disambiguate are still single-method stages, same as before this exploration.",
   "referenced_files": [
-    "lab/exp_084_plan_then_execute/run.py",
+    "lab/tests/exp_084_plan_then_execute/run.py",
     "lab/common/brain.py",
     "lab/common/intent_signals.py",
     "lab/common/inference.py",
-    "lab/exp_083_symbolic_inference/run.py",
-    "lab/exp_085_multi_exception_scoping/run.py",
-    "lab/exp_089_brain_integration/run.py",
+    "lab/tests/exp_083_symbolic_inference/run.py",
+    "lab/tests/exp_085_multi_exception_scoping/run.py",
+    "lab/tests/exp_089_brain_integration/run.py",
     "data/exp_089_brain_integration/results.json"
   ],
   "follow_ups": [
     "reason()'s control flow could be refactored to literally iterate over stage_plan['stages'] and dispatch to a per-stage function, rather than the plan being computed and logged but the execution order still hardcoded separately -- not done here to avoid rewriting already-measured, passing code paths in the same step that introduced the plan."
   ],
-  "elapsed_sec": 14.2393,
-  "peak_rss_mb": 2800.34,
+  "elapsed_sec": 18.4156,
+  "peak_rss_mb": 2799.39,
   "models_used": "bge-small-en-v1.5 (lab.common.real_encoders.bge_embed) for wants_rule_application, the same embedding-similarity mechanism intent_signals.py already uses for wants_document/wants_identity/wants_total. spaCy dependency parser (unchanged) for forward_chain/instantiate_consequence. No generative model -- the plan is always a selection among STAGE_REGISTRY's fixed names, never freely generated text."
 }

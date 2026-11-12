@@ -28,15 +28,15 @@
   "conclusion": "The local tagger did not clear both baselines on this fixture -- see metrics for the exact numbers, reported as measured rather than assumed to work. The fixture is tiny (10 hard sentences); a token-level classifier with only 5-fold sentence-grouped CV has very little signal to learn from.",
   "scale_down": "10 hard sentences, 19 gold hard-slice spans total -- a genuinely small fixture for a trained classifier; this result should not be read as a general claim about span tagging, only about this specific repository's own fixture. Per-token classification with contiguous-run span reconstruction, not a true BIO/CRF sequence tagger -- adjacent same-label entities would merge into one span, a real limit not exercised by this particular fixture (no two adjacent gold spans share a label here) but not proven absent either.",
   "referenced_files": [
-    "lab/exp_024_local_span_tagger/run.py",
+    "lab/tests/exp_024_local_span_tagger/run.py",
     "lab/common/rules.py",
-    "lab/exp_008_entity_detect/run.py",
-    "lab/exp_080_real_ner_rerun/run.py",
+    "lab/tests/exp_008_entity_detect/run.py",
+    "lab/tests/exp_080_real_ner_rerun/run.py",
     "data/exp_008_entity_detect/results.json",
     "data/exp_080_real_ner_rerun/results.json"
   ],
   "follow_ups": [],
-  "elapsed_sec": 8.5575,
-  "peak_rss_mb": 2800.96,
+  "elapsed_sec": 11.8674,
+  "peak_rss_mb": 2797.77,
   "models_used": "Multinomial logistic regression (sklearn) trained only on labels already stored in this repository. spaCy en_core_web_sm's POS tagger (lab.common.rules._parser, already a dependency) for features -- its NER component is never read. No pretrained NER model, no generative model."
 }

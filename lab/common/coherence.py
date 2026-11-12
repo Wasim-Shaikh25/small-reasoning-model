@@ -43,7 +43,7 @@ def neighbor_coherence(first: str, second: str) -> dict:
 
 
 COHERENCE_TAU = 0.65
-# Measured directly (lab/exp_050_neighbor_coherence/run.py): bge never
+# Measured directly (lab/tests/exp_050_neighbor_coherence/run.py): bge never
 # scores an unrelated sentence pair near 0 -- "The data subject has
 # given explicit consent..." vs an unrelated weather sentence still
 # scored 0.5005, the same property lab.common.brain's own

@@ -60,7 +60,7 @@
   "conclusion": "Multi-step symbolic inference -- converting a stated rule and a stated fact into predicate form, unifying the trigger, binding the consequence's subject to the actual named entity, and chaining a derived fact into further rules until nothing new follows -- works as a real mechanism, not just on the single-hop case this project already had (EXP-057/059/061), but genuinely across multiple steps. The exception handling is the part that matters most for trust: an exception whose truth the given context never actually states is never silently treated as false, only as unresolved and visibly flagged, and a rule with no stated exception at all is never confused with one whose exception just happens to not apply here. Every step runs through spaCy's dependency parser or the real DeBERTa-v3 NLI classifier -- no generative model anywhere in the conversion from language to rule/fact form, the project owner's own explicit requirement, so nothing in this chain can hallucinate a predicate that was never actually stated.",
   "scale_down": "Five hand-built cases proving each named mechanism works, not a broad benchmark across many rules or a real multi-exception statute (GDPR Art 9's four exceptions) -- that combination is a named follow-up, not covered here.",
   "referenced_files": [
-    "lab/exp_083_symbolic_inference/run.py",
+    "lab/tests/exp_083_symbolic_inference/run.py",
     "lab/common/inference.py",
     "lab/common/rules.py",
     "data/exp_057_rule_application/results.json",
@@ -74,7 +74,7 @@
     "check_exception's NLI call reads the whole context sentence as one premise; a longer passage with the exception's evidence buried in one clause among many was not tested -- EXP-056/069's sentence-splitting approach for ask-relevance may be needed here too if this scales to real documents.",
     "Not yet wired into lab.common.brain.reason as a signal -- this module is callable standalone, the same gap lab.common.longform had before EXP-079 wired it in."
   ],
-  "elapsed_sec": 11.9864,
-  "peak_rss_mb": 2685.89,
+  "elapsed_sec": 17.9841,
+  "peak_rss_mb": 2685.48,
   "models_used": "spaCy en_core_web_sm dependency parser (fact/rule/consequence extraction, non-generative, deterministic) + MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli (exception entailment, one bounded judgment per check, non-generative). No generative model anywhere in this exploration."
 }

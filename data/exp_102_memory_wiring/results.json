@@ -51,7 +51,7 @@
   "conclusion": "lab.common.memory is now wired into lab.common.brain.reason as its persistent, cross-call memory (memory_path=, default None, zero regression for every existing caller), narrowly scoped to the one place a fact maps cleanly onto its schema (lookup_fallback's single verbatim span). The full cycle works end to end: a verified note is written, recalled correctly when its source is still present and unchanged, and -- the part that would have been wrong with a shallow wiring -- correctly refused when its source is absent or has changed, with the system falling back to fresh extraction rather than ever trusting a stale note blindly.",
   "scale_down": "One fact, one passage id, three revalidation conditions -- a proof the write/recall/revalidate cycle is wired correctly and refuses to trust stale/missing sources, not a capacity or performance benchmark for the note store at scale.",
   "referenced_files": [
-    "lab/exp_102_memory_wiring/run.py",
+    "lab/tests/exp_102_memory_wiring/run.py",
     "lab/common/brain.py",
     "lab/common/memory.py",
     "data/exp_102_memory_wiring/results.json"
@@ -61,7 +61,7 @@
     "memory.mark_conflicted is not wired -- nothing today compares a freshly-extracted answer against a still-valid recalled note and flags disagreement; this would parallel lab.common.working_memory's cross-page contradiction check but for cross-call facts instead.",
     "memory_recall is reported in trace only, never used to answer directly or skip extraction -- the same 'report, don't act on it yet' posture coherence_flags/contract_violations started with; a future pass could decide whether a valid, high-confidence recall should ever short-circuit re-extraction."
   ],
-  "elapsed_sec": 13.567,
-  "peak_rss_mb": 2801.84,
+  "elapsed_sec": 17.5028,
+  "peak_rss_mb": 2799.99,
   "models_used": "None -- memory.py's write/recall/revalidate is pure deterministic SQLite + string/hash comparison; the lookup_fallback answer it wraps uses whichever extractor the caller already selected (use_real_qa or the classical default), unchanged by this wiring."
 }

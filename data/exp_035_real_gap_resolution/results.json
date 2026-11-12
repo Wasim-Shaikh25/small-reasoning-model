@@ -163,7 +163,7 @@
   "conclusion": "The real checkpoints resolve the same gap types EXP-010's lexical loop could: a gap closes only when some passage actually states the missing piece, and conflicting or vague cases are still refused a single answer rather than guessed, regardless of which extractor/judge pair sits underneath the retrieval-and-round control flow.",
   "scale_down": "Same 12 items as EXP-010, two or three per gap type. Context is pasted, which is the Phase 0 setup.",
   "referenced_files": [
-    "lab/exp_035_real_gap_resolution/run.py",
+    "lab/tests/exp_035_real_gap_resolution/run.py",
     "lab/common/index.py",
     "lab/common/real_encoders.py",
     "lab/common/textutil.py",
@@ -173,7 +173,7 @@
     "data/exp_035_real_gap_resolution/results.json"
   ],
   "follow_ups": [],
-  "elapsed_sec": 15.8534,
-  "peak_rss_mb": 1819.24,
+  "elapsed_sec": 85.7191,
+  "peak_rss_mb": 1818.46,
   "models_used": "deepset/deberta-v3-base-squad2 (extractive QA), MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli (NLI support check). Local checkpoints, not API calls. Not generative."
 }

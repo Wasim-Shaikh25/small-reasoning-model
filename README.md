@@ -10,7 +10,7 @@ python3 lab/run_all.py
 python3 lab/render_explorations.py
 ```
 
-Datasets are under `data/exp_NNN_slug/`. Methods are under `lab/exp_NNN_slug/` and `lab/common/`.
+Datasets are under `data/exp_NNN_slug/`. Production code is under `lab/common/`; experiments that only use it (never define their own shared logic) are under `lab/tests/exp_NNN_slug/`.
 
 ## Real-model reruns (EXP-025, EXP-029, EXP-032, EXP-033)
 
@@ -25,10 +25,10 @@ is blocked by this sandbox's egress policy).
 ```bash
 python3 -m spacy download en_core_web_sm
 python3 -m spacy download en_core_web_md
-python3 lab/exp_025_real_documents/run.py   # fetches real Reuters documents, run this first
-python3 lab/exp_029_real_retrieval/run.py
-python3 lab/exp_033_real_entities/run.py
-python3 lab/exp_032_real_multihop/run.py    # multi-document, multi-hop reasoning chain
+python3 lab/tests/exp_025_real_documents/run.py   # fetches real Reuters documents, run this first
+python3 lab/tests/exp_029_real_retrieval/run.py
+python3 lab/tests/exp_033_real_entities/run.py
+python3 lab/tests/exp_032_real_multihop/run.py    # multi-document, multi-hop reasoning chain
 ```
 
 EXP-025 fetches the real document collection once and writes it to
@@ -47,5 +47,5 @@ reachable without huggingface.co) and runs EXP-005's own lexical extractor on
 for direct comparison:
 
 ```bash
-python3 lab/exp_047_real_squad_qa/run.py
+python3 lab/tests/exp_047_real_squad_qa/run.py
 ```

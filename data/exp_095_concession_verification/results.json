@@ -17,13 +17,13 @@
   "conclusion": "CONCESSION's omission from lab.common.inference's condition-detection (_find_condition_match only recognizes CONDITION_NEGATIVE/POSITIVE) was already the CORRECT behavior, not an unfixed gap: a concession clause's own truth value genuinely cannot affect whether the consequence proceeds, by definition (that is what 'holds anyway' means), so never checking it against any context is exactly right -- the three cases above are identical because nothing about the context should ever change the outcome. No code change was needed; this exploration exists to verify that claim empirically rather than assume it, the same way EXP-094 verified CAUSAL's omission was already safe before adding its justification field.",
   "scale_down": "Only one hand-built rule/fact pair tested, with 'although' specifically -- not swept across 'though'/'even though'/'even if'/'despite', though all five share the same CONCESSION operator and the same _find_condition_match omission, so the same reasoning applies to each.",
   "referenced_files": [
-    "lab/exp_095_concession_verification/run.py",
+    "lab/tests/exp_095_concession_verification/run.py",
     "lab/common/brain.py",
     "lab/common/inference.py",
     "lab/common/connectives.py"
   ],
   "follow_ups": [],
-  "elapsed_sec": 12.0766,
-  "peak_rss_mb": 2801.13,
+  "elapsed_sec": 16.347,
+  "peak_rss_mb": 2799.3,
   "models_used": "spaCy en_core_web_sm dependency parser via lab.common.connectives.find_connectives (unchanged). No NLI call needed -- no exception check ever fires for a CONCESSION clause, which is exactly the point being verified. No generative model."
 }

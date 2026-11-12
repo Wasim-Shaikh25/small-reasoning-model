@@ -26,7 +26,7 @@
   "conclusion": "The unification EXP-060 proved for flat documents carries over to hierarchical ones without any change at the call site: the same function, given passages tagged with a 'hierarchy' dict instead of a flat 'group' string, navigates the structure (lab.common.nested_index, EXP-065's near-zero abstention floor included) and then runs the identical downstream signals (identity, arithmetic, rule application) EXP-058 already measured. A caller never needs to know or declare whether the document it's handing brain.reason is flat or structured -- the passages' own tags decide, the same 'input decides how much of the machinery runs' principle EXP-060 established for the simpler signals now extends to document structure itself.",
   "scale_down": "2 cases, 2-level hierarchy, 9 passages -- a wiring proof, not a scale test (EXP-065 already measured scale up to 450 leaves for the navigation mechanism alone).",
   "referenced_files": [
-    "lab/exp_066_brain_nested_navigation/run.py",
+    "lab/tests/exp_066_brain_nested_navigation/run.py",
     "lab/common/brain.py",
     "lab/common/nested_index.py",
     "lab/common/index.py",
@@ -40,7 +40,7 @@
     "Extend lab.common.brain's flat ('group') disambiguation branch with the same near-zero abstention floor nested navigation now has, so a flat off-topic ask also abstains instead of guessing (EXP-065's follow-up, not yet carried to the flat path).",
     "Test a 3-level hierarchy (chapter/section/paragraph) through brain.reason, not just the 2-level case here."
   ],
-  "elapsed_sec": 10.8156,
-  "peak_rss_mb": 2800.51,
+  "elapsed_sec": 15.8251,
+  "peak_rss_mb": 2798.23,
   "models_used": "No generative model. Every step is a previously-measured classical/deterministic primitive; this exploration only chains them through the existing single entry point."
 }

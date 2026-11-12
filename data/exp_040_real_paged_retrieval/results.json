@@ -100,7 +100,7 @@
   "conclusion": "The real BAAI/bge-small-en-v1.5 checkpoint is loaded and measured, not assumed. Recall matches EXP-015's TF-IDF dense leg at every size tested here -- a single distinctive numeric needle sentence is easy for both a lexical and a dense retriever to find in this synthetic haystack, so this fixture does not yet distinguish them. A harder retrieval probe (paraphrased needle, no shared surface tokens with the query) would be needed to see where a real dense embedder pulls ahead of TF-IDF, the way EXP-029's harder headline-retrieval test did for spaCy vectors.",
   "scale_down": "Pages are short synthetic paragraphs, not scanned document pages, same as EXP-015. 1,000 pages were run, not a multi-million-token archive.",
   "referenced_files": [
-    "lab/exp_040_real_paged_retrieval/run.py",
+    "lab/tests/exp_040_real_paged_retrieval/run.py",
     "lab/common/real_bge_index.py",
     "lab/common/real_encoders.py",
     "lab/common/index.py",
@@ -111,7 +111,7 @@
   "follow_ups": [
     "A harder retrieval probe where the needle doesn't share surface tokens with the query would better separate bge from TF-IDF than this fixture does."
   ],
-  "elapsed_sec": 14.7141,
-  "peak_rss_mb": 529.39,
+  "elapsed_sec": 20.9751,
+  "peak_rss_mb": 525.33,
   "models_used": "BAAI/bge-small-en-v1.5, a local checkpoint loaded with sentence-transformers (not an API call). This is the real blueprint embedder (ARCHITECTURE.md section 8), not a substitute and not the spaCy static vectors EXP-029/032 used while huggingface.co was blocked."
 }

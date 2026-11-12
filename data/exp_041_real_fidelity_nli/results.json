@@ -18,7 +18,7 @@
   "conclusion": "The real MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli checkpoint is loaded and measured for this fidelity check, not assumed. The renderer itself is still deterministic copy, not a generative rewriter -- this rerun only changes which model verifies that the copy preserved meaning, not what produced the copy.",
   "scale_down": "13 renders (8 claims, 5 paragraphs), one style each, versus EXP-017's 5-style x 13-item sweep.",
   "referenced_files": [
-    "lab/exp_041_real_fidelity_nli/run.py",
+    "lab/tests/exp_041_real_fidelity_nli/run.py",
     "lab/common/real_encoders.py",
     "lab/common/harness.py",
     "lab/common/verify.py",
@@ -26,7 +26,7 @@
     "data/exp_041_real_fidelity_nli/results.json"
   ],
   "follow_ups": [],
-  "elapsed_sec": 9.8335,
-  "peak_rss_mb": 1406.53,
+  "elapsed_sec": 13.426,
+  "peak_rss_mb": 1404.77,
   "models_used": "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli, a local checkpoint loaded with transformers (not an API call). Rewriter role is out of scope for this rerun; the renderer stays the unchanged deterministic copy."
 }

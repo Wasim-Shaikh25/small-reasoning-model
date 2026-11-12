@@ -27,7 +27,7 @@
   "conclusion": "Template analysis covers ordinary asks and keeps the raw ask as a fallback. Unusual multi-clause asks remain the weak spot, which matches the architecture's known limit. A human sub-question rating was not collected.",
   "scale_down": "Sixty original asks stand in for a larger labeled set. Experiment F's human 1-to-5 rating is not fabricated; only an automatic coverage proxy is reported.",
   "referenced_files": [
-    "lab/exp_002_ask_analyzer/run.py",
+    "lab/tests/exp_002_ask_analyzer/run.py",
     "lab/common/ask.py",
     "lab/common/textutil.py",
     "lab/common/harness.py",
@@ -37,6 +37,6 @@
   "follow_ups": [
     "Collect a human 1-to-5 rating for sub-question quality before treating the proxy as a product metric."
   ],
-  "elapsed_sec": 0.0045,
-  "peak_rss_mb": 19.29
+  "elapsed_sec": 0.0084,
+  "peak_rss_mb": 18.99
 }

@@ -93,7 +93,7 @@
   "conclusion": "Hierarchical navigation -- scoring each level's children against the ask and descending only into the best match, the same hybrid retriever EXP-004/015/029/040/058/060 already measured, never a language model -- correctly reaches the chapter and section containing a distinctive needle at every size tested, from 27 to 450 leaves, without ever scoring the full leaf set directly: by the final level, the candidate pool it searches is only the handful of leaves in the one resolved section, not the whole tree. This is the mechanism that lets the system work on a 1000-page document without Gemma (or anything else) ever holding more than one small section's worth of content at a time -- navigation cost grows with tree depth, not with total document size. An abstention floor is now in place, and getting it right took a real measured correction, not a guess: a fixed magnitude floor (0.05) correctly caught the off-topic negative control but then wrongly rejected the genuine needle at larger sizes too, because a true match's own dense score shrinks as its chapter's summary grows (0.64 -> 0.017 -> 0.0056 across the three sizes here) -- a magnitude tuned on the small case does not survive scale. A near-zero floor (strictly positive, not how large) does survive it, because true noise is exactly zero, not small, while a diluted-but-genuine signal never quite reaches zero. The gap lab.common.brain's flat disambiguation step has (no abstention threshold there yet either) is still open and is the natural next place to carry this same fix.",
   "scale_down": "3 chapters, up to 450 leaves, one needle -- not a real 1000-page document or multiple simultaneous needles. Two levels of hierarchy (chapter, section); a real book might want a third (chapter -> section -> paragraph -> sentence).",
   "referenced_files": [
-    "lab/exp_065_nested_navigation/run.py",
+    "lab/tests/exp_065_nested_navigation/run.py",
     "lab/common/nested_index.py",
     "lab/common/index.py",
     "lab/common/harness.py",
@@ -105,7 +105,7 @@
     "Wire this into lab.common.brain as a second disambiguation mode, used when passages carry multiple hierarchy-level tags instead of one flat 'group' tag -- not yet done, this exploration only proves the navigation mechanism standalone.",
     "Test with 3+ levels of hierarchy and with more than one needle to navigate to in the same ask."
   ],
-  "elapsed_sec": 0.0429,
-  "peak_rss_mb": 154.02,
+  "elapsed_sec": 0.0639,
+  "peak_rss_mb": 152.85,
   "models_used": "No model decides navigation. lab.common.index's hybrid retriever (TF-IDF + BM25, unchanged) scores each level; the same classical substitute every retrieval exploration in this project has used."
 }

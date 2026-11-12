@@ -103,7 +103,7 @@
   "conclusion": "One function handles a plain lookup, a rule-application question, and a multi-signal integrated scenario without the caller choosing a path. The difference between regimes shows up only in the trace -- which internal signal checks fired -- never in which function was called or how it was called. A lookup question fires none of the extra signals and falls back to the same single-slot extractor lab.common.engine already uses; the integrated cases fire three signals at once and chain their results. This is the unification the prior three explorations (EXP-057/058/059) proved piece by piece, now proved as one entry point rather than three scripts a person chooses between.",
   "scale_down": "8 cases across 3 regimes, not a benchmark of the brain's ceiling -- a targeted test that the single entry point reproduces every prior exploration's answer without per-case wiring.",
   "referenced_files": [
-    "lab/exp_060_unified_brain/run.py",
+    "lab/tests/exp_060_unified_brain/run.py",
     "lab/common/brain.py",
     "lab/common/ask.py",
     "lab/common/index.py",
@@ -121,7 +121,7 @@
     "Wire lab.common.brain.reason as the entry point lab.common.engine.run_task's callers would use, so the controller's own round/budget loop (EXP-001) and this brain's signal-chaining converge into one thing instead of two.",
     "Add long-form dispatch (lab.common.assemble) as a fifth signal -- 'does the ask want a document, not a short answer' -- so EXP-018/042/048/054/055/056's page-wise path is reachable from the same entry point too."
   ],
-  "elapsed_sec": 12.8559,
-  "peak_rss_mb": 2800.39,
+  "elapsed_sec": 19.1376,
+  "peak_rss_mb": 2799.13,
   "models_used": "No generative model. Every step is a previously-measured classical/deterministic primitive; this module's only new code is the control flow that chains them."
 }

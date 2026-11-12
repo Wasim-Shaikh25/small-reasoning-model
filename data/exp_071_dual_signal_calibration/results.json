@@ -30,7 +30,7 @@
   "conclusion": "Requiring lexical agreement does compensate for the semantic margin's own unreliability: every case resolves or abstains correctly end to end, even though EXP-068 measured the semantic margin alone as not cleanly separable across fixtures. The dual-signal requirement -- not a better single threshold -- is what makes this robust: a low-confidence semantic margin on a genuine paraphrase still gets corroborated by the lexical signal often enough, and a low-confidence semantic margin on real noise has no lexical corroboration to borrow from either.",
   "scale_down": "5 fixtures, 8 asks each -- enough to check the dual-signal claim directly, not an exhaustive calibration across every possible domain.",
   "referenced_files": [
-    "lab/exp_071_dual_signal_calibration/run.py",
+    "lab/tests/exp_071_dual_signal_calibration/run.py",
     "lab/common/semantic_index.py",
     "lab/common/nested_index.py",
     "data/exp_068_abstention_fixes/results.json",
@@ -38,7 +38,7 @@
     "data/exp_071_dual_signal_calibration/results.json"
   ],
   "follow_ups": [],
-  "elapsed_sec": 17.6482,
-  "peak_rss_mb": 530.66,
+  "elapsed_sec": 21.7402,
+  "peak_rss_mb": 526.77,
   "models_used": "bge-small-en-v1.5 for semantic scoring; TF-IDF/BM25 for lexical. No generative model."
 }

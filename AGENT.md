@@ -16,22 +16,23 @@ FORBIDDEN.md        what must never be done
 EXPLORATIONS.md     the lab notebook
 README.md           how to run the explorations
 lab/
-  common/           shared algorithms, snake_case module names
+  common/           production code: shared algorithms, snake_case module names
   config/           budgets and the model-substitute map, JSON
-  exp_NNN_slug/     one exploration, entry point run.py
+  tests/
+    exp_NNN_slug/   one exploration, entry point run.py
   run_all.py        runs every exploration
   render_explorations.py
 data/
   exp_NNN_slug/     inputs and results for that exploration
 ```
 
-The architecture document's `src/` tree maps to `lab/common/` and `lab/exp_NNN_slug/` in this POC. Do not create a second parallel source tree. Datasets live in `data/`. Scripts and methods live in `lab/`.
+The architecture document's `src/` tree maps to `lab/common/` in this POC. `lab/common/` is the production code -- everything reachable from `lab.common.brain.reason`, `lab.common.engine.run`, or any other public entry point. `lab/tests/exp_NNN_slug/` is the Java-style test tree: every exploration lives here, and each one may only *use* `lab/common`'s public functions to prove or measure what it can do -- it must never define its own shared/reusable logic. Logic more than one experiment needs independently belongs in `lab/common`, not copied between `exp_NNN_slug` folders. Do not create a second parallel source tree. Datasets live in `data/` (unchanged by the `lab/tests/` split -- `data/exp_NNN_slug/` stays directly under `data/`, since it holds fixtures/results, not code).
 
 ## Naming
 
 - Exploration id: `EXP-001`, `EXP-002`, … three digits, stable once assigned.
 - Folder slug: `exp_NNN_slug`. Lowercase ASCII, digits, underscores. The same slug is used in `lab/` and `data/`.
-- Entry point: `lab/exp_NNN_slug/run.py`.
+- Entry point: `lab/tests/exp_NNN_slug/run.py`.
 - Result file: `data/exp_NNN_slug/results.json`. The script writes it. Do not type metrics in by hand.
 - Shared modules: `lab/common/<name>.py`.
 - Config: `lab/config/<name>.json`.
@@ -44,8 +45,8 @@ An exploration is the unit of research.
 
 1. Add a record to `EXPLORATIONS.md` with status `todo` before implementing a new question. Include the goal and the files you expect to use.
 2. Set the status to `open` when a run is in progress.
-3. Implement the method in `lab/exp_NNN_slug/`. Put datasets in `data/exp_NNN_slug/`.
-4. Run `python lab/exp_NNN_slug/run.py`. The script must write `results.json`.
+3. Implement the method in `lab/tests/exp_NNN_slug/`, calling only `lab/common`'s own public functions -- never define new shared/reusable logic inside the exploration folder itself; that belongs in `lab/common`. Put datasets in `data/exp_NNN_slug/`.
+4. Run `python lab/tests/exp_NNN_slug/run.py`. The script must write `results.json`.
 5. Every exploration lists every file it read or wrote: its own script, the `lab/common` modules it imported, configs, input data, and the results file. A shared module that the run did not use is not listed. A file the run used is not omitted.
 6. Copy the measured metrics into `EXPLORATIONS.md` by running `python lab/render_explorations.py`. Do not invent or round a number into a nicer story. The prose may interpret the numbers; it may not change them.
 7. Set the status to `closed` once a result is recorded. A closed exploration stays in the notebook.
@@ -79,4 +80,4 @@ python3 lab/run_all.py
 python3 lab/render_explorations.py
 ```
 
-Each exploration also runs on its own: `python3 lab/exp_001_controller/run.py`.
+Each exploration also runs on its own: `python3 lab/tests/exp_002_ask_analyzer/run.py`.

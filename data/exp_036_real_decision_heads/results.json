@@ -77,7 +77,7 @@
   "conclusion": "The head and the validation-threshold procedure are unchanged; only the sentences each feature is computed from come from the real encoders now, so this isolates how much of EXP-011's accuracy was coming from the lexical QA/NLI pair's own feature quality versus the generated scenario's own templated regularity (truth/other pulled from a small, fixed value list per slot, which both the lexical and real checkpoints can latch onto similarly).",
   "scale_down": "Same generated 360-scenario set as EXP-011 (six slots, not MNLI/ANLI/FEVER/SQuAD2/HotpotQA).",
   "referenced_files": [
-    "lab/exp_036_real_decision_heads/run.py",
+    "lab/tests/exp_036_real_decision_heads/run.py",
     "lab/common/real_encoders.py",
     "lab/common/harness.py",
     "lab/common/textutil.py",
@@ -86,7 +86,7 @@
     "data/exp_036_real_decision_heads/results.json"
   ],
   "follow_ups": [],
-  "elapsed_sec": 79.2826,
-  "peak_rss_mb": 1823.79,
+  "elapsed_sec": 131.7771,
+  "peak_rss_mb": 1822.83,
   "models_used": "deepset/deberta-v3-base-squad2 (extractive QA feature), MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli (NLI feature). Local checkpoints, not API calls. Logistic regression (with Platt/sigmoid calibration) is the unchanged classical head."
 }

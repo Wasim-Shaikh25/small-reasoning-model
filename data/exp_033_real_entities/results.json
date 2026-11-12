@@ -46,7 +46,7 @@
   "conclusion": "The rule tagger was written against lease-fixture patterns (two-capitalized-word names, Pvt Ltd/Inc suffixes, a fixed exclusion list for false positives like 'New Delhi'). On real open-domain news text it both misses organization abbreviations it has no pattern for (ZIANA, IBC, UIC, Coffee Board) and can mistag place names its exclusion list does not cover as PERSON. The real pretrained OntoNotes NER generalizes across domains without hand-written patterns, which is exactly the generalization gap FORBIDDEN.md's own substitute list predicted. This closes the EXP-033 rerun todo for entity tagging, measured with spaCy rather than GLiNER or dslim/bert-base-NER.",
   "scale_down": "12 hand-labeled sentences, not a held-out annotated corpus (EXP-008 used 52 lines on the lease domain). GLiNER, dslim/bert-base-NER, and libpostal remain unloaded because huggingface.co is blocked by this sandbox's egress policy; see real_model_card. Address/GPE detection is out of scope for this head-to-head since the rule tagger has no general place category.",
   "referenced_files": [
-    "lab/exp_033_real_entities/run.py",
+    "lab/tests/exp_033_real_entities/run.py",
     "lab/common/real_models.py",
     "lab/common/entities.py",
     "lab/common/textutil.py",
@@ -59,7 +59,7 @@
     "Hand-label a larger gold sentence set (EXP-008-sized, 50+) for a more stable F1 estimate.",
     "If huggingface.co access is ever granted, rerun with GLiNER and dslim/bert-base-NER and compare against this spaCy result."
   ],
-  "elapsed_sec": 1.4965,
-  "peak_rss_mb": 433.11,
+  "elapsed_sec": 6.4459,
+  "peak_rss_mb": 431.8,
   "models_used": "Real pretrained spaCy en_core_web_sm NER (CNN tagger trained on OntoNotes 5) compared against the unmodified EXP-008 rule tagger. GLiNER, dslim/bert-base-NER, and libpostal were not loaded: huggingface.co is blocked in this sandbox (403 CONNECT, policy denial). This is a real, reachable, non-generative pretrained model, not the exact blueprint checkpoint. See lab/common/real_models.py:model_card()."
 }

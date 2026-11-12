@@ -45,7 +45,7 @@
   "conclusion": "lab.common.brain's hierarchical branch now uses the same lexical+semantic dual-signal design (lab.common.semantic_index.navigate_dual) the flat branch already had, closing the gap this exploration was built to close. The paraphrase cases are exactly where the two diverge, as predicted: the dual-signal navigator resolves both correctly while the lexical-only navigator it replaces does not -- direct, measured evidence this wiring is load-bearing, not cosmetic. The two regression cases (exact wording) and the off-topic negative control hold under both navigators, confirming this is additive -- the new signal only helps on asks where lexical alone was already weak, it does not regress the cases lexical alone already handled.",
   "scale_down": "1 fixture, 2 chapters, 5 cases -- a wiring/before-after proof, not a scale test (EXP-065 already measured the lexical mechanism's scale, EXP-067 the semantic mechanism's paraphrase case).",
   "referenced_files": [
-    "lab/exp_070_hierarchical_dual_signal/run.py",
+    "lab/tests/exp_070_hierarchical_dual_signal/run.py",
     "lab/common/brain.py",
     "lab/common/semantic_index.py",
     "lab/common/nested_index.py",
@@ -59,7 +59,7 @@
     "Only tested 2-level hierarchy; a 3+ level tree would exercise the dual-signal check at more levels in sequence, not yet tried.",
     "SEMANTIC_SINGLE_FLOOR=0.5 (the fix for the single-candidate gap found here) is a first measured value from a handful of samples, the same unvalidated-constant caveat MIN_SEMANTIC_MARGIN carries -- it has not had its own EXP-068-style sweep across independent fixtures."
   ],
-  "elapsed_sec": 12.9587,
-  "peak_rss_mb": 2800.96,
+  "elapsed_sec": 17.4521,
+  "peak_rss_mb": 2799.65,
   "models_used": "bge-small-en-v1.5 for the semantic signal (retrieval only); TF-IDF/BM25 for the lexical signal. No generative model."
 }

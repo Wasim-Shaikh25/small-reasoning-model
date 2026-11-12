@@ -64,7 +64,7 @@
   "conclusion": "Because the renderer copies verified sentences, number and modal preservation is a property of that copy step and was measured, not assumed. The validator catches the planted edits. Fluency was not rated by a person. A generative rewriter is not part of this run.",
   "scale_down": "Eight claims and five paragraphs, each rendered in five style labels that all take the copy path. This is smaller than 50 paragraphs and 50 claim lists, and it does not call FLAN-T5.",
   "referenced_files": [
-    "lab/exp_017_fidelity/run.py",
+    "lab/tests/exp_017_fidelity/run.py",
     "lab/common/harness.py",
     "lab/common/verify.py",
     "lab/common/nli.py",
@@ -75,6 +75,6 @@
   "follow_ups": [
     "A human 1-to-5 fluency rating can be added later. It must not be replaced with a generative model."
   ],
-  "elapsed_sec": 0.0057,
-  "peak_rss_mb": 19.11
+  "elapsed_sec": 0.0087,
+  "peak_rss_mb": 18.46
 }

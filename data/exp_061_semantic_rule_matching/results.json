@@ -108,7 +108,7 @@
   "conclusion": "Exact-lemma matching is exactly as brittle on messy phrasing as the objection predicted: 0.0 accuracy on paraphrased facts that share no verb with their rule, because 'took her life' and 'murdered' are different lemmas even though they describe the same act. Semantic matching recovers all of that gap (1.0 accuracy), using the real DeBERTa-v3 MNLI checkpoint to check whether the specific fact entails the rule's general condition, rather than requiring the same word. This is not a free upgrade: near-miss accuracy drops from 1.0 to 0.5 -- a related-but-insufficient fact (injuring someone in an accident, cooking in a shared kitchen) is exactly where a model that generalizes by meaning risks over-matching where exact lemma comparison, by being too strict, accidentally got it right for the wrong reason. Both numbers are reported, not just the one that favors the fix.",
   "scale_down": "10 hand-written cases across 4 domains, not a paraphrase benchmark -- a targeted test of one specific, named brittleness.",
   "referenced_files": [
-    "lab/exp_061_semantic_rule_matching/run.py",
+    "lab/tests/exp_061_semantic_rule_matching/run.py",
     "lab/common/rules.py",
     "lab/common/real_encoders.py",
     "lab/common/harness.py",
@@ -121,7 +121,7 @@
     "Wire semantic_apply_rule into lab.common.brain as the default rule-matching step (with apply_rule as a cheap first check, escalating to the NLI call only when the lemma check fails), so the brain itself gets this robustness, not just this standalone test.",
     "EXP-056 already showed NLI-based checks can misfire when wired against the wrong comparison target (the whole-document ask). This result and that one together argue the entailment direction and the comparison target both have to be chosen deliberately, not assumed safe just because the underlying model is real."
   ],
-  "elapsed_sec": 10.7337,
-  "peak_rss_mb": 2685.66,
+  "elapsed_sec": 16.7597,
+  "peak_rss_mb": 2684.16,
   "models_used": "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli, a local checkpoint loaded with transformers (not an API call), the same real NLI judge EXP-031 measured. Used here for one bounded judgment (does this fact entail this rule's condition), not as a general-purpose reasoner."
 }

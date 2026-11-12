@@ -43,7 +43,7 @@
   "conclusion": "lab.common.paged.WorkingSet is now wired into lab.common.brain.reason (working_set_budget=, default None, zero regression for every existing caller) as a real cap on how many passages a connector can add to a single reasoning pass: without it, a connector's fetch grows passages unboundedly; with it, only the budget's worth of most ask-relevant hits survive, least-relevant-first eviction, and the answer is still correctly produced from the surviving relevant passage. Passages the caller supplies directly are never subject to this eviction at all, by construction (only new_passages from the connector fetch are ever passed through WorkingSet), not just by coincidence on this fixture.",
   "scale_down": "Six passages, one collection, budget=2 -- a proof the wiring works end to end and correctly scopes eviction to connector-fetched passages only, not a capacity benchmark at corpus scale.",
   "referenced_files": [
-    "lab/exp_101_working_set_wiring/run.py",
+    "lab/tests/exp_101_working_set_wiring/run.py",
     "lab/common/brain.py",
     "lab/common/paged.py",
     "lab/common/relevance.py",
@@ -54,7 +54,7 @@
     "lab.common.paged.Notebook (sub-question row tracking, the other half of EXP-015) is still unwired -- this exploration only wires WorkingSet; Notebook's own purpose (tracking per-subquestion coverage) could parallel plan_stages' existing subquestions field, untested here.",
     "Relevance is ask_relevance's lexical coverage score, the same scale-down every other lexical-overlap gate in this repo already carries (a true paraphrase with no shared word stems scores low) -- untested against a connector with strong dense-only hits that a lexical score would undervalue."
   ],
-  "elapsed_sec": 11.0715,
-  "peak_rss_mb": 2801.44,
+  "elapsed_sec": 14.9609,
+  "peak_rss_mb": 2799.87,
   "models_used": "None -- WorkingSet's eviction is deterministic; ask_relevance (lexical coverage) drives the relevance score, no model of any kind."
 }

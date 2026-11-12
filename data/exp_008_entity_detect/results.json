@@ -67,7 +67,7 @@
   "conclusion": "Exact-span F1 is high on easy titled names, suffixed organizations, and fully patterned addresses, and lower on the hard slice (bare company names, amounts in words, lowercase names, courts). Ambiguous place names are flagged rather than treated as high-confidence addresses.",
   "scale_down": "52 short lines and 12 role passages replace the blueprint's 150 to 200 detection lines and 30 role passages. GLiNER, BERT-NER, and libpostal are not loaded.",
   "referenced_files": [
-    "lab/exp_008_entity_detect/run.py",
+    "lab/tests/exp_008_entity_detect/run.py",
     "lab/common/entities.py",
     "lab/common/qa.py",
     "lab/common/textutil.py",
@@ -79,6 +79,6 @@
   "follow_ups": [
     "If hard-slice F1 is not enough, train a span tagger only on locally labeled spans. Do not download a pretrained NER model."
   ],
-  "elapsed_sec": 0.0044,
-  "peak_rss_mb": 159.25
+  "elapsed_sec": 0.0057,
+  "peak_rss_mb": 158.8
 }

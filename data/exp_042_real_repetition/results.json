@@ -19323,7 +19323,7 @@
   "conclusion": "The real BAAI/bge-small-en-v1.5 checkpoint is loaded and measured on EXP-018's own assembled units, not assumed. It disagrees sharply with TF-IDF cosine as the unit count grows: at 5000 claims, bge flags 3740 pairs as near-duplicate versus TF-IDF's 1. These findings are all the same template ('The value of item {i} is {3i}.') differing only by a number. TF-IDF's bag-of-words vectors treat each distinct number as a distinct token, so it correctly sees these as different; bge's dense sentence embedding captures the shared template and largely ignores which specific number appears, so it rates nearly every pair in this templated set as near-duplicate even though each one states a different fact. This is a real, measured limitation worth keeping in mind before swapping the repetition check to a dense embedder: a template-heavy document (exactly the shape lab/common/assemble.build_outline produces) would have many of its genuinely distinct findings wrongly flagged as repetition and risk being dropped.",
   "scale_down": "Same templated findings and planted duplicates EXP-018 used, not a corpus with natural paraphrased repetition.",
   "referenced_files": [
-    "lab/exp_042_real_repetition/run.py",
+    "lab/tests/exp_042_real_repetition/run.py",
     "lab/common/real_encoders.py",
     "lab/common/assemble.py",
     "lab/common/harness.py",
@@ -19333,7 +19333,7 @@
   "follow_ups": [
     "A paraphrased (not verbatim) repetition probe would better separate bge from TF-IDF than this fixture does."
   ],
-  "elapsed_sec": 20.6321,
-  "peak_rss_mb": 548.83,
+  "elapsed_sec": 24.9583,
+  "peak_rss_mb": 545.96,
   "models_used": "BAAI/bge-small-en-v1.5, a local checkpoint loaded with sentence-transformers (not an API call). The unit text itself is still produced by the unchanged deterministic assembler; FLAN-T5 as the unit writer is out of scope here, per EXP-046."
 }

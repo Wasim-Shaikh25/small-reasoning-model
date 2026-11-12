@@ -62,7 +62,7 @@
   "conclusion": "Wrong resolution is the headline number and is reported above. Ambiguous shared names are flagged instead of guessed when the rule can see two full names. No wrong example was written when the store required a gold-matching resolved span.",
   "scale_down": "Six short documents replace 20 documents of 5 to 30 pages. The searchable context is the document itself, not a collection-wide index.",
   "referenced_files": [
-    "lab/exp_009_entity_resolve/run.py",
+    "lab/tests/exp_009_entity_resolve/run.py",
     "lab/common/entities.py",
     "lab/common/chunking.py",
     "lab/common/qa.py",
@@ -72,6 +72,6 @@
     "data/exp_009_entity_resolve/results.json"
   ],
   "follow_ups": [],
-  "elapsed_sec": 0.0245,
-  "peak_rss_mb": 160.45
+  "elapsed_sec": 0.0757,
+  "peak_rss_mb": 159.43
 }

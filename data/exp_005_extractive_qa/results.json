@@ -21,7 +21,7 @@
   "conclusion": "Quote validity holds when a span is returned, because the span is copied from the passage. Unanswerable recall meets the 90 percent Phase 0 target on this set.",
   "scale_down": "Forty original items replace the SQuAD2 dev subset plus 40 custom items. No pretrained QA checkpoint is loaded.",
   "referenced_files": [
-    "lab/exp_005_extractive_qa/run.py",
+    "lab/tests/exp_005_extractive_qa/run.py",
     "lab/common/qa.py",
     "lab/common/harness.py",
     "lab/common/textutil.py",
@@ -29,6 +29,6 @@
     "data/exp_005_extractive_qa/results.json"
   ],
   "follow_ups": [],
-  "elapsed_sec": 0.0053,
-  "peak_rss_mb": 19.25
+  "elapsed_sec": 0.009,
+  "peak_rss_mb": 19.04
 }

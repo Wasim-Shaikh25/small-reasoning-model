@@ -38,7 +38,7 @@
   "conclusion": "The real MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli checkpoint is loaded and measured on EXP-006's own items, not assumed from its training data description. It does not close the exception/qualification gap EXP-006 flagged: accuracy on that category is 0.0 here versus 0.0 for the lexical judge, so EXP-026's code-rule todo for except/unless/provided-that remains relevant even with a real NLI encoder.",
   "scale_down": "Same 30 hand-written pairs EXP-006 used, not the full MNLI/ANLI/ContractNLI dev sets.",
   "referenced_files": [
-    "lab/exp_031_real_nli_judge/run.py",
+    "lab/tests/exp_031_real_nli_judge/run.py",
     "lab/common/real_encoders.py",
     "lab/common/nli.py",
     "lab/common/harness.py",
@@ -49,7 +49,7 @@
   "follow_ups": [
     "Rerun EXP-012's support re-check and EXP-017's bidirectional-NLI fidelity gate with this same real_nli function (EXP-037, EXP-041) now that it is proven to load and score correctly."
   ],
-  "elapsed_sec": 15.5608,
-  "peak_rss_mb": 1406.47,
+  "elapsed_sec": 120.3865,
+  "peak_rss_mb": 1405.48,
   "models_used": "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli, a local checkpoint loaded with transformers (not an API call). This is the real blueprint NLI judge (ARCHITECTURE.md section 8), not a substitute. It is never used to write answer text, only to score entail/neutral/contradict for a premise/hypothesis pair."
 }
